@@ -25,18 +25,6 @@ public class MyApplication extends Application implements ISharedPreferences{
     public void onCreate() {
         super.onCreate();
 
-        /*
-        *
-        *
-        *
-        *
-        *
-        *
-        *
-        *
-        *
-        * */
-
 
 
      /*   CrashHandler crashHandler = CrashHandler.getInstance();
