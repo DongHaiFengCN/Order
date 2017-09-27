@@ -260,6 +260,7 @@ public class MainActivity extends AppCompatActivity implements IMainView{
         layoutParams.height = h/2;
         linearLayout.setLayoutParams(layoutParams);
 
+
         car_iv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

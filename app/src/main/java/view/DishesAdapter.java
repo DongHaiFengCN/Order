@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.couchbase.lite.Document;
@@ -58,10 +59,15 @@ public class DishesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         View v = null;
 
         if(viewType == TYPE_ITEM_THIRD){
+
             v = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_title_recl, parent, false);
+
             return new TitleHolder(v);
+
         }else{
+
             v = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_item_recl, parent, false);
+
             return new ItemHolder(v);
         }
 
@@ -129,23 +135,20 @@ public class DishesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             super(itemView);
             info = itemView.findViewById(R.id.item_info);
             price = itemView.findViewById(R.id.price_tv);
+            LinearLayout linearLayout = itemView.findViewById(R.id.select_ln);
+            linearLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
 
-              itemView.setOnTouchListener(new View.OnTouchListener() {
-                  @Override
-                  public boolean onTouch(View view, MotionEvent motionEvent) {
+                    if (mOnItemClickListener != null) {
 
-                      if (mOnItemClickListener != null) {
+                        String p[]= price.getText().toString().split("\\s+");//截取获取当前单价
 
-                         String p[]= price.getText().toString().split("\\s+");//截取获取当前单价
+                        mOnItemClickListener.onItemClick(view,info.getText().toString(),Float.parseFloat(p[0]));
 
-                         mOnItemClickListener.onItemClick(view,info.getText().toString(),Float.parseFloat(p[0]));
-
-                      }
-                      return false;
-                  }
-              });
-
-
+                    }
+                }
+            });
 
         }
     }
