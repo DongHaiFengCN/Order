@@ -1,0 +1,145 @@
+package view;
+
+import android.content.Context;
+import android.content.res.TypedArray;
+import android.support.annotation.Nullable;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.AttributeSet;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.zm.order.R;
+
+/**
+ * 项目名称：Order
+ * 类描述：
+ * 创建人：donghaifeng
+ * 创建时间：2017/9/20 13:20
+ * 修改人：donghaifeng
+ * 修改时间：2017/9/20 13:20
+ * 修改备注：
+ */
+
+public class AmountView extends LinearLayout implements View.OnClickListener {
+
+    public int getAmount() {
+        return amount;
+    }
+
+    private int amount = 0; //购买数量
+    private int goods_storage = 10; //实际场景由数据库提供，默认设置为10
+    private TextView etAmount;
+    private Button btnDecrease;
+    private Button btnIncrease;
+
+    private boolean flag = true;
+
+    public void setChangeListener(ChangeListener changeListener) {
+        this.changeListener = changeListener;
+    }
+
+    ChangeListener changeListener;
+    public AmountView(Context context) {
+        this(context, null);
+    }
+
+    public AmountView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+
+        LayoutInflater.from(context).inflate(R.layout.view_amount, this);
+
+        etAmount = findViewById(R.id.etAmount);
+        btnDecrease = findViewById(R.id.btnDecrease);
+        btnIncrease =  findViewById(R.id.btnIncrease);
+        btnDecrease.setOnClickListener(this);
+        btnIncrease.setOnClickListener(this);
+      //  etAmount.addTextChangedListener(this);
+        /**
+         * 获取自定义属性
+         */
+        TypedArray obtainStyledAttributes = getContext().obtainStyledAttributes(attrs, R.styleable.AmountView);
+        int btnWidth = obtainStyledAttributes.getDimensionPixelSize(R.styleable.AmountView_btnWidth, LayoutParams.WRAP_CONTENT);
+        int tvWidth = obtainStyledAttributes.getDimensionPixelSize(R.styleable.AmountView_tvWidth, 80);
+        int tvTextSize = obtainStyledAttributes.getDimensionPixelSize(R.styleable.AmountView_tvTextSize, 0);
+        int btnTextSize = obtainStyledAttributes.getDimensionPixelSize(R.styleable.AmountView_btnTextSize, 0);
+        obtainStyledAttributes.recycle();
+
+        LayoutParams btnParams = new LayoutParams(btnWidth, LayoutParams.MATCH_PARENT);
+
+        btnDecrease.setLayoutParams(btnParams);
+        btnIncrease.setLayoutParams(btnParams);
+        if (btnTextSize != 0) {
+            btnDecrease.setTextSize(TypedValue.COMPLEX_UNIT_PX, btnTextSize);
+            btnIncrease.setTextSize(TypedValue.COMPLEX_UNIT_PX, btnTextSize);
+        }
+
+        LayoutParams textParams = new LayoutParams(tvWidth, LayoutParams.MATCH_PARENT);
+        etAmount.setLayoutParams(textParams);
+        if (tvTextSize != 0) {
+            etAmount.setTextSize(tvTextSize);
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        int i = v.getId();
+        flag = false;
+        amount = Integer.valueOf(etAmount.getText().toString());
+        if (i == R.id.btnDecrease) {
+            if (amount > 0) {
+                amount--;
+                etAmount.setText(amount + "");
+                changeListener.OnChange(amount,false);
+            }
+        } else if (i == R.id.btnIncrease) {
+            if (amount < goods_storage) {
+                amount++;
+                etAmount.setText(amount + "");
+                changeListener.OnChange(amount,true);
+            }
+        }
+
+
+    }
+
+/*    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+        if (s.toString().isEmpty())
+            return;
+        amount = Integer.valueOf(s.toString());
+        if (amount > goods_storage) {
+            etAmount.setText(goods_storage + "");
+
+
+            return;
+        }
+    }*/
+
+
+    public void setNumber(String number){
+
+        etAmount.setText(number);
+    }
+
+    interface ChangeListener{
+
+        void OnChange(int ls,boolean flag);
+
+    }
+
+}

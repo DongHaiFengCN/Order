@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        android:id="@+id/appBarLayout2">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay">
+
+            <TextView
+                android:id="@+id/toolbar_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/title_activity_pay"
+                android:textColor="@color/textColor"
+                android:textSize="18sp" />
+        </android.support.v7.widget.Toolbar>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <LinearLayout
+        android:background="@color/md_white_1000"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/viewhight"
+        android:orientation="horizontal"
+        android:layout_below="@+id/appBarLayout2"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/linearLayout8">
+
+        <TextView
+            android:id="@+id/textView8"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="left|center"
+            android:paddingLeft="12dp"
+            android:text="桌位/xxx" />
+
+        <TextView
+            android:id="@+id/textView9"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="right|center"
+            android:paddingRight="12dp"
+            android:text="消费金额/xxx" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:background="@color/md_white_1000"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/viewhight"
+        android:orientation="horizontal"
+        android:id="@+id/linearLayout7"
+        android:layout_below="@+id/linearLayout8"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="16dp">
+
+        <TextView
+            android:id="@+id/textView7"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="left|center"
+            android:paddingLeft="12dp"
+            android:text="账单优惠" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:padding="12dp"
+            android:src="@mipmap/forward"
+            android:layout_height="match_parent"
+            android:layout_weight="0.03" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:background="@color/md_white_1000"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/viewhight"
+        android:orientation="horizontal"
+        android:id="@+id/linearLayout6"
+        android:layout_below="@+id/linearLayout7"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <TextView
+            android:gravity="left|center"
+            android:text="会员卡打折"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:paddingLeft="12dp"
+            android:layout_height="match_parent" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:padding="12dp"
+            android:src="@mipmap/forward"
+            android:layout_height="match_parent"
+            android:layout_weight="0.03" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:background="@color/md_white_1000"
+        android:layout_width="match_parent"
+        android:layout_below="@+id/linearLayout6"
+        android:layout_height="@dimen/viewhight"
+        android:orientation="horizontal"
+        android:id="@+id/linearLayout5"
+        android:layout_marginTop="16dp"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <TextView
+            android:gravity="left|center"
+            android:text="支付方式"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:paddingLeft="12dp"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:paddingRight="12dp"
+            android:gravity="right|center"
+            android:text="还需支付：55元"
+            android:textColor="@color/md_red_500"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:background="@color/md_white_1000"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/viewhight"
+        android:orientation="horizontal"
+        android:id="@+id/linearLayout4"
+        android:layout_below="@+id/linearLayout5"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:src="@mipmap/icon_qian"
+            />
+
+        <TextView
+            android:gravity="left|center"
+            android:text="现金支付"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:paddingLeft="8dp"
+            android:layout_height="match_parent" />
+
+<android.support.v7.widget.AppCompatCheckBox
+    android:paddingRight="12dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:background="@color/md_white_1000"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/viewhight"
+        android:orientation="horizontal"
+        android:id="@+id/linearLayout2"
+        android:layout_below="@+id/linearLayout4"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+             android:src="@mipmap/icon_zhi"
+            />
+
+        <TextView
+            android:gravity="left|center"
+            android:text="支付宝支付"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:paddingLeft="8dp"
+            android:layout_height="match_parent" />
+
+        <android.support.v7.widget.AppCompatCheckBox
+            android:paddingRight="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:background="@color/md_white_1000"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/viewhight"
+        android:orientation="horizontal"
+        android:id="@+id/linearLayout"
+        android:layout_below="@+id/linearLayout2"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/icon_wei"
+            android:padding="8dp"
+            />
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="left|center"
+            android:paddingLeft="8dp"
+            android:text="微信支付" />
+
+        <android.support.v7.widget.AppCompatCheckBox
+            android:paddingRight="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+
+    <Button
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:textColor="@color/md_white"
+        android:layout_marginBottom="2dp"
+        android:text="支付"
+        android:onClick="onClick"
+        android:id="@+id/pay_bt" />
+
+
+</RelativeLayout>
