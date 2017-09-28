@@ -126,7 +126,10 @@ public class DishesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             mTv = itemView.findViewById(R.id.item_title);
         }
     }
-
+    /**
+     *  设置点击事件，LinearLayout布局文件要设置  android:focusable="true" android:clickable="true"
+     *  android:addStatesFromChildren="true"否则select无效
+     */
     public class ItemHolder extends RecyclerView.ViewHolder{
         public  TextView info;
 
@@ -135,7 +138,10 @@ public class DishesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             super(itemView);
             info = itemView.findViewById(R.id.item_info);
             price = itemView.findViewById(R.id.price_tv);
+
+
             LinearLayout linearLayout = itemView.findViewById(R.id.select_ln);
+
             linearLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
