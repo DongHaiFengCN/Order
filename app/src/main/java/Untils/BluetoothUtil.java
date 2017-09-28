@@ -53,11 +53,14 @@ public class BluetoothUtil {
      *  @param text 要打印的文字
      *  @param socket 获取输出流
      */
-    public static void printText(String text,BluetoothSocket socket) {
+    public static void printText(String text,BluetoothSocket socket,byte[] command) {
 
         try {
 
             OutputStream  outputStream =socket.getOutputStream();
+
+            outputStream.write(command);//设置打印格式
+
             byte[] data = text.getBytes("gbk");
             outputStream.write(data, 0, data.length);
             outputStream.close();
