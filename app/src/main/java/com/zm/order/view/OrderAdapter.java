@@ -1,7 +1,6 @@
-package view;
+package com.zm.order.view;
 
 import android.content.Context;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,8 +11,6 @@ import android.widget.TextView;
 import com.zm.order.R;
 
 import java.util.List;
-
-import Untils.MyLog;
 
 /**
  * 项目名称：Order

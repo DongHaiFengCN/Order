@@ -3,28 +3,21 @@ package model;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v7.app.AlertDialog;
 import android.util.SparseArray;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
 
 import Untils.BluetoothUtil;
 import Untils.MyLog;
 import Untils.PrintUtils;
-import view.PayActivity;
+import com.zm.order.view.PayActivity;
 
 /**
  * 项目名称：Order
@@ -103,7 +96,7 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
 
         String waiter ="董海峰";
         String peopleSum = "8";
-        String tableNumber = "101";
+        String tableNumber = intent.getStringExtra("tableNumber");
 
         List list = (ArrayList<SparseArray<Object>>) intent.getSerializableExtra("Order");
 
@@ -112,7 +105,7 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
         PrintUtils.selectCommand(PrintUtils.ALIGN_CENTER);
         PrintUtils.printText("肴点点\n\n");
         PrintUtils.selectCommand(PrintUtils.DOUBLE_HEIGHT_WIDTH);
-        PrintUtils.printText("桌号："+tableNumber+"号桌\n\n");
+        PrintUtils.printText(tableNumber+"号桌\n\n");
         PrintUtils.selectCommand(PrintUtils.NORMAL);
         PrintUtils.selectCommand(PrintUtils.ALIGN_LEFT);
         PrintUtils.printText(PrintUtils.printTwoData("订单编号", OrderId()+"\n"));
@@ -135,7 +128,7 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
         PrintUtils.printText(PrintUtils.printTwoData("实收", str+"\n"));
         PrintUtils.printText("--------------------------------\n");
         PrintUtils.selectCommand(PrintUtils.ALIGN_LEFT);
-        PrintUtils.printText("备注：不要辣、不要香菜");
+        PrintUtils.printText("备注：");
         PrintUtils.printText("\n\n\n\n\n");
         PrintUtils.closeOutputStream();
 
@@ -163,6 +156,8 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
               Toast.makeText(payActivity,result, Toast.LENGTH_LONG).show();
           }
         payActivity.closeDialog();
+
+        payActivity.turnMainActivity();
     }
 
     /**

@@ -4,7 +4,7 @@ import android.content.Context;
 
 import model.ILoginModel;
 import model.LoginModelImpl;
-import view.ILoginView;
+import com.zm.order.view.ILoginView;
 
 /**
  * 项目名称：Order

@@ -41,7 +41,7 @@
         android:id="@+id/linearLayout8">
 
         <TextView
-            android:id="@+id/textView8"
+            android:id="@+id/tableNumber_tv"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"

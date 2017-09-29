@@ -1,4 +1,4 @@
-package view;
+package com.zm.order.view;
 
 import java.util.List;
 

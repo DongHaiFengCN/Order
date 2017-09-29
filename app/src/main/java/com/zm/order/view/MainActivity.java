@@ -1,11 +1,10 @@
-package view;
+package com.zm.order.view;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -75,9 +74,7 @@ public class MainActivity extends AppCompatActivity implements IMainView{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        /**
-         *董海峰
-         */
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
@@ -357,13 +354,7 @@ public class MainActivity extends AppCompatActivity implements IMainView{
             @Override
             public void onClick(View view) {
 
-                point = 0;
-                point_tv.setVisibility(View.INVISIBLE);
-
-                total_tv.setText("0元");
-                total = 0;
-                orderItem.clear();
-                o.notifyDataSetChanged();
+                clearOrder();
             }
         });
 
@@ -373,10 +364,6 @@ public class MainActivity extends AppCompatActivity implements IMainView{
             public void onClick(View view) {
 
                 if(total > 0){
-
-
-
-
 
                     Intent intent = new Intent(MainActivity.this,PayActivity.class);
                     intent.putExtra("Order", (Serializable) orderItem);
@@ -412,6 +399,22 @@ public class MainActivity extends AppCompatActivity implements IMainView{
         });
     }
 
+    /**
+     * 清空订单列表
+     */
+
+    private void clearOrder() {
+
+        point = 0;
+        point_tv.setVisibility(View.INVISIBLE);
+
+        total_tv.setText("0元");
+        total = 0;
+
+        orderItem.clear();
+        o.notifyDataSetChanged();
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -419,18 +422,12 @@ public class MainActivity extends AppCompatActivity implements IMainView{
 
         if(resultCode == RESULT_OK){
 
-            MyLog.e("RESULT_OK");
-
-
-
-        }else { //清空数据
-
-
+            clearOrder();
 
 
         }
-    }
 
+    }
 
 
     @Override
@@ -448,6 +445,7 @@ public class MainActivity extends AppCompatActivity implements IMainView{
         leftAdapter.setNames(data);
         leftAdapter.notifyDataSetChanged();
     }
+
     /**
      * 模拟原始数据
      * @return
@@ -495,9 +493,7 @@ public class MainActivity extends AppCompatActivity implements IMainView{
         }
 
         private  List<String> names;
-        public DishesKindAdapter(List<String> names){
-            this.names = names ;
-        }
+
         public DishesKindAdapter(){
         }
 

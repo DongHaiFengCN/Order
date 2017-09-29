@@ -41,7 +41,7 @@
     </RadioGroup>
         />
 
-    <view.AmountView
+    <com.zm.order.view.AmountView
         android:id="@+id/amount_view"
         android:layout_width="match_parent"
         android:layout_height="36dp"

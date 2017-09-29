@@ -21,12 +21,19 @@ android {
 }
 
 dependencies {
+
+    compile 'com.journeyapps:zxing-android-embedded:3.3.0'
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+
+    compile 'com.google.zxing:core:3.2.1'
+
+    //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.2.0
     compile 'pl.droidsonroids.gif:android-gif-drawable:1.2.2'
-    compile 'com.tencent.bugly:crashreport:latest.release' //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.2.0
+
+    compile 'com.tencent.bugly:crashreport:latest.release'
     compile 'com.couchbase.lite:couchbase-lite-android:2.0.0-DB015'
     compile 'com.android.support:appcompat-v7:26.+'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'

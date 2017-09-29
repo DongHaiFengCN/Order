@@ -1,4 +1,4 @@
-package view;
+package com.zm.order.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;

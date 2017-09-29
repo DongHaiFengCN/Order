@@ -131,7 +131,7 @@ public class CouchBaseManger<T> implements IDBManager,ReplicatorChangeListener {
                 String id = result.getString(0);
                 Document doc=database.getDocument(id);
                 documentList.add(doc);
-               MyLog.e("数据库查询结果 Name "+doc.getString("name"));
+              // MyLog.e("数据库查询结果 Name "+doc.getString("name"));
                 //MyLog.e("数据库查询结果 mPassword "+doc.getString("mPassword"));
 
 

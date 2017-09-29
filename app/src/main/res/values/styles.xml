@@ -10,12 +10,14 @@
 
     </style>
 
-
+    <!-- Activity theme-->
     <style name="AppTheme.NoActionBar">
+        <!-- 系统栏颜色. -->
         <item name="colorPrimaryDark">@color/md_black_1000</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="overlapAnchor">false</item>//不悬浮
+        <!-- 不悬浮. -->
+        <item name="overlapAnchor">false</item>
 
     </style>
 

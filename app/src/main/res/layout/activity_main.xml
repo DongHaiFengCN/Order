@@ -116,8 +116,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="46dp"
-        android:background="#f0000000"
-        android:textColor="@color/md_white"
+        android:background="@color/grey_color2"
         android:orientation="horizontal"
         android:layout_alignParentBottom="true"
         android:gravity="right"

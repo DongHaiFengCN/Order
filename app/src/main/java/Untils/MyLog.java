@@ -14,7 +14,7 @@ public class MyLog {
 
     static final String TAG ="DOAING";
 
-    static boolean FLAG =false;
+    static boolean FLAG =true;
 
     public static void e(String info){
 

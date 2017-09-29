@@ -1,4 +1,4 @@
-package view;
+package com.zm.order.view;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

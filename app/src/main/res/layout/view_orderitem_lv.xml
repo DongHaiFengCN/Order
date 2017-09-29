@@ -20,7 +20,7 @@
         android:gravity="center"
         android:text="2" />
 
-    <view.AmountView
+    <com.zm.order.view.AmountView
         android:id="@+id/amount_view"
         android:layout_weight="1"
         android:layout_width="0dp"
