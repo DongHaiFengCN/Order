@@ -75,16 +75,19 @@ public class CouchBaseManger<T> implements IDBManager,ReplicatorChangeListener {
     public boolean isLogin(String name, String pass) {
 
 
- /*       Document document = new Document();
+   /*   Document document = new Document();
 
         document.setString("className","LoginUserBean");
         document.setString("mName",name);
         document.setString("mPassword",pass);
+
         try {
             database.save(document);
         } catch (CouchbaseLiteException e) {
             e.printStackTrace();
         }*/
+
+
 
         Query query= Query.select(SelectResult.expression(Expression.meta().getId()))
                 .from(DataSource.database(database))
@@ -97,8 +100,8 @@ public class CouchBaseManger<T> implements IDBManager,ReplicatorChangeListener {
 
                  String id = result.getString(0);
                  Document doc=database.getDocument(id);
-                 MyLog.e("数据库查询结果 mName "+doc.getString("mName"));
-                 MyLog.e("数据库查询结果 mPassword "+doc.getString("mPassword"));
+          /*       MyLog.e("数据库查询结果 mName "+doc.getString("mName"));
+                 MyLog.e("数据库查询结果 mPassword "+doc.getString("mPassword"));*/
                 return  true;
 
             }

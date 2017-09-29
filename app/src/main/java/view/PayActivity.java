@@ -1,32 +1,40 @@
 package view;
 
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.util.SparseArray;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zm.order.R;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
-import Untils.BluetoothUtil;
+import Untils.MyLog;
+import model.ProgressBarasyncTask;
 
 public class PayActivity extends AppCompatActivity {
 
-    private BluetoothAdapter btAdapter;
-    private  BluetoothDevice device;
+private AlertDialog.Builder dialog;
 
+    private final static int CASH = 1;
+    private final static int ALIPAY = 2;
+    private final static int WECHATPAY = 3;
+
+    private  AlertDialog dg;
+    private  Intent intent;
+    private AppCompatCheckBox cash_cb;
+    private AppCompatCheckBox alipay_cb;
+    private AppCompatCheckBox wechatpay_cb;
+
+    private int flag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,22 +44,70 @@ public class PayActivity extends AppCompatActivity {
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        intent = getIntent();
 
-         btAdapter = BluetoothUtil.getBTAdapter();
+        TextView total_tv = (TextView) findViewById(R.id.total_tv);
+        total_tv.setText("消费金额/"+intent.getFloatExtra("total",0)+"元");
 
-         if (btAdapter == null) {
-            Toast.makeText(getBaseContext(),"请打开蓝牙设备!", Toast.LENGTH_LONG)
-                    .show();
-            return;
-         }
-         device = BluetoothUtil.getDevice(btAdapter);
-         if (device == null) {
-            Toast.makeText(getBaseContext(),"请确保有InnterPrinter 蓝牙打印设备!",
-                    Toast.LENGTH_LONG).show();
-            return;
-         }
+        TextView fact_tv = (TextView) findViewById(R.id.fact_tv);
 
+        cash_cb = (AppCompatCheckBox) findViewById(R.id.cash_cb);
+        alipay_cb = (AppCompatCheckBox) findViewById(R.id.alipay_cb);
+        wechatpay_cb = (AppCompatCheckBox) findViewById(R.id.wechatpay_cb);
+
+
+
+        cash_cb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                flag = CASH;
+
+                if(alipay_cb.isChecked()){
+                    alipay_cb.setChecked(false);
+                }
+
+                if(wechatpay_cb.isChecked()){
+                    wechatpay_cb.setChecked(false);
+                }
+            }
+        });
+        alipay_cb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                flag = ALIPAY;
+
+                if(cash_cb.isChecked()){
+                    cash_cb.setChecked(false);
+                }
+
+                if(wechatpay_cb.isChecked()){
+                    wechatpay_cb.setChecked(false);
+                }
+            }
+        });
+        wechatpay_cb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                flag = WECHATPAY;
+
+                if(cash_cb.isChecked()){
+                    cash_cb.setChecked(false);
+                }
+
+                if(alipay_cb.isChecked()){
+                    alipay_cb.setChecked(false);
+                }
+
+            }
+        });
+        dialog = new AlertDialog.Builder(PayActivity.this);
+        dialog.setView(getLayoutInflater().inflate(R.layout.view_print_dialog,null));
     }
+
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -68,39 +124,21 @@ public class PayActivity extends AppCompatActivity {
      */
     public void onClick(View view){
 
+        ProgressBarasyncTask progressBarasyncTask = new ProgressBarasyncTask(PayActivity.this);
+        progressBarasyncTask.setDate(intent);
 
-        try {
-
-            BluetoothUtil.printText("??? 青青杨柳陌，陌上别离人。",BluetoothUtil.getSocket(device));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-  /*      byte[] data = null;
-        try {
-            data = name.getBytes("gbk");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }*/
-
-    /*    BluetoothSocket socket = null;
-        try {
-            socket = BluetoothUtil.getSocket(device);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-     /*   try {
-            BluetoothUtil.sendData(data, socket);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-
-/*        Intent intent = new Intent(PayActivity.this,MainActivity.class);
-        setResult(RESULT_OK, intent);
-        finish();*/
+        progressBarasyncTask.execute();
 
     }
 
+    public void showDialog(){
+
+        dg = dialog.show();
+      }
+    public void closeDialog(){
+
+
+        dg.dismiss();
+     }
 }
 

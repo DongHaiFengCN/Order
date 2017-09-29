@@ -3,6 +3,7 @@ package Untils;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -23,16 +24,21 @@ public class BluetoothUtil {
 
     private static final UUID PRINTER_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private static final String Innerprinter_Address = "00:11:22:33:44:55";
-    public static BluetoothAdapter getBTAdapter() {
+
+    public static BluetoothAdapter getBTAdapter()
+    {
         return BluetoothAdapter.getDefaultAdapter();
     }
 
     public static BluetoothDevice getDevice(BluetoothAdapter bluetoothAdapter) {
 
         BluetoothDevice innerprinter_device = null;
-        Set<BluetoothDevice> devices = bluetoothAdapter.getBondedDevices();
+
+        Set<BluetoothDevice> devices = bluetoothAdapter.getBondedDevices();//获取蓝牙设备集合
+        MyLog.e("CCCCCC"+devices.size());
 
         for (BluetoothDevice device : devices) {
+
             if (device.getAddress().equals(Innerprinter_Address)) {
                 innerprinter_device = device;
                 break;

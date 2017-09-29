@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -30,6 +31,7 @@ import android.widget.Toast;
 
 import com.zm.order.R;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -155,6 +157,7 @@ public class MainActivity extends AppCompatActivity implements IMainView{
                     s.put(1,taste);
                     s.put(2,amountView.getAmount()+"");
                     s.put(3,price);
+                    s.put(4,amountView.getAmount()*price);
                     orderItem.add(s);
 
                     //刷新订单数据源
@@ -297,6 +300,8 @@ public class MainActivity extends AppCompatActivity implements IMainView{
             }
         });
 
+        final GridLayoutManager manager = new GridLayoutManager(MainActivity.this, 3);//设置每行展示3个
+
         dishesKindName = new ArrayList<>();
 
         leftAdapter = new DishesKindAdapter();
@@ -310,6 +315,12 @@ public class MainActivity extends AppCompatActivity implements IMainView{
 
                 leftAdapter.changeSelected(position);
 
+
+                /**准确定位到指定位置，并且将指定位置的item置顶，
+                 若直接调用scrollToPosition(...)方法，则不会置顶。**/
+                //manager.scrollToPositionWithOffset(position, 0);
+              //  manager.setStackFromEnd(true);
+
             }
 
         });
@@ -319,7 +330,7 @@ public class MainActivity extends AppCompatActivity implements IMainView{
 
         dishesAdapter = new DishesAdapter(MainActivity.this);
 
-        GridLayoutManager manager = new GridLayoutManager(MainActivity.this, 3);//设置每行展示3个
+
 
         manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                 @Override
@@ -361,16 +372,49 @@ public class MainActivity extends AppCompatActivity implements IMainView{
             @Override
             public void onClick(View view) {
 
-                Intent intent = new Intent(MainActivity.this,PayActivity.class);
-                startActivityForResult(intent,1);
+                if(total > 0){
+
+
+
+
+
+                    Intent intent = new Intent(MainActivity.this,PayActivity.class);
+                    intent.putExtra("Order", (Serializable) orderItem);
+                    intent.putExtra("total",total+0.3f);
+                    startActivityForResult(intent,1);
+
+                    //如果order列表开启状态就关闭
+                    if(!flag){
+                        linearLayout.setAnimation(AnimationUtil.moveToViewBottom());
+                        linearLayout.setVisibility(View.GONE);
+                        imageView.animate()
+                                .alpha(0f)
+                                .setDuration(400)
+                                .setListener(new AnimatorListenerAdapter() {
+                                    @Override
+                                    public void onAnimationEnd(Animator animation) {
+                                        imageView.setVisibility(View.GONE);
+                                    }
+                                });
+
+                        flag = true;
+                    }
+
+                }else {
+
+                    Toast.makeText(MainActivity.this,"订单为空！",Toast.LENGTH_SHORT).show();
+                }
+
+
             }
+
+
         });
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
 
 
         if(resultCode == RESULT_OK){
@@ -380,8 +424,6 @@ public class MainActivity extends AppCompatActivity implements IMainView{
 
 
         }else { //清空数据
-
-
 
 
 

@@ -50,13 +50,13 @@
             android:text="桌位/xxx" />
 
         <TextView
-            android:id="@+id/textView9"
+            android:id="@+id/total_tv"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="right|center"
             android:paddingRight="12dp"
-            android:text="消费金额/xxx" />
+            />
 
     </LinearLayout>
 
@@ -139,6 +139,7 @@
             android:layout_height="match_parent" />
 
         <TextView
+            android:id="@+id/fact_tv"
             android:paddingRight="12dp"
             android:gravity="right|center"
             android:text="还需支付：55元"
@@ -174,6 +175,7 @@
             android:layout_height="match_parent" />
 
 <android.support.v7.widget.AppCompatCheckBox
+    android:id="@+id/cash_cb"
     android:paddingRight="12dp"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content" />
@@ -205,9 +207,10 @@
             android:layout_height="match_parent" />
 
         <android.support.v7.widget.AppCompatCheckBox
-            android:paddingRight="12dp"
+            android:id="@+id/alipay_cb"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:paddingRight="12dp" />
 
     </LinearLayout>
 
@@ -237,6 +240,7 @@
             android:text="微信支付" />
 
         <android.support.v7.widget.AppCompatCheckBox
+            android:id="@+id/wechatpay_cb"
             android:paddingRight="12dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
