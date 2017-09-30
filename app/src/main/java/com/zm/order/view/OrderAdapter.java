@@ -66,6 +66,7 @@ public class OrderAdapter extends BaseAdapter {
         ViewHold  viewHold = null;
 
         if(view == null){
+
             //加载布局管理器
             LayoutInflater inflater = LayoutInflater.from(context);
             view = inflater.inflate(R.layout.view_orderitem_lv,null);
@@ -73,13 +74,17 @@ public class OrderAdapter extends BaseAdapter {
             viewHold.name =view.findViewById(R.id.name);
             viewHold.taste =view.findViewById(R.id.taste);
             viewHold.number =view.findViewById(R.id.amount_view);
-            viewHold.number.setFocusable(false);
+            viewHold.number.getEtAmount().setEnabled(false);
             view.setTag(viewHold);
+
         }else{
+
             viewHold = (ViewHold) view.getTag();
         }
         viewHold.name.setText(orderItem.get(i).get(0).toString());
+
         viewHold.taste.setText(orderItem.get(i).get(1).toString());
+
         viewHold.number.setNumber(orderItem.get(i).get(2).toString());
 
         //设置item的点击事件

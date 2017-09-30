@@ -38,6 +38,11 @@ public class AmountView extends LinearLayout implements View.OnClickListener {
 
     private int amount = 0; //购买数量
     private int goods_storage = 10; //实际场景由数据库提供，默认设置为10
+
+    public EditText getEtAmount() {
+        return etAmount;
+    }
+
     private EditText etAmount;
     private Button btnDecrease;
     private Button btnIncrease;
@@ -51,6 +56,7 @@ public class AmountView extends LinearLayout implements View.OnClickListener {
     }
 
     ChangeListener changeListener;
+
     public AmountView(Context context) {
         this(context, null);
     }
@@ -65,6 +71,7 @@ public class AmountView extends LinearLayout implements View.OnClickListener {
         btnIncrease =  findViewById(R.id.btnIncrease);
         btnDecrease.setOnClickListener(this);
         btnIncrease.setOnClickListener(this);
+
         etAmount.setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -74,6 +81,7 @@ public class AmountView extends LinearLayout implements View.OnClickListener {
                     etAmount.setCursorVisible(true);// 再次点击显示光标
 
                     aBoolean = false;
+
                 }
 
                 return false;
@@ -88,12 +96,6 @@ public class AmountView extends LinearLayout implements View.OnClickListener {
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
 
-               if(!"".equals(etAmount.getText().toString())){
-
-
-                   sum = Integer.valueOf(etAmount.getText().toString());
-                   MyLog.e("修改前 "+ sum);
-               }
             }
 
             @Override
@@ -111,6 +113,7 @@ public class AmountView extends LinearLayout implements View.OnClickListener {
                 aBoolean = false;
 
                 if (editable.toString().isEmpty())
+
                     return;
 
 
@@ -127,14 +130,17 @@ public class AmountView extends LinearLayout implements View.OnClickListener {
                 }else{
 
                     if(amount > sum){
+
                         changeListener.OnChange(amount,true);
 
                         MyLog.e("加法 "+amount);
 
-
                     }else if(amount < sum){
+
                         changeListener.OnChange(amount,false);
+
                         MyLog.e("减法 "+amount);
+
                     }
 
 
