@@ -53,8 +53,6 @@ public class MainActivity extends AppCompatActivity implements IMainView{
     private TextView total_tv;
 
     private DishesAdapter dishesAdapter;
-    private List<Integer> headPosition;
-    private List<Integer> footPosition;
     private ImageView  car_iv;
     private boolean flag = true ;
     private ImageButton delet_bt;
