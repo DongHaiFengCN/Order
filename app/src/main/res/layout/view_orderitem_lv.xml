@@ -20,12 +20,14 @@
         android:gravity="center"
         android:text="2" />
 
+
     <com.zm.order.view.AmountView
         android:id="@+id/amount_view"
         android:layout_weight="1"
         android:layout_width="0dp"
         android:layout_height="36dp"
         android:gravity="center|right"
+        android:focusableInTouchMode="false"
         app:btnTextSize="14sp"
         app:btnWidth="36dp"
         app:tvWidth="50dp"

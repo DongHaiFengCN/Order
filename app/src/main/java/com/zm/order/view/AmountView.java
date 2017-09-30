@@ -6,8 +6,10 @@ import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.EventLog;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,6 +17,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.zm.order.R;
+
+import Untils.MyLog;
 
 /**
  * 项目名称：Order
@@ -34,11 +38,13 @@ public class AmountView extends LinearLayout implements View.OnClickListener {
 
     private int amount = 0; //购买数量
     private int goods_storage = 10; //实际场景由数据库提供，默认设置为10
-    private TextView etAmount;
+    private EditText etAmount;
     private Button btnDecrease;
     private Button btnIncrease;
 
     private boolean flag = true;
+    private boolean aBoolean = true;
+    private int sum;
 
     public void setChangeListener(ChangeListener changeListener) {
         this.changeListener = changeListener;
@@ -59,7 +65,84 @@ public class AmountView extends LinearLayout implements View.OnClickListener {
         btnIncrease =  findViewById(R.id.btnIncrease);
         btnDecrease.setOnClickListener(this);
         btnIncrease.setOnClickListener(this);
-      //  etAmount.addTextChangedListener(this);
+        etAmount.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                if(MotionEvent.ACTION_DOWN == motionEvent.getAction()){
+
+                    etAmount.setCursorVisible(true);// 再次点击显示光标
+
+                    aBoolean = false;
+                }
+
+                return false;
+            }
+        });
+
+
+       etAmount.addTextChangedListener(new TextWatcher() {
+
+
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+
+               if(!"".equals(etAmount.getText().toString())){
+
+
+                   sum = Integer.valueOf(etAmount.getText().toString());
+                   MyLog.e("修改前 "+ sum);
+               }
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+                if(aBoolean){
+
+                    return;
+                }
+                aBoolean = false;
+
+                if (editable.toString().isEmpty())
+                    return;
+
+
+                amount = Integer.valueOf(editable.toString());
+
+                if (amount > goods_storage) {
+
+                  etAmount.setText(goods_storage + "");
+
+                    changeListener.OnChange(amount,true);
+
+                    return;
+
+                }else{
+
+                    if(amount > sum){
+                        changeListener.OnChange(amount,true);
+
+                        MyLog.e("加法 "+amount);
+
+
+                    }else if(amount < sum){
+                        changeListener.OnChange(amount,false);
+                        MyLog.e("减法 "+amount);
+                    }
+
+
+
+
+                }
+            }
+        });
         /**
          * 获取自定义属性
          */
@@ -88,6 +171,13 @@ public class AmountView extends LinearLayout implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
+
+
+        if(etAmount.isCursorVisible()){//如果光标开启就关闭
+
+            etAmount.setCursorVisible(false);
+            aBoolean = true;
+        }
         int i = v.getId();
         flag = false;
         amount = Integer.valueOf(etAmount.getText().toString());
@@ -108,27 +198,7 @@ public class AmountView extends LinearLayout implements View.OnClickListener {
 
     }
 
-/*    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-    }
-
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-    }
-
-    @Override
-    public void afterTextChanged(Editable s) {
-        if (s.toString().isEmpty())
-            return;
-        amount = Integer.valueOf(s.toString());
-        if (amount > goods_storage) {
-            etAmount.setText(goods_storage + "");
-
-
-            return;
-        }
-    }*/
 
 
     public void setNumber(String number){

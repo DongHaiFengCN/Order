@@ -15,11 +15,12 @@
 
     <TextView
         android:id="@+id/title"
-        android:padding="16dp"
+        android:layout_margin="16dp"
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="wrap_content"
         android:textColor="@color/grey_color2"
+        android:text="1"
         android:textSize="14sp"
         />
 

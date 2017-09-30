@@ -119,6 +119,8 @@ public class MainActivity extends AppCompatActivity implements IMainView{
             }
         });
 
+
+
         RadioGroup group = view.findViewById(R.id.radioGroup);
 
         //选择口味
@@ -147,14 +149,16 @@ public class MainActivity extends AppCompatActivity implements IMainView{
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
 
-                if(amountView.getAmount() != 0){//如果选择器的数量不为零，当前的选择的菜品加入订单列表
+                int sum = amountView.getAmount();
+
+                if(sum != 0){//如果选择器的数量不为零，当前的选择的菜品加入订单列表
 
                     SparseArray<Object> s = new SparseArray<>();
                     s.put(0,name);
                     s.put(1,taste);
-                    s.put(2,amountView.getAmount()+"");
+                    s.put(2,sum+"");
                     s.put(3,price);
-                    s.put(4,amountView.getAmount()*price);
+                    s.put(4,sum*price);
                     orderItem.add(s);
 
                     //刷新订单数据源

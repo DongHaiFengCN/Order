@@ -20,7 +20,7 @@
         android:background="@drawable/btn_amount"
         android:text="-"/>
 
-    <TextView
+    <EditText
         android:id="@+id/etAmount"
         android:layout_width="0dp"
         android:layout_height="match_parent"

@@ -73,7 +73,7 @@ public class OrderAdapter extends BaseAdapter {
             viewHold.name =view.findViewById(R.id.name);
             viewHold.taste =view.findViewById(R.id.taste);
             viewHold.number =view.findViewById(R.id.amount_view);
-
+            viewHold.number.setFocusable(false);
             view.setTag(viewHold);
         }else{
             viewHold = (ViewHold) view.getTag();
@@ -86,7 +86,6 @@ public class OrderAdapter extends BaseAdapter {
         viewHold.number.setChangeListener(new AmountView.ChangeListener() {
             @Override
             public void OnChange(int ls,boolean flag) {
-
 
                 orderItem.get(i).put(2,ls);
 

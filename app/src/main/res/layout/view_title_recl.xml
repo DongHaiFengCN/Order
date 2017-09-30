@@ -4,7 +4,7 @@
     android:id="@+id/item_title"
     android:layout_width="match_parent"
     android:layout_height="16dp"
-    android:background="@color/menu_item_press"
+    android:background="@color/grey_color2"
     android:gravity="left|center"
     android:paddingLeft="2dp"
     android:textColor="@color/md_white_1000"

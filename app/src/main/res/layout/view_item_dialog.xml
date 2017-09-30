@@ -44,14 +44,14 @@
     <com.zm.order.view.AmountView
         android:id="@+id/amount_view"
         android:layout_width="match_parent"
-        android:layout_height="36dp"
+        android:layout_height="48dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_marginBottom="@dimen/fab_margin"
         android:gravity="center"
         app:btnTextSize="14sp"
-        app:btnWidth="36dp"
-        app:tvWidth="50dp"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="@dimen/fab_margin"
+        app:btnWidth="50dp"
+        app:tvWidth="70dp"
 
         />
 
