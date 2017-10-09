@@ -9,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,9 +23,12 @@ public class PayActivity extends AppCompatActivity {
 
 private AlertDialog.Builder dialog;
 
+    private final static int TABLE_STATUS = -1;
+    private final static int DEFAULT = 0;
     private final static int CASH = 1;
     private final static int ALIPAY = 2;
     private final static int WECHATPAY = 3;
+
 
     private  AlertDialog dg;
     private  Intent intent;
@@ -35,7 +39,7 @@ private AlertDialog.Builder dialog;
     private TextView tableNumber_tv;
     private String tableNumber = null;
 
-    private int flag;
+    private int flag = 2;
     private TextView factPay_tv;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +114,10 @@ private AlertDialog.Builder dialog;
         });
         dialog = new AlertDialog.Builder(PayActivity.this);
         dialog.setView(getLayoutInflater().inflate(R.layout.view_print_dialog,null));
+
+
+
+
     }
 
 
@@ -121,17 +129,56 @@ private AlertDialog.Builder dialog;
      */
     public void onClick(View view){
 
+        if(!cash_cb.isChecked()&&!alipay_cb.isChecked()&&!wechatpay_cb.isChecked()){
+
+            flag = DEFAULT;
+        }
+
         if(tableNumber == null){
+
+            flag = TABLE_STATUS;
+
+        }
+
+
+
+        switch(flag){
+
+            case CASH:
+                Toast.makeText(this,"现金支付!",Toast.LENGTH_LONG).show();
+                break;
+            case ALIPAY:
+                Toast.makeText(this,"支付宝支付!",Toast.LENGTH_LONG).show();
+
+
+
+                break;
+            case WECHATPAY:
+                Toast.makeText(this,"微信支付!",Toast.LENGTH_LONG).show();
+                break;
+            case DEFAULT:
+                Toast.makeText(this,"请选择支付方式!",Toast.LENGTH_LONG).show();
+                break;
+            default:
+                Toast.makeText(this,"请选择桌号!",Toast.LENGTH_LONG).show();
+                break;
+        }
+
+    /*    if(tableNumber == null){
 
             Toast.makeText(this,"未选择座号!",Toast.LENGTH_LONG).show();
 
         }else {
 
-            ProgressBarasyncTask progressBarasyncTask = new ProgressBarasyncTask(PayActivity.this);
-            progressBarasyncTask.setDate(intent);
-            progressBarasyncTask.execute();
 
-        }
+            }*/
+
+
+     /*       ProgressBarasyncTask progressBarasyncTask = new ProgressBarasyncTask(PayActivity.this);
+            progressBarasyncTask.setDate(intent);
+            progressBarasyncTask.execute();*/
+
+       // }
 
 
     }
