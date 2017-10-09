@@ -50,7 +50,7 @@ private AlertDialog.Builder dialog;
         TextView total_tv = (TextView) findViewById(R.id.total_tv);
         total_tv.setText("消费金额: "+intent.getFloatExtra("total",0)+"元");
         tableNumber_tv = (TextView) findViewById(R.id.tableNumber_tv);
-        tableNumber_tv.setText("桌号/");
+        tableNumber_tv.setText("桌号/空");
 
 
         factPay_tv = (TextView) findViewById(R.id.fact_tv);

@@ -30,7 +30,6 @@
     </android.support.design.widget.AppBarLayout>
 
 
-
         <ListView
             android:id="@+id/dishesKind_lv"
             android:layout_width="90dp"
@@ -63,7 +62,7 @@
         android:layout_height="match_parent"
         android:background="#a0000000"
         android:visibility="invisible"
-        android:layout_above="@+id/linearLayout3"
+        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
