@@ -1,5 +1,7 @@
 package com.zm.order.view;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -116,8 +118,6 @@ private AlertDialog.Builder dialog;
         dialog.setView(getLayoutInflater().inflate(R.layout.view_print_dialog,null));
 
 
-
-
     }
 
 
@@ -129,18 +129,19 @@ private AlertDialog.Builder dialog;
      */
     public void onClick(View view){
 
+
+        if(tableNumber == null){
+
+            Toast.makeText(this,"请选择桌号!",Toast.LENGTH_LONG).show();
+
+            return;
+
+        }
+
         if(!cash_cb.isChecked()&&!alipay_cb.isChecked()&&!wechatpay_cb.isChecked()){
 
             flag = DEFAULT;
         }
-
-        if(tableNumber == null){
-
-            flag = TABLE_STATUS;
-
-        }
-
-
 
         switch(flag){
 
@@ -148,9 +149,29 @@ private AlertDialog.Builder dialog;
                 Toast.makeText(this,"现金支付!",Toast.LENGTH_LONG).show();
                 break;
             case ALIPAY:
-                Toast.makeText(this,"支付宝支付!",Toast.LENGTH_LONG).show();
+                //Toast.makeText(this,"支付宝支付!",Toast.LENGTH_LONG).show();
+                AlertDialog.Builder dialog = new AlertDialog.Builder(PayActivity.this);
+                dialog.setView(getLayoutInflater().inflate(R.layout.view_alipay_dialog,null));
+                dialog.setPositiveButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+                dialog.setNegativeButton("确定支付", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
 
 
+                        ProgressBarasyncTask progressBarasyncTask = new ProgressBarasyncTask(PayActivity.this);
+                        progressBarasyncTask.setDate(intent);
+                        progressBarasyncTask.execute();
+
+
+                    }
+                });
+
+                dialog.show();
 
                 break;
             case WECHATPAY:
@@ -160,7 +181,7 @@ private AlertDialog.Builder dialog;
                 Toast.makeText(this,"请选择支付方式!",Toast.LENGTH_LONG).show();
                 break;
             default:
-                Toast.makeText(this,"请选择桌号!",Toast.LENGTH_LONG).show();
+
                 break;
         }
 
@@ -174,9 +195,7 @@ private AlertDialog.Builder dialog;
             }*/
 
 
-     /*       ProgressBarasyncTask progressBarasyncTask = new ProgressBarasyncTask(PayActivity.this);
-            progressBarasyncTask.setDate(intent);
-            progressBarasyncTask.execute();*/
+     /*       */
 
        // }
 
@@ -243,10 +262,15 @@ private AlertDialog.Builder dialog;
                 intent.putExtra("tableNumber",tableNumber);
 
                 tableNumber_tv.setText("桌号/ "+tableNumber);
+
+
             }
         } else {
             super.onActivityResult(requestCode,resultCode,data);
         }
+
+
+
     }
     public void turnMainActivity(){
 
