@@ -1,4 +1,4 @@
-package Untils;
+package untils;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;

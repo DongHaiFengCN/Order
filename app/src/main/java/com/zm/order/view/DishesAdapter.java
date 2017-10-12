@@ -3,7 +3,6 @@ package com.zm.order.view;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -14,7 +13,6 @@ import com.zm.order.R;
 
 import java.util.List;
 
-import Untils.MyLog;
 import model.DBFactory;
 import model.DatabaseSource;
 import model.IDBManager;

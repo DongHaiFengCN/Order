@@ -1,4 +1,4 @@
-package Untils;
+package untils;
 
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;

@@ -162,11 +162,9 @@ private AlertDialog.Builder dialog;
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
-
                         ProgressBarasyncTask progressBarasyncTask = new ProgressBarasyncTask(PayActivity.this);
                         progressBarasyncTask.setDate(intent);
                         progressBarasyncTask.execute();
-
 
                     }
                 });

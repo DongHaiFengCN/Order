@@ -4,13 +4,10 @@ import android.content.Context;
 
 import com.couchbase.lite.Array;
 import com.couchbase.lite.CouchbaseLiteException;
-import com.couchbase.lite.Database;
 import com.couchbase.lite.Document;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import Untils.MyLog;
 
 /**
  * 项目名称：Order

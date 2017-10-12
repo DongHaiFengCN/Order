@@ -2,11 +2,9 @@ package com.zm.order.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.EventLog;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -14,11 +12,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.zm.order.R;
 
-import Untils.MyLog;
+import untils.MyLog;
 
 /**
  * 项目名称：Order

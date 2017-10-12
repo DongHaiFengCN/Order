@@ -6,7 +6,7 @@ import android.content.SharedPreferences;
 
 import com.tencent.bugly.crashreport.CrashReport;
 
-import Untils.CrashHandler;
+import okhttp3.OkHttpClient;
 
 /**
  * 项目名称：Order
@@ -21,18 +21,14 @@ import Untils.CrashHandler;
 public class MyApplication extends Application implements ISharedPreferences{
 
 
+
+    OkHttpClient okHttpClient;
     @Override
     public void onCreate() {
         super.onCreate();
 
-
-
-     /*   CrashHandler crashHandler = CrashHandler.getInstance();
-        crashHandler.init(getApplicationContext());*/
-
-
         CrashReport.initCrashReport(getApplicationContext(), "1b0a55dc94", true);
-        //CrashReport.testJavaCrash();
+
     }
 
 

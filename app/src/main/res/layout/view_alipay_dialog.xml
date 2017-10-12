@@ -1,10 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
     <ImageView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/activity_gif_giv"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerInParent="true"
-        android:src="@mipmap/ceshi"/>
+        android:layout_height="150dp"
+        android:background="@mipmap/zhi_bg"
+
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="215dp"
+        android:background="#00c3df"
+        >
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_gravity="center"
+            android:padding="2dp"
+            android:src="@mipmap/ceshi"
+
+            />
+    </LinearLayout>
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@mipmap/_bg"
+        />
+
+</LinearLayout>
 
 

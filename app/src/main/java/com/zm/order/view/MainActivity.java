@@ -34,8 +34,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import Untils.AnimationUtil;
-import Untils.MyLog;
+import untils.AnimationUtil;
 import application.MyApplication;
 import presenter.IMainPresenter;
 import presenter.MainPresenterImpl;

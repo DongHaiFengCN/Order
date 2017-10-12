@@ -3,7 +3,7 @@ package model;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import Untils.NetworkStatusUtil;
+import untils.NetworkStatusUtil;
 
 /**
  * 项目名称：Order
