@@ -42,6 +42,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
 
                 initView();
 
+
            }else {
 
                 this.success();

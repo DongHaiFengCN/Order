@@ -1,7 +1,6 @@
 package model;
 
 import android.content.Context;
-import android.widget.Switch;
 
 /**
  * 项目名称：Order

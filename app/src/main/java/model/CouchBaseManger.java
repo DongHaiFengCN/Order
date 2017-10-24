@@ -2,20 +2,25 @@ package model;
 
 import android.content.Context;
 
+import com.couchbase.lite.BasicAuthenticator;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.DataSource;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.DatabaseConfiguration;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
+import com.couchbase.lite.Log;
 import com.couchbase.lite.Query;
 import com.couchbase.lite.Replicator;
 import com.couchbase.lite.ReplicatorChangeListener;
+import com.couchbase.lite.ReplicatorConfiguration;
 import com.couchbase.lite.Result;
 import com.couchbase.lite.ResultSet;
 import com.couchbase.lite.SelectResult;
 
 import java.lang.reflect.Field;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,9 +40,10 @@ import untils.MyLog;
 
 public class CouchBaseManger<T> implements IDBManager,ReplicatorChangeListener {
 
-    private final static String DATABASE_NAME = "kitchendb131";
+    private static final String TAG = "CouchBaseManger";
+    private final static String DATABASE_NAME = "order";
     private final static String SYNCGATEWAY_URL = "blip://123.207.174.171:4984/kitchen/";
-    private final static boolean SYNC_ENABLED = false;
+    private final static boolean SYNC_ENABLED = true;
     private static Database database = null;
     private Replicator replicator;
     private String Company_ID="zmsy010";
@@ -49,6 +55,8 @@ public class CouchBaseManger<T> implements IDBManager,ReplicatorChangeListener {
 
         try {
             database = new Database(DATABASE_NAME, config);
+
+            startReplication(DATABASE_NAME,null);
 
         } catch (CouchbaseLiteException e) {
             // TODO: error handling
@@ -232,4 +240,42 @@ public class CouchBaseManger<T> implements IDBManager,ReplicatorChangeListener {
     public void changed(Replicator replicator, Replicator.Status status, CouchbaseLiteException error) {
 
     }
+
+
+    // -------------------------
+    // Replicator operation
+    // -------------------------
+
+    private void startReplication(String username, String password) {
+        if (!SYNC_ENABLED) return;
+
+        URI uri;
+        try {
+            uri = new URI(SYNCGATEWAY_URL);
+        } catch (URISyntaxException e) {
+            Log.e(TAG, "Failed parse URI: %s", e, SYNCGATEWAY_URL);
+            return;
+        }
+
+        ReplicatorConfiguration config = new ReplicatorConfiguration(database, uri);
+        config.setReplicatorType(ReplicatorConfiguration.ReplicatorType.PUSH_AND_PULL);
+        config.setContinuous(true);
+
+        // authentication
+
+        if (username != null && password != null)
+            config.setAuthenticator(new BasicAuthenticator(username, password));
+
+        replicator = new Replicator(config);
+        replicator.addChangeListener(this);
+        replicator.start();
+    }
+
+    private void stopReplication() {
+        if (!SYNC_ENABLED) return;
+
+        replicator.stop();
+    }
+
+
 }

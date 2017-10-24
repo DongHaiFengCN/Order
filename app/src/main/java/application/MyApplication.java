@@ -23,6 +23,7 @@ public class MyApplication extends Application implements ISharedPreferences{
 
 
     OkHttpClient okHttpClient;
+
     @Override
     public void onCreate() {
         super.onCreate();
