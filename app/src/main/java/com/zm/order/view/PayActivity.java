@@ -19,7 +19,9 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.zm.order.R;
 
+import bean.Order;
 import model.ProgressBarasyncTask;
+import untils.OkHttpController;
 
 public class PayActivity extends AppCompatActivity {
 
@@ -47,16 +49,22 @@ private AlertDialog.Builder dialog;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pay);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
         intent = getIntent();
 
         TextView total_tv = (TextView) findViewById(R.id.total_tv);
         total_tv.setText("消费金额: "+intent.getFloatExtra("total",0)+"元");
+
+
+
         tableNumber_tv = (TextView) findViewById(R.id.tableNumber_tv);
-        tableNumber_tv.setText("桌号/空");
+
 
 
         factPay_tv = (TextView) findViewById(R.id.fact_tv);
@@ -150,6 +158,8 @@ private AlertDialog.Builder dialog;
                 break;
             case ALIPAY:
                 //Toast.makeText(this,"支付宝支付!",Toast.LENGTH_LONG).show();
+
+
                 AlertDialog.Builder dialog = new AlertDialog.Builder(PayActivity.this);
                 dialog.setView(getLayoutInflater().inflate(R.layout.view_alipay_dialog,null));
                 dialog.setPositiveButton("取消", new DialogInterface.OnClickListener() {
@@ -162,9 +172,12 @@ private AlertDialog.Builder dialog;
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
-                        ProgressBarasyncTask progressBarasyncTask = new ProgressBarasyncTask(PayActivity.this);
-                        progressBarasyncTask.setDate(intent);
-                        progressBarasyncTask.execute();
+                            ProgressBarasyncTask progressBarasyncTask = new ProgressBarasyncTask(PayActivity.this);
+                            progressBarasyncTask.setDate(intent);
+                            progressBarasyncTask.execute();
+
+
+
 
                     }
                 });

@@ -368,7 +368,7 @@ public class MainActivity extends AppCompatActivity implements IMainView{
 
                     Intent intent = new Intent(MainActivity.this,PayActivity.class);
                     intent.putExtra("Order", (Serializable) orderItem);
-                    intent.putExtra("total",total+0.3f);
+                    intent.putExtra("total",total);
                     startActivityForResult(intent,1);
 
                     //如果order列表开启状态就关闭

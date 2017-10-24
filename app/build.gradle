@@ -39,5 +39,4 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.squareup.okhttp3:okhttp:3.9.0'
     compile 'com.squareup.okio:okio:1.13.0'
-    compile 'org.kie.modules:com-google-code-gson:6.5.0.Final'
 }

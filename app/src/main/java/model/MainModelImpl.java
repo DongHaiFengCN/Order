@@ -85,7 +85,6 @@ public class MainModelImpl<T> implements IMainModel {
 
 
 
-
         Document documentA = new Document();
         documentA.setString("className","DishesKind");
         documentA.setString("name","主食");

@@ -14,8 +14,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import okhttp3.OkHttpClient;
 import untils.BluetoothUtil;
 import untils.MyLog;
+import untils.OkHttpController;
 import untils.PrintUtils;
 import com.zm.order.view.PayActivity;
 
@@ -32,6 +34,7 @@ import com.zm.order.view.PayActivity;
 public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
     private  Date date;
 
+    private String flag = "";
 
     private BluetoothAdapter btAdapter;
     private BluetoothDevice device;
@@ -85,58 +88,66 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
         total = intent.getFloatExtra("total",0);
         str = String.valueOf(total);
         MyLog.e(str);
+
+        //抹零
        // setMl();
 
         onPrint();
 
-        return "ok";
+        return flag;
     }
 
     private void onPrint() {
 
-        String waiter ="董海峰";
-        String peopleSum = "8";
-        String tableNumber = intent.getStringExtra("tableNumber");
+        if(true){ //支付成功
 
-        List list = (ArrayList<SparseArray<Object>>) intent.getSerializableExtra("Order");
+            flag = "ok";
+            String waiter ="董海峰";
+            String peopleSum = "8";
+            String tableNumber = intent.getStringExtra("tableNumber");
 
-        PrintUtils.selectCommand(PrintUtils.RESET);
-        PrintUtils.selectCommand(PrintUtils.LINE_SPACING_DEFAULT);
-        PrintUtils.selectCommand(PrintUtils.ALIGN_CENTER);
-        PrintUtils.printText("肴点点\n\n");
-        PrintUtils.selectCommand(PrintUtils.DOUBLE_HEIGHT_WIDTH);
-        PrintUtils.printText(tableNumber+"号桌\n\n");
-        PrintUtils.selectCommand(PrintUtils.NORMAL);
-        PrintUtils.selectCommand(PrintUtils.ALIGN_LEFT);
-        PrintUtils.printText(PrintUtils.printTwoData("订单编号", OrderId()+"\n"));
-        PrintUtils.printText(PrintUtils.printTwoData("下单时间", getFormatDate()+"\n"));
-        PrintUtils.printText(PrintUtils.printTwoData("人数："+peopleSum, "收银员："+waiter+"\n"));
-        PrintUtils.printText("--------------------------------\n");
-        PrintUtils.selectCommand(PrintUtils.BOLD);
-        PrintUtils.printText(PrintUtils.printThreeData("项目", "数量", "金额\n"));
-        PrintUtils.printText("--------------------------------\n");
-        PrintUtils.selectCommand(PrintUtils.BOLD_CANCEL);
-        for (int i = 0; i < list.size(); i++) {
+            List list = (ArrayList<SparseArray<Object>>) intent.getSerializableExtra("Order");
 
-            SparseArray<Object> s = (SparseArray<Object>) list.get(i);
-            PrintUtils.printText(PrintUtils.printThreeData(s.get(0).toString(), s.get(2).toString(), s.get(4).toString()+"\n"));
-        }
-        PrintUtils.printText("--------------------------------\n");
-        PrintUtils.printText(PrintUtils.printTwoData("合计", total+"\n"));
-        PrintUtils.printText(PrintUtils.printTwoData("抹零", "0"+ml+"\n"));
-        PrintUtils.printText("--------------------------------\n");
-        PrintUtils.printText(PrintUtils.printTwoData("实收", str+"\n"));
-        PrintUtils.printText("--------------------------------\n");
-        PrintUtils.selectCommand(PrintUtils.ALIGN_LEFT);
-        PrintUtils.printText("备注：");
-        PrintUtils.printText("\n\n\n\n\n");
-        PrintUtils.closeOutputStream();
+            PrintUtils.selectCommand(PrintUtils.RESET);
+            PrintUtils.selectCommand(PrintUtils.LINE_SPACING_DEFAULT);
+            PrintUtils.selectCommand(PrintUtils.ALIGN_CENTER);
+            PrintUtils.printText("肴点点\n\n");
+            PrintUtils.selectCommand(PrintUtils.DOUBLE_HEIGHT_WIDTH);
+            PrintUtils.printText(tableNumber+"号桌\n\n");
+            PrintUtils.selectCommand(PrintUtils.NORMAL);
+            PrintUtils.selectCommand(PrintUtils.ALIGN_LEFT);
+            PrintUtils.printText(PrintUtils.printTwoData("订单编号", OrderId()+"\n"));
+            PrintUtils.printText(PrintUtils.printTwoData("下单时间", getFormatDate()+"\n"));
+            PrintUtils.printText(PrintUtils.printTwoData("人数："+peopleSum, "收银员："+waiter+"\n"));
+            PrintUtils.printText("--------------------------------\n");
+            PrintUtils.selectCommand(PrintUtils.BOLD);
+            PrintUtils.printText(PrintUtils.printThreeData("项目", "数量", "金额\n"));
+            PrintUtils.printText("--------------------------------\n");
+            PrintUtils.selectCommand(PrintUtils.BOLD_CANCEL);
+            for (int i = 0; i < list.size(); i++) {
 
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+                SparseArray<Object> s = (SparseArray<Object>) list.get(i);
+                PrintUtils.printText(PrintUtils.printThreeData(s.get(0).toString(), s.get(2).toString(), s.get(4).toString()+"\n"));
+            }
+            PrintUtils.printText("--------------------------------\n");
+            PrintUtils.printText(PrintUtils.printTwoData("合计", total+"\n"));
+            PrintUtils.printText(PrintUtils.printTwoData("抹零", "0"+ml+"\n"));
+            PrintUtils.printText("--------------------------------\n");
+            PrintUtils.printText(PrintUtils.printTwoData("实收", str+"\n"));
+            PrintUtils.printText("--------------------------------\n");
+            PrintUtils.selectCommand(PrintUtils.ALIGN_LEFT);
+            PrintUtils.printText("备注：");
+            PrintUtils.printText("\n\n\n\n\n");
+            PrintUtils.closeOutputStream();
+
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        };
+
+
     }
 
 
@@ -153,11 +164,13 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
 
           if(!result.equals("ok")){
 
-              Toast.makeText(payActivity,result, Toast.LENGTH_LONG).show();
+              Toast.makeText(payActivity,"支付失败！", Toast.LENGTH_LONG).show();
+          }else {
+              payActivity.turnMainActivity();
           }
         payActivity.closeDialog();
 
-        payActivity.turnMainActivity();
+
     }
 
     /**
