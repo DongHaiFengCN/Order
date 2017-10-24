@@ -29,6 +29,8 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //qqqqq
+
         setContentView(R.layout.activity_login);
 
          myApplication = (MyApplication) getApplication();
