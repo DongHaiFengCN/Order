@@ -71,15 +71,12 @@
 
 
     <LinearLayout
-        android:background="@color/md_white_1000"
+        android:id="@+id/discount"
+        android:background="@drawable/background_pay_select"
         android:layout_width="match_parent"
         android:layout_height="@dimen/viewhight"
         android:orientation="horizontal"
-        android:id="@+id/linearLayout"
         android:clickable="true"
-        android:layout_below="@+id/appBarLayout"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
         >
 
         <TextView
@@ -116,21 +113,20 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
+        android:paddingRight="8dp"
+        android:paddingLeft="8dp"
         android:src="@drawable/divider">
 
     </ImageView>
 
     <LinearLayout
-        android:background="@color/md_white_1000"
+        android:id="@+id/associator"
+        android:background="@drawable/background_pay_select"
         android:layout_width="match_parent"
         android:layout_height="@dimen/viewhight"
         android:orientation="horizontal"
-        android:id="@+id/linearLayout6"
-        android:layout_below="@+id/imageView6"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        android:clickable="true"
+        >
 
         <TextView
             android:gravity="left|center"
@@ -160,43 +156,102 @@
              />
 
     </LinearLayout>
+
+
+    <LinearLayout
+
+        android:background="@color/md_white_1000"
+        android:layout_width="match_parent"
+        android:layout_below="@+id/linearLayout6"
+        android:layout_height="@dimen/viewhight"
+        android:orientation="horizontal"
+        android:id="@+id/linearLayout5"
+        android:layout_marginTop="16dp"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="left|center"
+            android:paddingLeft="16dp"
+            android:text="支付方式"
+           />
+
+        <TextView
+            android:id="@+id/fact_tv"
+            android:paddingRight="16dp"
+            android:gravity="right|center"
+            android:text="实际支付：55元"
+            android:textColor="@color/md_red_500"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingRight="8dp"
+        android:paddingLeft="8dp"
+        android:src="@drawable/divider">
+
+    </ImageView>
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_marginTop="12dp"
+        android:layout_height="70dp"
         android:background="@color/md_white"
         android:orientation="horizontal"
         >
         <ImageView
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="match_parent" />
+            android:clickable="true"
+            android:layout_height="match_parent"
+            android:src="@mipmap/icon_zhi"
+            android:padding="16dp"
+            android:background="@drawable/background_pay_select"
+            />
 
         <ImageView
-            android:layout_width="1dp"
+            android:layout_width="0.5dp"
             android:layout_height="match_parent"
-            android:src="@drawable/fenge"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
+            android:src="@drawable/divider"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
             />
 
         <ImageView
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="match_parent" />
+            android:clickable="true"
+            android:padding="16dp"
+            android:src="@mipmap/icon_wei"
+            android:layout_height="match_parent"
+            android:background="@drawable/background_pay_select"
+            />
 
         <ImageView
-            android:layout_width="1dp"
+            android:layout_width="0.5dp"
             android:layout_height="match_parent"
-            android:src="@drawable/fenge"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
+            android:src="@drawable/divider"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
             />
 
         <ImageView
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="match_parent" />
+            android:clickable="true"
+            android:padding="16dp"
+            android:src="@mipmap/icon_qian"
+            android:layout_height="match_parent"
+            android:background="@drawable/background_pay_select"
+            />
 
 
 
