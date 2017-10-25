@@ -3,6 +3,7 @@ package com.zm.order.view;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -27,24 +28,11 @@ public class PayActivity extends AppCompatActivity {
 
 private AlertDialog.Builder dialog;
 
-    private final static int TABLE_STATUS = -1;
-    private final static int DEFAULT = 0;
-    private final static int CASH = 1;
-    private final static int ALIPAY = 2;
-    private final static int WECHATPAY = 3;
-
-
     private  AlertDialog dg;
     private  Intent intent;
-    private AppCompatCheckBox cash_cb;
-    private AppCompatCheckBox alipay_cb;
-    private AppCompatCheckBox wechatpay_cb;
 
-    private TextView tableNumber_tv;
     private String tableNumber = null;
 
-    private int flag = 2;
-    private TextView factPay_tv;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,10 +43,14 @@ private AlertDialog.Builder dialog;
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        getSupportActionBar().setElevation(0);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            toolbar.setElevation(0);
+        }
 
         intent = getIntent();
 
-        TextView total_tv = (TextView) findViewById(R.id.total_tv);
+/*        TextView total_tv = (TextView) findViewById(R.id.total_tv);
         total_tv.setText("消费金额: "+intent.getFloatExtra("total",0)+"元");
 
 
@@ -71,10 +63,10 @@ private AlertDialog.Builder dialog;
 
         cash_cb = (AppCompatCheckBox) findViewById(R.id.cash_cb);
         alipay_cb = (AppCompatCheckBox) findViewById(R.id.alipay_cb);
-        wechatpay_cb = (AppCompatCheckBox) findViewById(R.id.wechatpay_cb);
+        wechatpay_cb = (AppCompatCheckBox) findViewById(R.id.wechatpay_cb);*/
 
 
-        alipay_cb.setChecked(true);
+  /*      alipay_cb.setChecked(true);
 
         cash_cb.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,7 +113,7 @@ private AlertDialog.Builder dialog;
                 }
 
             }
-        });
+        });*/
         dialog = new AlertDialog.Builder(PayActivity.this);
         dialog.setView(getLayoutInflater().inflate(R.layout.view_print_dialog,null));
 
@@ -131,20 +123,20 @@ private AlertDialog.Builder dialog;
 
 
 
-    /**
+   /* *//**
      *
-     * @param view
-     */
+     *
+     *//*
     public void onClick(View view){
 
 
-        if(tableNumber == null){
+   *//*     if(tableNumber == null){
 
             Toast.makeText(this,"请选择桌号!",Toast.LENGTH_LONG).show();
 
             return;
 
-        }
+        }*//*
 
         if(!cash_cb.isChecked()&&!alipay_cb.isChecked()&&!wechatpay_cb.isChecked()){
 
@@ -196,22 +188,9 @@ private AlertDialog.Builder dialog;
                 break;
         }
 
-    /*    if(tableNumber == null){
-
-            Toast.makeText(this,"未选择座号!",Toast.LENGTH_LONG).show();
-
-        }else {
 
 
-            }*/
-
-
-     /*       */
-
-       // }
-
-
-    }
+    }*/
 
     public void showDialog(){
 
@@ -243,14 +222,14 @@ private AlertDialog.Builder dialog;
 
                 break;
 
-            case R.id.action_sm:
+      /*      case R.id.action_sm:
 
                 new IntentIntegrator(this)
                         .setOrientationLocked(false)
                         .setCaptureActivity(ScanActivity.class) // 设置自定义的activity是CustomActivity
                         .initiateScan(); // 初始化扫描
 
-                break;
+                break;*/
         }
         return super.onOptionsItemSelected(item);
     }
@@ -260,7 +239,7 @@ private AlertDialog.Builder dialog;
 // 通过 onActivityResult的方法获取 扫描回来的 值
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode,resultCode,data);
+       /* IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode,resultCode,data);
 
         if(intentResult != null) {
 
@@ -278,7 +257,7 @@ private AlertDialog.Builder dialog;
             }
         } else {
             super.onActivityResult(requestCode,resultCode,data);
-        }
+        }*/
 
 
 
