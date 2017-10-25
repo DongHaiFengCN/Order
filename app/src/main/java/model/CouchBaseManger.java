@@ -74,8 +74,7 @@ public class CouchBaseManger<T> implements IDBManager,ReplicatorChangeListener {
     @Override
     public boolean isLogin(String name, String pass) {
 
-
-   /*   Document document = new Document();
+      Document document = new Document();
 
         document.setString("className","LoginUserBean");
         document.setString("mName",name);
@@ -85,7 +84,7 @@ public class CouchBaseManger<T> implements IDBManager,ReplicatorChangeListener {
             database.save(document);
         } catch (CouchbaseLiteException e) {
             e.printStackTrace();
-        }*/
+        }
 
 
 

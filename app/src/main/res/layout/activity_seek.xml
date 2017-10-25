@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!--<RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50sp"
+        android:background="@color/colorPrimaryDark">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@drawable/bg_amount_layout"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:text="搜索"
+            android:textSize="26sp"
+            android:gravity="center_vertical"
+            android:textColor="@color/md_white"
+
+            />
+
+
+    </RelativeLayout>-->
+
+    <ListView
+        android:id="@+id/activity_seek_list"
+        android:layout_width="match_parent"
+        android:layout_height="200sp"
+        />
+
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="50sp"
+        android:background="@null"
+        />
+
+
+
+    <TableLayout
+        android:id="@+id/tl_key_grid"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:visibility="visible"
+        >
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <ImageButton
+                android:id="@+id/ibtn_key_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/style_public_1"
+                android:background="@drawable/bg_key_selector"
+                android:onClick="onClick"
+                android:src="@mipmap/icon_key_1"
+                />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ibtn_key_2"
+                style="@style/style_public_1"
+                android:background="@drawable/bg_key_selector"
+                android:onClick="onClick"
+                android:src="@mipmap/icon_key_2" />
+
+            <ImageButton
+                android:id="@+id/ibtn_key_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/style_public_1"
+                android:background="@drawable/bg_key_selector"
+                android:onClick="onClick"
+                android:src="@mipmap/icon_key_3" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <ImageButton
+                android:id="@+id/ibtn_key_4"
+                style="@style/style_public_1"
+                android:background="@drawable/bg_key_selector"
+                android:onClick="onClick"
+                android:src="@mipmap/icon_key_4" />
+
+            <ImageButton
+                android:id="@+id/ibtn_key_5"
+                style="@style/style_public_1"
+                android:background="@drawable/bg_key_selector"
+                android:onClick="onClick"
+                android:src="@mipmap/icon_key_5" />
+
+            <ImageButton
+                android:id="@+id/ibtn_key_6"
+                style="@style/style_public_1"
+                android:background="@drawable/bg_key_selector"
+                android:onClick="onClick"
+                android:src="@mipmap/icon_key_6" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <ImageButton
+                android:id="@+id/ibtn_key_7"
+                style="@style/style_public_1"
+                android:background="@drawable/bg_key_selector"
+                android:onClick="onClick"
+                android:src="@mipmap/icon_key_7" />
+
+            <ImageButton
+                android:id="@+id/ibtn_key_8"
+                style="@style/style_public_1"
+                android:background="@drawable/bg_key_selector"
+                android:onClick="onClick"
+                android:src="@mipmap/icon_key_8" />
+
+            <ImageButton
+                android:id="@+id/ibtn_key_9"
+                style="@style/style_public_1"
+                android:background="@drawable/bg_key_selector"
+                android:onClick="onClick"
+                android:src="@mipmap/icon_key_9" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <ImageButton
+                android:id="@+id/ibtn_key_l"
+                style="@style/style_public_1"
+                android:background="@drawable/bg_key_selector"
+                android:onClick="onClick"
+                android:src="@mipmap/icon_key_l" />
+
+            <ImageButton
+                android:id="@+id/ibtn_key_0"
+                style="@style/style_public_1"
+                android:background="@drawable/bg_key_selector"
+                android:onClick="onClick"
+                android:src="@mipmap/icon_key_0" />
+
+            <ImageButton
+                android:id="@+id/ibtn_key_r"
+                style="@style/style_public_1"
+                android:background="@drawable/bg_key_selector"
+                android:onClick="onClick"
+                android:src="@mipmap/icon_key_r" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <ImageButton
+                android:id="@+id/ibtn_key_del"
+                style="@style/style_public_1"
+                android:background="@drawable/bg_key_selector"
+                android:onClick="onClick"
+                android:src="@mipmap/icon_key_del" />
+        </TableRow>
+    </TableLayout>
+
+
+
+</LinearLayout>
