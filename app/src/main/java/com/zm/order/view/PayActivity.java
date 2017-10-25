@@ -52,9 +52,6 @@ public class PayActivity extends AppCompatActivity {
         setContentView(R.layout.activity_pay);
         ButterKnife.bind(this);
 
-        //456
-        //789
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
