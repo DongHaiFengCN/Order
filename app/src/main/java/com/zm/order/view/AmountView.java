@@ -20,7 +20,7 @@ import untils.MyLog;
 /**
  * 项目名称：Order
  * 类描述：
- * 创建人：donghaifeng
+ * @author:donghaifeng
  * 创建时间：2017/9/20 13:20
  * 修改人：donghaifeng
  * 修改时间：2017/9/20 13:20
