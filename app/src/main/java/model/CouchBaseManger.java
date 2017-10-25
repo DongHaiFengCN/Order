@@ -3,6 +3,8 @@ package model;
 import android.content.Context;
 
 import com.couchbase.lite.BasicAuthenticator;
+import com.couchbase.lite.Conflict;
+import com.couchbase.lite.ConflictResolver;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.DataSource;
 import com.couchbase.lite.Database;
@@ -11,6 +13,7 @@ import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
 import com.couchbase.lite.Log;
 import com.couchbase.lite.Query;
+import com.couchbase.lite.ReadOnlyDocument;
 import com.couchbase.lite.Replicator;
 import com.couchbase.lite.ReplicatorChangeListener;
 import com.couchbase.lite.ReplicatorConfiguration;
@@ -23,8 +26,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import untils.MyLog;
 
@@ -43,15 +48,18 @@ public class CouchBaseManger<T> implements IDBManager,ReplicatorChangeListener {
     private static final String TAG = "CouchBaseManger";
     private final static String DATABASE_NAME = "order";
     private final static String SYNCGATEWAY_URL = "blip://123.207.174.171:4984/kitchen/";
+
     private final static boolean SYNC_ENABLED = true;
     private static Database database = null;
     private Replicator replicator;
-    private String Company_ID="zmsy010";
+    private String Company_ID="wangbo008";
 
 
     public CouchBaseManger(Context context){
 
         DatabaseConfiguration config = new DatabaseConfiguration(context.getApplicationContext());
+
+        config.setConflictResolver(getConflictResolver());//冲突解决机制
 
         try {
             database = new Database(DATABASE_NAME, config);
@@ -63,6 +71,38 @@ public class CouchBaseManger<T> implements IDBManager,ReplicatorChangeListener {
         }
 
 
+    }
+
+    private ConflictResolver getConflictResolver(){
+        /**
+         * Example: Conflict resolver that merges Mine and Their document.
+         */
+        return new ConflictResolver() {
+            @Override
+            public ReadOnlyDocument resolve(Conflict conflict) {
+                ReadOnlyDocument mine = conflict.getMine();
+                ReadOnlyDocument theirs = conflict.getTheirs();
+
+                Document resolved = new Document();
+                Set<String> changed = new HashSet<>();
+
+                // copy all data from theirs document
+                for (String key : theirs) {
+                    resolved.setObject(key, theirs.getObject(key));
+                    changed.add(key);
+                }
+
+                // copy all data from mine which are not in mine document
+                for (String key : mine) {
+                    if (!changed.contains(key))
+                        resolved.setObject(key, mine.getObject(key));
+                }
+
+                Log.e(TAG, "ConflictResolver.resolve() resolved -> %s", resolved.toMap());
+
+                return resolved;
+            }
+        };
     }
 
     @Override
@@ -239,6 +279,7 @@ public class CouchBaseManger<T> implements IDBManager,ReplicatorChangeListener {
     @Override
     public void changed(Replicator replicator, Replicator.Status status, CouchbaseLiteException error) {
 
+        Log.e(TAG, "**************"+"%s/%s",status.getProgress().getCompleted(),status.getProgress().getTotal());
     }
 
 
@@ -258,8 +299,13 @@ public class CouchBaseManger<T> implements IDBManager,ReplicatorChangeListener {
         }
 
         ReplicatorConfiguration config = new ReplicatorConfiguration(database, uri);
+        List<String>channels =new ArrayList<>();
+        channels.add(Company_ID);
+        config.setChannels(channels);
         config.setReplicatorType(ReplicatorConfiguration.ReplicatorType.PUSH_AND_PULL);
         config.setContinuous(true);
+
+
 
         // authentication
 

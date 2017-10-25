@@ -15,6 +15,9 @@ import com.zm.order.R;
 
 import application.ISharedPreferences;
 import application.MyApplication;
+import model.DBFactory;
+import model.DatabaseSource;
+import model.IDBManager;
 import presenter.ILoginPresenter;
 import presenter.LoginPresentImpl;
 
@@ -33,6 +36,8 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
 
         setContentView(R.layout.activity_login);
 
+
+
          myApplication = (MyApplication) getApplication();
 
 
@@ -47,6 +52,12 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
 
                 this.success();
            }
+
+
+           //设置登录用户名称全局变量
+
+        myApplication.setLoginName(name.getText().toString());
+
 }
 
     private void initView() {
