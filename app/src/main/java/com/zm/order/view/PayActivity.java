@@ -1,35 +1,48 @@
 package com.zm.order.view;
 
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Switch;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
 import com.zm.order.R;
 
-import bean.Order;
-import model.ProgressBarasyncTask;
-import untils.OkHttpController;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class PayActivity extends AppCompatActivity {
 
-private AlertDialog.Builder dialog;
+    @BindView(R.id.toolbar_title)
+    TextView toolbarTitle;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.appBarLayout)
+    AppBarLayout appBarLayout;
+    @BindView(R.id.textView7)
+    TextView textView7;
+    @BindView(R.id.discount)
+    LinearLayout discount;
+    @BindView(R.id.associator)
+    LinearLayout associator;
+    @BindView(R.id.textView)
+    TextView textView;
+    @BindView(R.id.fact_tv)
+    TextView factTv;
+    @BindView(R.id.linearLayout5)
+    LinearLayout linearLayout5;
+    private AlertDialog.Builder dialog;
 
-    private  AlertDialog dg;
-    private  Intent intent;
+    private AlertDialog dg;
+    private Intent intent;
 
     private String tableNumber = null;
 
@@ -37,6 +50,7 @@ private AlertDialog.Builder dialog;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pay);
+        ButterKnife.bind(this);
 
         //456
         //789
@@ -118,7 +132,7 @@ private AlertDialog.Builder dialog;
             }
         });*/
         dialog = new AlertDialog.Builder(PayActivity.this);
-        dialog.setView(getLayoutInflater().inflate(R.layout.view_print_dialog,null));
+        dialog.setView(getLayoutInflater().inflate(R.layout.view_print_dialog, null));
 
 
     }
@@ -126,7 +140,9 @@ private AlertDialog.Builder dialog;
 
 
 
-   /* *//**
+   /* */
+
+    /**
      *
      *
      *//*
@@ -194,19 +210,16 @@ private AlertDialog.Builder dialog;
 
 
     }*/
-
-    public void showDialog(){
+    public void showDialog() {
 
         dg = dialog.show();
-      }
-    public void closeDialog(){
+    }
+
+    public void closeDialog() {
 
 
         dg.dismiss();
-     }
-
-
-
+    }
 
 
     @Override
@@ -263,9 +276,9 @@ private AlertDialog.Builder dialog;
         }*/
 
 
-
     }
-    public void turnMainActivity(){
+
+    public void turnMainActivity() {
 
         try {
             Thread.sleep(800);
@@ -273,10 +286,19 @@ private AlertDialog.Builder dialog;
             e.printStackTrace();
         }
 
-        setResult(RESULT_OK,null);//携带参数返回到MainActivity
+        setResult(RESULT_OK, null);//携带参数返回到MainActivity
 
         finish();
     }
 
+    @OnClick({R.id.discount, R.id.associator})
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.discount:
+                break;
+            case R.id.associator:
+                break;
+        }
+    }
 }
 
