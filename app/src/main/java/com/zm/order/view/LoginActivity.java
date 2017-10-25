@@ -15,12 +15,15 @@ import com.zm.order.R;
 
 import application.ISharedPreferences;
 import application.MyApplication;
-import model.DBFactory;
-import model.DatabaseSource;
-import model.IDBManager;
 import presenter.ILoginPresenter;
 import presenter.LoginPresentImpl;
 
+/**
+ *
+ *
+ * @author 董海峰
+ * @date 2017/10/25
+ */
 public class LoginActivity extends AppCompatActivity implements ILoginView, ISharedPreferences{
     private EditText name;
     private EditText password;
@@ -40,8 +43,9 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
 
          myApplication = (MyApplication) getApplication();
 
+          //查看是否有缓存
 
-         String flag = myApplication.getSharePreferences().getString("name","");//查看是否有缓存
+         String flag = myApplication.getSharePreferences().getString("name","");
 
            if("".equals(flag)){
 
@@ -85,7 +89,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
     @Override
     public String[] getLoginInfo() {
 
-        String info[] = new String[2];
+        String[] info = new String[2];
         info[0] = name.getText().toString();
         info[1]= password.getText().toString();
         return info;
