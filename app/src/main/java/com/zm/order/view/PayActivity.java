@@ -50,6 +50,7 @@ private AlertDialog.Builder dialog;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pay);
 
+         //33334333
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
