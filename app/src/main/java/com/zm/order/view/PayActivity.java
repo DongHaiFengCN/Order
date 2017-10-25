@@ -138,13 +138,13 @@ private AlertDialog.Builder dialog;
     public void onClick(View view){
 
 
-        if(tableNumber == null){
+   /*     if(tableNumber == null){
 
             Toast.makeText(this,"请选择桌号!",Toast.LENGTH_LONG).show();
 
             return;
 
-        }
+        }*/
 
         if(!cash_cb.isChecked()&&!alipay_cb.isChecked()&&!wechatpay_cb.isChecked()){
 
@@ -196,19 +196,6 @@ private AlertDialog.Builder dialog;
                 break;
         }
 
-    /*    if(tableNumber == null){
-
-            Toast.makeText(this,"未选择座号!",Toast.LENGTH_LONG).show();
-
-        }else {
-
-
-            }*/
-
-
-     /*       */
-
-       // }
 
 
     }
@@ -243,14 +230,14 @@ private AlertDialog.Builder dialog;
 
                 break;
 
-            case R.id.action_sm:
+      /*      case R.id.action_sm:
 
                 new IntentIntegrator(this)
                         .setOrientationLocked(false)
                         .setCaptureActivity(ScanActivity.class) // 设置自定义的activity是CustomActivity
                         .initiateScan(); // 初始化扫描
 
-                break;
+                break;*/
         }
         return super.onOptionsItemSelected(item);
     }
