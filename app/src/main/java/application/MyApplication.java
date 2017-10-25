@@ -6,6 +6,9 @@ import android.content.SharedPreferences;
 
 import com.tencent.bugly.crashreport.CrashReport;
 
+import model.DBFactory;
+import model.DatabaseSource;
+import model.IDBManager;
 import okhttp3.OkHttpClient;
 
 /**
@@ -22,12 +25,20 @@ public class MyApplication extends Application implements ISharedPreferences{
 
 
 
-    OkHttpClient okHttpClient;
+
+    String loginName;
+
+
+
+    IDBManager idbManager;
+
     @Override
     public void onCreate() {
         super.onCreate();
 
-        CrashReport.initCrashReport(getApplicationContext(), "1b0a55dc94", true);
+        //CrashReport.initCrashReport(getApplicationContext(), "1b0a55dc94", true);
+
+        this.idbManager = DBFactory.get(DatabaseSource.CouchBase,getApplicationContext());//返回当前数据库
 
     }
 
@@ -45,4 +56,15 @@ public class MyApplication extends Application implements ISharedPreferences{
     }
 
 
+    public String getLoginName() {
+        return loginName;
+    }
+
+    public void setLoginName(String loginName) {
+        this.loginName = loginName;
+    }
+    public IDBManager getIdbManager() {
+
+        return idbManager;
+    }
 }
