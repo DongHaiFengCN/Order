@@ -4,9 +4,9 @@
     tools:context="com.example.donghaifeng.myapplication.MainActivity">
 
 
-       <item android:id="@+id/action_sm"
-           android:icon="@mipmap/sm"
-           app:showAsAction="ifRoom"
-           android:title="@string/sm"/>
+     <item android:id="@+id/setting"
+         app:showAsAction="never"
+         android:title=""
+          />
 
 </menu>
