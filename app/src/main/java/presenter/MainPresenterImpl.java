@@ -34,8 +34,8 @@ public class MainPresenterImpl implements IMainPresenter {
     @Override
     public void init() {
 
-       /*  mainModel = new MainModelImpl((Context) context);
-       try {
+         mainModel = new MainModelImpl((Context) context);
+       /*try {
             mainModel.addTestData();
         } catch (CouchbaseLiteException e) {
             e.printStackTrace();
@@ -46,7 +46,7 @@ public class MainPresenterImpl implements IMainPresenter {
 
         context.initView();
 
-        mainModel = new MainModelImpl((Context) context);
+        //mainModel = new MainModelImpl((Context) context);
 
 
         mainModel.getHeadList();
