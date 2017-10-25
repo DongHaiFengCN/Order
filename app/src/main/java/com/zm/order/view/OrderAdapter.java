@@ -1,5 +1,6 @@
 package com.zm.order.view;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -37,7 +38,7 @@ public class OrderAdapter extends BaseAdapter {
 
     private OnchangeListener onchangeListener;
 
-    public OrderAdapter(List<SparseArray<Object>> orderItem, MainActivity mainActivity) {
+    public OrderAdapter(List<SparseArray<Object>> orderItem, Activity mainActivity) {
         this.orderItem = orderItem;
         this.context = mainActivity;
     }
