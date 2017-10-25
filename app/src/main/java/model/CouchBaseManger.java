@@ -50,7 +50,7 @@ public class CouchBaseManger<T> implements IDBManager,ReplicatorChangeListener {
     private final static String SYNCGATEWAY_URL = "blip://123.207.174.171:4984/kitchen/";
 
     private final static boolean SYNC_ENABLED = true;
-    private static Database database = null;
+    private  Database database = null;
     private Replicator replicator;
     private String Company_ID="wangbo008";
 
