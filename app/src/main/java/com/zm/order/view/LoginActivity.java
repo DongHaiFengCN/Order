@@ -25,7 +25,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
     private EditText name;
     private EditText password;
     private Button submit;
-    private CheckBox saveLoginStatue_chk;
+    private CheckBox saveloginstatueChk;
     private  MyApplication myApplication;
 
     @Override
@@ -66,7 +66,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
 
         password = (EditText) findViewById(R.id.loginPassword_edtTxt);
 
-        saveLoginStatue_chk = (CheckBox) findViewById(R.id.saveLoginStatue_chk);
+        saveloginstatueChk = (CheckBox) findViewById(R.id.saveLoginStatue_chk);
 
         submit = (Button) findViewById(R.id.login_bt);
 
@@ -112,7 +112,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
     @Override
     public boolean isSave() {
 
-        return saveLoginStatue_chk.isChecked();
+        return saveloginstatueChk.isChecked();
     }
 
 
