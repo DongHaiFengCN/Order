@@ -58,7 +58,7 @@ public class LoginModelImpl implements ILoginModel{
     public void saveStatus(SharedPreferences mSharedPreferences) {
 
 
-      SharedPreferences.Editor editor = mSharedPreferences.edit();
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
 
         editor.putString("name",info[0]);
         editor.putString("password",info[1]);

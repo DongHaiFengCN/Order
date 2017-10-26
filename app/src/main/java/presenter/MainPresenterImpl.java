@@ -3,6 +3,8 @@ package presenter;
 import android.content.Context;
 
 import model.MainModelImpl;
+
+import com.couchbase.lite.CouchbaseLiteException;
 import com.zm.order.view.IMainView;
 
 /**
@@ -32,8 +34,8 @@ public class MainPresenterImpl implements IMainPresenter {
     @Override
     public void init() {
 
-    /*     mainModel = new MainModelImpl((Context) context);
-       try {
+         mainModel = new MainModelImpl((Context) context);
+       /*try {
             mainModel.addTestData();
         } catch (CouchbaseLiteException e) {
             e.printStackTrace();
@@ -44,7 +46,7 @@ public class MainPresenterImpl implements IMainPresenter {
 
         context.initView();
 
-        mainModel = new MainModelImpl((Context) context);
+        //mainModel = new MainModelImpl((Context) context);
 
 
         mainModel.getHeadList();
