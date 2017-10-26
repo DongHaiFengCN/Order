@@ -8,24 +8,17 @@
         android:layout_width="match_parent"
         android:layout_height="150dp"
         android:background="@mipmap/zhi_bg"
-
         />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="215dp"
-        android:background="#00c3df"
-        >
 
-        <ImageView
+
+    <ImageView
+            android:id="@+id/encode"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_gravity="center"
-            android:padding="2dp"
-            android:src="@mipmap/ceshi"
-
+            android:layout_height="215dp"
+            android:gravity="center"
+            android:background="#00c3df"
             />
-    </LinearLayout>
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

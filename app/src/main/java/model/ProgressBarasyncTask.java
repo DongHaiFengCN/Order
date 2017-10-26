@@ -204,10 +204,5 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
         this.intent = intent;
     }
 
-    public void setMl(){
 
-        String l[] = str.split("\\.");//抹零功能
-        ml = l[1];
-
-    }
 }
