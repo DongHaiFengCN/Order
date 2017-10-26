@@ -1,10 +1,11 @@
-package bean.table;
+package bean.kitchenmanage.table;
 
-import com.kitchenmanage.user.UsersC;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import bean.kitchenmanage.user.UsersC;
 
 /**
  * @ClassName: Tables

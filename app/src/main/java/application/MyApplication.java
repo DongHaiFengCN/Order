@@ -48,22 +48,21 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 public class MyApplication extends Application implements ISharedPreferences, ReplicatorChangeListener {
 
     private static final String TAG = Application.class.getSimpleName();
-    private final static boolean LOGIN_FLOW_ENABLED = false;
+
     private final static boolean SYNC_ENABLED = true;
     private final static String DATABASE_NAME = "kitchendb118";
     private final static String SYNCGATEWAY_URL = "blip://123.207.174.171:4984/kitchen/";
     private Database database = null;
     private Replicator replicator;
-    private String username = DATABASE_NAME;
     //private String Company_ID="zmsy010";
     private String Company_ID="wangbo08";
-    private ExecutorService mExecutor;
 
+    private ExecutorService mExecutor;
     OkHttpClient okHttpClient;
     @Override
-    public void onCreate() {
+    public void onCreate()
+    {
         super.onCreate();
-
         CrashReport.initCrashReport(getApplicationContext(), "1b0a55dc94", true);
         startSession(DATABASE_NAME, null);
         mExecutor =  Executors.newCachedThreadPool();
@@ -82,7 +81,6 @@ public class MyApplication extends Application implements ISharedPreferences, Re
 
     private void startSession(String username, String password) {
         openDatabase(username);
-        this.username = username;
         startReplication(username, password);
     }
 
@@ -110,6 +108,9 @@ public class MyApplication extends Application implements ISharedPreferences, Re
             }
         }
 
+    }
+    public Database getDatabase() {
+        return database;
     }
     private ConflictResolver getConflictResolver(){
         /**

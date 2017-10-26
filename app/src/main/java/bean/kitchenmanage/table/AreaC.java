@@ -1,4 +1,4 @@
-package bean.table;
+package bean.kitchenmanage.table;
 import java.io.Serializable;
 import java.util.List;
 

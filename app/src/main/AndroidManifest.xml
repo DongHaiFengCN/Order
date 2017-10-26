@@ -39,7 +39,10 @@
             android:configChanges="keyboard|keyboardHidden|orientation"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".view.ScanActivity" />
-        <activity android:name=".view.DeskActivity"></activity>
+        <activity android:name=".view.DeskActivity"
+             >
+
+        </activity>
     </application>
 
 </manifest>

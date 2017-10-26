@@ -1,4 +1,4 @@
-package bean.table;
+package bean.kitchenmanage.table;
 
 import java.util.Date;
 
