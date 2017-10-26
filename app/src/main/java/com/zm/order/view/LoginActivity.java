@@ -106,7 +106,6 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
     public void success() {
 
         Intent intent = new Intent(this,MainActivity.class);
-
         startActivity(intent);
         finish();
 
