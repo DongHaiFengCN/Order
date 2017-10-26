@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -33,6 +34,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import model.ProgressBarasyncTask;
+import untils.MyLog;
 
 /**
  * @author 董海峰
@@ -58,7 +60,14 @@ public class PayActivity extends AppCompatActivity {
     private Intent intent;
     private AlertDialog.Builder alertDialog;
     private Bitmap bitmap = null;
+    private static final int DISTCOUNT = 0;
+    private float total = 0.0f;
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        MyLog.e(total+"?");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +98,10 @@ public class PayActivity extends AppCompatActivity {
 
         String alipayId = "qwhhh";
         bitmap = encodeAsBitmap(alipayId);
+
+        total = 4399;
     }
+
 
 
     public void showDialog() {
@@ -120,14 +132,6 @@ public class PayActivity extends AppCompatActivity {
 
                 break;
 
-      /*      case R.id.action_sm:
-
-                new IntentIntegrator(this)
-                        .setOrientationLocked(false)
-                        .setCaptureActivity(ScanActivity.class) // 设置自定义的activity是CustomActivity
-                        .initiateScan(); // 初始化扫描
-
-                break;*/
             default:
                 break;
         }
@@ -140,25 +144,13 @@ public class PayActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-       /* IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode,resultCode,data);
+        if(requestCode == DISTCOUNT && resultCode == RESULT_OK ){
 
-        if(intentResult != null) {
+               total = data.getFloatExtra("Total",0);
 
-            if(intentResult.getContents() == null) {
+                MyLog.e(total+"");
 
-                Toast.makeText(this,"扫描失败，请重新尝试。",Toast.LENGTH_LONG).show();
-            } else {
-
-                tableNumber = intentResult.getContents();
-                intent.putExtra("tableNumber",tableNumber);
-
-                tableNumber_tv.setText("桌号/ "+tableNumber);
-
-
-            }
-        } else {
-            super.onActivityResult(requestCode,resultCode,data);
-        }*/
+        }
 
 
     }
@@ -183,7 +175,10 @@ public class PayActivity extends AppCompatActivity {
         switch (view.getId()) {
             case R.id.discount:
 
-                Toast.makeText(PayActivity.this,"discount",Toast.LENGTH_SHORT).show();
+                Intent discount = new Intent();
+                discount.setClass(PayActivity.this,DiscountActivity.class);
+                discount.putExtra("Total",total);
+                startActivityForResult(discount,DISTCOUNT);
 
                 break;
             case R.id.associator:

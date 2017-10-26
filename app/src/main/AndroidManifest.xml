@@ -31,7 +31,8 @@
             </intent-filter>
         </activity>
 
-  <!--      <activity
+        <!--
+            <activity
             android:name=".view.LoginActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -48,7 +49,11 @@
             android:name=".view.PayActivity"
             android:configChanges="keyboard|keyboardHidden|orientation"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".view.ScanActivity" />-->
+        <activity android:name=".view.ScanActivity" />
+        -->
+        <activity android:name=".view.DiscountActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            ></activity>
     </application>
 
 </manifest>

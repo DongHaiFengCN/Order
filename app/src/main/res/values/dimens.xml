@@ -1,4 +1,5 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="viewhight">48dp</dimen>
+    <dimen name="radiobutton">24dp</dimen>
 </resources>

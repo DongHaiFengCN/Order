@@ -20,6 +20,8 @@
     <color name="grey_color3">#999999</color>
     <!-- 橙色 -->
     <color name="orange_color">#de6838</color>
+    <color name="orange_color_600">#FB8C00</color>
+    <color name="orange_color_400">#FFA726</color>
     <!--reds-->
     <color name="md_red_50">#FFEBEE</color>
     <color name="md_red_100">#FFCDD2</color>

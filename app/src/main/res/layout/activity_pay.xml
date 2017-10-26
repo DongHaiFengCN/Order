@@ -12,9 +12,7 @@
         app:elevation="0dp"
         android:background="@color/paycolor"
         android:id="@+id/appBarLayout"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+       >
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
@@ -217,7 +215,7 @@
             android:layout_weight="1"
             android:clickable="true"
             android:layout_height="match_parent"
-            android:src="@mipmap/icon_zhi"
+            android:src="@mipmap/icon_alipay"
             android:padding="16dp"
             android:background="@drawable/background_pay_select"
             />
@@ -236,7 +234,7 @@
             android:layout_weight="1"
             android:clickable="true"
             android:padding="16dp"
-            android:src="@mipmap/icon_wei"
+            android:src="@mipmap/icon_wx"
             android:layout_height="match_parent"
             android:background="@drawable/background_pay_select"
             />
@@ -255,7 +253,7 @@
             android:layout_weight="1"
             android:clickable="true"
             android:padding="16dp"
-            android:src="@mipmap/icon_qian"
+            android:src="@mipmap/icon_rmb"
             android:layout_height="match_parent"
             android:background="@drawable/background_pay_select"
             />
