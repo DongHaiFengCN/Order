@@ -1,14 +1,24 @@
 package com.zm.order.view;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.InputFilter;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zm.order.R;
@@ -16,7 +26,6 @@ import com.zm.order.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import untils.MyLog;
 
 
 public class DiscountActivity extends AppCompatActivity {
@@ -31,9 +40,12 @@ public class DiscountActivity extends AppCompatActivity {
     RadioGroup unit;
     @BindView(R.id.submit_area)
     Button submitArea;
-
-    private float total;
-
+    @BindView(R.id.total_tv)
+    TextView totalTv;
+    @BindView(R.id.discount_et)
+    EditText discountEt;
+    private float stashTotal;
+    private CharSequence c;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,8 +56,89 @@ public class DiscountActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        total = getIntent().getFloatExtra("Total",0);
-        MyLog.e(total+"");
+        stashTotal = getIntent().getFloatExtra("Total", 0);
+
+        totalTv.setText(stashTotal+"");
+
+        discountEt.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                if (MotionEvent.ACTION_DOWN == motionEvent.getAction()) {
+
+                    if(unitTen.isChecked()){
+
+                        unitTen.setChecked(false);
+                    }
+                    if(unitElement.isChecked()){
+
+                        unitElement.setChecked(false);
+                    }
+                    if(unitHorn.isChecked()){
+
+                        unitHorn.setChecked(false);
+                    }
+                    if(!discountEt.isCursorVisible()){
+
+                        discountEt.setCursorVisible(true);
+                    }
+
+                    if(getTextTotal() != stashTotal){
+
+                        totalTv.setText(stashTotal+"");
+                    }
+
+                }
+
+                return false;
+            }
+        });
+
+
+
+        discountEt.addTextChangedListener(new TextWatcher() {
+
+
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                c = charSequence;
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+
+                if(!TextUtils.isEmpty(discountEt.getText().toString())){
+
+                    if(getTextTotal() >= Float.valueOf(discountEt.getText().toString())){
+
+                        totalTv.setText((stashTotal-Float.valueOf(discountEt.getText().toString()))+"");
+
+                    }else {
+
+                        //设置输入的长度
+                        discountEt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(c.length())});
+                        Toast.makeText(DiscountActivity.this,"输入的数字超出当前总价！",Toast.LENGTH_SHORT).show();
+                    }
+
+                }else {
+
+                    totalTv.setText(stashTotal+"");
+                }
+            }
+        });
+
+    }
+
+    public float getTextTotal(){
+
+        return (TextUtils.isEmpty(totalTv.getText().toString()))?0:Float.valueOf(totalTv.getText().toString());
     }
 
     @Override
@@ -63,26 +156,62 @@ public class DiscountActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @OnClick({R.id.unit_ten, R.id.unit_element, R.id.unit_horn, R.id.unit, R.id.submit_area})
+    @OnClick({R.id.unit_ten, R.id.unit_element, R.id.unit_horn,R.id.submit_area})
     public void onClick(View view) {
+
+        if(discountEt.isCursorVisible()){
+
+            discountEt.setCursorVisible(false);
+
+            if(!TextUtils.isEmpty(discountEt.getText().toString())){
+                discountEt.setText("");
+            }
+
+               /*隐藏软键盘*/
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            if(inputMethodManager.isActive()){
+                inputMethodManager.hideSoftInputFromWindow(DiscountActivity.this.getCurrentFocus().getWindowToken(), 0);
+            }
+        }
+
         switch (view.getId()) {
             case R.id.unit_ten:
-                Toast.makeText(DiscountActivity.this,"unit_ten",Toast.LENGTH_SHORT).show();
+
+                compareTotal(100f);
+
                 break;
             case R.id.unit_element:
-                Toast.makeText(DiscountActivity.this,"unit_element",Toast.LENGTH_SHORT).show();
+
+                compareTotal(10f);
+
                 break;
             case R.id.unit_horn:
-                Toast.makeText(DiscountActivity.this,"unit_horn",Toast.LENGTH_SHORT).show();
+
+                compareTotal(1f);
+
                 break;
             case R.id.submit_area:
 
                 Intent intent = new Intent();
-                intent.putExtra("Total",total-1);
-                setResult(RESULT_OK,intent);
+                intent.putExtra("Total", getTextTotal());
+                setResult(RESULT_OK, intent);
                 finish();
 
                 break;
         }
     }
+
+  public void compareTotal(float t){
+
+
+      if(stashTotal > t){
+
+          totalTv.setText(String.valueOf(stashTotal - t));
+
+      }else {
+
+          Toast.makeText(DiscountActivity.this,"不满足条件！",Toast.LENGTH_SHORT).show();
+
+      }
+  }
 }

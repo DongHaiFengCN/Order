@@ -64,12 +64,6 @@ public class PayActivity extends AppCompatActivity {
     private float total = 0.0f;
 
     @Override
-    protected void onRestart() {
-        super.onRestart();
-        MyLog.e(total+"?");
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pay);
@@ -148,7 +142,6 @@ public class PayActivity extends AppCompatActivity {
 
                total = data.getFloatExtra("Total",0);
 
-                MyLog.e(total+"");
 
         }
 

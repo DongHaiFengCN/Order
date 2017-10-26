@@ -34,6 +34,40 @@
                 android:textSize="16sp" />
         </android.support.v7.widget.Toolbar>
 
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="2">
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="￥"
+        android:typeface="sans"
+        android:textSize="28sp"
+        android:textColor="@color/md_white"
+        android:gravity="center|right"
+        android:paddingBottom="16dp"
+        android:paddingTop="16dp"
+        />
+    <TextView
+        android:id="@+id/total_tv"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="80.00"
+        android:typeface="sans"
+        android:textSize="28sp"
+        android:textColor="@color/md_white"
+        android:gravity="center|left"
+        android:paddingBottom="16dp"
+        android:paddingTop="16dp"
+        android:layout_marginRight="56dp"
+        />
+</LinearLayout>
+
+
 
     </android.support.design.widget.AppBarLayout>
 
@@ -76,7 +110,6 @@
                 android:layout_height="match_parent"
                 android:layout_marginLeft="24dp"
                 android:layout_weight="1"
-                android:checked="true"
                 android:text="元" />
 
             <RadioButton
@@ -96,6 +129,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         >
 
         <TextView
@@ -107,6 +142,7 @@
             android:textSize="14sp" />
 
             <EditText
+                android:id="@+id/discount_et"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:background="@color/md_white"
