@@ -40,7 +40,6 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
         setContentView(R.layout.activity_login);
 
 
-
          myApplication = (MyApplication) getApplication();
 
           //查看是否有缓存
