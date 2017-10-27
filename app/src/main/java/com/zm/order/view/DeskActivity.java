@@ -95,7 +95,6 @@ public class DeskActivity extends AppCompatActivity {
       listViewDesk.setLayoutManager(new GridLayoutManager(this,3));
       listViewDesk.setAdapter(tableadapter);
 
-
   }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

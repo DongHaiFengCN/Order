@@ -45,7 +45,7 @@ import presenter.IMainPresenter;
 import presenter.MainPresenterImpl;
 import untils.AnimationUtil;
 
-public class MainActivity extends AppCompatActivity  {
+public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.activity_frame)
     FrameLayout activityFrame;
@@ -56,15 +56,11 @@ public class MainActivity extends AppCompatActivity  {
     private ImageView car_iv;
     private boolean flag = true;
     private ImageButton delet_bt;
-    private List<SparseArray<Object>> orderItem = new ArrayList<>();
-    public OrderAdapter o;
-
+    public  List<SparseArray<Object>> orderItem = new ArrayList<>();
+    public  OrderAdapter o;
     private int point = 0;
-
     private TextView point_tv;
-
     private float total = 0.0f;
-
     private Fragment seekT9Fragment;
     private Fragment orderFragment;
 
@@ -90,8 +86,12 @@ public class MainActivity extends AppCompatActivity  {
         select(isFlag);
     }
 
-    private void geiIm(){}
-
+    public List<SparseArray<Object>> setOrderItem(){
+        return orderItem;
+    }
+    public int getPoint(){
+        return point;
+    }
     public void initView() {
 
         total_tv = (TextView) findViewById(R.id.total_tv);
@@ -110,51 +110,6 @@ public class MainActivity extends AppCompatActivity  {
 
         final LinearLayout linearLayout = (LinearLayout) findViewById(R.id.orderList);
 
-        //初始化订单的数据，绑定数据源的信息。
-
-        o = new OrderAdapter(orderItem, MainActivity.this);
-
-        order_lv = (ListView) findViewById(R.id.order_lv);
-
-        order_lv.setAdapter(o);
-
-        //监听orderItem的增加删除，设置总价以及总数量, flag ？+ ：-,price 单价 ,sum 当前item的个数。
-
-        o.setOnchangeListener(new OrderAdapter.OnchangeListener() {
-            @Override
-            public void onchangeListener(boolean flag, float price, int sum) {
-
-                if (flag) {
-
-                    total += price;
-
-                    total_tv.setText(total + "元");
-
-
-                } else {
-
-                    total -= price;
-
-                    total_tv.setText(total + "元");
-
-                    if (sum == 0) {
-
-                        point--;
-
-                        point_tv.setText(point + "");
-
-                        if (point == 0) {
-
-                            point_tv.setVisibility(View.INVISIBLE);
-                        }
-
-
-                    }
-
-
-                }
-            }
-        });
 
         //获取屏幕尺寸
 
@@ -171,11 +126,50 @@ public class MainActivity extends AppCompatActivity  {
         layoutParams.height = h / 2;
         linearLayout.setLayoutParams(layoutParams);
 
-
         car_iv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //初始化订单的数据，绑定数据源的信息。
+                o = new OrderAdapter( setOrderItem(), MainActivity.this);
+                order_lv = (ListView) findViewById(R.id.order_lv);
+                order_lv.setAdapter(o);
+                //监听orderItem的增加删除，设置总价以及总数量, flag ？+ ：-,price 单价 ,sum 当前item的个数。
 
+                o.setOnchangeListener(new OrderAdapter.OnchangeListener() {
+                    @Override
+                    public void onchangeListener(boolean flag, float price, int sum) {
+
+                        if (flag) {
+
+                            total += price;
+
+                            total_tv.setText(total + "元");
+
+
+                        } else {
+
+                            total -= price;
+
+                            total_tv.setText(total + "元");
+
+                            if (sum == 0) {
+
+                                point--;
+
+                                point_tv.setText(point + "");
+
+                                if (point == 0) {
+
+                                    point_tv.setVisibility(View.INVISIBLE);
+                                }
+
+
+                            }
+
+
+                        }
+                    }
+                });
                 if (flag) {
 
                     linearLayout.setAnimation(AnimationUtil.moveToViewLocation());
@@ -230,7 +224,7 @@ public class MainActivity extends AppCompatActivity  {
                 if (total > 0) {
 
                     Intent intent = new Intent(MainActivity.this, PayActivity.class);
-                    intent.putExtra("Order", (Serializable) orderItem);
+                    intent.putExtra("Order", (Serializable) setOrderItem());
                     intent.putExtra("total", total);
                     startActivityForResult(intent, 1);
 
@@ -275,7 +269,7 @@ public class MainActivity extends AppCompatActivity  {
         total_tv.setText("0元");
         total = 0;
 
-        orderItem.clear();
+        setOrderItem().clear();
         o.notifyDataSetChanged();
     }
 
