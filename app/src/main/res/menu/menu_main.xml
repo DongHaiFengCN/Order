@@ -9,7 +9,7 @@
          />
 
        <item android:id="@+id/action_search"
-           android:icon="@mipmap/hone_search"
+           android:icon="@drawable/animcut"
            app:showAsAction="ifRoom"
            android:title="@string/search"/>
 
