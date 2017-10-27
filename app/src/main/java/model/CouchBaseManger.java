@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import application.MyApplication;
 import untils.MyLog;
 
 /**
@@ -43,7 +44,7 @@ import untils.MyLog;
  * 修改备注：
  */
 
-public class CouchBaseManger<T> implements IDBManager,ReplicatorChangeListener {
+public class CouchBaseManger<T> implements IDBManager {
 
     private static final String TAG = "CouchBaseManger";
     private final static String DATABASE_NAME = "order";
@@ -57,58 +58,10 @@ public class CouchBaseManger<T> implements IDBManager,ReplicatorChangeListener {
 
     public CouchBaseManger(Context context){
 
-        DatabaseConfiguration config = new DatabaseConfiguration(context.getApplicationContext());
-
-        config.setConflictResolver(getConflictResolver());//冲突解决机制
-
-        try {
-            database = new Database(DATABASE_NAME, config);
-
-            startReplication(DATABASE_NAME,null);
-
-        } catch (CouchbaseLiteException e) {
-            // TODO: error handling
-        }
-
-
+        MyApplication application = (MyApplication)context.getApplicationContext();
+        database = application.getDatabase();
     }
 
-    private ConflictResolver getConflictResolver(){
-        /**
-         * Example: Conflict resolver that merges Mine and Their document.
-         */
-        return new ConflictResolver() {
-            @Override
-            public ReadOnlyDocument resolve(Conflict conflict) {
-                ReadOnlyDocument mine = conflict.getMine();
-                ReadOnlyDocument theirs = conflict.getTheirs();
-
-                Document resolved = new Document();
-                Set<String> changed = new HashSet<>();
-
-                // copy all data from theirs document
-                for (String key : theirs) {
-                    resolved.setObject(key, theirs.getObject(key));
-                    changed.add(key);
-                }
-
-                // copy all data from mine which are not in mine document
-                for (String key : mine) {
-                    if (!changed.contains(key))
-                        resolved.setObject(key, mine.getObject(key));
-                }
-
-                Log.e(TAG, "ConflictResolver.resolve() resolved -> %s", resolved.toMap());
-
-                return resolved;
-            }
-        };
-    }
-
-    @Override
-    public Database getDatabase() {
-        return database;
-    }
 
     @Override
     public void Testshow() {
@@ -273,54 +226,6 @@ public class CouchBaseManger<T> implements IDBManager,ReplicatorChangeListener {
                     }
                return map;
            }
-
-
-    @Override
-    public void changed(Replicator replicator, Replicator.Status status, CouchbaseLiteException error) {
-
-        Log.e(TAG, "**************"+"%s/%s",status.getProgress().getCompleted(),status.getProgress().getTotal());
-    }
-
-
-    // -------------------------
-    // Replicator operation
-    // -------------------------
-
-    private void startReplication(String username, String password) {
-        if (!SYNC_ENABLED) return;
-
-        URI uri;
-        try {
-            uri = new URI(SYNCGATEWAY_URL);
-        } catch (URISyntaxException e) {
-            Log.e(TAG, "Failed parse URI: %s", e, SYNCGATEWAY_URL);
-            return;
-        }
-
-        ReplicatorConfiguration config = new ReplicatorConfiguration(database, uri);
-        List<String>channels =new ArrayList<>();
-        channels.add(Company_ID);
-        config.setChannels(channels);
-        config.setReplicatorType(ReplicatorConfiguration.ReplicatorType.PUSH_AND_PULL);
-        config.setContinuous(true);
-
-
-
-        // authentication
-
-        if (username != null && password != null)
-            config.setAuthenticator(new BasicAuthenticator(username, password));
-
-        replicator = new Replicator(config);
-        replicator.addChangeListener(this);
-        replicator.start();
-    }
-
-    private void stopReplication() {
-        if (!SYNC_ENABLED) return;
-
-        replicator.stop();
-    }
 
 
 }

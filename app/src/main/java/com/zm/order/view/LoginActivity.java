@@ -15,17 +15,20 @@ import com.zm.order.R;
 
 import application.ISharedPreferences;
 import application.MyApplication;
-import model.DBFactory;
-import model.DatabaseSource;
-import model.IDBManager;
 import presenter.ILoginPresenter;
 import presenter.LoginPresentImpl;
 
+/**
+ *
+ *
+ * @author 董海峰
+ * @date 2017/10/25
+ */
 public class LoginActivity extends AppCompatActivity implements ILoginView, ISharedPreferences{
     private EditText name;
     private EditText password;
     private Button submit;
-    private CheckBox saveLoginStatue_chk;
+    private CheckBox saveloginstatueChk;
     private  MyApplication myApplication;
 
     @Override
@@ -37,11 +40,11 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
         setContentView(R.layout.activity_login);
 
 
-
          myApplication = (MyApplication) getApplication();
 
+          //查看是否有缓存
 
-         String flag = myApplication.getSharePreferences().getString("name","");//查看是否有缓存
+         String flag = myApplication.getSharePreferences().getString("name","");
 
            if("".equals(flag)){
 
@@ -56,7 +59,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
 
            //设置登录用户名称全局变量
 
-        myApplication.setLoginName(name.getText().toString());
+        //myApplication.setLoginName(name.getText().toString());
 
 }
 
@@ -66,7 +69,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
 
         password = (EditText) findViewById(R.id.loginPassword_edtTxt);
 
-        saveLoginStatue_chk = (CheckBox) findViewById(R.id.saveLoginStatue_chk);
+        saveloginstatueChk = (CheckBox) findViewById(R.id.saveLoginStatue_chk);
 
         submit = (Button) findViewById(R.id.login_bt);
 
@@ -85,7 +88,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
     @Override
     public String[] getLoginInfo() {
 
-        String info[] = new String[2];
+        String[] info = new String[2];
         info[0] = name.getText().toString();
         info[1]= password.getText().toString();
         return info;
@@ -102,8 +105,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
     @Override
     public void success() {
 
-        Intent intent = new Intent(this,MainActivity.class);
-
+        Intent intent = new Intent(this,DeskActivity.class);
         startActivity(intent);
         finish();
 
@@ -112,7 +114,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
     @Override
     public boolean isSave() {
 
-        return saveLoginStatue_chk.isChecked();
+        return saveloginstatueChk.isChecked();
     }
 
 
