@@ -26,6 +26,7 @@ import com.zm.order.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import untils.MyLog;
 
 
 public class DiscountActivity extends AppCompatActivity {
@@ -82,7 +83,6 @@ public class DiscountActivity extends AppCompatActivity {
 
                         discountEt.setCursorVisible(true);
                     }
-
                     if(getTextTotal() != stashTotal){
 
                         totalTv.setText(stashTotal+"");
@@ -129,7 +129,11 @@ public class DiscountActivity extends AppCompatActivity {
 
                 }else {
 
-                    totalTv.setText(stashTotal+"");
+
+                    if(discountEt.isCursorVisible()){
+
+                        totalTv.setText(stashTotal+"");
+                    }
                 }
             }
         });
@@ -194,6 +198,7 @@ public class DiscountActivity extends AppCompatActivity {
 
                 Intent intent = new Intent();
                 intent.putExtra("Total", getTextTotal());
+                MyLog.e(getTextTotal()+"");
                 setResult(RESULT_OK, intent);
                 finish();
 
@@ -206,7 +211,10 @@ public class DiscountActivity extends AppCompatActivity {
 
       if(stashTotal > t){
 
-          totalTv.setText(String.valueOf(stashTotal - t));
+
+          int stash = (int) (stashTotal/t);
+
+          totalTv.setText(String.valueOf(stash*t));
 
       }else {
 
