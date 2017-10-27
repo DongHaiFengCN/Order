@@ -1,6 +1,7 @@
 package model;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -99,6 +100,17 @@ public class LiveTableRecyclerAdapter extends RecyclerView.Adapter<LiveTableRecy
                 itemClickListener.onItemClick(v,v.getTag());
             }
         });
+        view.setOnLongClickListener(new View.OnLongClickListener()
+        {
+            @Override
+            public boolean onLongClick(View v)
+            {
+
+                if (itemClickListener != null)
+                    itemClickListener.onItemLongClick(v,v.getTag());
+                return false;
+            }
+        });
 
         TestHolderView testHolderView = new TestHolderView(view);
         return testHolderView;
@@ -164,5 +176,7 @@ public class LiveTableRecyclerAdapter extends RecyclerView.Adapter<LiveTableRecy
     public  interface onRecyclerViewItemClickListener {
 
         void onItemClick(View v, Object tag);
+        void onItemLongClick(View v, Object tag);
     }
+
 }

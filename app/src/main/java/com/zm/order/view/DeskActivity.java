@@ -1,9 +1,11 @@
 package com.zm.order.view;
 
 import android.app.Application;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -29,6 +31,7 @@ import application.MyApplication;
 import bean.kitchenmanage.table.AreaC;
 import bean.kitchenmanage.table.TableC;
 import model.AreaAdapter;
+import model.CDBHelper;
 import model.LiveTableRecyclerAdapter;
 import untils.MyLog;
 
@@ -40,7 +43,9 @@ public class DeskActivity extends AppCompatActivity {
     private AreaAdapter areaAdapter;
 
     private RecyclerView listViewDesk;
-    private LiveTableRecyclerAdapter tableadapter;
+
+
+    private MyApplication myapp;
 
     private Handler uiHandler = new Handler()
     {
@@ -71,12 +76,14 @@ public class DeskActivity extends AppCompatActivity {
             actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        myapp= (MyApplication) getApplicationContext();
+
         initWidget();
     }
     private void initWidget()
     {
-       final MyApplication application = (MyApplication) getApplication();
-        db = application.getDatabase();
+
+        db = myapp.getDatabase();
         if(db == null) throw new IllegalArgumentException();
         areaAdapter = new AreaAdapter(this, db);
         listViewArea = (ListView)findViewById(R.id.lv_area);
@@ -108,11 +115,45 @@ public class DeskActivity extends AppCompatActivity {
             public void onItemClick(View view,Object data)
             {
                 TableC tableC=(TableC)data;
+                tableC.setState(2);
+                CDBHelper.createAndUpdate(getApplicationContext(),tableC);
+                myapp.setTable_sel_obj(tableC);
+
                 Intent mainIntent = new Intent();
-                mainIntent.putExtra("state", tableC.getState());
-                mainIntent.putExtra("tableId", tableC.get_id());
                 mainIntent.setClass(DeskActivity.this, MainActivity.class);
-                startActivityForResult(mainIntent, 1);
+                startActivity(mainIntent);
+            }
+            @Override
+            public void onItemLongClick(View view,Object data)
+            {
+                final TableC tableC=(TableC)data;
+                if(tableC.getState()==0)//空闲不用弹出消台框
+                    return;
+                //// TODO: 2017/10/27 判断是否有未买单情况，一定要强制提示
+
+                android.app.AlertDialog.Builder dialog1 = new android.app.AlertDialog.Builder(DeskActivity.this);
+                dialog1.setTitle("是否消台？").setCancelable(false);
+                dialog1.setNegativeButton("是",
+                        new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                tableC.setState(0);
+                                CDBHelper.createAndUpdate(getApplicationContext(),tableC);
+                                myapp.setTable_sel_obj(tableC);
+                            }
+                        }).setPositiveButton("否",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface arg0, int arg1)
+                            {
+                                // TODO Auto-generated method stub
+                            }
+                        }).show();
+
+
+
             }
         });
         long endTime1 = System.currentTimeMillis();

@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import bean.kitchenmanage.table.TableC;
 import okhttp3.OkHttpClient;
 import untils.MyLog;
 
@@ -56,6 +57,7 @@ public class MyApplication extends Application implements ISharedPreferences, Re
     private Replicator replicator;
     //private String Company_ID="zmsy010";
     private String Company_ID="wangbo08";
+    private TableC table_sel_obj;
 
     public ExecutorService mExecutor;
     OkHttpClient okHttpClient;
@@ -203,5 +205,13 @@ public class MyApplication extends Application implements ISharedPreferences, Re
 
     public void setCompany_ID(String company_ID) {
         Company_ID = company_ID;
+    }
+
+    public TableC getTable_sel_obj() {
+        return table_sel_obj;
+    }
+
+    public void setTable_sel_obj(TableC table_sel_obj) {
+        this.table_sel_obj = table_sel_obj;
     }
 }
