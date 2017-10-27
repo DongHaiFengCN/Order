@@ -59,6 +59,7 @@ public class PayActivity extends AppCompatActivity {
     private AlertDialog.Builder alertDialog;
     private Bitmap bitmap = null;
     private static final int DISTCOUNT = 0;
+    private static final int SALE = 1;
     private float total = 0.0f;
 
     @Override
@@ -89,7 +90,7 @@ public class PayActivity extends AppCompatActivity {
         String alipayId = "qwhhh";
         bitmap = encodeAsBitmap(alipayId);
 
-        total = 324.5f;
+        total = 32.5f;
         totalTv.setText(total+"");
         factTv.setText("实际支付："+total+"元");
     }
@@ -175,7 +176,9 @@ public class PayActivity extends AppCompatActivity {
                 break;
             case R.id.associator:
 
-                Toast.makeText(PayActivity.this, "associator", Toast.LENGTH_SHORT).show();
+                Intent sale = new Intent();
+                sale.setClass(PayActivity.this, SaleActivity.class);
+                startActivityForResult(sale, SALE);
 
                 break;
             case R.id.ivalipay:

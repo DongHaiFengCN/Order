@@ -206,6 +206,10 @@ public class DiscountActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 判断是否满足折扣条件
+     * @param t
+     */
   public void compareTotal(float t){
 
 

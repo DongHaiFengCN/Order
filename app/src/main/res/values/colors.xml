@@ -66,4 +66,5 @@
     <color name="item_select">#f2ba5e</color>
     <color name="item_normal">#f4f4f4</color>
     <color name="bootstrap_brand_success">#5cb85c</color>
+    <color name="bootstrap_brand_press">#7bff94</color>
 </resources>
