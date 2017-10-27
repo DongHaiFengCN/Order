@@ -7,12 +7,14 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.couchbase.lite.Document;
 import com.zm.order.R;
 
 import java.util.List;
 
+import bean.kitchenmanage.dishes.DishesC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import model.DBFactory;
@@ -25,15 +27,18 @@ import model.IDBManager;
 
 public class SeekT9Adapter extends BaseAdapter {
 
-    private List<String> mData;
+    private List<DishesC> mData;
     private Context context;
-    private IDBManager idbManager;
-
+    private SeekT9OnClickListener listener;
     public SeekT9Adapter(Context context) {
-        idbManager = DBFactory.get(DatabaseSource.CouchBase, context);
+        this.context = context;
     }
 
-    public void setmData(List<String> mData) {
+    public void setListener(SeekT9OnClickListener listener){
+        this.listener = listener;
+    }
+
+    public void setmData(List<DishesC> mData) {
         this.mData = mData;
     }
 
@@ -53,7 +58,7 @@ public class SeekT9Adapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
 
         if (convertView == null) {
@@ -66,17 +71,22 @@ public class SeekT9Adapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        viewHolder.itemSeekInfo = convertView.findViewById(R.id.item_seek_info);
-        viewHolder.itemSeekTv = convertView.findViewById(R.id.item_seek_tv);
-        Document document = (Document) idbManager.getById(mData.get(position));
-        viewHolder.itemSeekInfo.setText(document.getString("name"));
-
+        viewHolder.itemSeekInfo.setText(mData.get(position).getDishesName());
+        viewHolder.itemSeekTv.setText(mData.get(position).getPrice()+"");
+        viewHolder.itemSeekLn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               if (listener != null){
+                   listener.OnClickListener(mData.get(position).getDishesName(),mData.get(position).getPrice());
+               }
+            }
+        });
         return convertView;
     }
 
-
-    static
-
+    interface SeekT9OnClickListener{
+        void OnClickListener(String name,float price);
+    }
     public class ViewHolder {
         @BindView(R.id.item_seek_info)
         TextView itemSeekInfo;
