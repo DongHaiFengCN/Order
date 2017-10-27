@@ -208,9 +208,6 @@ public class CDBHelper
       Result row;
       while ((row = resultSet.next()) != null)
       {
-
-
-
         ObjectMapper objectMapper = new ObjectMapper();
         // Ignore undeclared properties
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -644,7 +641,8 @@ public class CDBHelper
   }
 
 
-  private static class SingletonHolder{
+  private static class SingletonHolder
+  {
     private final static CDBHelper single=new CDBHelper();
   }
   public static CDBHelper getInstance(){

@@ -4,12 +4,14 @@ import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.DataSource;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.Document;
@@ -19,15 +21,20 @@ import com.couchbase.lite.LiveQueryChange;
 import com.couchbase.lite.LiveQueryChangeListener;
 import com.couchbase.lite.Ordering;
 import com.couchbase.lite.Query;
+import com.couchbase.lite.ReadOnlyDictionary;
 import com.couchbase.lite.Result;
 import com.couchbase.lite.ResultSet;
 import com.couchbase.lite.SelectResult;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zm.order.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import bean.kitchenmanage.table.TableC;
+import untils.MyLog;
 
 
 /**
@@ -43,9 +50,10 @@ public class LiveTableRecyclerAdapter extends RecyclerView.Adapter<LiveTableRecy
     private LiveQuery listsLiveQuery = null;
     protected Context context;
     private List<String> documentList;
+
     private onRecyclerViewItemClickListener itemClickListener = null;
 
-    public LiveTableRecyclerAdapter(Context context,Database db,String areaId)
+    public LiveTableRecyclerAdapter(Context context,final Database db,String areaId)
     {
         if(db == null) throw new IllegalArgumentException();
         this.db = db;
@@ -63,6 +71,7 @@ public class LiveTableRecyclerAdapter extends RecyclerView.Adapter<LiveTableRecy
                     documentList.add(row.getString(0));
                 }
                 notifyDataSetChanged();
+
             }
         });
         this.listsLiveQuery.run();
@@ -91,7 +100,7 @@ public class LiveTableRecyclerAdapter extends RecyclerView.Adapter<LiveTableRecy
             }
         });
 
-    TestHolderView testHolderView = new TestHolderView(view);
+        TestHolderView testHolderView = new TestHolderView(view);
         return testHolderView;
     }
 
@@ -104,14 +113,11 @@ public class LiveTableRecyclerAdapter extends RecyclerView.Adapter<LiveTableRecy
     @Override
     public void onBindViewHolder(LiveTableRecyclerAdapter.TestHolderView holder, int position)
     {
-//        ViewGroup.LayoutParams params = holder.itemView.getLayoutParams();
-//        params.height = 100;
-//        params.width = 100;
-//        holder.itemView.setLayoutParams(params);//把params设置item布局
 
 
         String docId=documentList.get(position);
         TableC tableobj=CDBHelper.getObjById(context.getApplicationContext(),docId, TableC.class);
+
         int state=tableobj.getState();
         switch (state)
         {
@@ -130,6 +136,7 @@ public class LiveTableRecyclerAdapter extends RecyclerView.Adapter<LiveTableRecy
 
         holder.tv.setText(tableobj.getTableName());
         holder.itemView.setTag(tableobj);
+
     }
 
     @Override

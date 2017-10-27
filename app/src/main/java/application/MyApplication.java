@@ -57,7 +57,7 @@ public class MyApplication extends Application implements ISharedPreferences, Re
     //private String Company_ID="zmsy010";
     private String Company_ID="wangbo08";
 
-    private ExecutorService mExecutor;
+    public ExecutorService mExecutor;
     OkHttpClient okHttpClient;
     @Override
     public void onCreate()
