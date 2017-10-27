@@ -137,9 +137,16 @@ public class SaleActivity extends AppCompatActivity {
 
                     SMSSDK.submitVerificationCode("+86", etAmountphone.getText().toString(), etcode.getText().toString());
 
-                    String result = requestData("https://webapi.sms.mob.com/sms/verify","appkey=21efc5a881e60&phone="+etAmountphone.getText().toString()+"&zone=86&&code="+etcode.getText().toString());
 
-                    MyLog.e(result);
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            String result = requestData("https://webapi.sms.mob.com/sms/verify","appkey=21efc5a881e60&phone="+etAmountphone.getText().toString()+"&zone=86&&code="+etcode.getText().toString());
+                            MyLog.e(result);
+                        }
+                    }).start();
+
+
                 }
                 break;
         }
