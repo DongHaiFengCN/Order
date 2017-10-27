@@ -98,6 +98,18 @@ public class SaleActivity extends AppCompatActivity {
 
 
                     }
+
+                    if(event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE){
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                Toast.makeText(SaleActivity.this,"验证码验证通过！！",Toast.LENGTH_SHORT).show();
+
+                            }
+                        });
+                    }
                 }
             }
         };
