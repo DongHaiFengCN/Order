@@ -190,6 +190,12 @@
                 android:background="@color/md_white" />
 
         </LinearLayout>
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:src="@drawable/divider" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="48dp"
@@ -241,6 +247,12 @@
 
 
         </LinearLayout>
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:src="@drawable/divider" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="48dp"

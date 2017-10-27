@@ -34,7 +34,7 @@ import model.ProgressBarasyncTask;
  */
 
 public class PayActivity extends AppCompatActivity {
-
+    
     @BindView(R.id.discount)
     LinearLayout discount;
     @BindView(R.id.associator)
