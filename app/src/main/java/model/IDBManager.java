@@ -20,8 +20,6 @@ import java.util.List;
 
 public interface IDBManager<T> {
 
-    Database getDatabase() ;
-
     void Testshow();
 
     boolean isLogin(String name, String pass);

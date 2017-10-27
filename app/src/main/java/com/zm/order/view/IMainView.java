@@ -1,5 +1,7 @@
 package com.zm.order.view;
 
+import android.content.Context;
+
 import java.util.List;
 
 /**
@@ -20,5 +22,6 @@ public interface IMainView {
 
     void showKindName(List<String> data);
 
+    Context getIMainViewActivity();
 
 }

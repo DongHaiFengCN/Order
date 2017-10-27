@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    >
 
     <!--<RelativeLayout
+        android:id="@+id/seek_rel"
         android:layout_width="match_parent"
         android:layout_height="50sp"
         android:background="@color/colorPrimaryDark">
 
         <ImageView
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:src="@drawable/bg_amount_layout"
+            android:layout_height="30sp"
+            android:src="@drawable/animback"
+            android:layout_marginLeft="20dp"
+            android:layout_centerVertical="true"
             />
 
         <TextView
@@ -25,162 +29,183 @@
             android:textColor="@color/md_white"
 
             />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="30sp"
+
+            />
 
 
-    </RelativeLayout>-->
-
+    </RelativeLayout>
+-->
     <ListView
         android:id="@+id/activity_seek_list"
         android:layout_width="match_parent"
-        android:layout_height="200sp"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/activity_seek_edit"
         />
 
 
     <EditText
+        android:id="@+id/activity_seek_edit"
         android:layout_width="match_parent"
-        android:layout_height="50sp"
-        android:background="@null"
+        android:layout_height="70sp"
+        android:background="@drawable/background_select"
+        android:gravity="center"
+        android:layout_centerInParent="true"
+        android:textSize="22sp"
+        android:layout_margin="20sp"
+        android:focusable="false"
         />
 
 
 
     <TableLayout
+        android:layout_below="@+id/activity_seek_edit"
         android:id="@+id/tl_key_grid"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
         android:visibility="visible"
+        android:layout_above="@+id/linearLayout3"
+        android:layout_marginTop="20sp"
         >
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="50sp"
             android:layout_weight="1">
 
-            <ImageButton
+            <ImageView
                 android:id="@+id/ibtn_key_1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 style="@style/style_public_1"
                 android:background="@drawable/bg_key_selector"
-                android:onClick="onClick"
                 android:src="@mipmap/icon_key_1"
                 />
 
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:id="@+id/ibtn_key_2"
                 style="@style/style_public_1"
                 android:background="@drawable/bg_key_selector"
-                android:onClick="onClick"
                 android:src="@mipmap/icon_key_2" />
 
-            <ImageButton
+            <ImageView
                 android:id="@+id/ibtn_key_3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 style="@style/style_public_1"
                 android:background="@drawable/bg_key_selector"
-                android:onClick="onClick"
                 android:src="@mipmap/icon_key_3" />
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="50sp"
             android:layout_weight="1">
 
-            <ImageButton
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:id="@+id/ibtn_key_4"
                 style="@style/style_public_1"
                 android:background="@drawable/bg_key_selector"
-                android:onClick="onClick"
                 android:src="@mipmap/icon_key_4" />
 
-            <ImageButton
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:id="@+id/ibtn_key_5"
                 style="@style/style_public_1"
                 android:background="@drawable/bg_key_selector"
-                android:onClick="onClick"
                 android:src="@mipmap/icon_key_5" />
 
-            <ImageButton
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:id="@+id/ibtn_key_6"
                 style="@style/style_public_1"
                 android:background="@drawable/bg_key_selector"
-                android:onClick="onClick"
                 android:src="@mipmap/icon_key_6" />
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="50sp"
             android:layout_weight="1">
 
-            <ImageButton
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:id="@+id/ibtn_key_7"
                 style="@style/style_public_1"
                 android:background="@drawable/bg_key_selector"
-                android:onClick="onClick"
                 android:src="@mipmap/icon_key_7" />
 
-            <ImageButton
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:id="@+id/ibtn_key_8"
                 style="@style/style_public_1"
                 android:background="@drawable/bg_key_selector"
-                android:onClick="onClick"
                 android:src="@mipmap/icon_key_8" />
 
-            <ImageButton
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:id="@+id/ibtn_key_9"
                 style="@style/style_public_1"
                 android:background="@drawable/bg_key_selector"
-                android:onClick="onClick"
                 android:src="@mipmap/icon_key_9" />
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="50sp"
             android:layout_weight="1">
 
-            <ImageButton
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:id="@+id/ibtn_key_l"
                 style="@style/style_public_1"
                 android:background="@drawable/bg_key_selector"
-                android:onClick="onClick"
                 android:src="@mipmap/icon_key_l" />
 
-            <ImageButton
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:id="@+id/ibtn_key_0"
                 style="@style/style_public_1"
                 android:background="@drawable/bg_key_selector"
-                android:onClick="onClick"
                 android:src="@mipmap/icon_key_0" />
 
-            <ImageButton
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:id="@+id/ibtn_key_r"
                 style="@style/style_public_1"
                 android:background="@drawable/bg_key_selector"
-                android:onClick="onClick"
                 android:src="@mipmap/icon_key_r" />
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="50sp"
             android:layout_weight="1">
 
-            <ImageButton
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:id="@+id/ibtn_key_del"
                 style="@style/style_public_1"
                 android:background="@drawable/bg_key_selector"
-                android:onClick="onClick"
                 android:src="@mipmap/icon_key_del" />
         </TableRow>
     </TableLayout>
 
-
-
-</LinearLayout>
+</RelativeLayout>

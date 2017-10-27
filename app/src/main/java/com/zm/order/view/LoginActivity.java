@@ -59,7 +59,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
 
            //设置登录用户名称全局变量
 
-        myApplication.setLoginName(name.getText().toString());
+        //myApplication.setLoginName(name.getText().toString());
 
 }
 
@@ -105,8 +105,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
     @Override
     public void success() {
 
-        Intent intent = new Intent(this,MainActivity.class);
-
+        Intent intent = new Intent(this,DeskActivity.class);
         startActivity(intent);
         finish();
 

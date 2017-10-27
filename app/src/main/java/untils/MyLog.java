@@ -26,4 +26,14 @@ public class MyLog {
         }
 
     }
+    public static void d(String info){
+
+
+        if(FLAG){
+
+            android.util.Log.d(TAG,info);
+
+        }
+
+    }
 }

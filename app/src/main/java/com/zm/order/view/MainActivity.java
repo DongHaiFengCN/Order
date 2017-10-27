@@ -2,10 +2,14 @@ package com.zm.order.view;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,8 +21,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -34,161 +38,69 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import untils.AnimationUtil;
 import application.MyApplication;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import presenter.IMainPresenter;
 import presenter.MainPresenterImpl;
+import untils.AnimationUtil;
 
-public class MainActivity extends AppCompatActivity implements IMainView{
-    private ListView dishesKind_lv;
+public class MainActivity extends AppCompatActivity  {
 
-    private ListView order_lv;
-    private RecyclerView dishes_rv;
-    private List<String> dishesKindName;
-    private DishesKindAdapter leftAdapter;
+    @BindView(R.id.activity_frame)
+    FrameLayout activityFrame;
     private MyApplication myApp;
-
+    private ListView order_lv;
     private TextView ok_tv;
     private TextView total_tv;
-
-    private DishesAdapter dishesAdapter;
-    private ImageView  car_iv;
-    private boolean flag = true ;
+    private ImageView car_iv;
+    private boolean flag = true;
     private ImageButton delet_bt;
     private List<SparseArray<Object>> orderItem = new ArrayList<>();
-    private  OrderAdapter o;
-    private View view;
-    private int point = 0;
+    public OrderAdapter o;
 
-    private  String taste = "默认";
+    private int point = 0;
 
     private TextView point_tv;
 
     private float total = 0.0f;
 
+    private Fragment seekT9Fragment;
+    private Fragment orderFragment;
 
+    private FragmentManager fm;//获得Fragment管理器
+    private FragmentTransaction ft; //开启一个事务
+    private boolean isFlag = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
 
         myApp = (MyApplication) getApplication();
 
-        IMainPresenter iMainView = new MainPresenterImpl(this);
 
-        iMainView.init();
+        initView();
 
+        select(isFlag);
     }
 
-    /**
-     * 菜品选择弹出框编辑模块
-     *
-     * @param name 传入的菜品的名称
-     * @param price 传入的菜品的价格
-     *
-     */
-    private void showDialog(final String name,final float price) {
+    private void geiIm(){}
 
-        final float[] l = {0.0f};
-
-        view = LayoutInflater.from(MainActivity.this).inflate(R.layout.view_item_dialog,null);
-
-        final TextView price_tv = view.findViewById(R.id.price);
-
-        final AmountView amountView = view.findViewById(R.id.amount_view);
-
-        //增删选择器的数据改变的监听方法
-
-        amountView.setChangeListener(new AmountView.ChangeListener() {
-            @Override
-            public void OnChange(int ls,boolean flag) {
-
-
-                l[0] = ls*price;//实时计算当前菜品选择不同数量后的单品总价
-
-                price_tv.setText("总计 "+ l[0] +" 元");
-
-            }
-        });
-
-
-
-        RadioGroup group = view.findViewById(R.id.radioGroup);
-
-        //选择口味
-        group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup radioGroup, @IdRes int i) {
-
-             if(i == R.id.Spicy ){
-
-                 taste = "微辣";
-
-                }else if(i == R.id.hot){
-
-                 taste = "辣";
-
-                }
-            }
-        });
-
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog
-                .Builder(this);
-        builder.setTitle(name);
-        builder.setView(view);
-        builder.setNegativeButton("取消", null);
-        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-
-                int sum = amountView.getAmount();
-
-                if(sum != 0){//如果选择器的数量不为零，当前的选择的菜品加入订单列表
-
-                    SparseArray<Object> s = new SparseArray<>();
-                    s.put(0,name);
-                    s.put(1,taste);
-                    s.put(2,sum+"");
-                    s.put(3,price);
-                    s.put(4,sum*price);
-                    orderItem.add(s);
-
-                    //刷新订单数据源
-                    o.notifyDataSetChanged();
-
-                    //购物车计数器数据更新
-                    point++;
-                    point_tv.setText(point+"");
-                    point_tv.setVisibility(View.VISIBLE);
-
-                    //计算总价
-                    total+=l[0];
-                    total_tv.setText(total+"元");
-
-                }else {
-
-                    Toast.makeText(MainActivity.this,"没有选择商品数量！",Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-        builder.show();
-    }
-
-    @Override
     public void initView() {
 
         total_tv = (TextView) findViewById(R.id.total_tv);
 
         point_tv = (TextView) findViewById(R.id.point);
 
-        dishesKind_lv = (ListView) findViewById(R.id.dishesKind_lv);
+        //dishesKind_lv = (ListView) findViewById(R.id.dishesKind_lv);
 
-        dishes_rv = (RecyclerView) findViewById(R.id.dishes_rv);
+        //dishes_rv = (RecyclerView) findViewById(R.id.dishes_rv);
 
         car_iv = (ImageView) findViewById(R.id.car);
 
@@ -198,9 +110,9 @@ public class MainActivity extends AppCompatActivity implements IMainView{
 
         final LinearLayout linearLayout = (LinearLayout) findViewById(R.id.orderList);
 
-       //初始化订单的数据，绑定数据源的信息。
+        //初始化订单的数据，绑定数据源的信息。
 
-        o = new OrderAdapter(orderItem,MainActivity.this);
+        o = new OrderAdapter(orderItem, MainActivity.this);
 
         order_lv = (ListView) findViewById(R.id.order_lv);
 
@@ -210,28 +122,28 @@ public class MainActivity extends AppCompatActivity implements IMainView{
 
         o.setOnchangeListener(new OrderAdapter.OnchangeListener() {
             @Override
-            public void onchangeListener(boolean flag,float price,int sum) {
+            public void onchangeListener(boolean flag, float price, int sum) {
 
-                if(flag){
+                if (flag) {
 
                     total += price;
 
-                    total_tv.setText(total+"元");
+                    total_tv.setText(total + "元");
 
 
-                }else {
+                } else {
 
                     total -= price;
 
-                    total_tv.setText(total+"元");
+                    total_tv.setText(total + "元");
 
-                    if(sum == 0){
+                    if (sum == 0) {
 
-                        point --;
+                        point--;
 
-                        point_tv.setText(point+"");
+                        point_tv.setText(point + "");
 
-                        if(point == 0){
+                        if (point == 0) {
 
                             point_tv.setVisibility(View.INVISIBLE);
                         }
@@ -240,15 +152,13 @@ public class MainActivity extends AppCompatActivity implements IMainView{
                     }
 
 
-
-
                 }
             }
         });
 
         //获取屏幕尺寸
 
-        DisplayMetrics  dm = new DisplayMetrics();
+        DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
         int w = dm.widthPixels;
         int h = dm.heightPixels;
@@ -258,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements IMainView{
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) linearLayout
                 .getLayoutParams();
         layoutParams.width = w;
-        layoutParams.height = h/2;
+        layoutParams.height = h / 2;
         linearLayout.setLayoutParams(layoutParams);
 
 
@@ -266,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements IMainView{
             @Override
             public void onClick(View view) {
 
-                if(flag){
+                if (flag) {
 
                     linearLayout.setAnimation(AnimationUtil.moveToViewLocation());
                     linearLayout.setVisibility(View.VISIBLE);
@@ -277,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements IMainView{
                             .setListener(null);
                     flag = false;
 
-                }else {
+                } else {
 
                     linearLayout.setAnimation(AnimationUtil.moveToViewBottom());
                     linearLayout.setVisibility(View.GONE);
@@ -298,54 +208,7 @@ public class MainActivity extends AppCompatActivity implements IMainView{
             }
         });
 
-        final GridLayoutManager manager = new GridLayoutManager(MainActivity.this, 3);//设置每行展示3个
 
-        dishesKindName = new ArrayList<>();
-
-        leftAdapter = new DishesKindAdapter();
-
-        dishesKind_lv.setAdapter(leftAdapter);
-
-        //左侧点击事件监听
-        dishesKind_lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                leftAdapter.changeSelected(position);
-
-
-                /**准确定位到指定位置，并且将指定位置的item置顶，
-                 若直接调用scrollToPosition(...)方法，则不会置顶。**/
-                //manager.scrollToPositionWithOffset(position, 0);
-              //  manager.setStackFromEnd(true);
-
-            }
-
-        });
-
-        dishesKind_lv.performItemClick(dishesKind_lv.getChildAt(0),0, dishesKind_lv
-                .getItemIdAtPosition(0));
-
-        dishesAdapter = new DishesAdapter(MainActivity.this);
-
-
-
-        manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-                @Override
-                public int getSpanSize(int position) {
-
-                    return dishesAdapter.getItemViewType(position);
-                }
-            });
-            dishes_rv.setLayoutManager(manager);
-            dishes_rv.setAdapter(dishesAdapter);
-            dishesAdapter.setOnItemClickListener(new DishesAdapter.OnItemClickListener() {
-                @Override
-                public void onItemClick(View view, String name, float price) {
-                    showDialog(name,price);
-                }
-
-            });
 
 
         //清空按钮
@@ -364,15 +227,15 @@ public class MainActivity extends AppCompatActivity implements IMainView{
             @Override
             public void onClick(View view) {
 
-                if(total > 0){
+                if (total > 0) {
 
-                    Intent intent = new Intent(MainActivity.this,PayActivity.class);
+                    Intent intent = new Intent(MainActivity.this, PayActivity.class);
                     intent.putExtra("Order", (Serializable) orderItem);
-                    intent.putExtra("total",total);
-                    startActivityForResult(intent,1);
+                    intent.putExtra("total", total);
+                    startActivityForResult(intent, 1);
 
                     //如果order列表开启状态就关闭
-                    if(!flag){
+                    if (!flag) {
                         linearLayout.setAnimation(AnimationUtil.moveToViewBottom());
                         linearLayout.setVisibility(View.GONE);
                         imageView.animate()
@@ -388,9 +251,9 @@ public class MainActivity extends AppCompatActivity implements IMainView{
                         flag = true;
                     }
 
-                }else {
+                } else {
 
-                    Toast.makeText(MainActivity.this,"订单为空！",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "订单为空！", Toast.LENGTH_SHORT).show();
                 }
 
 
@@ -421,7 +284,7 @@ public class MainActivity extends AppCompatActivity implements IMainView{
         super.onActivityResult(requestCode, resultCode, data);
 
 
-        if(resultCode == RESULT_OK){
+        if (resultCode == RESULT_OK) {
 
             clearOrder();
 
@@ -431,24 +294,48 @@ public class MainActivity extends AppCompatActivity implements IMainView{
     }
 
 
-    @Override
-    public void showDishes(List<String> data,List<Integer> headPosition) {
 
-        dishesAdapter.setmData(data);
-        dishesAdapter.setHeadPosition(headPosition);
-        dishesAdapter.notifyDataSetChanged();
 
+    //隐藏所有Fragment
+    private void hidtFragment(FragmentTransaction fragmentTransaction){
+
+
+        if (seekT9Fragment != null){
+            fragmentTransaction.hide(seekT9Fragment);
+        }
+        if (orderFragment != null){
+            fragmentTransaction.hide(orderFragment);
+        }
     }
 
-    @Override
-    public void showKindName(List<String> data) {
+    private void select(boolean isTrue) {
+        fm = getFragmentManager();
+        ft = fm.beginTransaction();
+        hidtFragment(ft);
+        if(isTrue == true){
+            if (seekT9Fragment == null){
+                seekT9Fragment = new SeekT9Fragment();
+                ft.add(R.id.activity_frame,seekT9Fragment);
 
-        leftAdapter.setNames(data);
-        leftAdapter.notifyDataSetChanged();
+            }else{
+                ft.show(seekT9Fragment);;
+            }
+            isFlag = false;
+        }else if (isTrue == false){
+            if (orderFragment == null){
+                orderFragment = new OrderFragment();
+                ft.add(R.id.activity_frame,orderFragment);
+            }else{
+                ft.show(orderFragment);;
+            }
+            isFlag = true;
+        }
+        ft.commit();
+
     }
-
     /**
      * 模拟原始数据
+     *
      * @return
      */
 
@@ -468,14 +355,14 @@ public class MainActivity extends AppCompatActivity implements IMainView{
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if(id == R.id.action_search){
+        if (id == R.id.action_search) {
+            select(isFlag);
 
-
-        }else if(id == R.id.action_cancel){
+        } else if (id == R.id.action_cancel) {
 
             myApp.cancleSharePreferences();
             Intent itent = new Intent();
-            itent.setClass(MainActivity.this,LoginActivity.class);
+            itent.setClass(MainActivity.this, LoginActivity.class);
             startActivity(itent);
             finish();
 
@@ -484,74 +371,6 @@ public class MainActivity extends AppCompatActivity implements IMainView{
         return super.onOptionsItemSelected(item);
     }
 
-    public class DishesKindAdapter extends BaseAdapter{
 
-        private LayoutInflater listContainerLeft;
-        private int mSelect = 0; //选中项
-
-        public void setNames(List<String> names) {
-            this.names = names;
-        }
-
-        private  List<String> names;
-
-        public DishesKindAdapter(){
-        }
-
-        @Override
-        public int getCount() {
-            return names == null?0:names.size();
-        }
-
-        @Override
-        public Object getItem(int i) {
-            return names.get(i);
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return 0;
-        }
-
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-            listContainerLeft = LayoutInflater.from(MainActivity.this);
-            ListItemView listItemView = null;
-            if(view == null){
-                listItemView = new ListItemView();
-                view = listContainerLeft.inflate(R.layout.view_kindname_lv, null);
-                listItemView.tv_title = view.findViewById(R.id.title);
-                listItemView.imageView = view.findViewById(R.id.imageView);
-                view.setTag(listItemView);
-            }
-            else{
-                listItemView = (ListItemView)view.getTag();
-            }
-            if(mSelect == i){
-                view.setBackgroundResource(R.color.md_grey_50);  //选中项背景
-                listItemView.imageView.setVisibility(View.VISIBLE);
-            }else{
-                view.setBackgroundResource(R.color.md_grey_100);  //其他项背景
-                listItemView.imageView.setVisibility(View.INVISIBLE);
-            }
-            listItemView.tv_title.setText(names.get(i));
-
-            return view;
-
-        }
-
-
-        public void changeSelected(int positon){ //刷新方法
-            mSelect = positon;
-            notifyDataSetChanged();
-        }
-
-       class ListItemView {
-
-            TextView tv_title;
-            ImageView imageView;
-        }
-
-    }
 
 }
