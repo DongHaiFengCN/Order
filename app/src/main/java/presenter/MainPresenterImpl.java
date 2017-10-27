@@ -23,6 +23,7 @@ public class MainPresenterImpl implements IMainPresenter {
     MainModelImpl mainModel;
 
     public MainPresenterImpl(IMainView context){
+
         this.context = context;
 
     }

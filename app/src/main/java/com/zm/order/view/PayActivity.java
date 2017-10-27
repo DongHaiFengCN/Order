@@ -1,12 +1,10 @@
 package com.zm.order.view;
 
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -22,12 +20,8 @@ import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
-import com.google.zxing.integration.android.IntentIntegrator;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 import com.zm.order.R;
-
-import java.io.UnsupportedEncodingException;
-import java.sql.ResultSet;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -53,19 +47,26 @@ public class PayActivity extends AppCompatActivity {
     ImageView ivwechat;
     @BindView(R.id.cash)
     ImageView cash;
+    @BindView(R.id.discount_tv)
+    TextView discountTv;
+    @BindView(R.id.total_tv)
+    TextView totalTv;
+    @BindView(R.id.textView)
+    TextView textView;
     private AlertDialog.Builder dialog;
     private AlertDialog dg;
     private Intent intent;
     private AlertDialog.Builder alertDialog;
     private Bitmap bitmap = null;
-
+    private static final int DISTCOUNT = 0;
+    private float total = 0.0f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_pay);
         ButterKnife.bind(this);
-
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
@@ -81,14 +82,16 @@ public class PayActivity extends AppCompatActivity {
 
         intent = getIntent();
 
-
         //创建打印dialog
         dialog = new AlertDialog.Builder(PayActivity.this);
         dialog.setView(getLayoutInflater().inflate(R.layout.view_print_dialog, null)).create();
 
-
         String alipayId = "qwhhh";
         bitmap = encodeAsBitmap(alipayId);
+
+        total = 324.5f;
+        totalTv.setText(total+"");
+        factTv.setText("实际支付："+total+"元");
     }
 
 
@@ -120,14 +123,6 @@ public class PayActivity extends AppCompatActivity {
 
                 break;
 
-      /*      case R.id.action_sm:
-
-                new IntentIntegrator(this)
-                        .setOrientationLocked(false)
-                        .setCaptureActivity(ScanActivity.class) // 设置自定义的activity是CustomActivity
-                        .initiateScan(); // 初始化扫描
-
-                break;*/
             default:
                 break;
         }
@@ -140,25 +135,14 @@ public class PayActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-       /* IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode,resultCode,data);
+        if (requestCode == DISTCOUNT && resultCode == RESULT_OK) {
 
-        if(intentResult != null) {
+            total = data.getFloatExtra("Total", 0);
 
-            if(intentResult.getContents() == null) {
+            discountTv.setText("- " +(Float.valueOf(totalTv.getText().toString())-total)+"元");
 
-                Toast.makeText(this,"扫描失败，请重新尝试。",Toast.LENGTH_LONG).show();
-            } else {
-
-                tableNumber = intentResult.getContents();
-                intent.putExtra("tableNumber",tableNumber);
-
-                tableNumber_tv.setText("桌号/ "+tableNumber);
-
-
-            }
-        } else {
-            super.onActivityResult(requestCode,resultCode,data);
-        }*/
+            factTv.setText("实际支付："+total+"元");
+        }
 
 
     }
@@ -183,17 +167,20 @@ public class PayActivity extends AppCompatActivity {
         switch (view.getId()) {
             case R.id.discount:
 
-                Toast.makeText(PayActivity.this,"discount",Toast.LENGTH_SHORT).show();
+                Intent discount = new Intent();
+                discount.setClass(PayActivity.this, DiscountActivity.class);
+                discount.putExtra("Total", Float.valueOf(totalTv.getText().toString()));
+                startActivityForResult(discount, DISTCOUNT);
 
                 break;
             case R.id.associator:
 
-                Toast.makeText(PayActivity.this,"associator",Toast.LENGTH_SHORT).show();
+                Toast.makeText(PayActivity.this, "associator", Toast.LENGTH_SHORT).show();
 
                 break;
             case R.id.ivalipay:
 
-                View dialog = getLayoutInflater().inflate(R.layout.view_alipay_dialog,null);
+                View dialog = getLayoutInflater().inflate(R.layout.view_alipay_dialog, null);
 
                 ImageView imageView = dialog.findViewById(R.id.encode);
 
@@ -221,12 +208,12 @@ public class PayActivity extends AppCompatActivity {
                 break;
             case R.id.ivwechat:
 
-                Toast.makeText(PayActivity.this,"ivwechat",Toast.LENGTH_SHORT).show();
+                Toast.makeText(PayActivity.this, "ivwechat", Toast.LENGTH_SHORT).show();
 
                 break;
             case R.id.cash:
 
-                Toast.makeText(PayActivity.this,"cash",Toast.LENGTH_SHORT).show();
+                Toast.makeText(PayActivity.this, "cash", Toast.LENGTH_SHORT).show();
 
                 break;
         }
@@ -234,11 +221,12 @@ public class PayActivity extends AppCompatActivity {
 
     /**
      * 字符串生成二维码图片
+     *
      * @param str
      * @return
      */
 
-    private Bitmap encodeAsBitmap(String str){
+    private Bitmap encodeAsBitmap(String str) {
         Bitmap bitmap = null;
         BitMatrix result = null;
         MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
@@ -249,9 +237,9 @@ public class PayActivity extends AppCompatActivity {
             BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
             bitmap = barcodeEncoder.createBitmap(result);
 
-        } catch (WriterException e){
+        } catch (WriterException e) {
             e.printStackTrace();
-        } catch (IllegalArgumentException iae){
+        } catch (IllegalArgumentException iae) {
             return null;
         }
         return bitmap;
