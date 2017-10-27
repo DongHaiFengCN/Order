@@ -64,8 +64,6 @@ public class SaleActivity extends AppCompatActivity {
 
         //初始化SMSSDK
 
-        // 如果希望在读取通信录的时候提示用户，可以添加下面的代码，并且必须在其他代码调用之前，否则不起作用；如果没这个需求，可以不加这行代码
-        //  SMSSDK.setAskPermisionOnReadContact(boolShowInDialog);
 
         // 创建EventHandler对象
         eventHandler = new EventHandler() {

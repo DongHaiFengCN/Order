@@ -129,7 +129,6 @@ public class PayActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
     /**
      * onActivityResult的方法获取 扫描回来的 值
      */
@@ -145,7 +144,6 @@ public class PayActivity extends AppCompatActivity {
             factTv.setText("实际支付："+total+"元");
         }
 
-
     }
 
     public void turnMainActivity() {
@@ -155,13 +153,11 @@ public class PayActivity extends AppCompatActivity {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
         //携带参数返回到MainActivity
         setResult(RESULT_OK, null);
 
         finish();
     }
-
 
     @OnClick({R.id.discount, R.id.associator, R.id.fact_tv, R.id.ivalipay, R.id.ivwechat, R.id.cash})
     public void onClick(View view) {
