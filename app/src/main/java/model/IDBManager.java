@@ -32,5 +32,9 @@ public interface IDBManager<T> {
 
     <T> T getById(String id);
 
+    Document getMembers(String tel);
+    Document getCard(String id);
+
+    List<Document> getByClassName(String name);
 
 }

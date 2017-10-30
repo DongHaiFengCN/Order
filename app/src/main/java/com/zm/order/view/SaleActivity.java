@@ -13,7 +13,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.couchbase.lite.Document;
 import com.zm.order.R;
+
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -26,6 +29,8 @@ import java.nio.charset.Charset;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -39,7 +44,12 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cn.smssdk.EventHandler;
 import cn.smssdk.SMSSDK;
+import cn.smssdk.utils.SMSLog;
+import model.DBFactory;
+import model.DatabaseSource;
+import model.IDBManager;
 import untils.MyLog;
+import untils.Tool;
 
 public class SaleActivity extends AppCompatActivity {
 
@@ -56,62 +66,119 @@ public class SaleActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_sale);
         ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        // 注册监听器
+        final IDBManager idbManager = DBFactory.get(DatabaseSource.CouchBase,this);
 
-        //初始化SMSSDK
+        List<Document> list = idbManager.getByClassName("MembersC");
+        if(!list.isEmpty()){
 
+            Iterator iterator = list.iterator();
+            while (iterator.hasNext()){
+
+
+                Document document = (Document) iterator.next();
+
+                MyLog.e(document.getString("name"));
+                MyLog.e(document.getString("tel"));
+                MyLog.e(document.getString("cardNum"));
+
+            }
+
+        }
 
         // 创建EventHandler对象
         eventHandler = new EventHandler() {
-            public void afterEvent(int event, int result, Object data) {
-                if (data instanceof Throwable) {
-                    Throwable throwable = (Throwable) data;
-                    final String msg = throwable.getMessage();
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
+            public void afterEvent(int event, final int result, final Object data) {
 
-                            Toast.makeText(SaleActivity.this, msg, Toast.LENGTH_SHORT).show();
 
+                    if (result == SMSSDK.RESULT_COMPLETE) {
+                        //回调完成
+                        MyLog.e("回调完成");
+                        if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
+                            //提交并验证验证码成功！
+
+                            //读取数据库操作
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+
+                                 etcode.setText("");
+                                 etcode.setCursorVisible(false);
+
+                                   Document document = idbManager.getMembers(etAmountphone.getText().toString());
+
+                                    if(Tool.isNotEmpty(document)){
+
+
+
+
+                                        MyLog.e(document.getString("name"));
+                                        MyLog.e(document.getString("cardNum"));
+                                        MyLog.e(document.getString("cardTypeId"));
+                                        MyLog.e(document.getInt("status")+"");
+
+
+                                    }else {
+
+                                        Toast.makeText(SaleActivity.this,"用户不存在！",Toast.LENGTH_SHORT).show();
+
+                                    }
+
+
+                                }
+                            });
+
+
+
+                        }else if (event == SMSSDK.EVENT_GET_VERIFICATION_CODE){
+                            //获取验证码成功
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+
+                                    Toast.makeText(SaleActivity.this,"获取验证码成功！",Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                          //  MyLog.e("获取验证码成功");
                         }
-                    });
-                } else {
-                    if (event == SMSSDK.EVENT_GET_VERIFICATION_CODE) {
 
-                        // 验证通过读取数据库
-
-                       runOnUiThread(new Runnable() {
-                           @Override
-                           public void run() {
-
-                               Toast.makeText(SaleActivity.this,"发送验证成功！",Toast.LENGTH_SHORT).show();
-
-                           }
-                       });
+                    }else if(data instanceof Throwable){
 
 
+                        try {
+                            ((Throwable) data).printStackTrace();
+                            Throwable throwable = (Throwable) data;
 
-                    }
+                            JSONObject object = new JSONObject(throwable.getMessage());
+                            final String des = object.optString("detail");
+                            if (!TextUtils.isEmpty(des)) {
+                                MyLog.e("错误信息！"+des);
 
-                    if(event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE){
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
 
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-
-                                Toast.makeText(SaleActivity.this,"验证码验证通过！！",Toast.LENGTH_SHORT).show();
-
+                                        Toast.makeText(SaleActivity.this,des,Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                return;
                             }
-                        });
+                        } catch (Exception e) {
+                            SMSLog.getInstance().w(e);
+                        }
                     }
+
                 }
-            }
+
         };
 
         SMSSDK.registerEventHandler(eventHandler);
@@ -149,27 +216,17 @@ public class SaleActivity extends AppCompatActivity {
 
                     SMSSDK.submitVerificationCode("+86", etAmountphone.getText().toString(), etcode.getText().toString());
 
-
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            String result = requestData("https://webapi.sms.mob.com/sms/verify","appkey=21efc5a881e60&phone="+etAmountphone.getText().toString()+"&zone=86&&code="+etcode.getText().toString());
-                            MyLog.e(result);
-                        }
-                    }).start();
-
-
                 }
                 break;
         }
     }
     /**
      * 发起https 请求
-     * @param address
+     * @param
      * @param
      * @return
      */
-    public  static String requestData(String address ,String params){
+    /*public  static String requestData(String address ,String params){
 
         HttpURLConnection conn = null;
         try {
@@ -228,12 +285,12 @@ public class SaleActivity extends AppCompatActivity {
 
 
     public static String convertStreamToString(InputStream is) {
-        /*
+        *//*
           * To convert the InputStream to String we use the BufferedReader.readLine()
           * method. We iterate until the BufferedReader return null which means
           * there's no more data to read. Each line will appended to a StringBuilder
           * and returned as String.
-          */
+          *//*
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         StringBuilder sb = new StringBuilder();
 
@@ -253,7 +310,7 @@ public class SaleActivity extends AppCompatActivity {
         }
 
         return sb.toString();
-    }
+    }*/
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

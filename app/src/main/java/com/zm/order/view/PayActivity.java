@@ -34,7 +34,7 @@ import model.ProgressBarasyncTask;
  */
 
 public class PayActivity extends AppCompatActivity {
-    
+
     @BindView(R.id.discount)
     LinearLayout discount;
     @BindView(R.id.associator)
@@ -93,6 +93,7 @@ public class PayActivity extends AppCompatActivity {
         total = 32.5f;
         totalTv.setText(total+"");
         factTv.setText("实际支付："+total+"元");
+
     }
 
 
