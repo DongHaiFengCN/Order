@@ -53,6 +53,8 @@ public class PayActivity extends AppCompatActivity {
     TextView totalTv;
     @BindView(R.id.textView)
     TextView textView;
+    @BindView(R.id.associator_tv)
+    TextView associatorTv;
     private AlertDialog.Builder dialog;
     private AlertDialog dg;
     private Intent intent;
@@ -91,8 +93,8 @@ public class PayActivity extends AppCompatActivity {
         bitmap = encodeAsBitmap(alipayId);
 
         total = 32.5f;
-        totalTv.setText(total+"");
-        factTv.setText("实际支付："+total+"元");
+        totalTv.setText(total + "");
+        factTv.setText("实际支付：" + total + "元");
 
     }
 
@@ -130,6 +132,7 @@ public class PayActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
     /**
      * onActivityResult的方法获取 扫描回来的 值
      */
@@ -140,9 +143,14 @@ public class PayActivity extends AppCompatActivity {
 
             total = data.getFloatExtra("Total", 0);
 
-            discountTv.setText("- " +(Float.valueOf(totalTv.getText().toString())-total)+"元");
+            discountTv.setText("- " + (Float.valueOf(totalTv.getText().toString()) - total) + "元");
 
-            factTv.setText("实际支付："+total+"元");
+            factTv.setText("实际支付：" + total + "元");
+
+            associator.setEnabled(false);
+            associatorTv.setText("减免后不可选");
+        }else if(requestCode == SALE && resultCode == RESULT_OK){
+
         }
 
     }

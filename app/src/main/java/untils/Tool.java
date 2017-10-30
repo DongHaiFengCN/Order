@@ -1,6 +1,11 @@
 package untils;
 
 import android.text.TextUtils;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -37,5 +42,37 @@ public class Tool {
             }
         }
         return true;
+    }
+
+    public static void bindView(View view,String value){
+
+
+     if(view instanceof TextView){
+
+
+        if(TextUtils.isEmpty(value)){
+
+             ((TextView) view).setText("");
+
+         }else{
+
+             ((TextView) view).setText(value);
+         }
+
+
+     }else if(view instanceof EditText) {
+
+
+         if(TextUtils.isEmpty(value)){
+
+             ((EditText) view).setText("");
+
+         }else {
+
+             ((EditText) view).setText(value);
+         }
+     }
+
+
     }
 }

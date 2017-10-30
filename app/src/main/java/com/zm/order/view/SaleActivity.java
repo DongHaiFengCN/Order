@@ -1,16 +1,15 @@
 package com.zm.order.view;
 
 import android.os.Bundle;
-import android.support.annotation.UiThread;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.couchbase.lite.Document;
@@ -18,26 +17,8 @@ import com.zm.order.R;
 
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -63,6 +44,19 @@ public class SaleActivity extends AppCompatActivity {
     @BindView(R.id.etcode)
     EditText etcode;
 
+    @BindView(R.id.name)
+    TextView name;
+    @BindView(R.id.number)
+    TextView number;
+    @BindView(R.id.type)
+    TextView type;
+    @BindView(R.id.status)
+    TextView status;
+    @BindView(R.id.discount)
+    TextView discount;
+    @BindView(R.id.submit_area)
+    Button submitArea;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,20 +67,31 @@ public class SaleActivity extends AppCompatActivity {
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        final IDBManager idbManager = DBFactory.get(DatabaseSource.CouchBase,this);
+        final IDBManager idbManager = DBFactory.get(DatabaseSource.CouchBase, this);
 
         List<Document> list = idbManager.getByClassName("MembersC");
-        if(!list.isEmpty()){
+        if (!list.isEmpty()) {
 
             Iterator iterator = list.iterator();
-            while (iterator.hasNext()){
+            if (iterator.hasNext()) {
 
 
                 Document document = (Document) iterator.next();
 
+
+/*
                 MyLog.e(document.getString("name"));
                 MyLog.e(document.getString("tel"));
-                MyLog.e(document.getString("cardNum"));
+                MyLog.e(document.getString("cardNum"));*/
+
+
+                Tool.bindView(name,document.getString("name"));
+
+                Tool.bindView(number,document.getString("cardNum"));
+
+                Tool.bindView(type,document.getString("cardTypeId"));
+
+                Tool.bindView(status,document.getInt("status") + "");
 
             }
 
@@ -97,87 +102,98 @@ public class SaleActivity extends AppCompatActivity {
             public void afterEvent(int event, final int result, final Object data) {
 
 
-                    if (result == SMSSDK.RESULT_COMPLETE) {
-                        //回调完成
-                        MyLog.e("回调完成");
-                        if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
-                            //提交并验证验证码成功！
+                if (result == SMSSDK.RESULT_COMPLETE) {
+                    //回调完成
+                    MyLog.e("回调完成");
+                    if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
+                        //提交并验证验证码成功！
 
-                            //读取数据库操作
+                        //读取数据库操作
 
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
 
-                                 etcode.setText("");
-                                 etcode.setCursorVisible(false);
+                                etcode.setText("");
+                                etcode.setCursorVisible(false);
 
-                                   Document document = idbManager.getMembers(etAmountphone.getText().toString());
+                                Document document = idbManager.getMembers(etAmountphone.getText().toString());
 
-                                    if(Tool.isNotEmpty(document)){
-
-
+                                if (Tool.isNotEmpty(document)) {
 
 
-                                        MyLog.e(document.getString("name"));
-                                        MyLog.e(document.getString("cardNum"));
-                                        MyLog.e(document.getString("cardTypeId"));
-                                        MyLog.e(document.getInt("status")+"");
+                                 /*   MyLog.e(document.getString("name"));
+                                    MyLog.e(document.getString("cardNum"));
+                                    MyLog.e(document.getString("cardTypeId"));
+                                    MyLog.e(document.getInt("status") + "");*/
+
+                                    Tool.bindView(name,document.getString("name"));
+
+                                    Tool.bindView(number,document.getString("cardNum"));
+
+                                    Tool.bindView(type,document.getString("cardTypeId"));
+
+                                    Tool.bindView(status,document.getInt("status") + "");
+
+/*
+                                    name.setText(document.getString("name"));
+                                    number.setText(document.getString("cardNum"));
+                                    type.setText(document.getString("cardTypeId"));
+                                    status.setText(document.getInt("status") + "");*/
 
 
-                                    }else {
+                                } else {
 
-                                        Toast.makeText(SaleActivity.this,"用户不存在！",Toast.LENGTH_SHORT).show();
-
-                                    }
-
+                                    Toast.makeText(SaleActivity.this, "用户不存在！", Toast.LENGTH_SHORT).show();
 
                                 }
-                            });
 
 
-
-                        }else if (event == SMSSDK.EVENT_GET_VERIFICATION_CODE){
-                            //获取验证码成功
-
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-
-                                    Toast.makeText(SaleActivity.this,"获取验证码成功！",Toast.LENGTH_SHORT).show();
-                                }
-                            });
-
-                          //  MyLog.e("获取验证码成功");
-                        }
-
-                    }else if(data instanceof Throwable){
-
-
-                        try {
-                            ((Throwable) data).printStackTrace();
-                            Throwable throwable = (Throwable) data;
-
-                            JSONObject object = new JSONObject(throwable.getMessage());
-                            final String des = object.optString("detail");
-                            if (!TextUtils.isEmpty(des)) {
-                                MyLog.e("错误信息！"+des);
-
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-
-                                        Toast.makeText(SaleActivity.this,des,Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                                return;
                             }
-                        } catch (Exception e) {
-                            SMSLog.getInstance().w(e);
-                        }
+                        });
+
+
+                    } else if (event == SMSSDK.EVENT_GET_VERIFICATION_CODE) {
+                        //获取验证码成功
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                Toast.makeText(SaleActivity.this, "获取验证码成功！", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                        //  MyLog.e("获取验证码成功");
                     }
 
+                } else if (data instanceof Throwable) {
+
+
+                    try {
+                        ((Throwable) data).printStackTrace();
+                        Throwable throwable = (Throwable) data;
+
+                        JSONObject object = new JSONObject(throwable.getMessage());
+                        final String des = object.optString("detail");
+                        if (!TextUtils.isEmpty(des)) {
+                            MyLog.e("错误信息！" + des);
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+
+                                    Toast.makeText(SaleActivity.this, des, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            return;
+                        }
+                    } catch (Exception e) {
+                        SMSLog.getInstance().w(e);
+                    }
                 }
+
+            }
 
         };
 
@@ -194,25 +210,24 @@ public class SaleActivity extends AppCompatActivity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.submitphone:
-                if(TextUtils.isEmpty(etAmountphone.getText().toString())){
+                if (TextUtils.isEmpty(etAmountphone.getText().toString())) {
 
                     etAmountphone.setError("号码不能为空");
 
-                }else {
+                } else {
 
-                    SMSSDK.getVerificationCode("86",etAmountphone.getText().toString());
+                    SMSSDK.getVerificationCode("86", etAmountphone.getText().toString());
                 }
-
 
 
                 break;
             case R.id.submitcode:
 
-                if(TextUtils.isEmpty(etcode.getText().toString())){
+                if (TextUtils.isEmpty(etcode.getText().toString())) {
 
                     etcode.setError("验证码不能为空！");
 
-                }else {
+                } else {
 
                     SMSSDK.submitVerificationCode("+86", etAmountphone.getText().toString(), etcode.getText().toString());
 
@@ -220,8 +235,10 @@ public class SaleActivity extends AppCompatActivity {
                 break;
         }
     }
+
     /**
      * 发起https 请求
+     *
      * @param
      * @param
      * @return
@@ -317,6 +334,7 @@ public class SaleActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_pay, menu);
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -330,5 +348,9 @@ public class SaleActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @OnClick(R.id.submit_area)
+    public void onClick() {
     }
 }

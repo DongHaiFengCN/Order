@@ -80,6 +80,7 @@
                 android:id="@+id/submitphone"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
+                android:layout_marginRight="16dp"
                 android:text="发送验证码" />
         </LinearLayout>
 
@@ -117,7 +118,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:textColor="@color/md_white"
-                android:layout_marginRight="3dp"
+                android:layout_marginRight="19dp"
                 android:layout_gravity="center|right"
                 android:background="@drawable/background_sale_select"
                 android:text="查 询" />
@@ -127,10 +128,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        >
+        android:orientation="vertical">
 
         <TextView
             android:layout_width="match_parent"
@@ -159,7 +159,12 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:background="@color/md_white" />
+                android:background="@color/md_white"
+                android:gravity="right|center"
+                android:paddingRight="16dp"
+                android:text="董海峰"
+                android:textColor="@color/grey_color1"
+                android:textSize="16sp" />
 
         </LinearLayout>
 
@@ -189,15 +194,22 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:background="@color/md_white" />
+                android:background="@color/md_white"
+                android:gravity="right|center"
+                android:paddingRight="16dp"
+                android:text="11111111"
+                android:textColor="@color/grey_color1"
+                android:textSize="16sp" />
 
         </LinearLayout>
+
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
             android:src="@drawable/divider" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="48dp"
@@ -217,7 +229,12 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:background="@color/md_white" />
+                android:background="@color/md_white"
+                android:gravity="right|center"
+                android:paddingRight="16dp"
+                android:text="打折卡"
+                android:textColor="@color/grey_color1"
+                android:textSize="16sp" />
 
         </LinearLayout>
 
@@ -247,16 +264,23 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:background="@color/md_white" />
+                android:background="@color/md_white"
+                android:gravity="right|center"
+                android:paddingRight="16dp"
+                android:text="启用"
+                android:textColor="@color/grey_color1"
+                android:textSize="16sp" />
 
 
         </LinearLayout>
+
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
             android:src="@drawable/divider" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="48dp"
@@ -276,15 +300,19 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:background="@color/md_white" />
+                android:background="@color/md_white"
+                android:gravity="right|center"
+                android:paddingRight="16dp"
+                android:text="85折"
+                android:textColor="@color/grey_color1"
+                android:textSize="16sp" />
 
 
         </LinearLayout>
 
 
-
-
     </LinearLayout>
+
     <Button
         android:id="@+id/submit_area"
         android:layout_width="match_parent"
