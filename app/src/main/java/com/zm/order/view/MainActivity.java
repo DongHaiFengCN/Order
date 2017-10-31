@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        myApp = (MyApplication) getApplication();
+        //myApp = (MyApplication) getApplication();
 
 
         initView();

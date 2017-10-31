@@ -245,7 +245,7 @@ public class PayActivity extends AppCompatActivity {
             case R.id.associator:
 
                 Intent sale = new Intent();
-                sale.setClass(PayActivity.this, SaleActivity.class);
+                //sale.setClass(PayActivity.this, SaleActivity.class);
                 startActivityForResult(sale, SALE);
 
                 break;

@@ -1,3 +1,4 @@
+/*
 package com.zm.order.view;
 
 import android.content.Intent;
@@ -34,9 +35,11 @@ import bean.kitchenmanage.member.CardTypeC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import cn.smssdk.EventHandler;
+i*/
+/*mport cn.smssdk.EventHandler;
 import cn.smssdk.SMSSDK;
-import cn.smssdk.utils.SMSLog;
+import cn.smssdk.utils.SMSLog;*//*
+
 import model.CDBHelper;
 import model.DBFactory;
 import model.DatabaseSource;
@@ -45,6 +48,7 @@ import untils.MyLog;
 import untils.Tool;
 
 
+*/
 /**
  * 项目名称：Order
  * 类描述：
@@ -53,11 +57,12 @@ import untils.Tool;
  * 修改人：donghaifeng
  * 修改时间：2017/10/27
  * 修改备注：会员折扣界面
- */
+ *//*
+
 
 public class SaleActivity extends AppCompatActivity {
 
-    EventHandler eventHandler;
+   // EventHandler eventHandler;
     @BindView(R.id.submitphone)
     Button submitphone;
     @BindView(R.id.submitcode)
@@ -175,9 +180,11 @@ public class SaleActivity extends AppCompatActivity {
     }
 
 
-    /**
+    */
+/**
      * 绑定数据到控件
-     */
+     *//*
+
     public void setData(){
 
 
@@ -359,3 +366,4 @@ public class SaleActivity extends AppCompatActivity {
 
     }
 }
+*/
