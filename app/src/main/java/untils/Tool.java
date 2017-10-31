@@ -44,7 +44,7 @@ public class Tool {
         return true;
     }
 
-    public static void bindView(View view,String value){
+    public static boolean bindView(View view,String value){
 
 
      if(view instanceof TextView){
@@ -54,9 +54,12 @@ public class Tool {
 
              ((TextView) view).setText("");
 
+            return false;
+
          }else{
 
              ((TextView) view).setText(value);
+
          }
 
 
@@ -66,13 +69,16 @@ public class Tool {
          if(TextUtils.isEmpty(value)){
 
              ((EditText) view).setText("");
+             return false;
 
          }else {
 
              ((EditText) view).setText(value);
+
+
          }
      }
 
-
+        return true;
     }
 }

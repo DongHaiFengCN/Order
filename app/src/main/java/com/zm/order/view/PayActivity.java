@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.couchbase.lite.Document;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
@@ -23,10 +25,18 @@ import com.google.zxing.common.BitMatrix;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 import com.zm.order.R;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import model.DBFactory;
+import model.DatabaseSource;
+import model.IDBManager;
 import model.ProgressBarasyncTask;
+import untils.MyLog;
+import untils.PrintUtils;
 
 /**
  * @author 董海峰
@@ -89,11 +99,18 @@ public class PayActivity extends AppCompatActivity {
         dialog = new AlertDialog.Builder(PayActivity.this);
         dialog.setView(getLayoutInflater().inflate(R.layout.view_print_dialog, null)).create();
 
+        //支付宝收款码
         String alipayId = "qwhhh";
+
+        //转化二维码
         bitmap = encodeAsBitmap(alipayId);
 
-        total = 32.5f;
+        total = intent.getFloatExtra("total",0);
+
+        //显示原价
         totalTv.setText(total + "");
+
+        //显示操作后价格
         factTv.setText("实际支付：" + total + "元");
 
     }
@@ -106,10 +123,8 @@ public class PayActivity extends AppCompatActivity {
 
     public void closeDialog() {
 
-
         dg.dismiss();
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -127,14 +142,18 @@ public class PayActivity extends AppCompatActivity {
 
                 break;
 
+            case R.id.reset:
+
+                Toast.makeText(PayActivity.this,"重置～",Toast.LENGTH_SHORT).show();
+
+                break;
             default:
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
-
     /**
-     * onActivityResult的方法获取 扫描回来的 值
+     * onActivityResult的方法获取
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -148,13 +167,55 @@ public class PayActivity extends AppCompatActivity {
             factTv.setText("实际支付：" + total + "元");
 
             associator.setEnabled(false);
+
             associatorTv.setText("减免后不可选");
+
         }else if(requestCode == SALE && resultCode == RESULT_OK){
 
+            int flag =  data.getIntExtra("flag",3);
+
+            if(flag == 0 ){
+
+                Toast.makeText(PayActivity.this,"充值卡 ",Toast.LENGTH_SHORT).show();
+
+            }else if(flag == 1){
+
+                IDBManager idbManager = DBFactory.get(DatabaseSource.CouchBase, this);
+
+                List<String> stringList = data.getStringArrayListExtra("DishseList");
+
+                int disrate = data.getIntExtra("disrate",3);
+
+                MyLog.e("折扣率："+disrate);
+
+                List list = (List) intent.getSerializableExtra("Order");
+
+                for (int j = 0; j < list.size(); j++) {
+
+                    SparseArray<Object> s = (SparseArray<Object>) list.get(j);
+
+                    String name = (String) s.get(0);
+
+                    for (int i = 0; i < list.size(); i++) {
+
+                        Document document = (Document) idbManager.getById(stringList.get(i));
+
+                        if(name.equals(document.getString("dishesName"))){
+
+                            MyLog.e("订单中包含打折的菜品名称："+name);
+
+                        }
+                    }
+                }
+
+            }else {
+
+                Toast.makeText(PayActivity.this,"其他 ",Toast.LENGTH_SHORT).show();
+
+            }
+
         }
-
     }
-
     public void turnMainActivity() {
 
         try {
@@ -167,6 +228,8 @@ public class PayActivity extends AppCompatActivity {
 
         finish();
     }
+
+
 
     @OnClick({R.id.discount, R.id.associator, R.id.fact_tv, R.id.ivalipay, R.id.ivwechat, R.id.cash})
     public void onClick(View view) {
