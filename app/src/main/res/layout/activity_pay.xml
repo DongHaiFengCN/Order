@@ -86,57 +86,7 @@
     </android.support.design.widget.AppBarLayout>
 
 
-    <LinearLayout
-        android:id="@+id/discount"
-        android:background="@drawable/background_pay_select"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/viewhight"
-        android:orientation="horizontal"
 
-        android:clickable="true"
-        >
-
-        <TextView
-            android:id="@+id/textView7"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="left|center"
-            android:typeface="monospace"
-            android:paddingLeft="16dp"
-            android:text="账单优惠" />
-
-        <TextView
-            android:id="@+id/discount_tv"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center|right"
-            android:typeface="serif"
-            android:textSize="16sp"
-            android:paddingRight="16dp"
-            android:textColor="@color/grey_color1"
-            android:text="0.0元"
-            />
-
-        <ImageView
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:src="@mipmap/forward"
-            android:layout_gravity="center"
-            android:layout_marginRight="8dp"
-          />
-
-    </LinearLayout>
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingRight="8dp"
-        android:paddingLeft="8dp"
-        android:src="@drawable/divider">
-
-    </ImageView>
 
     <LinearLayout
         android:id="@+id/associator"
@@ -156,6 +106,7 @@
             android:typeface="monospace"
             android:layout_height="match_parent" />
         <TextView
+            android:id="@+id/associator_tv"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -164,7 +115,6 @@
             android:textSize="16sp"
             android:paddingRight="16dp"
             android:textColor="@color/grey_color1"
-            android:text="八折"
             />
 
         <ImageView
@@ -177,6 +127,54 @@
 
     </LinearLayout>
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingRight="8dp"
+        android:paddingLeft="8dp"
+        android:src="@drawable/divider">
+
+    </ImageView>
+    <LinearLayout
+        android:id="@+id/discount"
+        android:background="@drawable/background_pay_select"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/viewhight"
+        android:orientation="horizontal"
+        android:clickable="true"
+        >
+
+        <TextView
+            android:id="@+id/textView7"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="left|center"
+            android:typeface="monospace"
+            android:paddingLeft="16dp"
+            android:text="账单减免" />
+
+        <TextView
+            android:id="@+id/discount_tv"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center|right"
+            android:typeface="serif"
+            android:textSize="16sp"
+            android:paddingRight="16dp"
+            android:textColor="@color/grey_color1"
+            />
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@mipmap/forward"
+            android:layout_gravity="center"
+            android:layout_marginRight="8dp"
+            />
+
+    </LinearLayout>
 
     <LinearLayout
 
@@ -224,7 +222,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="60dp"
         android:background="@color/md_white"
         android:orientation="horizontal"
         >

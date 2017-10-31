@@ -83,7 +83,7 @@ public class DeskActivity extends AppCompatActivity {
               Intent mainIntent = new Intent();
               mainIntent.putExtra("state", tableC.getState());
               mainIntent.putExtra("tableId", tableC.get_id());
-              mainIntent.setClass(DeskActivity.this, SeekT9Activity.class);
+              mainIntent.setClass(DeskActivity.this, MainActivity.class);
               startActivityForResult(mainIntent, 1);
           }
       });

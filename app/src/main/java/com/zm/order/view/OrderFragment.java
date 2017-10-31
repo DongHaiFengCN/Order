@@ -101,9 +101,6 @@ public class OrderFragment extends Fragment implements IMainView {
 
     public void initView() {
 
-
-
-
         //初始化订单的数据，绑定数据源的信息。
 
         o = new OrderAdapter(orderItem, getActivity());
@@ -246,50 +243,6 @@ public class OrderFragment extends Fragment implements IMainView {
             }
 
         });
-
-        //提交按钮
-        ok_tv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if (total > 0) {
-
-                    Intent intent = new Intent(getActivity(), PayActivity.class);
-                    intent.putExtra("Order", (Serializable) orderItem);
-                    intent.putExtra("total", total);
-                    startActivityForResult(intent, 1);
-
-                    //如果order列表开启状态就关闭
-                    if (!flag) {
-                        linearLayout.setAnimation(AnimationUtil.moveToViewBottom());
-                        linearLayout.setVisibility(View.GONE);
-                        imageView.animate()
-                                .alpha(0f)
-                                .setDuration(400)
-                                .setListener(new AnimatorListenerAdapter() {
-                                    @Override
-                                    public void onAnimationEnd(Animator animation) {
-                                        imageView.setVisibility(View.GONE);
-                                    }
-                                });
-
-                        flag = true;
-                    }
-
-                } else {
-
-                    Toast.makeText(getActivity(), "订单为空！", Toast.LENGTH_SHORT).show();
-                }
-
-
-            }
-
-
-        });
-
-
-
-
 
         delet_bt.setOnClickListener(new View.OnClickListener() {
             @Override

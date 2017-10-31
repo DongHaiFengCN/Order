@@ -10,6 +10,7 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -144,7 +145,12 @@ public class DiscountActivity extends AppCompatActivity {
 
         return (TextUtils.isEmpty(totalTv.getText().toString()))?0:Float.valueOf(totalTv.getText().toString());
     }
-
+/*    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_pay, menu);
+        return true;
+    }*/
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -206,6 +212,10 @@ public class DiscountActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 判断是否满足折扣条件
+     * @param t
+     */
   public void compareTotal(float t){
 
 
@@ -222,4 +232,8 @@ public class DiscountActivity extends AppCompatActivity {
 
       }
   }
+
+
+
+
 }

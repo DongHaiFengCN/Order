@@ -4,9 +4,9 @@
     tools:context="com.example.donghaifeng.myapplication.MainActivity">
 
 
-     <item android:id="@+id/setting"
-         app:showAsAction="never"
-         android:title=""
+     <item android:id="@+id/reset"
+         app:showAsAction="ifRoom"
+         android:title="重置"
           />
 
 </menu>
