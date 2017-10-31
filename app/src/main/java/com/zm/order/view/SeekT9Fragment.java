@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.GridLayoutManager;
+import android.util.DisplayMetrics;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +35,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import bean.Order;
 import bean.kitchenmanage.dishes.DishesC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -85,20 +89,22 @@ public class SeekT9Fragment extends Fragment{
     private boolean flag = true;
     private String taste = "默认";
     private float total = 0.0f;
-    private TextView point_tv;
-    private OrderAdapter o;
-    private ListView order_lv;
-    private int point = 0;
+   // private OrderAdapter o;
+    public int point = 0;
     private List<DishesC> mlistSearchDishesObj;
-    private List<SparseArray<Object>> orderItem = new ArrayList<>();
-    private TextView total_tv;
+    //private List<SparseArray<Object>> orderItem =new ArrayList<>();
+    //
     private SeekT9Adapter seekT9Adapter ;
-    private List<String> mData;
-    private ImageButton delet_bt,car_iv;
+    private TextView total_tv;
+    /*private ImageButton delet_bt,car_iv;
     private TextView ok_tv;
+    private ListView order_lv;
     private ImageView imageView;
-    View view;
-    private LinearLayout linearLayout;
+    private LinearLayout linearLayout;*/
+   private TextView point_tv;
+   View view;
+    private MainActivity mainActivity ;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -106,29 +112,27 @@ public class SeekT9Fragment extends Fragment{
 
         unbinder = ButterKnife.bind(this, view);
         point_tv = getActivity().findViewById(R.id.point);
+        total_tv = getActivity().findViewById(R.id.total_tv);
+        /*ok_tv = getActivity().findViewById(R.id.ok_tv);
         imageView = getActivity().findViewById(R.id.shade);
         linearLayout = getActivity().findViewById(R.id.orderList);
-        ok_tv = getActivity().findViewById(R.id.ok_tv);
         car_iv = getActivity().findViewById(R.id.car);
-        total_tv = getActivity().findViewById(R.id.total_tv);
         order_lv = getActivity().findViewById(R.id.order_lv);
         //清空按钮
-        delet_bt = getActivity().findViewById(R.id.delet);
+        delet_bt = getActivity().findViewById(R.id.delet);*/
         initView();
-
 
         return view;
 
     }
-
-    private void initView() {
+    public void initView() {
         seekT9Adapter = new SeekT9Adapter(getActivity());
         mlistSearchDishesObj = new ArrayList<>();
-
         //初始化订单的数据，绑定数据源的信息。
-        o = new OrderAdapter(orderItem, getActivity());
+        /*o = new OrderAdapter(orderItem, getActivity());
 
         order_lv.setAdapter(o);
+
         //监听orderItem的增加删除，设置总价以及总数量, flag ？+ ：-,price 单价 ,sum 当前item的个数。
 
         o.setOnchangeListener(new OrderAdapter.OnchangeListener() {
@@ -167,23 +171,22 @@ public class SeekT9Fragment extends Fragment{
             }
         });
 
-        seekT9Adapter.setmData(mlistSearchDishesObj);
-        seekT9Adapter.notifyDataSetChanged();
+        //获取屏幕尺寸
 
-        activitySeekList.setAdapter(seekT9Adapter);
-        seekT9Adapter.setListener(new SeekT9Adapter.SeekT9OnClickListener() {
-            @Override
-            public void OnClickListener(String name, float price) {
-                showDialog(name, price);
-            }
-        });
-        delet_bt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        DisplayMetrics dm = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
+        int w = dm.widthPixels;
+        int h = dm.heightPixels;
 
-                clearOrder();
-            }
-        });
+        //设置表单的容器的长度为视窗的一半高，由父类的节点获得
+
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) linearLayout
+                .getLayoutParams();
+        layoutParams.width = w;
+        layoutParams.height = h / 2;
+        linearLayout.setLayoutParams(layoutParams);
+
+
         car_iv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -217,6 +220,26 @@ public class SeekT9Fragment extends Fragment{
                     flag = true;
 
                 }
+            }
+        });*/
+
+        seekT9Adapter.setmData(mlistSearchDishesObj);
+        seekT9Adapter.notifyDataSetChanged();
+
+        activitySeekList.setAdapter(seekT9Adapter);
+        seekT9Adapter.setListener(new SeekT9Adapter.SeekT9OnClickListener() {
+            @Override
+            public void OnClickListener(String name, float price) {
+                showDialog(name, price);
+            }
+        });
+
+
+       /* delet_bt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                clearOrder();
             }
         });
 
@@ -258,12 +281,12 @@ public class SeekT9Fragment extends Fragment{
             }
 
 
-        });
-
-
+        });*/
     }
 
-
+    public void SetPoint(int point){
+        this.point = point;
+    }
     /**
      * 菜品选择弹出框编辑模块
      *
@@ -321,31 +344,32 @@ public class SeekT9Fragment extends Fragment{
         builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-
+                mainActivity = (MainActivity)getActivity();
                 int sum = amountView.getAmount();
 
                 if (sum != 0) {//如果选择器的数量不为零，当前的选择的菜品加入订单列表
 
-                    SparseArray<Object> s = new SparseArray<>();
+                    final SparseArray<Object> s = new SparseArray<>();//查下这个怎么用
                     s.put(0, name);
                     s.put(1, taste);
                     s.put(2, sum + "");
                     s.put(3, price);
                     s.put(4, sum * price);
-                    orderItem.add(s);
-
+                    mainActivity.setOrderItem().add(s);
+                    point =  (((MainActivity) getActivity()).getPoint());
+                    SetPoint(point);
+                    point_tv.setText(point + "");
                     //刷新订单数据源
                     //o.notifyDataSetChanged();
 
-                    //购物车计数器数据更新
+                 /*   //购物车计数器数据更新
                     point++;
                     point_tv.setText(point + "");
                     point_tv.setVisibility(View.VISIBLE);
 
                     //计算总价
                     total += l[0];
-                    total_tv.setText(total + "元");
-
+                    total_tv.setText(total + "元");*/
                 } else {
 
                     Toast.makeText(getActivity(), "没有选择商品数量！", Toast.LENGTH_SHORT).show();
@@ -355,11 +379,12 @@ public class SeekT9Fragment extends Fragment{
         builder.show();
     }
 
+
     /**
      * 清空订单列表
      */
 
-    private void clearOrder() {
+   /* private void clearOrder() {
 
         point = 0;
         point_tv.setVisibility(View.INVISIBLE);
@@ -369,7 +394,7 @@ public class SeekT9Fragment extends Fragment{
 
         orderItem.clear();
         o.notifyDataSetChanged();
-    }
+    }*/
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
