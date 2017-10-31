@@ -12,9 +12,7 @@
         app:elevation="0dp"
         android:background="@color/paycolor"
         android:id="@+id/appBarLayout"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+       >
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
@@ -50,18 +48,36 @@
                 android:paddingLeft="16dp"
 
                 />
-            <TextView
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="2"
-                android:text="消费金额：￥80.00"
-                android:typeface="sans"
-                android:textSize="28sp"
-                android:textColor="@color/md_white"
-                android:gravity="center|left"
-                android:paddingLeft="32dp"
-                android:paddingBottom="16dp"
-                />
+                android:orientation="horizontal"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="消费金额：￥"
+                    android:typeface="sans"
+                    android:textSize="28sp"
+                    android:textColor="@color/md_white"
+                    android:gravity="center"
+                    android:layout_marginLeft="16dp"
+                    />
+
+                <TextView
+                    android:id="@+id/total_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="80.00"
+                    android:typeface="sans"
+                    android:textSize="28sp"
+                    android:textColor="@color/md_white"
+                    android:gravity="center"
+                    />
+            </LinearLayout>
+
         </LinearLayout>
 
 
@@ -70,56 +86,7 @@
     </android.support.design.widget.AppBarLayout>
 
 
-    <LinearLayout
-        android:id="@+id/discount"
-        android:background="@drawable/background_pay_select"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/viewhight"
-        android:orientation="horizontal"
 
-        android:clickable="true"
-        >
-
-        <TextView
-            android:id="@+id/textView7"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="left|center"
-            android:typeface="monospace"
-            android:paddingLeft="16dp"
-            android:text="账单优惠" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center|right"
-            android:typeface="serif"
-            android:textSize="16sp"
-            android:paddingRight="16dp"
-            android:textColor="@color/grey_color1"
-            android:text="- 2.0元"
-            />
-
-        <ImageView
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:src="@mipmap/forward"
-            android:layout_gravity="center"
-            android:layout_marginRight="8dp"
-          />
-
-    </LinearLayout>
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingRight="8dp"
-        android:paddingLeft="8dp"
-        android:src="@drawable/divider">
-
-    </ImageView>
 
     <LinearLayout
         android:id="@+id/associator"
@@ -139,6 +106,7 @@
             android:typeface="monospace"
             android:layout_height="match_parent" />
         <TextView
+            android:id="@+id/associator_tv"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -147,7 +115,6 @@
             android:textSize="16sp"
             android:paddingRight="16dp"
             android:textColor="@color/grey_color1"
-            android:text="八折"
             />
 
         <ImageView
@@ -160,6 +127,54 @@
 
     </LinearLayout>
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingRight="8dp"
+        android:paddingLeft="8dp"
+        android:src="@drawable/divider">
+
+    </ImageView>
+    <LinearLayout
+        android:id="@+id/discount"
+        android:background="@drawable/background_pay_select"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/viewhight"
+        android:orientation="horizontal"
+        android:clickable="true"
+        >
+
+        <TextView
+            android:id="@+id/textView7"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="left|center"
+            android:typeface="monospace"
+            android:paddingLeft="16dp"
+            android:text="账单减免" />
+
+        <TextView
+            android:id="@+id/discount_tv"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center|right"
+            android:typeface="serif"
+            android:textSize="16sp"
+            android:paddingRight="16dp"
+            android:textColor="@color/grey_color1"
+            />
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@mipmap/forward"
+            android:layout_gravity="center"
+            android:layout_marginRight="8dp"
+            />
+
+    </LinearLayout>
 
     <LinearLayout
 
@@ -207,7 +222,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="60dp"
         android:background="@color/md_white"
         android:orientation="horizontal"
         >
@@ -217,7 +232,7 @@
             android:layout_weight="1"
             android:clickable="true"
             android:layout_height="match_parent"
-            android:src="@mipmap/icon_zhi"
+            android:src="@mipmap/icon_alipay"
             android:padding="16dp"
             android:background="@drawable/background_pay_select"
             />
@@ -236,7 +251,7 @@
             android:layout_weight="1"
             android:clickable="true"
             android:padding="16dp"
-            android:src="@mipmap/icon_wei"
+            android:src="@mipmap/icon_wx"
             android:layout_height="match_parent"
             android:background="@drawable/background_pay_select"
             />
@@ -255,7 +270,7 @@
             android:layout_weight="1"
             android:clickable="true"
             android:padding="16dp"
-            android:src="@mipmap/icon_qian"
+            android:src="@mipmap/icon_rmb"
             android:layout_height="match_parent"
             android:background="@drawable/background_pay_select"
             />

@@ -96,10 +96,10 @@ public class CouchBaseManger<T> implements IDBManager {
             ResultSet resultSet= query.run();
             Result result;
 
-            if ((result=resultSet.next())!=null){
+            if (resultSet.next() != null){
 
-                 String id = result.getString(0);
-                 Document doc=database.getDocument(id);
+              //   String id = result.getString(0);
+                // Document doc=database.getDocument(id);
           /*       MyLog.e("数据库查询结果 mName "+doc.getString("mName"));
                  MyLog.e("数据库查询结果 mPassword "+doc.getString("mPassword"));*/
                 return  true;
@@ -188,6 +188,92 @@ public class CouchBaseManger<T> implements IDBManager {
         }
 
 
+    }
+
+    @Override
+    public Document getMembers(String tel) {
+        Document doc = null;
+        Query query= Query.select(SelectResult.expression(Expression.meta().getId()))
+                .from(DataSource.database(database))
+                .where(Expression.property("className").equalTo("MembersC").and(Expression.property("tel").equalTo(tel)));
+
+        try {
+            ResultSet resultSet= query.run();
+            Result result;
+    
+            if ((result=resultSet.next())!=null){
+
+                String id = result.getString(0);
+                 doc=database.getDocument(id);
+                // MyLog.e("数据库查询结果 Name "+doc.getString("name"));
+                //MyLog.e("数据库查询结果 mPassword "+doc.getString("mPassword"));
+
+            }
+            //
+
+        } catch (CouchbaseLiteException e) {
+            e.printStackTrace();
+        }
+        
+        return doc;
+    }
+
+    @Override
+    public Document getCard(String id) {
+        Document doc = null;
+        Query query= Query.select(SelectResult.expression(Expression.meta().getId()))
+                .from(DataSource.database(database))
+                .where(Expression.property("className").equalTo("CardTypeC").and(Expression.property("_id").equalTo(id)));
+
+        try {
+            ResultSet resultSet= query.run();
+            Result result;
+
+            if ((result=resultSet.next())!=null){
+
+                String cardId = result.getString(0);
+                doc=database.getDocument(cardId);
+                // MyLog.e("数据库查询结果 Name "+doc.getString("name"));
+                //MyLog.e("数据库查询结果 mPassword "+doc.getString("mPassword"));
+
+            }
+
+
+        } catch (CouchbaseLiteException e) {
+            e.printStackTrace();
+        }
+
+        return doc;
+    }
+
+    @Override
+    public List<Document> getByClassName(String name) {
+
+        List<Document> documentList = new ArrayList<>();
+        Query query= Query.select(SelectResult.expression(Expression.meta().getId()))
+                .from(DataSource.database(database))
+                .where(Expression.property("className").equalTo(name));
+        try {
+            ResultSet resultSet= query.run();
+            Result result;
+
+            while ((result=resultSet.next())!=null){
+
+                String id = result.getString(0);
+                Document doc=database.getDocument(id);
+                documentList.add(doc);
+                // MyLog.e("数据库查询结果 Name "+doc.getString("name"));
+                //MyLog.e("数据库查询结果 mPassword "+doc.getString("mPassword"));
+
+
+            }
+            //
+
+        } catch (CouchbaseLiteException e) {
+            e.printStackTrace();
+        }
+
+        return documentList;
     }
 
     @Override

@@ -18,6 +18,7 @@ import com.couchbase.lite.ReadOnlyDocument;
 import com.couchbase.lite.Replicator;
 import com.couchbase.lite.ReplicatorChangeListener;
 import com.couchbase.lite.ReplicatorConfiguration;
+import com.mob.MobApplication;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.zm.order.view.LoginActivity;
 
@@ -46,7 +47,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
  * 修改备注：
  */
 
-public class MyApplication extends Application implements ISharedPreferences, ReplicatorChangeListener {
+public class MyApplication extends MobApplication implements ISharedPreferences, ReplicatorChangeListener {
 
     private static final String TAG = Application.class.getSimpleName();
 

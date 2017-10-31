@@ -1,5 +1,9 @@
 package bean.kitchenmanage.member;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +14,7 @@ import java.util.List;
  * @date 2014-7-29 上午1:06:02
  *
  */
-public class CardDishesKindC {
+public class CardDishesKindC{
 
     /**
      * 所属卡类id
@@ -32,6 +36,14 @@ public class CardDishesKindC {
     public CardDishesKindC()
     {
     }
+
+
+    protected CardDishesKindC(Parcel in) {
+        cardTypeCId = in.readString();
+        dishKindCId = in.readString();
+        ischecked = in.readInt();
+    }
+
 
 
     public String getCardTypeCId() {
@@ -75,4 +87,6 @@ public class CardDishesKindC {
             cardDishesList=new ArrayList<CardDishesC>();
         cardDishesList.add(obj);
     }
+
+
 }
