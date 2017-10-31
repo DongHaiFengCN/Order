@@ -84,23 +84,14 @@ public class SeekT9Fragment extends Fragment{
     @BindView(R.id.ibtn_key_del)
     ImageView ibtnKeyDel;
     Unbinder unbinder;
-    private ArrayList<String> list = new ArrayList<>();
 
-    private boolean flag = true;
     private String taste = "默认";
     private float total = 0.0f;
-   // private OrderAdapter o;
-    public int point = 0;
+    public int point = 1;
     private List<DishesC> mlistSearchDishesObj;
-    //private List<SparseArray<Object>> orderItem =new ArrayList<>();
-    //
+
     private SeekT9Adapter seekT9Adapter ;
     private TextView total_tv;
-    /*private ImageButton delet_bt,car_iv;
-    private TextView ok_tv;
-    private ListView order_lv;
-    private ImageView imageView;
-    private LinearLayout linearLayout;*/
    private TextView point_tv;
    View view;
     private MainActivity mainActivity ;
@@ -113,180 +104,38 @@ public class SeekT9Fragment extends Fragment{
         unbinder = ButterKnife.bind(this, view);
         point_tv = getActivity().findViewById(R.id.point);
         total_tv = getActivity().findViewById(R.id.total_tv);
-        /*ok_tv = getActivity().findViewById(R.id.ok_tv);
-        imageView = getActivity().findViewById(R.id.shade);
-        linearLayout = getActivity().findViewById(R.id.orderList);
-        car_iv = getActivity().findViewById(R.id.car);
-        order_lv = getActivity().findViewById(R.id.order_lv);
-        //清空按钮
-        delet_bt = getActivity().findViewById(R.id.delet);*/
         initView();
 
         return view;
 
     }
     public void initView() {
-        seekT9Adapter = new SeekT9Adapter(getActivity());
+        seekT9Adapter = new SeekT9Adapter((MainActivity)getActivity());
         mlistSearchDishesObj = new ArrayList<>();
-        //初始化订单的数据，绑定数据源的信息。
-        /*o = new OrderAdapter(orderItem, getActivity());
-
-        order_lv.setAdapter(o);
-
-        //监听orderItem的增加删除，设置总价以及总数量, flag ？+ ：-,price 单价 ,sum 当前item的个数。
-
-        o.setOnchangeListener(new OrderAdapter.OnchangeListener() {
-            @Override
-            public void onchangeListener(boolean flag, float price, int sum) {
-
-                if (flag) {
-
-                    total += price;
-
-                    total_tv.setText(total + "元");
-
-
-                } else {
-
-                    total -= price;
-
-                    total_tv.setText(total + "元");
-
-                    if (sum == 0) {
-
-                        point--;
-
-                        point_tv.setText(point + "");
-
-                        if (point == 0) {
-
-                            point_tv.setVisibility(View.INVISIBLE);
-                        }
-
-
-                    }
-
-
-                }
-            }
-        });
-
-        //获取屏幕尺寸
-
-        DisplayMetrics dm = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
-        int w = dm.widthPixels;
-        int h = dm.heightPixels;
-
-        //设置表单的容器的长度为视窗的一半高，由父类的节点获得
-
-        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) linearLayout
-                .getLayoutParams();
-        layoutParams.width = w;
-        layoutParams.height = h / 2;
-        linearLayout.setLayoutParams(layoutParams);
-
-
-        car_iv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if (flag) {
-
-                    linearLayout.setAnimation(AnimationUtil.moveToViewLocation());
-                    linearLayout.setVisibility(View.VISIBLE);
-                    imageView.setVisibility(View.VISIBLE);
-                    imageView.animate()
-                            .alpha(1f)
-                            .setDuration(400)
-                            .setListener(null);
-                    flag = false;
-
-                } else {
-
-                    linearLayout.setAnimation(AnimationUtil.moveToViewBottom());
-                    linearLayout.setVisibility(View.GONE);
-
-                    imageView.animate()
-                            .alpha(0f)
-                            .setDuration(400)
-                            .setListener(new AnimatorListenerAdapter() {
-                                @Override
-                                public void onAnimationEnd(Animator animation) {
-                                    imageView.setVisibility(View.GONE);
-                                }
-                            });
-
-                    flag = true;
-
-                }
-            }
-        });*/
-
         seekT9Adapter.setmData(mlistSearchDishesObj);
         seekT9Adapter.notifyDataSetChanged();
-
         activitySeekList.setAdapter(seekT9Adapter);
+        /*seekT9Adapter.setOrderItem(new SeekT9Adapter.SeekT9OrderItem() {
+            @Override
+            public void seekT9OrderItem(SparseArray<Object> list, int point, float total) {
+                ((MainActivity) getActivity()).setPoint(point);
+                ((MainActivity) getActivity()).setOrderItem().add(list);
+                ((MainActivity) getActivity()).setTotal(total);
+
+            }
+        });*/
         seekT9Adapter.setListener(new SeekT9Adapter.SeekT9OnClickListener() {
             @Override
-            public void OnClickListener(String name, float price) {
+            public void OnClickListener(View view,String name, float price) {
+                view.setBackgroundResource(R.color.lucency);
                 showDialog(name, price);
             }
         });
 
 
-       /* delet_bt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                clearOrder();
-            }
-        });
-
-        //提交按钮
-        ok_tv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if (total > 0) {
-
-                    Intent intent = new Intent(getActivity(), PayActivity.class);
-                    intent.putExtra("Order", (Serializable) orderItem);
-                    intent.putExtra("total", total);
-                    startActivityForResult(intent, 1);
-
-                    //如果order列表开启状态就关闭
-                    if (!flag) {
-                        linearLayout.setAnimation(AnimationUtil.moveToViewBottom());
-                        linearLayout.setVisibility(View.GONE);
-                        imageView.animate()
-                                .alpha(0f)
-                                .setDuration(400)
-                                .setListener(new AnimatorListenerAdapter() {
-                                    @Override
-                                    public void onAnimationEnd(Animator animation) {
-                                        imageView.setVisibility(View.GONE);
-                                    }
-                                });
-
-                        flag = true;
-                    }
-
-                } else {
-
-                    Toast.makeText(getActivity(), "订单为空！", Toast.LENGTH_SHORT).show();
-                }
-
-
-            }
-
-
-        });*/
     }
 
-    public void SetPoint(int point){
-        this.point = point;
-    }
+
     /**
      * 菜品选择弹出框编辑模块
      *
@@ -301,6 +150,7 @@ public class SeekT9Fragment extends Fragment{
         final TextView price_tv = view.findViewById(R.id.price);
 
         final AmountView amountView = view.findViewById(R.id.amount_view);
+        amountView.getAmount();
 
         //增删选择器的数据改变的监听方法
 
@@ -355,21 +205,20 @@ public class SeekT9Fragment extends Fragment{
                     s.put(2, sum + "");
                     s.put(3, price);
                     s.put(4, sum * price);
-                    mainActivity.setOrderItem().add(s);
+                    mainActivity.getOrderItem().add(s);
+                    //购物车计数器数据更新
                     point =  (((MainActivity) getActivity()).getPoint());
-                    SetPoint(point);
-                    point_tv.setText(point + "");
+                    point++;
+                    ((MainActivity) getActivity()).setPoint(point);
+
+                    //计算总价
+                    total = ((MainActivity) getActivity()).getTotal();
+                    total += l[0];
+                    ((MainActivity) getActivity()).setTotal(total);
+
                     //刷新订单数据源
                     //o.notifyDataSetChanged();
 
-                 /*   //购物车计数器数据更新
-                    point++;
-                    point_tv.setText(point + "");
-                    point_tv.setVisibility(View.VISIBLE);
-
-                    //计算总价
-                    total += l[0];
-                    total_tv.setText(total + "元");*/
                 } else {
 
                     Toast.makeText(getActivity(), "没有选择商品数量！", Toast.LENGTH_SHORT).show();
@@ -378,23 +227,6 @@ public class SeekT9Fragment extends Fragment{
         });
         builder.show();
     }
-
-
-    /**
-     * 清空订单列表
-     */
-
-   /* private void clearOrder() {
-
-        point = 0;
-        point_tv.setVisibility(View.INVISIBLE);
-
-        total_tv.setText("0元");
-        total = 0;
-
-        orderItem.clear();
-        o.notifyDataSetChanged();
-    }*/
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

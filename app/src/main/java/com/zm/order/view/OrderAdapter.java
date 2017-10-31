@@ -30,15 +30,21 @@ public class OrderAdapter extends BaseAdapter {
      *
      */
     private List<SparseArray<Object>> orderItem;
-    private Context context;
+    private MainActivity context;
 
     public void setOnchangeListener(OnchangeListener onchangeListener) {
         this.onchangeListener = onchangeListener;
     }
 
+    public void setOrderItem(SparseArray<Object> sparseArray){
+        orderItem.add(sparseArray);
+        notifyDataSetChanged();
+
+    }
+
     private OnchangeListener onchangeListener;
 
-    public OrderAdapter(List<SparseArray<Object>> orderItem, Activity mainActivity) {
+    public OrderAdapter(List<SparseArray<Object>> orderItem, MainActivity mainActivity) {
         this.orderItem = orderItem;
         this.context = mainActivity;
     }
@@ -96,7 +102,7 @@ public class OrderAdapter extends BaseAdapter {
                 orderItem.get(i).put(2,ls);
 
                 onchangeListener.onchangeListener(flag,(float)orderItem.get(i).get(3),ls);
-
+                context.getSeekT9Adapter().notifyDataSetChanged();
 
               if(ls == 0){
 
@@ -132,5 +138,6 @@ public class OrderAdapter extends BaseAdapter {
 
        void onchangeListener(boolean flag,float price,int sum);
     }
+
 
 }

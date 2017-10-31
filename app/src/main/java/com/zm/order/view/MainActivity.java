@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
     private float total = 0.0f;
     private Fragment seekT9Fragment;
     private Fragment orderFragment;
-
+    private SeekT9Adapter seekT9Adapter;
     private FragmentManager fm;//获得Fragment管理器
     private FragmentTransaction ft; //开启一个事务
     private boolean isFlag = true;
@@ -77,6 +77,14 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
+        //关键下面两句话，设置了回退按钮，及点击事件的效果
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         myApp = (MyApplication) getApplication();
 
@@ -86,8 +94,34 @@ public class MainActivity extends AppCompatActivity {
         select(isFlag);
     }
 
-    public List<SparseArray<Object>> setOrderItem(){
+    public void setOrderItem(SparseArray<Object> sparseArray){
+        orderItem.add(sparseArray);
+    }
+
+    public void setT9Adapter(SeekT9Adapter seekT9Adapter){
+        this.seekT9Adapter = seekT9Adapter;
+    }
+
+    public SeekT9Adapter getSeekT9Adapter(){
+        return seekT9Adapter;
+    }
+
+
+    public List<SparseArray<Object>> getOrderItem(){
         return orderItem;
+    }
+    public void setTotal(float total){
+        this.total = total;
+        total_tv.setText(total + "元");
+    }
+
+    public float getTotal(){
+        return total;
+    }
+    public void setPoint(int point){
+        this.point = point;
+        point_tv.setText(point + "");
+        point_tv.setVisibility(View.VISIBLE);
     }
     public int getPoint(){
         return point;
@@ -97,10 +131,6 @@ public class MainActivity extends AppCompatActivity {
         total_tv = (TextView) findViewById(R.id.total_tv);
 
         point_tv = (TextView) findViewById(R.id.point);
-
-        //dishesKind_lv = (ListView) findViewById(R.id.dishesKind_lv);
-
-        //dishes_rv = (RecyclerView) findViewById(R.id.dishes_rv);
 
         car_iv = (ImageView) findViewById(R.id.car);
 
@@ -130,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //初始化订单的数据，绑定数据源的信息。
-                o = new OrderAdapter( setOrderItem(), MainActivity.this);
+                o = new OrderAdapter( getOrderItem(), MainActivity.this);
                 order_lv = (ListView) findViewById(R.id.order_lv);
                 order_lv.setAdapter(o);
                 //监听orderItem的增加删除，设置总价以及总数量, flag ？+ ：-,price 单价 ,sum 当前item的个数。
@@ -224,7 +254,7 @@ public class MainActivity extends AppCompatActivity {
                 if (total > 0) {
 
                     Intent intent = new Intent(MainActivity.this, PayActivity.class);
-                    intent.putExtra("Order", (Serializable) setOrderItem());
+                    intent.putExtra("Order", (Serializable) getOrderItem());
                     intent.putExtra("total", total);
                     startActivityForResult(intent, 1);
 
@@ -269,7 +299,7 @@ public class MainActivity extends AppCompatActivity {
         total_tv.setText("0元");
         total = 0;
 
-        setOrderItem().clear();
+        getOrderItem().clear();
         o.notifyDataSetChanged();
     }
 
@@ -320,7 +350,7 @@ public class MainActivity extends AppCompatActivity {
                 orderFragment = new OrderFragment();
                 ft.add(R.id.activity_frame,orderFragment);
             }else{
-                ft.show(orderFragment);;
+                ft.show(orderFragment);
             }
             isFlag = true;
         }
@@ -352,7 +382,7 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_search) {
             select(isFlag);
 
-        } else if (id == R.id.action_cancel) {
+        } /*else if (id == R.id.action_cancel) {
 
             myApp.cancleSharePreferences();
             Intent itent = new Intent();
@@ -360,7 +390,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(itent);
             finish();
 
-        }
+        }*/
 
         return super.onOptionsItemSelected(item);
     }

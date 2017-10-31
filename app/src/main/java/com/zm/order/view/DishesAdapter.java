@@ -1,6 +1,7 @@
 package com.zm.order.view;
 
 import android.content.Context;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import com.zm.order.R;
 
 import java.util.List;
 
+import model.CDBHelper;
 import model.DBFactory;
 import model.DatabaseSource;
 import model.IDBManager;
@@ -36,16 +38,26 @@ public class DishesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private Context context;
     private OnItemClickListener mOnItemClickListener = null;
     private IDBManager idbManager;
+
+    private RecyclerView mRecyclerView;
+
+    private boolean mShouldScroll = false;
+
     public void setOnItemClickListener(OnItemClickListener listener) {
         mOnItemClickListener = listener;
     }
     public DishesAdapter(Context context) {
-
+        this.context = context;
         idbManager = DBFactory.get(DatabaseSource.CouchBase,context);
+
     }
 
     public void setmData(List<String> mData) {
         this.mData = mData;
+    }
+
+    public List<String> getmData(){
+        return mData;
     }
 
     public void setHeadPosition(List<Integer> headPosition) {
@@ -80,10 +92,10 @@ public class DishesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
        }else if (holder instanceof ItemHolder){
 
-          Document document = (Document) idbManager.getById(mData.get(position));
+          //Document document = (Document) idbManager.getById(mData.get(position));
 
-           ((ItemHolder) holder).info.setText(document.getString("name"));
-           ((ItemHolder) holder).price.setText(document.getFloat("price")+" 元/份");
+           ((ItemHolder) holder).info.setText(CDBHelper.getDocByID(context,mData.get(position)).getString("dishesName"));
+           ((ItemHolder) holder).price.setText(CDBHelper.getDocByID(context,mData.get(position)).getFloat("price")+" 元/份");
        }
     }
 
@@ -161,5 +173,4 @@ public class DishesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         void onItemClick(View view,String name,float price);
     }
-
 }

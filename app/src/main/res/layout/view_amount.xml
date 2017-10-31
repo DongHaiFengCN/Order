@@ -28,7 +28,7 @@
         android:background="@null"
         android:inputType="number"
         android:gravity="center"
-        android:text="0"/>
+        android:text="1"/>
 
     <Button
         android:id="@+id/btnIncrease"

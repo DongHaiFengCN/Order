@@ -9,6 +9,9 @@
     <color name="divider">#ffd2d2d2</color>
     <color name="paycolor">#686f79</color>
 
+    <!--透明-->
+    <color name="lucency">#00000000</color>
+
 
     <color name="colorText">#ffffff</color>
     <color name="md_white">#ffffff</color>

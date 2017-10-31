@@ -6,11 +6,13 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
@@ -28,6 +30,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.couchbase.lite.Document;
+import com.couchbase.lite.Expression;
+import com.couchbase.lite.Ordering;
 import com.zm.order.R;
 
 import java.io.Serializable;
@@ -37,6 +42,10 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import model.CDBHelper;
+import model.DBFactory;
+import model.DatabaseSource;
+import model.IDBManager;
 import presenter.IMainPresenter;
 import presenter.MainPresenterImpl;
 import untils.AnimationUtil;
@@ -48,11 +57,12 @@ import untils.AnimationUtil;
 public class OrderFragment extends Fragment implements IMainView {
 
     @BindView(R.id.dishes_rv)
-    RecyclerView dishesRv;
+    ListView dishesRv;
     @BindView(R.id.order_list)
     ListView orderList;
     private DishesKindAdapter leftAdapter;
-    private DishesAdapter dishesAdapter;
+    //private DishesAdapter dishesAdapter;
+    private OrderDragAdapter orderDragAdapter;
     private List<String> dishesKindName;
     private View view;
     private String taste = "默认";
@@ -61,32 +71,22 @@ public class OrderFragment extends Fragment implements IMainView {
     private int point = 0;
     private float total = 0.0f;
     private TextView point_tv;
-    private ListView order_lv;
-    private TextView ok_tv;
     private TextView total_tv;
-    private ImageView car_iv;
-    private ImageView imageView;
-    private LinearLayout linearLayout;
     private boolean flag = true;
-    private ImageButton delet_bt;
-
+    private List<String> titleList = new ArrayList<>();
+    List<Object> DishesIdList;
     @Override
     public View onCreateView(LayoutInflater inflater,  ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.frame_order,null);
         ButterKnife.bind(this, view);
         point_tv = getActivity().findViewById(R.id.point);
         total_tv = getActivity().findViewById(R.id.total_tv);
-        ok_tv = getActivity().findViewById(R.id.ok_tv);
-        imageView = getActivity().findViewById(R.id.shade);
-        linearLayout = getActivity().findViewById(R.id.orderList);
-        car_iv = getActivity().findViewById(R.id.car);
-        order_lv = getActivity().findViewById(R.id.order_lv);
-        //清空按钮
-        delet_bt = getActivity().findViewById(R.id.delet);
 
+        //initData();
         initView();
         IMainPresenter iMainView = new MainPresenterImpl(this);
         iMainView.init();
+
 
         return view;
 
@@ -101,218 +101,98 @@ public class OrderFragment extends Fragment implements IMainView {
 
     public void initView() {
 
-        //初始化订单的数据，绑定数据源的信息。
 
-        o = new OrderAdapter(orderItem, getActivity());
-
-        order_lv.setAdapter(o);
-
-        //监听orderItem的增加删除，设置总价以及总数量, flag ？+ ：-,price 单价 ,sum 当前item的个数。
-
-        o.setOnchangeListener(new OrderAdapter.OnchangeListener() {
-            @Override
-            public void onchangeListener(boolean flag, float price, int sum) {
-
-                if (flag) {
-
-                    total += price;
-
-                    total_tv.setText(total + "元");
-
-
-                } else {
-
-                    total -= price;
-
-                    total_tv.setText(total + "元");
-
-                    if (sum == 0) {
-
-                        point--;
-
-                        point_tv.setText(point + "");
-
-                        if (point == 0) {
-
-                            point_tv.setVisibility(View.INVISIBLE);
-                        }
-
-
-                    }
-
-
-                }
-            }
-        });
-
-        //获取屏幕尺寸
-
-        DisplayMetrics dm = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
-        int w = dm.widthPixels;
-        int h = dm.heightPixels;
-
-        //设置表单的容器的长度为视窗的一半高，由父类的节点获得
-
-        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) linearLayout
-                .getLayoutParams();
-        layoutParams.width = w;
-        layoutParams.height = h / 2;
-        linearLayout.setLayoutParams(layoutParams);
-
-
-        car_iv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if (flag) {
-
-                    linearLayout.setAnimation(AnimationUtil.moveToViewLocation());
-                    linearLayout.setVisibility(View.VISIBLE);
-                    imageView.setVisibility(View.VISIBLE);
-                    imageView.animate()
-                            .alpha(1f)
-                            .setDuration(400)
-                            .setListener(null);
-                    flag = false;
-
-                } else {
-
-                    linearLayout.setAnimation(AnimationUtil.moveToViewBottom());
-                    linearLayout.setVisibility(View.GONE);
-
-                    imageView.animate()
-                            .alpha(0f)
-                            .setDuration(400)
-                            .setListener(new AnimatorListenerAdapter() {
-                                @Override
-                                public void onAnimationEnd(Animator animation) {
-                                    imageView.setVisibility(View.GONE);
-                                }
-                            });
-
-                    flag = true;
-
-                }
-            }
-        });
         final GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);//设置每行展示3个
+        //dishesAdapter = new DishesAdapter(getActivity());
 
         dishesKindName = new ArrayList<>();
 
         leftAdapter = new DishesKindAdapter();
-
+        titleList = CDBHelper.getIdsByWhere(getActivity(),
+                Expression.property("className").equalTo("DishesKindC")
+                        .and(Expression.property("isSetMenu").equalTo(false)),
+                Ordering.property("kindName").ascending());
+        leftAdapter.setNames(titleList);
         orderList.setAdapter(leftAdapter);
-
         //左侧点击事件监听
         orderList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+                if(DishesIdList!=null)
+                    DishesIdList.clear();
                 leftAdapter.changeSelected(position);
-
 
                 /*准确定位到指定位置，并且将指定位置的item置顶，
                     若直接调用scrollToPosition(...)方法，则不会置顶。*/
                 //manager.scrollToPositionWithOffset(position, 0);
                 //  manager.setStackFromEnd(true);
 
+              /*  manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                    @Override
+                    public int getSpanSize(int position) {
+
+                        return dishesAdapter.getItemViewType(position);
+                    }
+                });
+                dishesRv.setLayoutManager(manager);*/
+
+
+                final List<String> dishesIdList=new ArrayList<>();
+                //获取点击的菜品类别的Document
+                Document KindDocument= CDBHelper.getDocByID(getActivity(),titleList.get(position));
+                //获取此Document下的菜品Id号
+                if(KindDocument.getArray("dishesListId")!=null)
+                {
+                    DishesIdList= KindDocument.getArray("dishesListId").toList();
+                    //增强for循环读取id
+                    for(Object DishesId:DishesIdList)
+                    {
+                        if(DishesId==null)
+                            continue;
+                        dishesIdList.add(DishesId.toString());
+                    }
+                }
+                orderDragAdapter = new OrderDragAdapter(getActivity(),KindDocument);
+
+                orderDragAdapter.setMlistDishesId(dishesIdList);
+
+
+                dishesRv.setAdapter(orderDragAdapter);
+                orderDragAdapter.setOnItemClickListener(new OrderDragAdapter.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(String name, float price) {
+                        showDialog(name,price);
+                    }
+                });
+               /* dishesAdapter.setOnItemClickListener(new DishesAdapter.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, String name, float price) {
+                        showDialog(name, price);
+                    }
+
+                });*/
+
+
             }
+
+
 
         });
 
         orderList.performItemClick(orderList.getChildAt(0), 0, orderList
                 .getItemIdAtPosition(0));
 
-        dishesAdapter = new DishesAdapter(getActivity());
 
 
-        manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-            @Override
-            public int getSpanSize(int position) {
-
-                return dishesAdapter.getItemViewType(position);
-            }
-        });
-        dishesRv.setLayoutManager(manager);
-        dishesRv.setAdapter(dishesAdapter);
-        dishesAdapter.setOnItemClickListener(new DishesAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, String name, float price) {
-                showDialog(name, price);
-            }
-
-        });
-
-        delet_bt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                clearOrder();
-            }
-        });
-
-        //提交按钮
-        ok_tv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if (total > 0) {
-
-                    Intent intent = new Intent(getActivity(), PayActivity.class);
-                    intent.putExtra("Order", (Serializable) orderItem);
-                    intent.putExtra("total", total);
-                    startActivityForResult(intent, 1);
-
-                    //如果order列表开启状态就关闭
-                    if (!flag) {
-                        linearLayout.setAnimation(AnimationUtil.moveToViewBottom());
-                        linearLayout.setVisibility(View.GONE);
-                        imageView.animate()
-                                .alpha(0f)
-                                .setDuration(400)
-                                .setListener(new AnimatorListenerAdapter() {
-                                    @Override
-                                    public void onAnimationEnd(Animator animation) {
-                                        imageView.setVisibility(View.GONE);
-                                    }
-                                });
-
-                        flag = true;
-                    }
-
-                } else {
-
-                    Toast.makeText(getActivity(), "订单为空！", Toast.LENGTH_SHORT).show();
-                }
 
 
-            }
-
-
-        });
     }
-    /**
-     * 清空订单列表
-     */
 
-    private void clearOrder() {
-
-        point = 0;
-        point_tv.setVisibility(View.INVISIBLE);
-
-        total_tv.setText("0元");
-        total = 0;
-
-        orderItem.clear();
-        o.notifyDataSetChanged();
-    }
     @Override
     public void showDishes(List<String> data, List<Integer> headPosition) {
-
-        dishesAdapter.setmData(data);
-        dishesAdapter.setHeadPosition(headPosition);
-        dishesAdapter.notifyDataSetChanged();
+//        dishesAdapter.setmData(data);
+//        dishesAdapter.setHeadPosition(headPosition);
+//        dishesAdapter.notifyDataSetChanged();
 
     }
 
@@ -386,18 +266,21 @@ public class OrderFragment extends Fragment implements IMainView {
                     s.put(3, price);
                     s.put(4, sum * price);
                     orderItem.add(s);
-
-                    //刷新订单数据源
-                    //o.notifyDataSetChanged();
-
+                    ((MainActivity)getActivity()).getOrderItem().add(s);
                     //购物车计数器数据更新
+                    point =  (((MainActivity) getActivity()).getPoint());
                     point++;
+                    ((MainActivity) getActivity()).setPoint(point);
                     point_tv.setText(point + "");
                     point_tv.setVisibility(View.VISIBLE);
 
                     //计算总价
+                    total = ((MainActivity) getActivity()).getTotal();
                     total += l[0];
+                    ((MainActivity) getActivity()).setTotal(total);
                     total_tv.setText(total + "元");
+                    //刷新订单数据源
+                    //o.notifyDataSetChanged();
 
                 } else {
 
@@ -411,8 +294,7 @@ public class OrderFragment extends Fragment implements IMainView {
     @Override
     public void showKindName(List<String> data) {
 
-        leftAdapter.setNames(data);
-        leftAdapter.notifyDataSetChanged();
+
     }
 
     @Override
@@ -424,7 +306,6 @@ public class OrderFragment extends Fragment implements IMainView {
 
         private LayoutInflater listContainerLeft;
         private int mSelect = 0; //选中项
-
         public void setNames(List<String> names) {
             this.names = names;
         }
@@ -433,6 +314,7 @@ public class OrderFragment extends Fragment implements IMainView {
 
         public DishesKindAdapter() {
         }
+
 
         @Override
         public int getCount() {
@@ -469,7 +351,7 @@ public class OrderFragment extends Fragment implements IMainView {
                 view.setBackgroundResource(R.color.md_grey_100);  //其他项背景
                 listItemView.imageView.setVisibility(View.INVISIBLE);
             }
-            listItemView.tv_title.setText(names.get(i));
+            listItemView.tv_title.setText(CDBHelper.getDocByID(getActivity(),names.get(i)).getString("kindName"));
 
             return view;
 
