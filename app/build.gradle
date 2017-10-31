@@ -24,9 +24,16 @@ android {
         }
     }
 }
-
+repositories{
+    flatDir{
+        dirs 'libs' //就是你放aar的目录地址
+    }
+}
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
+
+   //你的其他依赖
+    compile name:'SMSSDK-3.0.0',ext:'aar'
 
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
