@@ -9,8 +9,10 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.couchbase.lite.Log;
 import com.zm.order.R;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -90,15 +92,33 @@ public class OrderAdapter extends BaseAdapter {
 
             viewHold = (ViewHold) view.getTag();
         }
+
+        for (Iterator iterator = orderItem.iterator(); iterator.hasNext();){
+
+            SparseArray<Object> sparseArray = (SparseArray<Object>) iterator.next();
+            if (sparseArray.get(2).toString().equals("0")){
+                iterator.remove();
+                break;
+            }
+        }
+
+
+//       for (int a = 0;a < orderItem.size();a++){
+//            if (orderItem.get(a).get(2).toString().equals("0")){
+//                orderItem.remove(a);
+//                a--;
+//                break;
+//            }
+//        }
+
         viewHold.name.setText(orderItem.get(i).get(0).toString());
 
         viewHold.taste.setText(orderItem.get(i).get(1).toString());
 
         viewHold.number.setNumber(orderItem.get(i).get(2).toString());
-        if (orderItem.get(i).get(2).toString().equals("0")){
-            orderItem.iterator().next().get(i);
-        }
-        //viewHold.price.setText(orderItem.get(i).get(4).toString());
+
+
+        viewHold.price.setText(orderItem.get(i).get(4).toString());
         //设置item的点击事件
         viewHold.number.setChangeListener(new AmountView.ChangeListener() {
             @Override
