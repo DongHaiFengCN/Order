@@ -86,44 +86,40 @@
     </android.support.design.widget.AppBarLayout>
 
 
-
-
     <LinearLayout
         android:id="@+id/associator"
-        android:background="@drawable/background_pay_select"
         android:layout_width="match_parent"
         android:layout_height="@dimen/viewhight"
-        android:orientation="horizontal"
+        android:background="@drawable/background_pay_select"
         android:clickable="true"
-        >
+        android:orientation="horizontal">
 
         <TextView
-            android:gravity="left|center"
-            android:text="会员卡打折"
-            android:layout_weight="1"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="left|center"
             android:paddingLeft="16dp"
-            android:typeface="monospace"
-            android:layout_height="match_parent" />
+            android:text="会员特惠"
+            android:typeface="monospace" />
+
         <TextView
             android:id="@+id/associator_tv"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center|right"
-            android:typeface="serif"
-            android:textSize="16sp"
             android:paddingRight="16dp"
             android:textColor="@color/grey_color1"
-            />
+            android:textSize="16sp"
+            android:typeface="serif" />
 
         <ImageView
-            android:src="@mipmap/forward"
             android:layout_width="22dp"
             android:layout_height="22dp"
             android:layout_gravity="center"
             android:layout_marginRight="8dp"
-             />
+            android:src="@mipmap/forward" />
 
     </LinearLayout>
 

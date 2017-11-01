@@ -9,6 +9,7 @@ import android.os.Parcelable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -174,7 +175,8 @@ public class PayActivity extends AppCompatActivity {
 
              //   setIntentData();
 
-                MyLog.e("重置后数据"+intent.getFloatExtra("total",0f));
+               // MyLog.e("重置后数据"+intent.getFloatExtra("total",0f));
+
                 break;
             default:
                 break;
@@ -192,13 +194,23 @@ public class PayActivity extends AppCompatActivity {
 
             total = data.getFloatExtra("Total", 0);
 
-            discountTv.setText("- " + (Float.valueOf(totalTv.getText().toString()) - total) + "元");
+
+
+            //discountTv.setText("- " + (Float.valueOf(totalTv.getText().toString()) - total) + "元");
+
+            //差额
+            discountTv.setText("- " + data.getFloatExtra("Margin", 0) + "元");
 
             factTv.setText("实际支付：" + total + "元");
 
             associator.setEnabled(false);
 
-            associatorTv.setText("减免后不可选");
+            if(TextUtils.isEmpty(associatorTv.getText().toString())){
+
+                associatorTv.setText("减免后不可选");
+            }
+
+
 
         }else if(requestCode == SALE && resultCode == RESULT_OK){//会员账单返回
 
@@ -211,6 +223,10 @@ public class PayActivity extends AppCompatActivity {
                 float r = data.getFloatExtra("remainder",0f);
 
                 MyLog.e("充值卡：余额"+r);
+
+
+
+
 
             }else if(flag == 1){//折扣
 
@@ -231,7 +247,7 @@ public class PayActivity extends AppCompatActivity {
                 }
 
                 //获取折扣率
-                int disrate = data.getIntExtra("disrate",3);
+                final int disrate = data.getIntExtra("disrate",3);
 
                 //MyLog.e("折扣率："+disrate);
 
@@ -316,11 +332,17 @@ public class PayActivity extends AppCompatActivity {
                     }
                 });
 
+                final float finalSaleTotal = saleTotal;
+
                 builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
+                        total = finalSaleTotal;
 
+                        factTv.setText("实际支付：" + total + "元");
+
+                        associatorTv.setText(disrate+"/折");
                     }
                 });
 
@@ -358,7 +380,8 @@ public class PayActivity extends AppCompatActivity {
 
                 Intent discount = new Intent();
                 discount.setClass(PayActivity.this, DiscountActivity.class);
-                discount.putExtra("Total", Float.valueOf(totalTv.getText().toString()));
+               // discount.putExtra("Total", Float.valueOf(totalTv.getText().toString()));
+                discount.putExtra("Total", total);
                 startActivityForResult(discount, DISTCOUNT);
 
                 break;

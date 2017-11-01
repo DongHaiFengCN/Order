@@ -48,6 +48,7 @@ public class DiscountActivity extends AppCompatActivity {
     EditText discountEt;
     private float stashTotal;
     private CharSequence c;
+    private InputMethodManager inputMethodManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +58,9 @@ public class DiscountActivity extends AppCompatActivity {
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
+        inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 
         stashTotal = getIntent().getFloatExtra("Total", 0);
 
@@ -68,26 +72,7 @@ public class DiscountActivity extends AppCompatActivity {
 
                 if (MotionEvent.ACTION_DOWN == motionEvent.getAction()) {
 
-                    if(unitTen.isChecked()){
-
-                        unitTen.setChecked(false);
-                    }
-                    if(unitElement.isChecked()){
-
-                        unitElement.setChecked(false);
-                    }
-                    if(unitHorn.isChecked()){
-
-                        unitHorn.setChecked(false);
-                    }
-                    if(!discountEt.isCursorVisible()){
-
-                        discountEt.setCursorVisible(true);
-                    }
-                    if(getTextTotal() != stashTotal){
-
-                        totalTv.setText(stashTotal+"");
-                    }
+                    reset();
 
                 }
 
@@ -141,16 +126,40 @@ public class DiscountActivity extends AppCompatActivity {
 
     }
 
+    private void reset() {
+        if(unitTen.isChecked()){
+
+            unitTen.setChecked(false);
+        }
+        if(unitElement.isChecked()){
+
+            unitElement.setChecked(false);
+        }
+        if(unitHorn.isChecked()){
+
+            unitHorn.setChecked(false);
+        }
+        if(!discountEt.isCursorVisible()){
+
+            discountEt.setCursorVisible(true);
+        }
+        if(getTextTotal() != stashTotal){
+
+            totalTv.setText(stashTotal+"");
+        }
+
+    }
+
     public float getTextTotal(){
 
         return (TextUtils.isEmpty(totalTv.getText().toString()))?0:Float.valueOf(totalTv.getText().toString());
     }
-/*    @Override
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_pay, menu);
         return true;
-    }*/
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -159,7 +168,21 @@ public class DiscountActivity extends AppCompatActivity {
                 finish();
 
                 break;
+            case R.id.reset:
 
+                reset();
+
+                if(!TextUtils.isEmpty(discountEt.getText().toString())){
+
+                    discountEt.setText("");
+                }
+                if(discountEt.isCursorVisible()){
+
+                    discountEt.setCursorVisible(false);
+                }
+
+
+                break;
             default:
                 break;
         }
@@ -177,8 +200,7 @@ public class DiscountActivity extends AppCompatActivity {
                 discountEt.setText("");
             }
 
-               /*隐藏软键盘*/
-            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+
             if(inputMethodManager.isActive()){
                 inputMethodManager.hideSoftInputFromWindow(DiscountActivity.this.getCurrentFocus().getWindowToken(), 0);
             }
@@ -204,6 +226,7 @@ public class DiscountActivity extends AppCompatActivity {
 
                 Intent intent = new Intent();
                 intent.putExtra("Total", getTextTotal());
+                intent.putExtra("Margin",stashTotal-getTextTotal());
                 MyLog.e(getTextTotal()+"");
                 setResult(RESULT_OK, intent);
                 finish();

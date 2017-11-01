@@ -1,5 +1,6 @@
 package com.zm.order.view;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -8,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -70,6 +72,8 @@ public class SaleActivity extends AppCompatActivity {
     TextView discount;
     @BindView(R.id.submit_area)
     Button submitArea;
+    @BindView(R.id.balance)
+    TextView balance;
 
     private int STATUS;
     private Array array;
@@ -80,12 +84,13 @@ public class SaleActivity extends AppCompatActivity {
     private int disrate = 0;
     private float remainder;
 
-    private ArrayList DishesIdList = (ArrayList<?extends Parcelable>)new ArrayList();
+    private ArrayList DishesIdList = (ArrayList<? extends Parcelable>) new ArrayList();
+    private InputMethodManager inputMethodManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
+        inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         setContentView(R.layout.activity_sale);
         ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -95,7 +100,7 @@ public class SaleActivity extends AppCompatActivity {
 
         idbManager = DBFactory.get(DatabaseSource.CouchBase, this);
 
-        setData();
+        //setData();
         // 创建EventHandler对象
         eventHandler = new EventHandler() {
             public void afterEvent(int event, final int result, final Object data) {
@@ -168,35 +173,36 @@ public class SaleActivity extends AppCompatActivity {
     /**
      * 绑定数据到控件
      */
-    public void setData(){
+    public void setData() {
 
 
         etcode.setCursorVisible(false);
 
         //获取会员信息
-       //Document document = idbManager.getMembers(etAmountphone.getText().toString());
-       Document members = idbManager.getMembers("15054029395");
-       // Document document = idbManager.getMembers("17605413611");
+        Document members = idbManager.getMembers(etAmountphone.getText().toString());
+        //Document members = idbManager.getMembers("15054029395");
+        //Document members = idbManager.getMembers("17605413611");
         if (Tool.isNotEmpty(members)) {
 
-            Tool.bindView(name,members.getString("name"));
+            Tool.bindView(name, members.getString("name"));
 
-            Tool.bindView(number,members.getString("cardNum"));
+            Tool.bindView(number, members.getString("cardNum"));
 
-            if(!TextUtils.isEmpty(members.getString("cardTypeId"))){
+            if (!TextUtils.isEmpty(members.getString("cardTypeId"))) {
 
                 Document card = idbManager.getCard(members.getString("cardTypeId"));
 
                 //获取卡类型数据
-                if(members != null){
+                if (members != null) {
 
-                    Tool.bindView(type,card.getString("cardName"));
 
                     //cardType 1,折扣卡,2,充赠卡
 
                     CardTypeFlag = card.getInt("cardType");
 
-                    if(CardTypeFlag == 1){
+                    if (CardTypeFlag == 1) {
+
+                        Tool.bindView(type, "折扣卡");
 
                         disrate = card.getInt("disrate");
 
@@ -205,7 +211,7 @@ public class SaleActivity extends AppCompatActivity {
                         List<Object> list = array.toList();
 
                         //便利当前会员包含的会员菜类
-                        for (int i = 0 ;i<list.size();i++) {
+                        for (int i = 0; i < list.size(); i++) {
 
                             HashMap c = (HashMap) list.get(i);
 
@@ -233,32 +239,35 @@ public class SaleActivity extends AppCompatActivity {
                             }
                         }
 
-                    }else if(CardTypeFlag == 2){
+                    } else if (CardTypeFlag == 2) {
 
-                        //充值卡返回当前会员
 
+                        Tool.bindView(type, "充值卡");
+
+                        //充值卡金额返回支付界面
                         remainder = members.getFloat("remainder");
+                        Tool.bindView(balance,remainder+"元");
 
                     }
 
-                    Tool.bindView(discount,card.getInt("disrate")+"/折");
+                    Tool.bindView(discount, card.getInt("disrate") + "/折");
 
                 }
 
             }
 
             STATUS = members.getInt("status");
-            if(STATUS == 1){
+            if (STATUS == 1) {
 
-                Tool.bindView(status,  "正常");
+                Tool.bindView(status, "正常");
 
-            }else if(STATUS == 2){
+            } else if (STATUS == 2) {
 
-                Tool.bindView(status,  "已挂失");
+                Tool.bindView(status, "已挂失");
 
-            }else if(STATUS == 3) {
+            } else if (STATUS == 3) {
 
-                Tool.bindView(status,  "已销卡");
+                Tool.bindView(status, "已销卡");
 
             }
 
@@ -268,6 +277,7 @@ public class SaleActivity extends AppCompatActivity {
 
         }
     }
+
     protected void onDestroy() {
         super.onDestroy();
         SMSSDK.unregisterEventHandler(eventHandler);
@@ -284,6 +294,10 @@ public class SaleActivity extends AppCompatActivity {
                 } else {
 
                     SMSSDK.getVerificationCode("86", etAmountphone.getText().toString());
+
+                    if(inputMethodManager.isActive()){
+                        inputMethodManager.hideSoftInputFromWindow(SaleActivity.this.getCurrentFocus().getWindowToken(), 0);
+                    }
                 }
 
 
@@ -297,7 +311,9 @@ public class SaleActivity extends AppCompatActivity {
                 } else {
 
                     SMSSDK.submitVerificationCode("+86", etAmountphone.getText().toString(), etcode.getText().toString());
-
+                    if(inputMethodManager.isActive()){
+                        inputMethodManager.hideSoftInputFromWindow(SaleActivity.this.getCurrentFocus().getWindowToken(), 0);
+                    }
                 }
                 break;
         }
@@ -322,7 +338,7 @@ public class SaleActivity extends AppCompatActivity {
     @OnClick(R.id.submit_area)
     public void onClick() {
 
-        if(STATUS == 1){
+        if (STATUS == 1) {
 
             Intent intent = new Intent();
 
@@ -332,21 +348,21 @@ public class SaleActivity extends AppCompatActivity {
 
             //折扣卡返回折扣率及支持的菜品列表
 
-            if(CardTypeFlag == 1){
+            if (CardTypeFlag == 1) {
 
                 MyLog.e("折扣");
 
-                intent.putExtra("disrate",disrate);
+                intent.putExtra("disrate", disrate);
 
                 intent.putParcelableArrayListExtra("DishseList", DishesIdList);
 
 
-            }else if(CardTypeFlag == 2){
+            } else if (CardTypeFlag == 2) {
 
 
                 MyLog.e("充值");
 
-                intent.putExtra("remainder",remainder);
+                intent.putExtra("remainder", remainder);
 
             }
 
@@ -354,13 +370,11 @@ public class SaleActivity extends AppCompatActivity {
             //返回支持打折菜品id
 
 
-            setResult(RESULT_OK,intent);
+            setResult(RESULT_OK, intent);
 
             finish();
 
-        }else Toast.makeText(SaleActivity.this, "当前会员无效", Toast.LENGTH_SHORT).show();
-
-
+        } else Toast.makeText(SaleActivity.this, "当前会员无效", Toast.LENGTH_SHORT).show();
 
 
     }
