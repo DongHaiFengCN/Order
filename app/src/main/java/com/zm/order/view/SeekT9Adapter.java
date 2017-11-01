@@ -133,8 +133,9 @@ public class SeekT9Adapter extends BaseAdapter {
                         s.put(1, "默认");
                         s.put(2, 1+"");
                         s.put(3, mData.get(position).getPrice());
-                        s.put(4, number * mData.get(position).getPrice());
+                        s.put(4, 1 * mData.get(position).getPrice());
                         s.put(5, 0);
+                        s.put(6, 0f);
                         activity.getOrderItem().add(s);
                         //购物车计数器数据更新
                         point =  activity.getPoint();
@@ -168,7 +169,7 @@ public class SeekT9Adapter extends BaseAdapter {
                             s.put(1, "默认");
                             s.put(2, 1+"");
                             s.put(3, mData.get(position).getPrice());
-                            s.put(4, number * mData.get(position).getPrice());
+                            s.put(4, 1 * mData.get(position).getPrice());
                             s.put(5, 0);
                             activity.getOrderItem().add(s);
                             //购物车计数器数据更新
@@ -191,6 +192,14 @@ public class SeekT9Adapter extends BaseAdapter {
         viewHolder.viewJian.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (activity.getOrderItem().size() != 0 || activity.getOrderItem() != null){
+                    for (int i = 0 ;i< activity.getOrderItem().size() ;i++){
+                        if (activity.getOrderItem().get(i).get(0).toString().equals(mData.get(position).getDishesName())) {
+                            number = Integer.parseInt(activity.getOrderItem().get(i).get(2).toString());
+                            break;
+                        }
+                    }
+                }
 
                 //number = activity.getOrderItem().size();
                 if (number <= 1){
