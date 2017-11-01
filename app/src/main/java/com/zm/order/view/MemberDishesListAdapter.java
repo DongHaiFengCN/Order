@@ -17,6 +17,7 @@ import android.widget.BaseAdapter;
 public class MemberDishesListAdapter extends BaseAdapter {
     public MemberDishesListAdapter() {
         super();
+
     }
 
     @Override
