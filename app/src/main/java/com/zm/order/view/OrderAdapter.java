@@ -47,6 +47,7 @@ public class OrderAdapter extends BaseAdapter {
     public OrderAdapter(List<SparseArray<Object>> orderItem, MainActivity mainActivity) {
         this.orderItem = orderItem;
         this.context = mainActivity;
+        notifyDataSetChanged();
     }
 
 
@@ -80,6 +81,7 @@ public class OrderAdapter extends BaseAdapter {
             viewHold = new ViewHold();
             viewHold.name =view.findViewById(R.id.name);
             viewHold.taste =view.findViewById(R.id.taste);
+            viewHold.price = view.findViewById(R.id.price);
             viewHold.number =view.findViewById(R.id.amount_view);
             viewHold.number.getEtAmount().setEnabled(false);
             view.setTag(viewHold);
@@ -93,7 +95,10 @@ public class OrderAdapter extends BaseAdapter {
         viewHold.taste.setText(orderItem.get(i).get(1).toString());
 
         viewHold.number.setNumber(orderItem.get(i).get(2).toString());
-
+        if (orderItem.get(i).get(2).toString().equals("0")){
+            orderItem.iterator().next().get(i);
+        }
+        //viewHold.price.setText(orderItem.get(i).get(4).toString());
         //设置item的点击事件
         viewHold.number.setChangeListener(new AmountView.ChangeListener() {
             @Override
@@ -126,6 +131,7 @@ public class OrderAdapter extends BaseAdapter {
 
         TextView taste;
 
+        TextView price;
 
 
         AmountView number;

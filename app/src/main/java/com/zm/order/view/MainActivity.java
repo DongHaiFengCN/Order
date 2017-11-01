@@ -120,8 +120,13 @@ public class MainActivity extends AppCompatActivity {
     }
     public void setPoint(int point){
         this.point = point;
-        point_tv.setText(point + "");
-        point_tv.setVisibility(View.VISIBLE);
+        if(point > 0 ){
+            point_tv.setText(point + "");
+            point_tv.setVisibility(View.VISIBLE);
+        }else{
+            point_tv.setVisibility(View.GONE);
+        }
+
     }
     public int getPoint(){
         return point;

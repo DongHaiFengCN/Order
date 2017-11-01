@@ -20,6 +20,13 @@
         android:gravity="center"
         android:text="2" />
 
+    <TextView
+        android:id="@+id/price"
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="2" />
+
 
     <com.zm.order.view.AmountView
         android:id="@+id/amount_view"

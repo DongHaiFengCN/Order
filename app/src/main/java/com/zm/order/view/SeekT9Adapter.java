@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.zm.order.R;
@@ -30,7 +31,7 @@ public class SeekT9Adapter extends BaseAdapter {
     private MainActivity activity;
     private SeekT9OnClickListener listener;
     private int number=1;
-    private int point = 2;
+    private int point = 1;
     private float total;
     private List<SparseArray<Object>> list = new ArrayList<>();
     private SeekT9OrderItem orderItem;
@@ -102,20 +103,21 @@ public class SeekT9Adapter extends BaseAdapter {
                     break;
                 }
             }
-            number = Integer.parseInt(viewHolder.viewShu.getText().toString());
-        }
-        if (viewHolder.viewShu.getText().toString() == "0"){
-            viewHolder.viewShu.setVisibility(View.GONE);
-            viewHolder.viewJian.setVisibility(View.GONE);
-        }else {
-            viewHolder.viewShu.setVisibility(View.VISIBLE);
-            viewHolder.viewJian.setVisibility(View.VISIBLE);
         }
 
         final SparseArray<Object> s = new SparseArray<>();
         viewHolder.viewTj.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                number = Integer.parseInt(viewHolder.viewShu.getText().toString());
+                if (activity.getOrderItem().size() != 0 || activity.getOrderItem() != null){
+                    for (int i = 0 ;i< activity.getOrderItem().size() ;i++){
+                        if (activity.getOrderItem().get(i).get(0).toString().equals(mData.get(position).getDishesName())) {
+                            viewHolder.viewShu.setText(activity.getOrderItem().get(i).get(2)+"");
+                            break;
+                        }
+                    }
+                }
                 if (viewHolder.viewShu.getText().toString() == "0"){
                     viewHolder.viewShu.setVisibility(View.GONE);
                     viewHolder.viewJian.setVisibility(View.GONE);
@@ -132,11 +134,12 @@ public class SeekT9Adapter extends BaseAdapter {
                         s.put(2, 1+"");
                         s.put(3, mData.get(position).getPrice());
                         s.put(4, number * mData.get(position).getPrice());
+                        s.put(5, 0);
                         activity.getOrderItem().add(s);
                         //购物车计数器数据更新
-                        number =  activity.getPoint();
-                        number++;
-                        activity.setPoint(number);
+                        point =  activity.getPoint();
+                        point++;
+                        activity.setPoint(point);
                         //计算总价
                         total = activity.getTotal();
                         total += 1 * mData.get(position).getPrice();
@@ -148,6 +151,7 @@ public class SeekT9Adapter extends BaseAdapter {
                         if (activity.getOrderItem().get(i).get(0).toString().equals(mData.get(position).getDishesName())){
                             activity.getOrderItem().get(i).put(2, number++);
                             number = Integer.parseInt(activity.getOrderItem().get(i).get(2).toString());
+                            activity.getOrderItem().get(i).put(4, number * mData.get(position).getPrice());
                             total = activity.getTotal();
                             total += 1 * mData.get(position).getPrice();
                             activity.setTotal(total);
@@ -165,11 +169,12 @@ public class SeekT9Adapter extends BaseAdapter {
                             s.put(2, 1+"");
                             s.put(3, mData.get(position).getPrice());
                             s.put(4, number * mData.get(position).getPrice());
+                            s.put(5, 0);
                             activity.getOrderItem().add(s);
                             //购物车计数器数据更新
-                            number =  activity.getPoint();
-                            number++;
-                            activity.setPoint(number);
+                            point =  activity.getPoint();
+                            point++;
+                            activity.setPoint(point);
                             //计算总价
                             total = activity.getTotal();
                             total += 1 * mData.get(position).getPrice();;
@@ -186,7 +191,7 @@ public class SeekT9Adapter extends BaseAdapter {
         viewHolder.viewJian.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                number = Integer.parseInt(viewHolder.viewShu.getText().toString());
+
                 //number = activity.getOrderItem().size();
                 if (number <= 1){
                     viewHolder.viewShu.setVisibility(View.GONE);
@@ -197,6 +202,25 @@ public class SeekT9Adapter extends BaseAdapter {
                 }
                 if (number > 0){
                     viewHolder.viewShu.setText(number-1+"");
+                }
+                number = Integer.parseInt(viewHolder.viewShu.getText().toString());
+                if (activity.getOrderItem().size() != 0 || activity.getOrderItem() != null){
+                    for (int i = 0 ;i< activity.getOrderItem().size() ;i++){
+                        if (activity.getOrderItem().get(i).get(0).toString().equals(mData.get(position).getDishesName())) {
+                            activity.getOrderItem().get(i).put(2, number);
+                            number = Integer.parseInt(activity.getOrderItem().get(i).get(2).toString());
+                            activity.getOrderItem().get(i).put(4, number * mData.get(position).getPrice());
+                            total = activity.getTotal();
+                            total -= 1 * mData.get(position).getPrice();
+                            activity.setTotal(total);
+                            point = activity.getPoint();
+                            if (number == 0){
+                                point--;
+                            }
+                            activity.setPoint(point);
+                            break;
+                        }
+                    }
                 }
 
 
@@ -223,11 +247,11 @@ public class SeekT9Adapter extends BaseAdapter {
         @BindView(R.id.item_seek_ln)
         LinearLayout itemSeekLn;
         @BindView(R.id.view_jian)
-        ImageView viewJian;
+        RelativeLayout viewJian;
         @BindView(R.id.view_shu)
         TextView viewShu;
         @BindView(R.id.view_tj)
-        ImageView viewTj;
+        RelativeLayout viewTj;
 
         ViewHolder(View view) {
             ButterKnife.bind(this, view);

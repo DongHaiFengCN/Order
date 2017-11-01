@@ -265,6 +265,7 @@ public class OrderFragment extends Fragment implements IMainView {
                     s.put(2, sum + "");
                     s.put(3, price);
                     s.put(4, sum * price);
+                    s.put(5, 0);
                     orderItem.add(s);
                     ((MainActivity)getActivity()).getOrderItem().add(s);
                     //购物车计数器数据更新
