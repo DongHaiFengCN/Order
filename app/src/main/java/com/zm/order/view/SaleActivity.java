@@ -6,8 +6,6 @@ import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.SparseArray;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -23,21 +21,14 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
-import bean.kitchenmanage.dishes.DishesC;
-import bean.kitchenmanage.member.CardDishesC;
-import bean.kitchenmanage.member.CardDishesKindC;
-import bean.kitchenmanage.member.CardTypeC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cn.smssdk.EventHandler;
 import cn.smssdk.SMSSDK;
 import cn.smssdk.utils.SMSLog;
-import model.CDBHelper;
 import model.DBFactory;
 import model.DatabaseSource;
 import model.IDBManager;
@@ -84,10 +75,10 @@ public class SaleActivity extends AppCompatActivity {
     private Array array;
     private IDBManager idbManager;
 
-    private int flag;
+    private int CardTypeFlag;
 
     private int disrate = 0;
-
+    private float remainder;
 
     private ArrayList DishesIdList = (ArrayList<?extends Parcelable>)new ArrayList();
     @Override
@@ -103,7 +94,6 @@ public class SaleActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         idbManager = DBFactory.get(DatabaseSource.CouchBase, this);
-
 
         setData();
         // 创建EventHandler对象
@@ -202,9 +192,11 @@ public class SaleActivity extends AppCompatActivity {
 
                     Tool.bindView(type,card.getString("cardName"));
 
-                    if("打折卡".equals(card.getString("cardName"))){
+                    //cardType 1,折扣卡,2,充赠卡
 
-                        flag = 1;
+                    CardTypeFlag = card.getInt("cardType");
+
+                    if(CardTypeFlag == 1){
 
                         disrate = card.getInt("disrate");
 
@@ -213,20 +205,23 @@ public class SaleActivity extends AppCompatActivity {
                         List<Object> list = array.toList();
 
                         //便利当前会员包含的会员菜类
-                        for (int i = 0 ;i<list.size();i++){
+                        for (int i = 0 ;i<list.size();i++) {
 
                             HashMap c = (HashMap) list.get(i);
 
                             //菜类启用
-                            if("1".equals(c.get("ischecked").toString())){
+
+                            if ("1".equals(c.get("ischecked").toString())) {
 
                                 List<HashMap> cardDishesList = (List<HashMap>) c.get("cardDishesList");
 
                                 //遍历当前菜类下的菜品
-                                for(HashMap cardDishesC: cardDishesList){
+
+                                for (HashMap cardDishesC : cardDishesList) {
+
                                     //当前菜品启用
 
-                                    if("1".equals(cardDishesC.get("ischecked").toString())){
+                                    if ("1".equals(cardDishesC.get("ischecked").toString())) {
 
                                         DishesIdList.add(cardDishesC.get("dishesId").toString());
 
@@ -236,24 +231,17 @@ public class SaleActivity extends AppCompatActivity {
                                 }
 
                             }
-
                         }
 
-                    }else if("充值卡".equals(card.getString("cardName"))){
+                    }else if(CardTypeFlag == 2){
 
-                        flag = 0;
+                        //充值卡返回当前会员
 
-                        Toast.makeText(SaleActivity.this,"充值卡",Toast.LENGTH_SHORT).show();
-
-                    }else {
-
-                        Toast.makeText(SaleActivity.this,"其它卡",Toast.LENGTH_SHORT).show();
+                        remainder = members.getFloat("remainder");
 
                     }
 
-
-                        Tool.bindView(discount,card.getInt("disrate")+"/折");
-
+                    Tool.bindView(discount,card.getInt("disrate")+"/折");
 
                 }
 
@@ -338,15 +326,33 @@ public class SaleActivity extends AppCompatActivity {
 
             Intent intent = new Intent();
 
-            intent.putExtra("flag",flag);
+            //设置会员卡类型
 
-            if(flag == 1){
+            intent.putExtra("CardTypeFlag", CardTypeFlag);
+
+            //折扣卡返回折扣率及支持的菜品列表
+
+            if(CardTypeFlag == 1){
+
+                MyLog.e("折扣");
 
                 intent.putExtra("disrate",disrate);
+
+                intent.putParcelableArrayListExtra("DishseList", DishesIdList);
+
+
+            }else if(CardTypeFlag == 2){
+
+
+                MyLog.e("充值");
+
+                intent.putExtra("remainder",remainder);
+
             }
 
 
-            intent.putParcelableArrayListExtra("DishseList", DishesIdList);
+            //返回支持打折菜品id
+
 
             setResult(RESULT_OK,intent);
 
