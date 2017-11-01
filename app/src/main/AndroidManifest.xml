@@ -58,6 +58,10 @@
             android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+            android:name=".view.DeskActivity"
+            android:launchMode="singleTask"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".view.PayActivity"
             android:configChanges="keyboard|keyboardHidden|orientation"
             android:theme="@style/AppTheme.NoActionBar" />
