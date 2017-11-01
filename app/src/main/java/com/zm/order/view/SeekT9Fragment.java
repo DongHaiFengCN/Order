@@ -206,6 +206,7 @@ public class SeekT9Fragment extends Fragment{
                     s.put(3, price);
                     s.put(4, sum * price);
                     s.put(5, 0);
+                    s.put(6, 0f);
                     mainActivity.getOrderItem().add(s);
                     //购物车计数器数据更新
                     point =  (((MainActivity) getActivity()).getPoint());

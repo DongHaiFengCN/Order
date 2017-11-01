@@ -171,6 +171,7 @@ public class SeekT9Adapter extends BaseAdapter {
                             s.put(3, mData.get(position).getPrice());
                             s.put(4, 1 * mData.get(position).getPrice());
                             s.put(5, 0);
+                            s.put(6, 0f);
                             activity.getOrderItem().add(s);
                             //购物车计数器数据更新
                             point =  activity.getPoint();

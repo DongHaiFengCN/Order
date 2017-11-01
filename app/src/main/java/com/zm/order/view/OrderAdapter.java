@@ -96,10 +96,13 @@ public class OrderAdapter extends BaseAdapter {
         for (Iterator iterator = orderItem.iterator(); iterator.hasNext();){
 
             SparseArray<Object> sparseArray = (SparseArray<Object>) iterator.next();
-            if (sparseArray.get(2).toString().equals("0")){
-                iterator.remove();
+            /*if (sparseArray.get(2).toString().equals("0")){
+                orderItem.remove(iterator.next());
                 break;
-            }
+            }*/
+
+            
+
         }
 
 
