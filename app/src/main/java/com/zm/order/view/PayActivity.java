@@ -230,9 +230,10 @@ public class PayActivity extends AppCompatActivity {
                     memberDishes.add(document.getString("dishesName"));
                 }
 
+                //获取折扣率
                 int disrate = data.getIntExtra("disrate",3);
 
-                MyLog.e("折扣率："+disrate);
+                //MyLog.e("折扣率："+disrate);
 
                 //订单
 
@@ -266,7 +267,7 @@ public class PayActivity extends AppCompatActivity {
 
                             sum = (sum*disrate)/100f;
 
-                            total += sum;
+                            saleTotal += sum;
 
                             MyLog.e("折后前价格："+sum);
                             //设置折后价格
@@ -278,14 +279,14 @@ public class PayActivity extends AppCompatActivity {
 
                     if((float)s.get(6) == 0f){
 
-                        total += (float) s.get(4);
+                        saleTotal += (float) s.get(4);
                     }
 
                 }
 
                 //展示享受折扣的列表
 
-                StringBuilder total = new StringBuilder("折后金额：￥");
+                StringBuilder total_sb = new StringBuilder("折后金额：￥");
 
                 View view = getLayoutInflater().inflate(R.layout.view_payactivity_memberdishes_dialog,null);
 
@@ -299,7 +300,7 @@ public class PayActivity extends AppCompatActivity {
 
                 listView.setAdapter(memberDishesListAdapter);
 
-                t.setText(total);
+                t.setText(total_sb.append(saleTotal));
 
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
