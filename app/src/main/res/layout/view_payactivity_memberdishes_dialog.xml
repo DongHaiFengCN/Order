@@ -9,7 +9,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:background="@color/md_grey_200"
+
+        android:background="@color/paycolor"
         android:orientation="horizontal">
 
         <TextView
@@ -18,6 +19,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
+            android:textColor="@color/md_white"
             android:text="菜名"
             />
         <TextView
@@ -26,6 +28,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
+            android:textColor="@color/md_white"
             android:text="当前价格"
             />
 
@@ -35,6 +38,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
+            android:textColor="@color/md_white"
             android:text="折扣价格"
             />
 
@@ -44,6 +48,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
+            android:textColor="@color/md_white"
             android:text="折扣"
             />
     </LinearLayout>
@@ -57,13 +62,13 @@
     </ListView>
 
     <TextView
+        android:id="@+id/saletotalprice_tv"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:gravity="center|right"
         android:paddingRight="16dp"
         android:textSize="18sp"
-        android:textColor="@color/md_white"
-        android:background="@color/paycolor"
+        android:background="@color/md_grey_200"
         android:text="折后金额：￥600"
         />
 </LinearLayout>

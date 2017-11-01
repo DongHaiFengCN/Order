@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -25,6 +26,8 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 import com.zm.order.R;
+
+import org.w3c.dom.Text;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -77,6 +80,7 @@ public class PayActivity extends AppCompatActivity {
     private float total = 0.0f;
 
     private Intent stashItent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,17 +93,14 @@ public class PayActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        stashItent = getIntent();
+
         //取消分割阴影
         getSupportActionBar().setElevation(0);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             toolbar.setElevation(0);
         }
 
-        intent = new Intent();
-
-
-        setIntentData();
+        stashItent = getIntent();
 
         //创建打印dialog
         dialog = new AlertDialog.Builder(PayActivity.this);
@@ -111,28 +112,18 @@ public class PayActivity extends AppCompatActivity {
         //转化二维码
         bitmap = encodeAsBitmap(alipayId);
 
-        total = intent.getFloatExtra("total",0);
-
-        MyLog.e("原始数据"+total);
+        total = stashItent.getFloatExtra("total",0);
 
         //显示原价
         totalTv.setText(total + "");
 
-       // intent.putExtra("total",30f);
-
-        //MyLog.e("修改后数据"+intent.getFloatExtra("total",0f));
-
         //显示操作后价格
         factTv.setText("实际支付：" + total + "元");
 
-    }
-
-    //设置备份数据
-    private void setIntentData() {
-
-        intent = (Intent) stashItent.clone();
+        show();
 
     }
+
 
 
     public void showDialog() {
@@ -145,6 +136,23 @@ public class PayActivity extends AppCompatActivity {
         dg.dismiss();
     }
 
+    private void show(){
+
+        List list = (List) stashItent.getSerializableExtra("Order");
+
+        for (int i = 0; i < list.size(); i++) {
+
+
+            SparseArray<Object> s = (SparseArray<Object>) list.get(i);
+
+            MyLog.e("订单菜名："+ s.get(0));
+            MyLog.e("菜品数量："+s.get(2));
+            MyLog.e("当前菜品总价："+s.get(4));
+            MyLog.e("打折："+s.get(5));
+            MyLog.e("折扣价："+s.get(6));
+        }
+
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -164,7 +172,7 @@ public class PayActivity extends AppCompatActivity {
             case R.id.reset:
 
 
-                setIntentData();
+             //   setIntentData();
 
                 MyLog.e("重置后数据"+intent.getFloatExtra("total",0f));
                 break;
@@ -206,6 +214,8 @@ public class PayActivity extends AppCompatActivity {
 
             }else if(flag == 1){//折扣
 
+                float saleTotal = 0.0f;
+
                 IDBManager idbManager = DBFactory.get(DatabaseSource.CouchBase, this);
 
                 List<String> stringList = data.getStringArrayListExtra("DishseList");
@@ -226,7 +236,9 @@ public class PayActivity extends AppCompatActivity {
 
                 //订单
 
-                List list = (List) intent.getSerializableExtra("Order");
+                List list = (List) stashItent.getSerializableExtra("Order");
+
+                MyLog.e("长度："+list.size());
 
                 for (int j = 0; j < list.size(); j++) {
 
@@ -237,14 +249,13 @@ public class PayActivity extends AppCompatActivity {
                     MyLog.e("订单菜名："+name);
 
 
-
                     for (int i = 0; i < memberDishes.size(); i++) {
 
                         MyLog.e("会员菜名："+memberDishes.get(i));
 
                         if(name.equals(memberDishes.get(i))){
 
-                            //设置折扣菜品
+                            //设置折扣菜品  0不打折 1打折
                             s.put(5,1);
 
                             MyLog.e("订单中包含打折的菜品名称："+name);
@@ -255,31 +266,51 @@ public class PayActivity extends AppCompatActivity {
 
                             sum = (sum*disrate)/100f;
 
+                            total += sum;
+
                             MyLog.e("折后前价格："+sum);
                             //设置折后价格
-                            s.put(6,1);
+                            s.put(6,sum);
                             break;
-
 
                         }
                     }
+
+                    if((float)s.get(6) == 0f){
+
+                        total += (float) s.get(4);
+                    }
+
                 }
 
                 //展示享受折扣的列表
 
+                StringBuilder total = new StringBuilder("折后金额：￥");
+
                 View view = getLayoutInflater().inflate(R.layout.view_payactivity_memberdishes_dialog,null);
+
+                TextView t = view.findViewById(R.id.saletotalprice_tv);
+
+
 
                 ListView listView = view.findViewById(R.id.memberdisheslist_lv);
 
-                MemberDishesListAdapter memberDishesListAdapter = new MemberDishesListAdapter();
+                MemberDishesListAdapter memberDishesListAdapter = new MemberDishesListAdapter(list,this);
+
+                listView.setAdapter(memberDishesListAdapter);
+
+                t.setText(total);
+
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
 
                 builder.setView(view);
 
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+
 
                     }
                 });
@@ -289,9 +320,10 @@ public class PayActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialogInterface, int i) {
 
 
-
                     }
                 });
+
+                builder.show();
 
 
             }else {
