@@ -354,7 +354,7 @@ public class PayActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
 
-                //
+
                 IDBManager idbManager = DBFactory.get(DatabaseSource.CouchBase, PayActivity.this);
                 Document members = idbManager.getMembers(tel);
 
@@ -449,6 +449,8 @@ public class PayActivity extends AppCompatActivity {
     }
 
     private void SubmitMemberConsumeInfo(Document d) {
+
+        Document consumLog = new Document();
 
 
 
