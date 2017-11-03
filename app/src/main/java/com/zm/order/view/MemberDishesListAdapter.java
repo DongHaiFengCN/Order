@@ -57,7 +57,7 @@ public class MemberDishesListAdapter extends BaseAdapter {
 
             //加载布局管理器
             LayoutInflater inflater = LayoutInflater.from(payActivity);
-            view = inflater.inflate(R.layout.view_payactivity_memberdishes_dialog_adapteritem,null);
+            view = inflater.inflate(R.layout.view_payactivity_memberdishes_sale_dialog_adapteritem,null);
             viewHold = new ViewHold();
             viewHold.dishesname =view.findViewById(R.id.dishesname_tv);
             viewHold.dishestotalprice =view.findViewById(R.id.dishestotalprice_tv);

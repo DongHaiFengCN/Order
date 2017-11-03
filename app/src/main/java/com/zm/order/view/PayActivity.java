@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -28,9 +27,6 @@ import com.google.zxing.common.BitMatrix;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 import com.zm.order.R;
 
-import org.w3c.dom.Text;
-
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +38,6 @@ import model.DatabaseSource;
 import model.IDBManager;
 import model.ProgressBarasyncTask;
 import untils.MyLog;
-import untils.PrintUtils;
 
 /**
  * @author 董海峰
@@ -121,7 +116,7 @@ public class PayActivity extends AppCompatActivity {
         //显示操作后价格
         factTv.setText("实际支付：" + total + "元");
 
-        show();
+        //show();
 
     }
 
@@ -192,24 +187,8 @@ public class PayActivity extends AppCompatActivity {
         //账单抹零返回参数
         if (requestCode == DISTCOUNT && resultCode == RESULT_OK) {
 
-            total = data.getFloatExtra("Total", 0);
 
-
-
-            //discountTv.setText("- " + (Float.valueOf(totalTv.getText().toString()) - total) + "元");
-
-            //差额
-            discountTv.setText("- " + data.getFloatExtra("Margin", 0) + "元");
-
-            factTv.setText("实际支付：" + total + "元");
-
-            associator.setEnabled(false);
-
-            if(TextUtils.isEmpty(associatorTv.getText().toString())){
-
-                associatorTv.setText("减免后不可选");
-            }
-
+            Discount(data);
 
 
         }else if(requestCode == SALE && resultCode == RESULT_OK){//会员账单返回
@@ -219,135 +198,11 @@ public class PayActivity extends AppCompatActivity {
             //充值
             if(flag == 2){
 
+                Rechange(data);
 
-                float r = data.getFloatExtra("remainder",0f);
+            }else if(flag == 1){
 
-                MyLog.e("充值卡：余额"+r);
-
-
-
-
-
-            }else if(flag == 1){//折扣
-
-                float saleTotal = 0.0f;
-
-                IDBManager idbManager = DBFactory.get(DatabaseSource.CouchBase, this);
-
-                List<String> stringList = data.getStringArrayListExtra("DishseList");
-
-                List<String> memberDishes = new ArrayList<>();
-
-
-                //初始化会员菜名
-                for(String id : stringList){
-
-                    Document document = (Document) idbManager.getById(id);
-                    memberDishes.add(document.getString("dishesName"));
-                }
-
-                //获取折扣率
-                final int disrate = data.getIntExtra("disrate",3);
-
-                //MyLog.e("折扣率："+disrate);
-
-                //订单
-
-                List list = (List) stashItent.getSerializableExtra("Order");
-
-                MyLog.e("长度："+list.size());
-
-                for (int j = 0; j < list.size(); j++) {
-
-                    SparseArray<Object> s = (SparseArray<Object>) list.get(j);
-
-                    String name = (String) s.get(0);
-
-                    MyLog.e("订单菜名："+name);
-
-
-                    for (int i = 0; i < memberDishes.size(); i++) {
-
-                        MyLog.e("会员菜名："+memberDishes.get(i));
-
-                        if(name.equals(memberDishes.get(i))){
-
-                            //设置折扣菜品  0不打折 1打折
-                            s.put(5,1);
-
-                            MyLog.e("订单中包含打折的菜品名称："+name);
-
-                            float sum = (float) s.get(4);
-
-                            MyLog.e("折前价格："+sum);
-
-                            sum = (sum*disrate)/100f;
-
-                            saleTotal += sum;
-
-                            MyLog.e("折后前价格："+sum);
-                            //设置折后价格
-                            s.put(6,sum);
-                            break;
-
-                        }
-                    }
-
-                    if((float)s.get(6) == 0f){
-
-                        saleTotal += (float) s.get(4);
-                    }
-
-                }
-
-                //展示享受折扣的列表
-
-                StringBuilder total_sb = new StringBuilder("折后金额：￥");
-
-                View view = getLayoutInflater().inflate(R.layout.view_payactivity_memberdishes_dialog,null);
-
-                TextView t = view.findViewById(R.id.saletotalprice_tv);
-
-
-
-                ListView listView = view.findViewById(R.id.memberdisheslist_lv);
-
-                MemberDishesListAdapter memberDishesListAdapter = new MemberDishesListAdapter(list,this);
-
-                listView.setAdapter(memberDishesListAdapter);
-
-                t.setText(total_sb.append(saleTotal));
-
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-
-                builder.setView(view);
-
-                builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-
-
-                    }
-                });
-
-                final float finalSaleTotal = saleTotal;
-
-                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                        total = finalSaleTotal;
-
-                        factTv.setText("实际支付：" + total + "元");
-
-                        associatorTv.setText(disrate+"/折");
-                    }
-                });
-
-                builder.show();
-
+                Sale(data);
 
             }else {
 
@@ -357,6 +212,200 @@ public class PayActivity extends AppCompatActivity {
 
         }
     }
+
+
+    /**
+     * 账单减免
+     * @param data
+     */
+
+    private void Discount(Intent data) {
+        total = data.getFloatExtra("Total", 0);
+
+        //差额
+        discountTv.setText("- " + data.getFloatExtra("Margin", 0) + "元");
+
+        factTv.setText("实际支付：" + total + "元");
+
+        associator.setEnabled(false);
+
+        if(TextUtils.isEmpty(associatorTv.getText().toString())){
+
+            associatorTv.setText("减免后不可选");
+        }
+    }
+
+    /**
+     * 会员折扣卡处理逻辑
+     * @param data
+     */
+    private void Sale(Intent data) {
+        //折扣
+
+        float saleTotal = 0.0f;
+
+        IDBManager idbManager = DBFactory.get(DatabaseSource.CouchBase, this);
+
+        List<String> stringList = data.getStringArrayListExtra("DishseList");
+
+        List<String> memberDishes = new ArrayList<>();
+
+
+        //初始化会员菜名
+        for(String id : stringList){
+
+            Document document = (Document) idbManager.getById(id);
+            memberDishes.add(document.getString("dishesName"));
+        }
+
+        //获取折扣率
+        final int disrate = data.getIntExtra("disrate",3);
+
+        //MyLog.e("折扣率："+disrate);
+
+        //订单
+
+        List list = (List) stashItent.getSerializableExtra("Order");
+
+        MyLog.e("长度："+list.size());
+
+        for (int j = 0; j < list.size(); j++) {
+
+            SparseArray<Object> s = (SparseArray<Object>) list.get(j);
+
+            String name = (String) s.get(0);
+
+            MyLog.e("订单菜名："+name);
+
+
+            for (int i = 0; i < memberDishes.size(); i++) {
+
+                MyLog.e("会员菜名："+memberDishes.get(i));
+
+                if(name.equals(memberDishes.get(i))){
+
+                    //设置折扣菜品  0不打折 1打折
+                    s.put(5,1);
+
+                    MyLog.e("订单中包含打折的菜品名称："+name);
+
+                    float sum = (float) s.get(4);
+
+                    MyLog.e("折前价格："+sum);
+
+                    sum = (sum*disrate)/100f;
+
+                    saleTotal += sum;
+
+                    MyLog.e("折后前价格："+sum);
+                    //设置折后价格
+                    s.put(6,sum);
+                    break;
+
+                }
+            }
+
+            if((float)s.get(6) == 0f){
+
+                saleTotal += (float) s.get(4);
+            }
+
+        }
+
+        //展示享受折扣的列表
+
+        StringBuilder total_sb = new StringBuilder("折后金额：￥");
+
+        View view = getLayoutInflater().inflate(R.layout.view_payactivity_memberdishes_sale_dialog,null);
+
+        TextView t = view.findViewById(R.id.saletotalprice_tv);
+
+
+        ListView listView = view.findViewById(R.id.memberdisheslist_lv);
+
+        MemberDishesListAdapter memberDishesListAdapter = new MemberDishesListAdapter(list,this);
+
+        listView.setAdapter(memberDishesListAdapter);
+
+        t.setText(total_sb.append(saleTotal));
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("折扣明细表");
+        builder.setView(view);
+
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+
+        final float finalSaleTotal = saleTotal;
+
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+                total = finalSaleTotal;
+
+                factTv.setText("实际支付：" + total + "元");
+
+                associatorTv.setText(disrate+"/折");
+            }
+        });
+
+        builder.show();
+    }
+
+
+    /**
+     *
+     * @param data
+     */
+    private void Rechange(Intent data) {
+
+
+        View view = getLayoutInflater().inflate(R.layout.view_payactivity_memberdishes_rechange_dialog,null);
+
+        float r = data.getFloatExtra("remainder",0f);
+
+        TextView remainder_tv = view.findViewById(R.id.remainder_tv);
+
+        remainder_tv.setText(r+"");
+
+        TextView rechangepay_tv = view.findViewById(R.id.rechangepay_tv);
+
+        rechangepay_tv.setText(total+"");
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("扣款明细表");
+        builder.setView(view);
+        builder.setPositiveButton("确定扣款", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+                //
+
+
+
+
+
+
+            }
+        });
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+
+            }
+        });
+
+        builder.show();
+    }
+
     public void turnMainActivity() {
 
         try {

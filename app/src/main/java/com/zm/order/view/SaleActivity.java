@@ -97,9 +97,7 @@ public class SaleActivity extends AppCompatActivity {
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         idbManager = DBFactory.get(DatabaseSource.CouchBase, this);
-
         //setData();
         // 创建EventHandler对象
         eventHandler = new EventHandler() {
@@ -314,6 +312,7 @@ public class SaleActivity extends AppCompatActivity {
                     if(inputMethodManager.isActive()){
                         inputMethodManager.hideSoftInputFromWindow(SaleActivity.this.getCurrentFocus().getWindowToken(), 0);
                     }
+                    etcode.setCursorVisible(false);
                 }
                 break;
         }
