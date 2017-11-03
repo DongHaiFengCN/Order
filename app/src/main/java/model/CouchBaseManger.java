@@ -2,34 +2,22 @@ package model;
 
 import android.content.Context;
 
-import com.couchbase.lite.BasicAuthenticator;
-import com.couchbase.lite.Conflict;
-import com.couchbase.lite.ConflictResolver;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.DataSource;
 import com.couchbase.lite.Database;
-import com.couchbase.lite.DatabaseConfiguration;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
-import com.couchbase.lite.Log;
 import com.couchbase.lite.Query;
-import com.couchbase.lite.ReadOnlyDocument;
 import com.couchbase.lite.Replicator;
-import com.couchbase.lite.ReplicatorChangeListener;
-import com.couchbase.lite.ReplicatorConfiguration;
 import com.couchbase.lite.Result;
 import com.couchbase.lite.ResultSet;
 import com.couchbase.lite.SelectResult;
 
 import java.lang.reflect.Field;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import application.MyApplication;
 import untils.MyLog;
@@ -45,22 +33,28 @@ import untils.MyLog;
  */
 
 public class CouchBaseManger<T> implements IDBManager {
-
-    private static final String TAG = "CouchBaseManger";
-    private final static String DATABASE_NAME = "order";
-    private final static String SYNCGATEWAY_URL = "blip://123.207.174.171:4984/kitchen/";
-
-    private final static boolean SYNC_ENABLED = true;
     private  Database database = null;
-    private Replicator replicator;
-    private String Company_ID="wangbo008";
 
+    public CouchBaseManger(){}
 
-    public CouchBaseManger(Context context){
+ /*   public CouchBaseManger(Context context){
 
         MyApplication application = (MyApplication)context.getApplicationContext();
         database = application.getDatabase();
+    }*/
+
+    private static  class SingletonHolder{
+
+
+        private static final  CouchBaseManger c = new CouchBaseManger();
     }
+
+    public static  CouchBaseManger getInstance(){
+
+
+        return SingletonHolder.c;
+    }
+
 
 
     @Override
@@ -274,6 +268,16 @@ public class CouchBaseManger<T> implements IDBManager {
         }
 
         return documentList;
+    }
+
+    @Override
+    public void setContext(Context context) {
+
+
+            MyApplication application = (MyApplication)context.getApplicationContext();
+            database = application.getDatabase();
+
+
     }
 
     @Override

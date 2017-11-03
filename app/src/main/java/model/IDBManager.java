@@ -1,5 +1,6 @@
 package model;
 
+import android.content.Context;
 import android.widget.TextView;
 
 import com.couchbase.lite.CouchbaseLiteException;
@@ -36,5 +37,7 @@ public interface IDBManager<T> {
     Document getCard(String id);
 
     List<Document> getByClassName(String name);
+
+    void setContext(Context context);
 
 }

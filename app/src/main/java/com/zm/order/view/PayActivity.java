@@ -284,7 +284,7 @@ public class PayActivity extends AppCompatActivity {
 
                 if(name.equals(memberDishes.get(i))){
 
-                    //设置折扣菜品  0不打折 1打折
+                    //5号位置设置折扣菜品状态  0不打折 1打折
                     s.put(5,1);
 
                     MyLog.e("订单中包含打折的菜品名称："+name);
@@ -298,13 +298,15 @@ public class PayActivity extends AppCompatActivity {
                     saleTotal += sum;
 
                     MyLog.e("折后前价格："+sum);
-                    //设置折后价格
+
+                    //6号位置设置折后价格
                     s.put(6,sum);
                     break;
 
                 }
             }
 
+            //折扣价格不是0加入到折扣后总价格
             if((float)s.get(6) == 0f){
 
                 saleTotal += (float) s.get(4);
@@ -387,11 +389,9 @@ public class PayActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialogInterface, int i) {
 
                 //
+             //   Document members = DBFactory.get(DatabaseSource.CouchBase, PayActivity.this).getMembers("17605413611");
 
-
-
-
-
+                MyLog.e("idbManager  "+ DBFactory.get(DatabaseSource.CouchBase, PayActivity.this).toString());
 
             }
         });

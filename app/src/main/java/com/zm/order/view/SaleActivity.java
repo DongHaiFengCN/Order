@@ -31,6 +31,7 @@ import butterknife.OnClick;
 import cn.smssdk.EventHandler;
 import cn.smssdk.SMSSDK;
 import cn.smssdk.utils.SMSLog;
+import model.CouchBaseManger;
 import model.DBFactory;
 import model.DatabaseSource;
 import model.IDBManager;
@@ -98,7 +99,7 @@ public class SaleActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         idbManager = DBFactory.get(DatabaseSource.CouchBase, this);
-        //setData();
+        setData();
         // 创建EventHandler对象
         eventHandler = new EventHandler() {
             public void afterEvent(int event, final int result, final Object data) {
@@ -177,9 +178,11 @@ public class SaleActivity extends AppCompatActivity {
         etcode.setCursorVisible(false);
 
         //获取会员信息
-        Document members = idbManager.getMembers(etAmountphone.getText().toString());
+       // Document members = idbManager.getMembers(etAmountphone.getText().toString());
         //Document members = idbManager.getMembers("15054029395");
-        //Document members = idbManager.getMembers("17605413611");
+          Document members = idbManager.getMembers("17605413611");
+
+
         if (Tool.isNotEmpty(members)) {
 
             Tool.bindView(name, members.getString("name"));
@@ -345,6 +348,16 @@ public class SaleActivity extends AppCompatActivity {
 
             intent.putExtra("CardTypeFlag", CardTypeFlag);
 
+            if(TextUtils.isEmpty(etAmountphone.getText().toString())){
+
+                etAmountphone.setError("数据为空");
+
+                return;
+
+            }
+
+            intent.putExtra("tel", etAmountphone.getText().toString());
+
             //折扣卡返回折扣率及支持的菜品列表
 
             if (CardTypeFlag == 1) {
@@ -367,7 +380,6 @@ public class SaleActivity extends AppCompatActivity {
 
 
             //返回支持打折菜品id
-
 
             setResult(RESULT_OK, intent);
 
