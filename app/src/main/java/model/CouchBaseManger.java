@@ -33,21 +33,8 @@ import untils.MyLog;
  */
 
 public class CouchBaseManger<T> implements IDBManager {
+
     private  Database database = null;
-
-    public CouchBaseManger(){}
-
- /*   public CouchBaseManger(Context context){
-
-        MyApplication application = (MyApplication)context.getApplicationContext();
-        database = application.getDatabase();
-    }*/
-
-    private static  class SingletonHolder{
-
-
-        private static final  CouchBaseManger c = new CouchBaseManger();
-    }
 
     public static  CouchBaseManger getInstance(){
 
@@ -56,20 +43,23 @@ public class CouchBaseManger<T> implements IDBManager {
     }
 
 
+    private static  class SingletonHolder{
+
+
+        private static final  CouchBaseManger c = new CouchBaseManger();
+    }
 
     @Override
     public void Testshow() {
 
         MyLog.e(getDishesKindsByClassName("DishesKind").size()+"~~~~~~");
 
-
-
     }
 
     @Override
     public boolean isLogin(String name, String pass) {
 
-      Document document = new Document();
+        Document document = new Document();
 
         document.setString("className","LoginUserBean");
         document.setString("mName",name);
@@ -87,8 +77,8 @@ public class CouchBaseManger<T> implements IDBManager {
                 .from(DataSource.database(database))
                 .where(Expression.property("className").equalTo("LoginUserBean").and(Expression.property("mName").equalTo(name).and(Expression.property("mPassword").equalTo(pass))));
         try {
+
             ResultSet resultSet= query.run();
-            Result result;
 
             if (resultSet.next() != null){
 

@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Document;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
@@ -113,8 +114,10 @@ public class PayActivity extends AppCompatActivity {
         //显示原价
         totalTv.setText(total + "");
 
+        StringBuilder stringBuilder = new StringBuilder("实际支付：");
+
         //显示操作后价格
-        factTv.setText("实际支付：" + total + "元");
+        factTv.setText(stringBuilder.append(total));
 
         //show();
 
@@ -168,9 +171,6 @@ public class PayActivity extends AppCompatActivity {
             case R.id.reset:
 
 
-             //   setIntentData();
-
-               // MyLog.e("重置后数据"+intent.getFloatExtra("total",0f));
 
                 break;
             default:
@@ -247,6 +247,8 @@ public class PayActivity extends AppCompatActivity {
         IDBManager idbManager = DBFactory.get(DatabaseSource.CouchBase, this);
 
         List<String> stringList = data.getStringArrayListExtra("DishseList");
+
+        final String tel = data.getStringExtra("tel");
 
         List<String> memberDishes = new ArrayList<>();
 
@@ -332,6 +334,8 @@ public class PayActivity extends AppCompatActivity {
         t.setText(total_sb.append(saleTotal));
 
 
+
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         builder.setTitle("折扣明细表");
@@ -350,11 +354,19 @@ public class PayActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
 
+                //
+                IDBManager idbManager = DBFactory.get(DatabaseSource.CouchBase, PayActivity.this);
+                Document members = idbManager.getMembers(tel);
+
                 total = finalSaleTotal;
 
                 factTv.setText("实际支付：" + total + "元");
 
                 associatorTv.setText(disrate+"/折");
+
+                //会员消费记录
+
+                SubmitMemberConsumeInfo(members);
             }
         });
 
@@ -371,7 +383,9 @@ public class PayActivity extends AppCompatActivity {
 
         View view = getLayoutInflater().inflate(R.layout.view_payactivity_memberdishes_rechange_dialog,null);
 
-        float r = data.getFloatExtra("remainder",0f);
+        final float r = data.getFloatExtra("remainder",0f);
+
+        final String tel = data.getStringExtra("tel");
 
         TextView remainder_tv = view.findViewById(R.id.remainder_tv);
 
@@ -384,17 +398,8 @@ public class PayActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("扣款明细表");
         builder.setView(view);
-        builder.setPositiveButton("确定扣款", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
+        builder.setPositiveButton("确定扣款",null);
 
-                //
-             //   Document members = DBFactory.get(DatabaseSource.CouchBase, PayActivity.this).getMembers("17605413611");
-
-                MyLog.e("idbManager  "+ DBFactory.get(DatabaseSource.CouchBase, PayActivity.this).toString());
-
-            }
-        });
         builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -403,8 +408,65 @@ public class PayActivity extends AppCompatActivity {
             }
         });
 
-        builder.show();
+       final AlertDialog alertDialog = builder.show();
+
+        alertDialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if(r >= total){
+
+                    IDBManager idbManager = DBFactory.get(DatabaseSource.CouchBase, PayActivity.this);
+                    Document members = idbManager.getMembers(tel);
+                    members.setFloat("remainder",r-total);
+
+                    try {
+                        idbManager.save(members);
+                    } catch (CouchbaseLiteException e) {
+                        e.printStackTrace();
+                    }
+
+                    //会员消费记录
+
+                    SubmitMemberConsumeInfo(members);
+
+
+                    //提交订单及打印
+
+                    SubmitOrder();
+
+                    Toast.makeText(PayActivity.this,"扣款成功！",Toast.LENGTH_SHORT).show();
+
+                    alertDialog.dismiss();
+
+                }else {
+                    Toast.makeText(PayActivity.this,"余额不足！",Toast.LENGTH_SHORT).show();
+
+                }
+
+            }
+        });
     }
+
+    private void SubmitMemberConsumeInfo(Document d) {
+
+
+
+
+    }
+
+
+
+    /**
+     * 提交订单到数据库，打印订单
+     */
+    private void SubmitOrder() {
+
+
+    }
+
+
+
 
     public void turnMainActivity() {
 
@@ -429,7 +491,6 @@ public class PayActivity extends AppCompatActivity {
 
                 Intent discount = new Intent();
                 discount.setClass(PayActivity.this, DiscountActivity.class);
-               // discount.putExtra("Total", Float.valueOf(totalTv.getText().toString()));
                 discount.putExtra("Total", total);
                 startActivityForResult(discount, DISTCOUNT);
 

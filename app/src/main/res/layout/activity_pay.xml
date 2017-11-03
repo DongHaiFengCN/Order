@@ -199,7 +199,6 @@
             android:id="@+id/fact_tv"
             android:paddingRight="16dp"
             android:gravity="right|center"
-            android:text="实际支付：55元"
             android:textColor="@color/md_red_500"
             android:textSize="18sp"
             android:layout_weight="1"

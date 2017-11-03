@@ -179,8 +179,8 @@ public class SaleActivity extends AppCompatActivity {
 
         //获取会员信息
        // Document members = idbManager.getMembers(etAmountphone.getText().toString());
-        //Document members = idbManager.getMembers("15054029395");
-          Document members = idbManager.getMembers("17605413611");
+          Document members = idbManager.getMembers("15054029395");
+        //  Document members = idbManager.getMembers("17605413611");
 
 
         if (Tool.isNotEmpty(members)) {
