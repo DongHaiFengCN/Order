@@ -82,7 +82,6 @@ public class SeekT9Fragment extends Fragment{
     private List<Goods> myGoodsList;
     private TestAdapte testAdapte;
     private SeekT9Adapter seekT9Adapter ;
-   // private SeekT9RAdapter seekT9RAdapter ;
     private TextView total_tv;
     private TextView point_tv;
     View view;
@@ -110,21 +109,7 @@ public class SeekT9Fragment extends Fragment{
         myGoodsList  = new ArrayList<>();
 
         activitySeekList.setAdapter(seekT9Adapter);
-       /* activitySeekList.setLayoutManager(new LinearLayoutManager(getActivity()));
-        seekT9RAdapter = new SeekT9RAdapter((MainActivity)getActivity());
-        seekT9RAdapter.setmData(mlistSearchDishesObj);
-        activitySeekList.setAdapter(seekT9RAdapter);
-        seekT9RAdapter.setListener(new SeekT9RAdapter.SeekT9ROnClickListener() {
-            @Override
-            public void OnClickListener(View view, String name, float price) {
-                showDialog(name, price);
-            }
-        });*/
 
-
-
-        final MainActivity activity = ((MainActivity)getActivity());
-        final SparseArray<Object> s = new SparseArray<>();
         seekT9Adapter.setListener(new SeekT9Adapter.SeekT9OnClickListener() {
             @Override
             public void OnClickListener(View view,String name, float price) {

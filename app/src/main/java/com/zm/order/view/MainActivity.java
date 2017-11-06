@@ -72,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
     private Fragment seekT9Fragment;
     private Fragment orderFragment;
     private SeekT9Adapter seekT9Adapter;
-    private SeekT9RAdapter seekT9RAdapter;
     private FragmentManager fm;//获得Fragment管理器
     private FragmentTransaction ft; //开启一个事务
     private boolean isFlag = true;
@@ -111,15 +110,9 @@ public class MainActivity extends AppCompatActivity {
     public void setT9Adapter(SeekT9Adapter seekT9Adapter){
         this.seekT9Adapter = seekT9Adapter;
     }
-    public void setT9RAdapter(SeekT9RAdapter seekT9RAdapter){
-        this.seekT9RAdapter = seekT9RAdapter;
-    }
 
     public SeekT9Adapter getSeekT9Adapter(){
         return seekT9Adapter;
-    }
-    public SeekT9RAdapter getSeekT9RAdapter(){
-        return seekT9RAdapter;
     }
 
 
