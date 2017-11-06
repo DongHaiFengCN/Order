@@ -15,8 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bean.Goods;
+import bean.kitchenmanage.order.GoodsC;
+import bean.kitchenmanage.order.OrderC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import model.CDBHelper;
 
 /**
  * Created by lenovo on 2017/10/26.
@@ -126,6 +129,23 @@ public class SeekT9Adapter extends BaseAdapter {
 
                 if (activity.getOrderItem().size() == 0 || activity.getOrderItem() == null){
                     if (number != -1) {//如果选择器的数量不为零，当前的选择的菜品加入订单列表
+                        OrderC orderC = new OrderC();
+                        GoodsC goodsC = new GoodsC();
+                        goodsC.setDishesName(mData.get(position).getDishesC().getDishesName());
+                        goodsC.setDishesTaste("默认");
+                        goodsC.setDishesCount(1);
+                        goodsC.setAllPrice(number * mData.get(position).getDishesC().getPrice());
+                        goodsC.setChannelId("wangbo08");
+                        goodsC.setClassName("GoodsC");
+                        CDBHelper.createAndUpdate(activity.getApplicationContext(),goodsC);
+                        orderC.addGoods(goodsC);
+                        orderC.setAllPrice(total);
+                        orderC.setOrderState(1);
+                        orderC.setOrderType(1);
+                        orderC.setChannelId("wangbo08");
+                        orderC.setClassName("OrderC");
+                        CDBHelper.createAndUpdate(activity.getApplicationContext(),orderC);
+
                         s.put(0, mData.get(position).getDishesC().getDishesName());
                         s.put(1, "默认");
                         s.put(2, 1+"");
@@ -159,6 +179,24 @@ public class SeekT9Adapter extends BaseAdapter {
 
                     if (isName == false){
                         if (number != -1) {//如果选择器的数量不为零，当前的选择的菜品加入订单列表
+
+                            OrderC orderC = new OrderC();
+                            GoodsC goodsC = new GoodsC();
+                            goodsC.setDishesName(mData.get(position).getDishesC().getDishesName());
+                            goodsC.setDishesTaste("默认");
+                            goodsC.setDishesCount(1);
+                            goodsC.setAllPrice(number * mData.get(position).getDishesC().getPrice());
+                            goodsC.setChannelId("wangbo08");
+                            goodsC.setClassName("GoodsC");
+                            CDBHelper.createAndUpdate(activity.getApplicationContext(),goodsC);
+                            orderC.addGoods(goodsC);
+                            orderC.setAllPrice(total);
+                            orderC.setOrderState(1);
+                            orderC.setOrderType(1);
+                            orderC.setChannelId("wangbo08");
+                            orderC.setClassName("OrderC");
+                            CDBHelper.createAndUpdate(activity.getApplicationContext(),orderC);
+
                             s.put(0, mData.get(position).getDishesC().getDishesName());
                             s.put(1, "默认");
                             s.put(2, 1+"");
@@ -194,6 +232,53 @@ public class SeekT9Adapter extends BaseAdapter {
                     viewHolder.viewJian.setVisibility(View.GONE);
                 }
                 viewHolder.viewShu.setText(mData.get(position).getCount()+"");
+                if (activity.getOrderItem().size() != 0 && activity.getOrderItem() != null){
+                    for (int i = 0 ;i< activity.getOrderItem().size() ;i++){
+                        if (activity.getOrderItem().get(i).get(0).toString().equals(mData.get(position).getDishesC().getDishesName())) {
+                            number = Integer.parseInt(activity.getOrderItem().get(i).get(2).toString());
+                            break;
+                        }
+                    }
+                }
+
+                if (activity.getOrderItem().size() != 0 && activity.getOrderItem() != null){
+                    for (int i = 0 ;i< activity.getOrderItem().size() ;i++){
+                        if (activity.getOrderItem().get(i).get(0).toString().equals(mData.get(position).getDishesC().getDishesName())) {
+                            number = Integer.parseInt(activity.getOrderItem().get(i).get(2).toString());
+                            break;
+                        }
+                    }
+                }
+
+                if (Integer.parseInt(viewHolder.viewShu.getText().toString()) <= 1){
+                    viewHolder.viewShu.setVisibility(View.GONE);
+                    viewHolder.viewJian.setVisibility(View.GONE);
+                }else {
+                    viewHolder.viewShu.setVisibility(View.VISIBLE);
+                    viewHolder.viewJian.setVisibility(View.VISIBLE);
+                }
+                if (Integer.parseInt(viewHolder.viewShu.getText().toString()) > 0){
+                    viewHolder.viewShu.setText(number-1+"");
+                }
+                number = Integer.parseInt(viewHolder.viewShu.getText().toString());
+                if (activity.getOrderItem().size() != 0 && activity.getOrderItem() != null){
+                    for (int i = 0 ;i< activity.getOrderItem().size() ;i++){
+                        if (activity.getOrderItem().get(i).get(0).toString().equals(mData.get(position).getDishesC().getDishesName())) {
+                            activity.getOrderItem().get(i).put(2, number);
+                            number = Integer.parseInt(activity.getOrderItem().get(i).get(2).toString());
+                            activity.getOrderItem().get(i).put(4, number * mData.get(position).getDishesC().getPrice());
+                            total = activity.getTotal();
+                            total -= 1 * mData.get(position).getDishesC().getPrice();
+                            activity.setTotal(total);
+                            point = activity.getPoint();
+                            if (number == 0){
+                                point--;
+                            }
+                            activity.setPoint(point);
+                            break;
+                        }
+                    }
+                }
 
             }
         });
