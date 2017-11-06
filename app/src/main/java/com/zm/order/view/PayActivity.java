@@ -103,7 +103,8 @@ public class PayActivity extends AppCompatActivity {
         dialog = new AlertDialog.Builder(PayActivity.this);
         dialog.setView(getLayoutInflater().inflate(R.layout.view_print_dialog, null)).create();
 
-        //支付宝收款码
+        //支付宝收款码,网络获取**********
+
         String alipayId = "qwhhh";
 
         //转化二维码
@@ -135,23 +136,6 @@ public class PayActivity extends AppCompatActivity {
         dg.dismiss();
     }
 
-    private void show(){
-
-        List list = (List) stashItent.getSerializableExtra("Order");
-
-        for (int i = 0; i < list.size(); i++) {
-
-
-            SparseArray<Object> s = (SparseArray<Object>) list.get(i);
-
-            MyLog.e("订单菜名："+ s.get(0));
-            MyLog.e("菜品数量："+s.get(2));
-            MyLog.e("当前菜品总价："+s.get(4));
-            MyLog.e("打折："+s.get(5));
-            MyLog.e("折扣价："+s.get(6));
-        }
-
-    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -213,22 +197,27 @@ public class PayActivity extends AppCompatActivity {
         }
     }
 
-
     /**
      * 账单减免
      * @param data
      */
 
     private void Discount(Intent data) {
+
+
+        //处理完成的总价
         total = data.getFloatExtra("Total", 0);
 
-        //差额
+        //展示差额
         discountTv.setText("- " + data.getFloatExtra("Margin", 0) + "元");
 
+        //设置实际处理后的价格
         factTv.setText("实际支付：" + total + "元");
 
+        //设置会员按钮不可用
         associator.setEnabled(false);
 
+        //未设置会员的优惠信息时展示不可用
         if(TextUtils.isEmpty(associatorTv.getText().toString())){
 
             associatorTv.setText("减免后不可选");
@@ -240,18 +229,21 @@ public class PayActivity extends AppCompatActivity {
      * @param data
      */
     private void Sale(Intent data) {
-        //折扣
 
+        //折扣
         float saleTotal = 0.0f;
 
         IDBManager idbManager = DBFactory.get(DatabaseSource.CouchBase, this);
 
+        //返回的会员菜品
+
         List<String> stringList = data.getStringArrayListExtra("DishseList");
 
+        //会员电话
         final String tel = data.getStringExtra("tel");
 
-        List<String> memberDishes = new ArrayList<>();
 
+        List<String> memberDishes = new ArrayList<>();
 
         //初始化会员菜名
         for(String id : stringList){
@@ -265,11 +257,9 @@ public class PayActivity extends AppCompatActivity {
 
         //MyLog.e("折扣率："+disrate);
 
-        //订单
+        //遍历订单中包含的会员菜品
 
         List list = (List) stashItent.getSerializableExtra("Order");
-
-        MyLog.e("长度："+list.size());
 
         for (int j = 0; j < list.size(); j++) {
 
@@ -282,24 +272,25 @@ public class PayActivity extends AppCompatActivity {
 
             for (int i = 0; i < memberDishes.size(); i++) {
 
-                MyLog.e("会员菜名："+memberDishes.get(i));
+              //  MyLog.e("会员菜名："+memberDishes.get(i));
 
                 if(name.equals(memberDishes.get(i))){
 
                     //5号位置设置折扣菜品状态  0不打折 1打折
                     s.put(5,1);
 
-                    MyLog.e("订单中包含打折的菜品名称："+name);
+                   // MyLog.e("订单中包含打折的菜品名称："+name);
 
                     float sum = (float) s.get(4);
 
-                    MyLog.e("折前价格："+sum);
+                   // MyLog.e("折前价格："+sum);
 
                     sum = (sum*disrate)/100f;
 
+                    //是打折的直接添加到折扣总价中
                     saleTotal += sum;
 
-                    MyLog.e("折后前价格："+sum);
+                  //  MyLog.e("折后前价格："+sum);
 
                     //6号位置设置折后价格
                     s.put(6,sum);
@@ -308,7 +299,7 @@ public class PayActivity extends AppCompatActivity {
                 }
             }
 
-            //折扣价格不是0加入到折扣后总价格
+            //折扣价格是0，将原价加入到折扣后总价格
             if((float)s.get(6) == 0f){
 
                 saleTotal += (float) s.get(4);
@@ -333,9 +324,6 @@ public class PayActivity extends AppCompatActivity {
 
         t.setText(total_sb.append(saleTotal));
 
-
-
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         builder.setTitle("折扣明细表");
@@ -354,7 +342,6 @@ public class PayActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
 
-
                 IDBManager idbManager = DBFactory.get(DatabaseSource.CouchBase, PayActivity.this);
                 Document members = idbManager.getMembers(tel);
 
@@ -365,7 +352,6 @@ public class PayActivity extends AppCompatActivity {
                 associatorTv.setText(disrate+"/折");
 
                 //会员消费记录
-
                 SubmitMemberConsumeInfo(members);
             }
         });
@@ -375,6 +361,8 @@ public class PayActivity extends AppCompatActivity {
 
 
     /**
+     *
+     * 充值卡操作
      *
      * @param data
      */
@@ -418,6 +406,8 @@ public class PayActivity extends AppCompatActivity {
 
                     IDBManager idbManager = DBFactory.get(DatabaseSource.CouchBase, PayActivity.this);
                     Document members = idbManager.getMembers(tel);
+
+                    //更新余额
                     members.setFloat("remainder",r-total);
 
                     try {
@@ -427,12 +417,9 @@ public class PayActivity extends AppCompatActivity {
                     }
 
                     //会员消费记录
-
                     SubmitMemberConsumeInfo(members);
 
-
                     //提交订单及打印
-
                     SubmitOrder();
 
                     Toast.makeText(PayActivity.this,"扣款成功！",Toast.LENGTH_SHORT).show();
@@ -448,27 +435,26 @@ public class PayActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * 设置会员消费记录
+     * @param d
+     */
     private void SubmitMemberConsumeInfo(Document d) {
 
         Document consumLog = new Document();
 
 
-
-
     }
 
-
-
     /**
-     * 提交订单到数据库，打印订单
+     * 提交打印订单
      */
     private void SubmitOrder() {
 
+        Document checkOrder = new Document();
+
 
     }
-
-
-
 
     public void turnMainActivity() {
 
@@ -507,9 +493,7 @@ public class PayActivity extends AppCompatActivity {
             case R.id.ivalipay:
 
                 View dialog = getLayoutInflater().inflate(R.layout.view_alipay_dialog, null);
-
                 ImageView imageView = dialog.findViewById(R.id.encode);
-
                 imageView.setImageBitmap(bitmap);
 
                 alertDialog = new AlertDialog.Builder(PayActivity.this);
@@ -517,19 +501,21 @@ public class PayActivity extends AppCompatActivity {
                 alertDialog.setPositiveButton("取消", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+
                     }
                 });
                 alertDialog.setNegativeButton("确定支付", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+
                         ProgressBarasyncTask progressBarasyncTask = new ProgressBarasyncTask(PayActivity.this);
                         progressBarasyncTask.setDate(intent);
                         progressBarasyncTask.execute();
 
                     }
                 });
-                alertDialog.show();
 
+                alertDialog.show();
 
                 break;
             case R.id.ivwechat:
@@ -558,7 +544,6 @@ public class PayActivity extends AppCompatActivity {
         MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
         try {
             result = multiFormatWriter.encode(str, BarcodeFormat.QR_CODE, 250, 250);
-
             // 使用 ZXing Android Embedded
             BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
             bitmap = barcodeEncoder.createBitmap(result);
