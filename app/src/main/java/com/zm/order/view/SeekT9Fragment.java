@@ -82,7 +82,7 @@ public class SeekT9Fragment extends Fragment{
     private List<Goods> myGoodsList;
     private TestAdapte testAdapte;
     private SeekT9Adapter seekT9Adapter ;
-    private SeekT9RAdapter seekT9RAdapter ;
+   // private SeekT9RAdapter seekT9RAdapter ;
     private TextView total_tv;
     private TextView point_tv;
     View view;
