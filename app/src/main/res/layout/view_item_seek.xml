@@ -52,16 +52,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_toLeftOf="@+id/view_shu"
-                android:visibility="invisible"
-                >
+                android:visibility="gone">
                 <ImageView
                     android:layout_width="20sp"
                     android:layout_height="20sp"
-                    android:src="@mipmap/icon_jian"
-                    android:layout_alignParentRight="true"
-                    android:layout_marginRight="30sp"
                     android:layout_centerVertical="true"
+                    android:src="@mipmap/icon_jian"
+                    android:layout_marginLeft="20sp"
+
                     />
+
 
             </RelativeLayout>
 
@@ -76,26 +76,27 @@
                 android:gravity="center"
                 android:textSize="18sp"
                 android:textColor="@color/md_black_1000"
-                android:visibility="invisible"
+                android:visibility="gone"
                 />
+
             <RelativeLayout
                 android:id="@+id/view_tj"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginRight="20sp"
-                android:layout_alignParentRight="true"
                 android:layout_toRightOf="@+id/view_shu">
 
-
                 <ImageView
+
                     android:layout_width="20sp"
                     android:layout_height="20sp"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
+                    android:layout_marginRight="20sp"
                     android:src="@mipmap/icon_tj"
                     />
-            </RelativeLayout>
 
+
+            </RelativeLayout>
 
 
         </RelativeLayout>

@@ -1,51 +1,39 @@
 package com.zm.order.view;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.app.Fragment;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.GridLayoutManager;
-import android.util.DisplayMetrics;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.couchbase.lite.Expression;
-import com.couchbase.lite.Log;
 import com.zm.order.R;
+import com.zm.order.view.adapter.TestAdapte;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import bean.Goods;
 import bean.Order;
 import bean.kitchenmanage.dishes.DishesC;
+import bean.kitchenmanage.order.GoodsC;
+import bean.kitchenmanage.order.OrderC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import model.CDBHelper;
-import presenter.IMainPresenter;
-import presenter.MainPresenterImpl;
-import untils.AnimationUtil;
-import untils.MyLog;
 
 /**
  * Created by lenovo on 2017/10/26.
@@ -55,6 +43,8 @@ public class SeekT9Fragment extends Fragment{
 
     @BindView(R.id.activity_seek_list)
     ListView activitySeekList;
+   /* @BindView(R.id.activity_seek_list)
+    RecyclerView activitySeekList;*/
     @BindView(R.id.activity_seek_edit)
     EditText activitySeekEdit;
     @BindView(R.id.ibtn_key_1)
@@ -89,12 +79,16 @@ public class SeekT9Fragment extends Fragment{
     private float total = 0.0f;
     public int point = 1;
     private List<DishesC> mlistSearchDishesObj;
-
+    private List<Goods> myGoodsList;
+    private TestAdapte testAdapte;
     private SeekT9Adapter seekT9Adapter ;
+    private SeekT9RAdapter seekT9RAdapter ;
     private TextView total_tv;
-   private TextView point_tv;
-   View view;
+    private TextView point_tv;
+    View view;
+    private boolean isName = false;
     private MainActivity mainActivity ;
+    private List<String> strings;
 
     @Nullable
     @Override
@@ -111,25 +105,33 @@ public class SeekT9Fragment extends Fragment{
     }
     public void initView() {
         seekT9Adapter = new SeekT9Adapter((MainActivity)getActivity());
-        mlistSearchDishesObj = new ArrayList<>();
-        seekT9Adapter.setmData(mlistSearchDishesObj);
-        seekT9Adapter.notifyDataSetChanged();
-        activitySeekList.setAdapter(seekT9Adapter);
-        /*seekT9Adapter.setOrderItem(new SeekT9Adapter.SeekT9OrderItem() {
-            @Override
-            public void seekT9OrderItem(SparseArray<Object> list, int point, float total) {
-                ((MainActivity) getActivity()).setPoint(point);
-                ((MainActivity) getActivity()).setOrderItem().add(list);
-                ((MainActivity) getActivity()).setTotal(total);
 
+        mlistSearchDishesObj = new ArrayList<>();
+        myGoodsList  = new ArrayList<>();
+
+        activitySeekList.setAdapter(seekT9Adapter);
+       /* activitySeekList.setLayoutManager(new LinearLayoutManager(getActivity()));
+        seekT9RAdapter = new SeekT9RAdapter((MainActivity)getActivity());
+        seekT9RAdapter.setmData(mlistSearchDishesObj);
+        activitySeekList.setAdapter(seekT9RAdapter);
+        seekT9RAdapter.setListener(new SeekT9RAdapter.SeekT9ROnClickListener() {
+            @Override
+            public void OnClickListener(View view, String name, float price) {
+                showDialog(name, price);
             }
         });*/
+
+
+
+        final MainActivity activity = ((MainActivity)getActivity());
+        final SparseArray<Object> s = new SparseArray<>();
         seekT9Adapter.setListener(new SeekT9Adapter.SeekT9OnClickListener() {
             @Override
             public void OnClickListener(View view,String name, float price) {
                 view.setBackgroundResource(R.color.lucency);
                 showDialog(name, price);
             }
+
         });
 
 
@@ -199,14 +201,29 @@ public class SeekT9Fragment extends Fragment{
 
                 if (sum != 0) {//如果选择器的数量不为零，当前的选择的菜品加入订单列表
 
+                    OrderC orderC = new OrderC();
+                    GoodsC goodsC = new GoodsC();
+                    goodsC.setDishesName(name);
+                    goodsC.setDishesTaste(taste);
+                    goodsC.setDishesCount(sum);
+                    goodsC.setAllPrice(sum * price);
+                    goodsC.setChannelId("wangbo08");
+                    goodsC.setClassName("GoodsC");
+                    CDBHelper.createAndUpdate(getActivity().getApplicationContext(),goodsC);
+                    orderC.addGoods(goodsC);
+                    orderC.setAllPrice(total);
+                    orderC.setOrderState(1);
+                    orderC.setOrderType(1);
+                    orderC.setChannelId("wangbo08");
+                    orderC.setClassName("OrderC");
+                    CDBHelper.createAndUpdate(getActivity().getApplicationContext(),orderC);
+
                     final SparseArray<Object> s = new SparseArray<>();//查下这个怎么用
                     s.put(0, name);
                     s.put(1, taste);
                     s.put(2, sum + "");
                     s.put(3, price);
                     s.put(4, sum * price);
-                    s.put(5, 0);
-                    s.put(6, 0f);
                     mainActivity.getOrderItem().add(s);
                     //购物车计数器数据更新
                     point =  (((MainActivity) getActivity()).getPoint());
@@ -239,13 +256,23 @@ public class SeekT9Fragment extends Fragment{
 
     // 查询方法
     public void search(String search) {
-        mlistSearchDishesObj.clear();
+        //mlistSearchDishesObj.clear();
+        myGoodsList.clear();
+
+
         List<DishesC> documentList=CDBHelper.getObjByWhere(getActivity().getApplicationContext(), Expression.property("className").equalTo("DishesC")
                 .and(Expression.property("dishesNameCode9").like(search+"%")),null,DishesC.class);
-        for(DishesC obj:documentList)
+        for(DishesC obj: documentList)
         {
-            mlistSearchDishesObj.add(obj);
+            //mlistSearchDishesObj.add(obj);
+            Goods goodsObj =new Goods();
+            goodsObj.setCount(0);
+            goodsObj.setDishesC(obj);
+            myGoodsList.add(goodsObj);
+
+
         }
+        seekT9Adapter.setmData(myGoodsList);
         seekT9Adapter.notifyDataSetChanged();
     }
 
@@ -273,6 +300,7 @@ public class SeekT9Fragment extends Fragment{
 
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "2");
                 search(activitySeekEdit.getText().toString());
+
                 break;
 
             case R.id.ibtn_key_3:

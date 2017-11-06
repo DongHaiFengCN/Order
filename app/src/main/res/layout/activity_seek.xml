@@ -4,42 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
-
-    <!--<RelativeLayout
-        android:id="@+id/seek_rel"
+    <!--<android.support.v7.widget.RecyclerView
+        android:id="@+id/activity_seek_list"
         android:layout_width="match_parent"
-        android:layout_height="50sp"
-        android:background="@color/colorPrimaryDark">
+        android:layout_height="match_parent"
+        android:layout_above="@+id/activity_seek_edit">
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="30sp"
-            android:src="@drawable/animback"
-            android:layout_marginLeft="20dp"
-            android:layout_centerVertical="true"
-            />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"
-            android:text="搜索"
-            android:textSize="26sp"
-            android:gravity="center_vertical"
-            android:textColor="@color/md_white"
-
-            />
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="30sp"
-
-            />
-
-
-    </RelativeLayout>
--->
+    </android.support.v7.widget.RecyclerView>-->
     <ListView
         android:id="@+id/activity_seek_list"
         android:layout_width="match_parent"
@@ -51,13 +22,14 @@
     <EditText
         android:id="@+id/activity_seek_edit"
         android:layout_width="match_parent"
-        android:layout_height="70sp"
+        android:layout_height="50dp"
         android:background="@drawable/background_select"
         android:gravity="center"
         android:layout_centerInParent="true"
         android:textSize="22sp"
         android:layout_margin="20sp"
         android:focusable="false"
+
         />
 
 

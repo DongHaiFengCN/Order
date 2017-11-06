@@ -9,10 +9,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.couchbase.lite.Log;
 import com.zm.order.R;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -49,7 +47,6 @@ public class OrderAdapter extends BaseAdapter {
     public OrderAdapter(List<SparseArray<Object>> orderItem, MainActivity mainActivity) {
         this.orderItem = orderItem;
         this.context = mainActivity;
-        notifyDataSetChanged();
     }
 
 
@@ -83,7 +80,6 @@ public class OrderAdapter extends BaseAdapter {
             viewHold = new ViewHold();
             viewHold.name =view.findViewById(R.id.name);
             viewHold.taste =view.findViewById(R.id.taste);
-            viewHold.price = view.findViewById(R.id.price);
             viewHold.number =view.findViewById(R.id.amount_view);
             viewHold.number.getEtAmount().setEnabled(false);
             view.setTag(viewHold);
@@ -92,36 +88,12 @@ public class OrderAdapter extends BaseAdapter {
 
             viewHold = (ViewHold) view.getTag();
         }
-
-        for (Iterator iterator = orderItem.iterator(); iterator.hasNext();){
-
-            SparseArray<Object> sparseArray = (SparseArray<Object>) iterator.next();
-            /*if (sparseArray.get(2).toString().equals("0")){
-                orderItem.remove(iterator.next());
-                break;
-            }*/
-
-            
-
-        }
-
-
-//       for (int a = 0;a < orderItem.size();a++){
-//            if (orderItem.get(a).get(2).toString().equals("0")){
-//                orderItem.remove(a);
-//                a--;
-//                break;
-//            }
-//        }
-
         viewHold.name.setText(orderItem.get(i).get(0).toString());
 
         viewHold.taste.setText(orderItem.get(i).get(1).toString());
 
         viewHold.number.setNumber(orderItem.get(i).get(2).toString());
 
-
-        viewHold.price.setText(orderItem.get(i).get(4).toString());
         //设置item的点击事件
         viewHold.number.setChangeListener(new AmountView.ChangeListener() {
             @Override
@@ -154,7 +126,6 @@ public class OrderAdapter extends BaseAdapter {
 
         TextView taste;
 
-        TextView price;
 
 
         AmountView number;

@@ -32,15 +32,23 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.couchbase.lite.Array;
+import com.couchbase.lite.Document;
+import com.couchbase.lite.Log;
 import com.zm.order.R;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import application.MyApplication;
+import bean.kitchenmanage.order.GoodsC;
+import bean.kitchenmanage.order.OrderC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import model.CDBHelper;
 import presenter.IMainPresenter;
 import presenter.MainPresenterImpl;
 import untils.AnimationUtil;
@@ -64,9 +72,11 @@ public class MainActivity extends AppCompatActivity {
     private Fragment seekT9Fragment;
     private Fragment orderFragment;
     private SeekT9Adapter seekT9Adapter;
+    private SeekT9RAdapter seekT9RAdapter;
     private FragmentManager fm;//获得Fragment管理器
     private FragmentTransaction ft; //开启一个事务
     private boolean isFlag = true;
+    private OrderAdapter orderAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        myApp = (MyApplication) getApplication();
+        //myApp = (MyApplication) getApplication();
 
 
         initView();
@@ -101,11 +111,25 @@ public class MainActivity extends AppCompatActivity {
     public void setT9Adapter(SeekT9Adapter seekT9Adapter){
         this.seekT9Adapter = seekT9Adapter;
     }
+    public void setT9RAdapter(SeekT9RAdapter seekT9RAdapter){
+        this.seekT9RAdapter = seekT9RAdapter;
+    }
 
     public SeekT9Adapter getSeekT9Adapter(){
         return seekT9Adapter;
     }
+    public SeekT9RAdapter getSeekT9RAdapter(){
+        return seekT9RAdapter;
+    }
 
+
+    public void setOrderAdapter(OrderAdapter orderAdapter){
+        this.orderAdapter = orderAdapter;
+    }
+
+    public OrderAdapter getOrderAdapter(){
+        return orderAdapter;
+    }
 
     public List<SparseArray<Object>> getOrderItem(){
         return orderItem;
@@ -120,13 +144,8 @@ public class MainActivity extends AppCompatActivity {
     }
     public void setPoint(int point){
         this.point = point;
-        if(point > 0 ){
-            point_tv.setText(point + "");
-            point_tv.setVisibility(View.VISIBLE);
-        }else{
-            point_tv.setVisibility(View.GONE);
-        }
-
+        point_tv.setText(point + "");
+        point_tv.setVisibility(View.VISIBLE);
     }
     public int getPoint(){
         return point;
@@ -160,12 +179,24 @@ public class MainActivity extends AppCompatActivity {
         layoutParams.width = w;
         layoutParams.height = h / 2;
         linearLayout.setLayoutParams(layoutParams);
-
+        o = new OrderAdapter( getOrderItem(), MainActivity.this);
         car_iv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //初始化订单的数据，绑定数据源的信息。
-                o = new OrderAdapter( getOrderItem(), MainActivity.this);
+
+                o.notifyDataSetChanged();
+                Iterator<SparseArray<Object>> iterator = getOrderItem().iterator();
+
+                while (iterator.hasNext()){
+                    SparseArray<Object> sparseArray = iterator.next();
+                    if (sparseArray.get(2).toString().equals("0")){
+                        iterator.remove();
+                        break;
+                    }
+
+                }
+
                 order_lv = (ListView) findViewById(R.id.order_lv);
                 order_lv.setAdapter(o);
                 //监听orderItem的增加删除，设置总价以及总数量, flag ？+ ：-,price 单价 ,sum 当前item的个数。
@@ -256,12 +287,25 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
+                List<OrderC> orderC =  CDBHelper.getObjByClass(getApplicationContext(),OrderC.class);
+                for (OrderC orderC1 : orderC){
+                    Log.e("Aaaa","-------------");
+                    for (GoodsC goodsC : orderC1.getGoodsList()){
+                        Log.e("Aaaa",goodsC.getDishesName()+"");
+                    }
+
+                }
+
+
                 if (total > 0) {
 
-                    Intent intent = new Intent(MainActivity.this, PayActivity.class);
+                /*    Intent intent = new Intent(MainActivity.this, PayActivity.class);
                     intent.putExtra("Order", (Serializable) getOrderItem());
                     intent.putExtra("total", total);
-                    startActivityForResult(intent, 1);
+
+                    startActivityForResult(intent, 1);*/
+
+
 
                     //如果order列表开启状态就关闭
                     if (!flag) {

@@ -109,6 +109,13 @@ public class OrderC {
 	 */
 	private int orderType;
 
+	public int getOrderType() {
+		return orderType;
+	}
+
+	public void setOrderType(int orderType) {
+		this.orderType = orderType;
+	}
 
 	public OrderC()
 	{
