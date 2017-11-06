@@ -220,6 +220,7 @@ public class SeekT9Adapter extends BaseAdapter {
             }
         });
 
+
         viewHolder.viewJian.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
