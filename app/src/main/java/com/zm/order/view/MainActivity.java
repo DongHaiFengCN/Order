@@ -287,23 +287,20 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                List<OrderC> orderC =  CDBHelper.getObjByClass(getApplicationContext(),OrderC.class);
-                for (OrderC orderC1 : orderC){
-                    Log.e("Aaaa","-------------");
-                    for (GoodsC goodsC : orderC1.getGoodsList()){
-                        Log.e("Aaaa",goodsC.getDishesName()+"");
-                    }
-
-                }
-
+//                List<OrderC> orderC =  CDBHelper.getObjByClass(getApplicationContext(),OrderC.class);
+//                for (OrderC orderC1 : orderC){
+//                    Log.e("Aaaa","-------------");
+//                    for (GoodsC goodsC : orderC1.getGoodsList()){
+//                        Log.e("Aaaa",goodsC.getDishesName()+"");
+//                    }
+//
+//                }
+                Intent intent = new Intent(MainActivity.this, PayActivity.class);
+                startActivity(intent);
 
                 if (total > 0) {
 
-                /*    Intent intent = new Intent(MainActivity.this, PayActivity.class);
-                    intent.putExtra("Order", (Serializable) getOrderItem());
-                    intent.putExtra("total", total);
 
-                    startActivityForResult(intent, 1);*/
 
 
 
