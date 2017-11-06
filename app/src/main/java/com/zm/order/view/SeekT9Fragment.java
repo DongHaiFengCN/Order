@@ -99,7 +99,7 @@ public class SeekT9Fragment extends Fragment{
         point_tv = getActivity().findViewById(R.id.point);
         total_tv = getActivity().findViewById(R.id.total_tv);
         initView();
-
+        //1111
         return view;
 
     }
