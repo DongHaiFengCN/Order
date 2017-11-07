@@ -40,4 +40,7 @@ public interface IDBManager<T> {
 
     void setContext(Context context);
 
+    List<Document> getOrderListBelongToTable(String key,String values);
+
+    Document getTable(String values);
 }
