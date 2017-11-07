@@ -29,6 +29,7 @@ import com.journeyapps.barcodescanner.BarcodeEncoder;
 import com.zm.order.R;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import application.MyApplication;
@@ -83,6 +84,7 @@ public class PayActivity extends AppCompatActivity {
 
     private Intent stashItent;
 
+    private List<Document> orderList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,9 +112,15 @@ public class PayActivity extends AppCompatActivity {
         TableC tableC = myApplication.getTable_sel_obj();
 
         //获取当前餐桌所有订单的集合
-        List<Document> orderList = idbManager.getOrderListBelongToTable("tableNo", tableC.getTableNum());
 
-        for (Document order : orderList) {
+        orderList = idbManager.getOrderListBelongToTable("tableNo", tableC.getTableNum());
+
+        Iterator<Document> i = orderList.iterator();
+
+        while (i.hasNext()){
+
+            Document order = i.next();
+
             //刚下单没有买单的订单的总价
             if (order.getInt("orderState") == 1) {
 
@@ -120,9 +128,15 @@ public class PayActivity extends AppCompatActivity {
 
                 MyLog.e(order.getFloat("allPrice") + "");
 
+            }else {
+
+                //将结帐的订单从当前列表移除
+
+                i.remove();
             }
 
         }
+
 
 
         //创建打印dialog
