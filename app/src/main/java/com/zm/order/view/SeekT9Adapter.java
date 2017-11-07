@@ -162,11 +162,13 @@ public class SeekT9Adapter extends BaseAdapter {
                     }
                 }else {
                     mData.get(position).setCount(Integer.parseInt(viewHolder.viewShu.getText().toString()));
+
                     number = mData.get(position).getCount();
                     for (int i = 0; i< activity.getOrderItem().size();i++) {
                         if (activity.getOrderItem().get(i).get(0).toString().equals(mData.get(position).getDishesC().getDishesName())){
                             activity.getOrderItem().get(i).put(2, number++);
                             number = Integer.parseInt(activity.getOrderItem().get(i).get(2).toString());
+                            activity.getOrderItem().get(i).put(4,number*mData.get(position).getDishesC().getPrice());
                             total = activity.getTotal();
                             total += 1 * mData.get(position).getDishesC().getPrice();
                             activity.setTotal(total);

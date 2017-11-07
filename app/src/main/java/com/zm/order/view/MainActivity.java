@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //myApp = (MyApplication) getApplication();
+        myApp = (MyApplication) getApplication();
 
 
         initView();
@@ -292,43 +292,35 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-               /* List<OrderC> orderC =  CDBHelper.getObjByClass(getApplicationContext(),OrderC.class);
-                for (OrderC orderC1 : orderC){
-                    Log.e("Aaaa","-------------");
-                    for (GoodsC goodsC : orderC1.getGoodsList()){
-                        Log.e("Aaaa",goodsC.getDishesName()+"");
-                    }
 
-                }*/
+               OrderC orderC = new OrderC();
+               for (int i = 0 ; i< getOrderItem().size();i++){
 
-               for (int i = 0 ; i< orderItem.size();i++){
-                   OrderC orderC = new OrderC();
                    GoodsC goodsC = new GoodsC();
-                   goodsC.setDishesName(orderItem.get(i).get(0).toString());
+                   goodsC.setDishesName(getOrderItem().get(i).get(0).toString());
                    goodsC.setDishesTaste("默认");
-                   goodsC.setDishesCount((Integer) orderItem.get(i).get(2));
-                   goodsC.setAllPrice((Float) orderItem.get(i).get(4));
+                   goodsC.setDishesCount(Integer.parseInt(getOrderItem().get(i).get(2).toString()));
+                   Log.e("Aaaa",getOrderItem().get(i).get(4)+"");
+                   goodsC.setAllPrice((Float) getOrderItem().get(i).get(4));
+
                    goodsC.setChannelId("wangbo08");
                    goodsC.setClassName("GoodsC");
                    CDBHelper.createAndUpdate(getApplicationContext(),goodsC);
                    orderC.addGoods(goodsC);
-                   orderC.setAllPrice(total);
-                   orderC.setOrderState(1);
-                   orderC.setOrderType(1);
-                   orderC.setTableNo(myApp.getTable_sel_obj().getTableNum());
-                   orderC.setChannelId("wangbo08");
-                   orderC.setClassName("OrderC");
-                   CDBHelper.createAndUpdate(getApplicationContext(),orderC);
                }
+               orderC.setAllPrice(total);
+               orderC.setOrderState(1);
+               orderC.setOrderType(1);
+               orderC.setTableNo(myApp.getTable_sel_obj().getTableNum());
+               orderC.setChannelId("wangbo08");
+               orderC.setClassName("OrderC");
+               CDBHelper.createAndUpdate(getApplicationContext(),orderC);
 
 
                 Intent intent = new Intent(MainActivity.this, PayActivity.class);
                 startActivity(intent);
 
                 if (total > 0) {
-
-
-
 
 
                     //如果order列表开启状态就关闭

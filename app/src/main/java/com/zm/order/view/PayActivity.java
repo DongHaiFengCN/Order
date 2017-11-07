@@ -9,6 +9,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,9 +32,13 @@ import com.zm.order.R;
 import java.util.ArrayList;
 import java.util.List;
 
+import bean.Goods;
+import bean.kitchenmanage.order.GoodsC;
+import bean.kitchenmanage.order.OrderC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import model.CDBHelper;
 import model.DBFactory;
 import model.DatabaseSource;
 import model.IDBManager;
@@ -90,7 +95,13 @@ public class PayActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-
+       /* List<OrderC> orderC =  CDBHelper.getObjByClass(getApplicationContext(),OrderC.class);
+        for (OrderC orderC1 : orderC){
+            Log.e("Aaaa","-------------");
+            for (GoodsC goodsC : orderC1.getGoodsList()){
+                Log.e("Aaaa",goodsC.getDishesName()+"------"+ goodsC.getAllPrice());
+            }
+        }*/
         //取消分割阴影
         getSupportActionBar().setElevation(0);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

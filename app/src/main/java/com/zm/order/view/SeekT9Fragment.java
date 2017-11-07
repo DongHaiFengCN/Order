@@ -229,10 +229,13 @@ public class SeekT9Fragment extends Fragment{
         //mlistSearchDishesObj.clear();
         myGoodsList.clear();
 
-/*
-        List<Document> documentList=CDBHelper.getDocmentsByWhere((getActivity().getApplicationContext(), Expression.property("className").equalTo("DishesC")
+
+//        List<Document> documentList=CDBHelper.getDocmentsByWhere((getActivity().getApplicationContext(), Expression.property("className").equalTo("DishesC")
+//                .and(Expression.property("dishesNameCode9").like(search+"%")),null,DishesC.class);
+
+        List<DishesC> dishesCs=CDBHelper.getObjByWhere(getActivity().getApplicationContext(), Expression.property("className").equalTo("DishesC")
                 .and(Expression.property("dishesNameCode9").like(search+"%")),null,DishesC.class);
-        for(Document doc: documentList)
+        for(DishesC obj: dishesCs)
         {
             //mlistSearchDishesObj.add(obj);
             if(obj.getTasteIdList()!=null)
@@ -243,7 +246,7 @@ public class SeekT9Fragment extends Fragment{
             myGoodsList.add(goodsObj);
 
 
-        }*/
+        }
         seekT9Adapter.setmData(myGoodsList);
         seekT9Adapter.notifyDataSetChanged();
     }

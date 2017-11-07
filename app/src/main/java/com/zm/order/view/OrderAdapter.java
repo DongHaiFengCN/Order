@@ -2,6 +2,7 @@ package com.zm.order.view;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -81,6 +82,7 @@ public class OrderAdapter extends BaseAdapter {
             viewHold = new ViewHold();
             viewHold.name =view.findViewById(R.id.name);
             viewHold.taste =view.findViewById(R.id.taste);
+            viewHold.price = view.findViewById(R.id.price);
             viewHold.number =view.findViewById(R.id.amount_view);
             viewHold.number.getEtAmount().setEnabled(false);
             view.setTag(viewHold);
@@ -95,18 +97,20 @@ public class OrderAdapter extends BaseAdapter {
 
         viewHold.number.setNumber(orderItem.get(i).get(2).toString());
 
+       // viewHold.price.setText(orderItem.get(i).get(4).toString());
         //设置item的点击事件
         viewHold.number.setChangeListener(new AmountView.ChangeListener() {
             @Override
             public void OnChange(int ls,boolean flag) {
 
                 orderItem.get(i).put(2,ls);
-
+                orderItem.get(i).put(4,ls * (float)orderItem.get(i).get(3));
                 onchangeListener.onchangeListener(flag,(float)orderItem.get(i).get(3),ls);
                 context.getSeekT9Adapter().notifyDataSetChanged();
 
               if(ls == 0){
-
+                  orderItem.get(i).put(2,ls);
+                  context.getSeekT9Adapter().notifyDataSetChanged();
                   orderItem.remove(i);
                   notifyDataSetChanged();
 
@@ -126,6 +130,7 @@ public class OrderAdapter extends BaseAdapter {
 
         TextView taste;
 
+        TextView price;
 
 
         AmountView number;
