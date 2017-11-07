@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
 import com.zm.order.R;
 import com.zm.order.view.adapter.TestAdapte;
@@ -24,6 +26,7 @@ import com.zm.order.view.adapter.TestAdapte;
 import java.util.ArrayList;
 import java.util.List;
 
+import application.MyApplication;
 import bean.Goods;
 import bean.Order;
 import bean.kitchenmanage.dishes.DishesC;
@@ -185,24 +188,6 @@ public class SeekT9Fragment extends Fragment{
                 int sum = amountView.getAmount();
 
                 if (sum != 0) {//如果选择器的数量不为零，当前的选择的菜品加入订单列表
-
-                    OrderC orderC = new OrderC();
-                    GoodsC goodsC = new GoodsC();
-                    goodsC.setDishesName(name);
-                    goodsC.setDishesTaste(taste);
-                    goodsC.setDishesCount(sum);
-                    goodsC.setAllPrice(sum * price);
-                    goodsC.setChannelId("wangbo08");
-                    goodsC.setClassName("GoodsC");
-                    CDBHelper.createAndUpdate(getActivity().getApplicationContext(),goodsC);
-                    orderC.addGoods(goodsC);
-                    orderC.setAllPrice(total);
-                    orderC.setOrderState(1);
-                    orderC.setOrderType(1);
-                    orderC.setChannelId("wangbo08");
-                    orderC.setClassName("OrderC");
-                    CDBHelper.createAndUpdate(getActivity().getApplicationContext(),orderC);
-
                     final SparseArray<Object> s = new SparseArray<>();//查下这个怎么用
                     s.put(0, name);
                     s.put(1, taste);
@@ -244,19 +229,21 @@ public class SeekT9Fragment extends Fragment{
         //mlistSearchDishesObj.clear();
         myGoodsList.clear();
 
-
-        List<DishesC> documentList=CDBHelper.getObjByWhere(getActivity().getApplicationContext(), Expression.property("className").equalTo("DishesC")
+/*
+        List<Document> documentList=CDBHelper.getDocmentsByWhere((getActivity().getApplicationContext(), Expression.property("className").equalTo("DishesC")
                 .and(Expression.property("dishesNameCode9").like(search+"%")),null,DishesC.class);
-        for(DishesC obj: documentList)
+        for(Document doc: documentList)
         {
             //mlistSearchDishesObj.add(obj);
+            if(obj.getTasteIdList()!=null)
+            Log.e("T9Fragment","kouwei size="+obj.getTasteIdList().size());
             Goods goodsObj =new Goods();
             goodsObj.setCount(0);
             goodsObj.setDishesC(obj);
             myGoodsList.add(goodsObj);
 
 
-        }
+        }*/
         seekT9Adapter.setmData(myGoodsList);
         seekT9Adapter.notifyDataSetChanged();
     }

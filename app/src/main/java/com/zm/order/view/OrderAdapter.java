@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.zm.order.R;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -107,7 +108,6 @@ public class OrderAdapter extends BaseAdapter {
               if(ls == 0){
 
                   orderItem.remove(i);
-
                   notifyDataSetChanged();
 
               }

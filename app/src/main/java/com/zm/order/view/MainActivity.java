@@ -137,8 +137,13 @@ public class MainActivity extends AppCompatActivity {
     }
     public void setPoint(int point){
         this.point = point;
-        point_tv.setText(point + "");
-        point_tv.setVisibility(View.VISIBLE);
+        if (point > 0){
+            point_tv.setText(point + "");
+            point_tv.setVisibility(View.VISIBLE);
+        }else{
+            point_tv.setVisibility(View.GONE);
+        }
+
     }
     public int getPoint(){
         return point;
@@ -177,7 +182,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //初始化订单的数据，绑定数据源的信息。
-
                 o.notifyDataSetChanged();
                 Iterator<SparseArray<Object>> iterator = getOrderItem().iterator();
 
@@ -185,11 +189,19 @@ public class MainActivity extends AppCompatActivity {
                     SparseArray<Object> sparseArray = iterator.next();
                     if (sparseArray.get(2).toString().equals("0")){
                         iterator.remove();
+
                         break;
                     }
 
                 }
+                for (int i = 0;0<orderItem.size();i++){
+                    if (orderItem.get(i).get(2).toString().equals("0")){
+                        orderItem.remove(i);
+                    }
+                    break;
+                }
 
+                o.notifyDataSetChanged();
                 order_lv = (ListView) findViewById(R.id.order_lv);
                 order_lv.setAdapter(o);
                 //监听orderItem的增加删除，设置总价以及总数量, flag ？+ ：-,price 单价 ,sum 当前item的个数。
@@ -280,14 +292,36 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-//                List<OrderC> orderC =  CDBHelper.getObjByClass(getApplicationContext(),OrderC.class);
-//                for (OrderC orderC1 : orderC){
-//                    Log.e("Aaaa","-------------");
-//                    for (GoodsC goodsC : orderC1.getGoodsList()){
-//                        Log.e("Aaaa",goodsC.getDishesName()+"");
-//                    }
-//
-//                }
+               /* List<OrderC> orderC =  CDBHelper.getObjByClass(getApplicationContext(),OrderC.class);
+                for (OrderC orderC1 : orderC){
+                    Log.e("Aaaa","-------------");
+                    for (GoodsC goodsC : orderC1.getGoodsList()){
+                        Log.e("Aaaa",goodsC.getDishesName()+"");
+                    }
+
+                }*/
+
+               for (int i = 0 ; i< orderItem.size();i++){
+                   OrderC orderC = new OrderC();
+                   GoodsC goodsC = new GoodsC();
+                   goodsC.setDishesName(orderItem.get(i).get(0).toString());
+                   goodsC.setDishesTaste("默认");
+                   goodsC.setDishesCount((Integer) orderItem.get(i).get(2));
+                   goodsC.setAllPrice((Float) orderItem.get(i).get(4));
+                   goodsC.setChannelId("wangbo08");
+                   goodsC.setClassName("GoodsC");
+                   CDBHelper.createAndUpdate(getApplicationContext(),goodsC);
+                   orderC.addGoods(goodsC);
+                   orderC.setAllPrice(total);
+                   orderC.setOrderState(1);
+                   orderC.setOrderType(1);
+                   orderC.setTableNo(myApp.getTable_sel_obj().getTableNum());
+                   orderC.setChannelId("wangbo08");
+                   orderC.setClassName("OrderC");
+                   CDBHelper.createAndUpdate(getApplicationContext(),orderC);
+               }
+
+
                 Intent intent = new Intent(MainActivity.this, PayActivity.class);
                 startActivity(intent);
 

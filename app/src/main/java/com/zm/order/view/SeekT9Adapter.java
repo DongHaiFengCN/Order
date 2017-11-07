@@ -1,5 +1,6 @@
 package com.zm.order.view;
 
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import com.zm.order.R;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import bean.Goods;
@@ -31,7 +33,7 @@ public class SeekT9Adapter extends BaseAdapter {
     private MainActivity activity;
     private SeekT9OnClickListener listener;
     private int number=1;
-    private int point = 2;
+    private int point = 1;
     private float total;
     private List<SparseArray<Object>> list = new ArrayList<>();
     private SeekT9OrderItem orderItem;
@@ -50,9 +52,13 @@ public class SeekT9Adapter extends BaseAdapter {
     }
 
     public void setmData(List<Goods> mData) {
+
         this.mData = mData;
     }
 
+    public List<Goods> getmData(){
+        return mData;
+    }
     @Override
     public int getCount() {
         return mData == null ? 0 : mData.size();
@@ -97,10 +103,11 @@ public class SeekT9Adapter extends BaseAdapter {
         });
 
         activity.setT9Adapter(this);
-        if (activity.getOrderItem().size() != 0 || activity.getOrderItem() != null){
+        if (activity.getOrderItem().size() != 0 ){
             for (int i = 0 ;i< activity.getOrderItem().size() ;i++){
                 if (activity.getOrderItem().get(i).get(0).toString().equals(mData.get(position).getDishesC().getDishesName())) {
-                    viewHolder.viewShu.setText(activity.getOrderItem().get(i).get(2)+"");
+                    viewHolder.viewShu.setText(activity.getOrderItem().get(i).get(2).toString());
+                    mData.get(position).setCount(Integer.parseInt(viewHolder.viewShu.getText().toString()));
                     break;
                 }
             }
@@ -119,6 +126,14 @@ public class SeekT9Adapter extends BaseAdapter {
         viewHolder.viewTj.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+               if (mData.get(position).getDishesC().getTasteIdList() != null){
+                  Log.e("Aaaa", mData.get(position).getDishesC().getTasteIdList().size()+"");
+               }else{
+                   Log.e("Aaaa", "null");
+               }
+
+
                 mData.get(position).setCount(mData.get(position).getCount()+1);
                 notifyDataSetChanged();
                 if (!viewHolder.viewShu.getText().toString().equals("0")){
@@ -127,42 +142,27 @@ public class SeekT9Adapter extends BaseAdapter {
                 }
                 viewHolder.viewShu.setText(mData.get(position).getCount()+"");
 
-                if (activity.getOrderItem().size() == 0 || activity.getOrderItem() == null){
-                    if (number != -1) {//如果选择器的数量不为零，当前的选择的菜品加入订单列表
-                        OrderC orderC = new OrderC();
-                        GoodsC goodsC = new GoodsC();
-                        goodsC.setDishesName(mData.get(position).getDishesC().getDishesName());
-                        goodsC.setDishesTaste("默认");
-                        goodsC.setDishesCount(1);
-                        goodsC.setAllPrice(number * mData.get(position).getDishesC().getPrice());
-                        goodsC.setChannelId("wangbo08");
-                        goodsC.setClassName("GoodsC");
-                        CDBHelper.createAndUpdate(activity.getApplicationContext(),goodsC);
-                        orderC.addGoods(goodsC);
-                        orderC.setAllPrice(total);
-                        orderC.setOrderState(1);
-                        orderC.setOrderType(1);
-                        orderC.setChannelId("wangbo08");
-                        orderC.setClassName("OrderC");
-                        CDBHelper.createAndUpdate(activity.getApplicationContext(),orderC);
+                if (activity.getOrderItem().size() == 0){
+                    if (mData.get(position).getCount() != -1) {//如果选择器的数量不为零，当前的选择的菜品加入订单列表
 
                         s.put(0, mData.get(position).getDishesC().getDishesName());
                         s.put(1, "默认");
                         s.put(2, 1+"");
                         s.put(3, mData.get(position).getDishesC().getPrice());
-                        s.put(4, number * mData.get(position).getDishesC().getPrice());
+                        s.put(4, mData.get(position).getCount() * mData.get(position).getDishesC().getPrice());
                         activity.getOrderItem().add(s);
                         //购物车计数器数据更新
-                        number =  activity.getPoint();
-                        number++;
-                        activity.setPoint(number);
+                        point =  activity.getPoint();
+                        point++;
+                        activity.setPoint(point);
                         //计算总价
                         total = activity.getTotal();
                         total += 1 * mData.get(position).getDishesC().getPrice();
                         activity.setTotal(total);
                     }
                 }else {
-                    number = Integer.parseInt(viewHolder.viewShu.getText().toString());
+                    mData.get(position).setCount(Integer.parseInt(viewHolder.viewShu.getText().toString()));
+                    number = mData.get(position).getCount();
                     for (int i = 0; i< activity.getOrderItem().size();i++) {
                         if (activity.getOrderItem().get(i).get(0).toString().equals(mData.get(position).getDishesC().getDishesName())){
                             activity.getOrderItem().get(i).put(2, number++);
@@ -171,6 +171,13 @@ public class SeekT9Adapter extends BaseAdapter {
                             total += 1 * mData.get(position).getDishesC().getPrice();
                             activity.setTotal(total);
                             isName = true;
+                            //购物车计数器数据更新
+                            point =  activity.getPoint();
+                            if (point==0){
+                                point++;
+                                activity.setPoint(point);
+                            }
+
                             break;
                         }else{
                             isName = false;
@@ -178,24 +185,9 @@ public class SeekT9Adapter extends BaseAdapter {
                     }
 
                     if (isName == false){
+                        number = mData.get(position).getCount();
                         if (number != -1) {//如果选择器的数量不为零，当前的选择的菜品加入订单列表
 
-                            OrderC orderC = new OrderC();
-                            GoodsC goodsC = new GoodsC();
-                            goodsC.setDishesName(mData.get(position).getDishesC().getDishesName());
-                            goodsC.setDishesTaste("默认");
-                            goodsC.setDishesCount(1);
-                            goodsC.setAllPrice(number * mData.get(position).getDishesC().getPrice());
-                            goodsC.setChannelId("wangbo08");
-                            goodsC.setClassName("GoodsC");
-                            CDBHelper.createAndUpdate(activity.getApplicationContext(),goodsC);
-                            orderC.addGoods(goodsC);
-                            orderC.setAllPrice(total);
-                            orderC.setOrderState(1);
-                            orderC.setOrderType(1);
-                            orderC.setChannelId("wangbo08");
-                            orderC.setClassName("OrderC");
-                            CDBHelper.createAndUpdate(activity.getApplicationContext(),orderC);
 
                             s.put(0, mData.get(position).getDishesC().getDishesName());
                             s.put(1, "默认");
@@ -204,9 +196,9 @@ public class SeekT9Adapter extends BaseAdapter {
                             s.put(4, number * mData.get(position).getDishesC().getPrice());
                             activity.getOrderItem().add(s);
                             //购物车计数器数据更新
-                            number =  activity.getPoint();
-                            number++;
-                            activity.setPoint(number);
+                            point =  activity.getPoint();
+                            point++;
+                            activity.setPoint(point);
                             //计算总价
                             total = activity.getTotal();
                             total += 1 * mData.get(position).getDishesC().getPrice();;
@@ -219,21 +211,34 @@ public class SeekT9Adapter extends BaseAdapter {
 
             }
         });
-
+        /*OrderC orderC = new OrderC();
+        GoodsC goodsC = new GoodsC();
+        goodsC.setDishesName(mData.get(position).getDishesC().getDishesName());
+        goodsC.setDishesTaste("默认");
+        goodsC.setDishesCount(1);
+        goodsC.setAllPrice(number * mData.get(position).getDishesC().getPrice());
+        goodsC.setChannelId("wangbo08");
+        goodsC.setClassName("GoodsC");
+        CDBHelper.createAndUpdate(activity.getApplicationContext(),goodsC);
+        orderC.addGoods(goodsC);
+        orderC.setAllPrice(total);
+        orderC.setOrderState(1);
+        orderC.setOrderType(1);
+        orderC.setChannelId("wangbo08");
+        orderC.setClassName("OrderC");
+        CDBHelper.createAndUpdate(activity.getApplicationContext(),orderC);
+*/
 
         viewHolder.viewJian.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if (mData.get(position).getCount() > 0){
-                    mData.get(position).setCount(mData.get(position).getCount()-1);
-
-                }else{
+                mData.get(position).setCount(mData.get(position).getCount()-1);
+                if (mData.get(position).getCount() <= 0){
                     viewHolder.viewShu.setVisibility(View.GONE);
                     viewHolder.viewJian.setVisibility(View.GONE);
                 }
                 viewHolder.viewShu.setText(mData.get(position).getCount()+"");
-                if (activity.getOrderItem().size() != 0 && activity.getOrderItem() != null){
+                if (activity.getOrderItem().size() != 0 ){
                     for (int i = 0 ;i< activity.getOrderItem().size() ;i++){
                         if (activity.getOrderItem().get(i).get(0).toString().equals(mData.get(position).getDishesC().getDishesName())) {
                             number = Integer.parseInt(activity.getOrderItem().get(i).get(2).toString());
@@ -242,29 +247,11 @@ public class SeekT9Adapter extends BaseAdapter {
                     }
                 }
 
-                if (activity.getOrderItem().size() != 0 && activity.getOrderItem() != null){
-                    for (int i = 0 ;i< activity.getOrderItem().size() ;i++){
-                        if (activity.getOrderItem().get(i).get(0).toString().equals(mData.get(position).getDishesC().getDishesName())) {
-                            number = Integer.parseInt(activity.getOrderItem().get(i).get(2).toString());
-                            break;
-                        }
-                    }
-                }
-
-                if (Integer.parseInt(viewHolder.viewShu.getText().toString()) <= 1){
-                    viewHolder.viewShu.setVisibility(View.GONE);
-                    viewHolder.viewJian.setVisibility(View.GONE);
-                }else {
-                    viewHolder.viewShu.setVisibility(View.VISIBLE);
-                    viewHolder.viewJian.setVisibility(View.VISIBLE);
-                }
-                if (Integer.parseInt(viewHolder.viewShu.getText().toString()) > 0){
-                    viewHolder.viewShu.setText(number-1+"");
-                }
                 number = Integer.parseInt(viewHolder.viewShu.getText().toString());
-                if (activity.getOrderItem().size() != 0 && activity.getOrderItem() != null){
+                if (activity.getOrderItem().size() != 0 ){
                     for (int i = 0 ;i< activity.getOrderItem().size() ;i++){
                         if (activity.getOrderItem().get(i).get(0).toString().equals(mData.get(position).getDishesC().getDishesName())) {
+
                             activity.getOrderItem().get(i).put(2, number);
                             number = Integer.parseInt(activity.getOrderItem().get(i).get(2).toString());
                             activity.getOrderItem().get(i).put(4, number * mData.get(position).getDishesC().getPrice());
@@ -274,11 +261,14 @@ public class SeekT9Adapter extends BaseAdapter {
                             point = activity.getPoint();
                             if (number == 0){
                                 point--;
+                                number = 1;
                             }
                             activity.setPoint(point);
+                            notifyDataSetChanged();
                             break;
                         }
                     }
+
                 }
 
             }

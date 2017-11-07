@@ -154,6 +154,7 @@ public class DishesC implements Serializable {
 	public void setTasteIdList(List<String> tasteIdList) {
 		this.tasteList = tasteIdList;
 	}
+
 	public void addTastId(String id)
 	{
 		if(this.tasteList==null)
