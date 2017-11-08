@@ -109,7 +109,7 @@ public class OrderAdapter extends BaseAdapter {
                 context.getSeekT9Adapter().notifyDataSetChanged();
 
               if(ls == 0){
-                  orderItem.get(i).put(2,ls);
+                  orderItem.get(i).put(2,0);
                   context.getSeekT9Adapter().notifyDataSetChanged();
                   orderItem.remove(i);
                   notifyDataSetChanged();

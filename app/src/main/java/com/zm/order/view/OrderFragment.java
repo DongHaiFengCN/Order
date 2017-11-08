@@ -102,7 +102,7 @@ public class OrderFragment extends Fragment implements IMainView {
     public void initView() {
 
 
-        final GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);//设置每行展示3个
+       // final GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);//设置每行展示3个
         //dishesAdapter = new DishesAdapter(getActivity());
 
         dishesKindName = new ArrayList<>();
@@ -212,6 +212,9 @@ public class OrderFragment extends Fragment implements IMainView {
 
         final AmountView amountView = view.findViewById(R.id.amount_view);
 
+        price_tv.setText("总计 " +amountView.getAmount()*price+" 元");
+        amountView.getAmount();
+        l[0] = amountView.getAmount()*price;
         //增删选择器的数据改变的监听方法
 
         amountView.setChangeListener(new AmountView.ChangeListener() {
@@ -258,27 +261,23 @@ public class OrderFragment extends Fragment implements IMainView {
                 int sum = amountView.getAmount();
 
                 if (sum != 0) {//如果选择器的数量不为零，当前的选择的菜品加入订单列表
-
-                    SparseArray<Object> s = new SparseArray<>();
+                    final SparseArray<Object> s = new SparseArray<>();//查下这个怎么用
                     s.put(0, name);
                     s.put(1, taste);
                     s.put(2, sum + "");
                     s.put(3, price);
                     s.put(4, sum * price);
-                    orderItem.add(s);
-                    ((MainActivity)getActivity()).getOrderItem().add(s);
+                    ((MainActivity) getActivity()).getOrderItem().add(s);
                     //购物车计数器数据更新
                     point =  (((MainActivity) getActivity()).getPoint());
                     point++;
                     ((MainActivity) getActivity()).setPoint(point);
-                    point_tv.setText(point + "");
-                    point_tv.setVisibility(View.VISIBLE);
 
                     //计算总价
                     total = ((MainActivity) getActivity()).getTotal();
                     total += l[0];
                     ((MainActivity) getActivity()).setTotal(total);
-                    total_tv.setText(total + "元");
+
                     //刷新订单数据源
                     //o.notifyDataSetChanged();
 

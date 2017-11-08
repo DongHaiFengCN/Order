@@ -3,6 +3,7 @@ package com.zm.order.view;
 import android.app.Fragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -83,14 +84,11 @@ public class SeekT9Fragment extends Fragment{
     public int point = 1;
     private List<DishesC> mlistSearchDishesObj;
     private List<Goods> myGoodsList;
-    private TestAdapte testAdapte;
     private SeekT9Adapter seekT9Adapter ;
-    private TextView total_tv;
-    private TextView point_tv;
     View view;
-    private boolean isName = false;
     private MainActivity mainActivity ;
-    private List<String> strings;
+    private Handler mHandler = null;
+
 
     @Nullable
     @Override
@@ -98,10 +96,9 @@ public class SeekT9Fragment extends Fragment{
         View view = inflater.inflate(R.layout.activity_seek, container, false);
 
         unbinder = ButterKnife.bind(this, view);
-        point_tv = getActivity().findViewById(R.id.point);
-        total_tv = getActivity().findViewById(R.id.total_tv);
+       /* point_tv = getActivity().findViewById(R.id.point);
+        total_tv = getActivity().findViewById(R.id.total_tv);*/
         initView();
-        //1111
         return view;
 
     }
@@ -139,9 +136,10 @@ public class SeekT9Fragment extends Fragment{
 
         final TextView price_tv = view.findViewById(R.id.price);
 
-        final AmountView amountView = view.findViewById(R.id.amount_view);
-        amountView.getAmount();
 
+        final AmountView amountView = view.findViewById(R.id.amount_view);
+        price_tv.setText("总计 " +amountView.getAmount()*price+" 元");
+        l[0] = amountView.getAmount()*price;
         //增删选择器的数据改变的监听方法
 
         amountView.setChangeListener(new AmountView.ChangeListener() {
@@ -225,30 +223,36 @@ public class SeekT9Fragment extends Fragment{
     }
 
     // 查询方法
-    public void search(String search) {
-        //mlistSearchDishesObj.clear();
-        myGoodsList.clear();
+    public void search(final String search) {
+        mHandler = new Handler();
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
 
-
+                myGoodsList.clear();
 //        List<Document> documentList=CDBHelper.getDocmentsByWhere((getActivity().getApplicationContext(), Expression.property("className").equalTo("DishesC")
 //                .and(Expression.property("dishesNameCode9").like(search+"%")),null,DishesC.class);
 
-        List<DishesC> dishesCs=CDBHelper.getObjByWhere(getActivity().getApplicationContext(), Expression.property("className").equalTo("DishesC")
-                .and(Expression.property("dishesNameCode9").like(search+"%")),null,DishesC.class);
-        for(DishesC obj: dishesCs)
-        {
-            //mlistSearchDishesObj.add(obj);
-            if(obj.getTasteIdList()!=null)
-            Log.e("T9Fragment","kouwei size="+obj.getTasteIdList().size());
-            Goods goodsObj =new Goods();
-            goodsObj.setCount(0);
-            goodsObj.setDishesC(obj);
-            myGoodsList.add(goodsObj);
+                List<DishesC> dishesCs=CDBHelper.getObjByWhere(getActivity().getApplicationContext(), Expression.property("className").equalTo("DishesC")
+                        .and(Expression.property("dishesNameCode9").like(search+"%")),null,DishesC.class);
+                for(DishesC obj: dishesCs)
+                {
+                    //mlistSearchDishesObj.add(obj);
+                    if(obj.getTasteIdList()!=null)
+                        Log.e("T9Fragment","kouwei size="+obj.getTasteIdList().size());
+                    Goods goodsObj =new Goods();
+                    goodsObj.setCount(0);
+                    goodsObj.setDishesC(obj);
+                    myGoodsList.add(goodsObj);
 
 
-        }
-        seekT9Adapter.setmData(myGoodsList);
-        seekT9Adapter.notifyDataSetChanged();
+                }
+                seekT9Adapter.setmData(myGoodsList);
+                seekT9Adapter.notifyDataSetChanged();
+            }
+        });
+
+
     }
 
         @Override
