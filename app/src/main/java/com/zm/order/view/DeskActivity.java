@@ -82,13 +82,14 @@ public class DeskActivity extends AppCompatActivity {
     }
     private void initWidget()
     {
-
         db = myapp.getDatabase();
         if(db == null) throw new IllegalArgumentException();
         areaAdapter = new AreaAdapter(this, db);
+
         listViewArea = (ListView)findViewById(R.id.lv_area);
         listViewArea.setAdapter(areaAdapter);
-        listViewArea.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listViewArea.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
             {
@@ -105,6 +106,7 @@ public class DeskActivity extends AppCompatActivity {
         areaAdapter.setSelectItem(0);
         showDeskListView(areaAdapter.getItem(0));
     }
+
     private void showDeskListView(String areaId)
     {
         long starttime = System.currentTimeMillis();
