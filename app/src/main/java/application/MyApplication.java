@@ -47,17 +47,18 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
  * 修改备注：
  */
 
-public class MyApplication extends MobApplication implements ISharedPreferences, ReplicatorChangeListener {
+public class MyApplication extends Application implements ISharedPreferences, ReplicatorChangeListener {
 
     private static final String TAG = Application.class.getSimpleName();
 
     private final static boolean SYNC_ENABLED = true;
-    private final static String DATABASE_NAME = "kitchendb118";
+    private final static String DATABASE_NAME = "KitchenDB";
+    private String Company_ID="zmsy";
+
     private final static String SYNCGATEWAY_URL = "blip://123.207.174.171:4984/kitchen/";
     private Database database = null;
     private Replicator replicator;
-    //private String Company_ID="zmsy010";
-    private String Company_ID="wangbo08";
+
     private TableC table_sel_obj;
 
     public ExecutorService mExecutor;
