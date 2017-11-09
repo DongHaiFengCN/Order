@@ -121,6 +121,8 @@ public class OrderFragment extends Fragment implements IMainView {
                     DishesIdList.clear();
                 leftAdapter.changeSelected(position);
 
+
+
                 /*准确定位到指定位置，并且将指定位置的item置顶，
                     若直接调用scrollToPosition(...)方法，则不会置顶。*/
                 //manager.scrollToPositionWithOffset(position, 0);
@@ -158,8 +160,8 @@ public class OrderFragment extends Fragment implements IMainView {
                 dishesRv.setAdapter(orderDragAdapter);
                 orderDragAdapter.setOnItemClickListener(new OrderDragAdapter.OnItemClickListener() {
                     @Override
-                    public void onItemClick(String name, float price) {
-                        showDialog(name,price);
+                    public void onItemClick(String name, float price,int position) {
+                        showDialog(name,price,position);
                     }
                 });
                /* dishesAdapter.setOnItemClickListener(new DishesAdapter.OnItemClickListener() {
@@ -200,7 +202,7 @@ public class OrderFragment extends Fragment implements IMainView {
      * @param name  传入的菜品的名称
      * @param price 传入的菜品的价格
      */
-    private void showDialog(final String name, final float price) {
+    private void showDialog(final String name, final float price,int position) {
 
         final float[] l = {0.0f};
         getDishesIdList = new ArrayList<>();
@@ -227,24 +229,21 @@ public class OrderFragment extends Fragment implements IMainView {
 
             }
         });
-        for (int i = 0;i < dishesIdList.size();i++){//dishesIdList.size() size 2
 
-            Document document = CDBHelper.getDocByID(getActivity().getApplicationContext(), dishesIdList.get(i).toString());
-            if (document.getArray("tasteList") != null){
-                getDishesIdList = document.getArray("tasteList").toList();
-            }
-
+        Document document = CDBHelper.getDocByID(getActivity().getApplicationContext(), dishesIdList.get(position).toString());
+        if (document.getArray("tasteList") != null){
+            getDishesIdList = document.getArray("tasteList").toList();
+        }else{
+            getDishesIdList = null;
         }
+
         if (getDishesIdList != null) {
-            for (int i = 0; i < getDishesIdList.size(); i++) {
-                Document document = CDBHelper.getDocByID(getActivity().getApplicationContext(), getDishesIdList.get(i).toString());
-                tasteList.add(document.getString("tasteName"));
+            for (int a = 0; a < getDishesIdList.size(); a++) {
+                Document document1 = CDBHelper.getDocByID(getActivity().getApplicationContext(), getDishesIdList.get(a).toString());
+                tasteList.add(document1.getString("tasteName"));
             }
 
-        } else {
-
         }
-
         final GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);//设置每行展示3个
         RecyclerView recyclerView = view.findViewById(R.id.view_dialog_recycler);
         recyclerView.setLayoutManager(manager);
