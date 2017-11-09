@@ -8,6 +8,8 @@ import android.os.Handler;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseArray;
@@ -26,6 +28,7 @@ import android.widget.Toast;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
 import com.zm.order.R;
+import com.zm.order.view.adapter.MyGridAdapter;
 import com.zm.order.view.adapter.SeekT9DialogAdapter;
 
 import java.util.ArrayList;
@@ -81,7 +84,7 @@ public class SeekT9Fragment extends Fragment {
 
     private String taste = "默认";
     private float total = 0.0f;
-    public int point = 1;
+    public int point = 1,pos;
     private List<DishesC> mlistSearchDishesObj;
     private List<Goods> myGoodsList;
     private List<String> tasteList;
@@ -163,33 +166,19 @@ public class SeekT9Fragment extends Fragment {
                     tasteList.add(document.getString("tasteName"));
                 }
 
-            } else {
-
             }
         }
-
+        final GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);//设置每行展示3个
         RecyclerView recyclerView = view.findViewById(R.id.view_dialog_recycler);
-
-        RadioGroup group = view.findViewById(R.id.radioGroup);
-        MyGridAdapter myGridAdapter = new MyGridAdapter();
-        recyclerView.setAdapter(myGridAdapter);
-        //选择口味
-        group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        recyclerView.setLayoutManager(manager);
+        MyGridAdapter myGridAdapter = new MyGridAdapter(getActivity(),tasteList);
+        myGridAdapter.setmOnItemOlickListener(new MyGridAdapter.OnItemOlickListener() {
             @Override
-            public void onCheckedChanged(RadioGroup radioGroup, @IdRes int i) {
-
-                if (i == R.id.Spicy) {
-
-                    taste = "微辣";
-
-                } else if (i == R.id.hot) {
-
-                    taste = "辣";
-
-                }
+            public void onItemClick(int position) {
+                pos = position;
             }
         });
-
+        recyclerView.setAdapter(myGridAdapter);
         AlertDialog.Builder builder = new AlertDialog
                 .Builder(getActivity());
         builder.setTitle(name);
@@ -204,7 +193,11 @@ public class SeekT9Fragment extends Fragment {
                 if (sum != 0) {//如果选择器的数量不为零，当前的选择的菜品加入订单列表
                     final SparseArray<Object> s = new SparseArray<>();//查下这个怎么用
                     s.put(0, name);
-                    s.put(1, taste);
+                    if (tasteList.size() == 0){
+                        s.put(1, null);
+                    }else{
+                        s.put(1, tasteList.get(pos));
+                    }
                     s.put(2, sum + "");
                     s.put(3, price);
                     s.put(4, sum * price);
@@ -220,7 +213,7 @@ public class SeekT9Fragment extends Fragment {
                     ((MainActivity) getActivity()).setTotal(total);
 
                     //刷新订单数据源
-                    //o.notifyDataSetChanged();
+                    ((MainActivity) getActivity()).getSeekT9Adapter().notifyDataSetChanged();
 
                 } else {
 
@@ -367,71 +360,4 @@ public class SeekT9Fragment extends Fragment {
         }
     }
 
-    static class MyGridAdapter extends RecyclerView.Adapter {
-
-
-        private int index = -1;
-        private Activity activity;
-        private List<String> tasteList;
-
-        private OnItemOlickListener mOnItemOlickListener = null;
-
-
-        public interface OnItemOlickListener {
-
-            void onItemClick(int position);
-        }
-
-        public void setmOnItemOlickListener(OnItemOlickListener listener) {
-            this.mOnItemOlickListener = listener;
-        }
-        @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            HolderView holderView;
-            View convertView = LayoutInflater.from(activity).inflate(R.layout.item_dialog_girdview, null);
-            holderView = new HolderView(convertView);
-            return holderView;
-        }
-
-        @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
-            final HolderView holderView = (HolderView) holder;
-            holderView.itemRcTv.setText(tasteList.get(position));
-            holderView.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    index = holderView.getLayoutPosition();
-                    notifyDataSetChanged();
-                    holderView.itemView.setTag(position);
-                    if (mOnItemOlickListener != null) {
-                        mOnItemOlickListener.onItemClick((int) v.getTag());
-                    }
-                }
-            });
-            if (position == index) {
-                holderView.itemRcCk.setChecked(true);
-            } else {
-                holderView.itemRcCk.setChecked(false);
-            }
-        }
-
-
-        @Override
-        public int getItemCount() {
-            return tasteList == null ? 0 : tasteList.size();
-        }
-
-        class HolderView extends RecyclerView.ViewHolder {
-
-            @BindView(R.id.item_rc_tv)
-            TextView itemRcTv;
-            @BindView(R.id.item_rc_ck)
-            CheckBox itemRcCk;
-            public HolderView(View itemView) {
-                super(itemView);
-                ButterKnife.bind(this,itemView);
-            }
-        }
-    }
 }

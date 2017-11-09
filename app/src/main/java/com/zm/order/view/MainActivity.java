@@ -298,7 +298,11 @@ public class MainActivity extends AppCompatActivity {
 
                    GoodsC goodsC = new GoodsC();
                    goodsC.setDishesName(getOrderItem().get(i).get(0).toString());
-                   goodsC.setDishesTaste(getOrderItem().get(i).get(1).toString());
+                   if (getOrderItem().get(i).get(1) == null){
+                       goodsC.setDishesTaste(null);
+                   }else {
+                       goodsC.setDishesTaste(getOrderItem().get(i).get(1).toString());
+                   }
                    goodsC.setDishesCount(Integer.parseInt(getOrderItem().get(i).get(2).toString()));
                    Log.e("Aaaa",getOrderItem().get(i).get(1)+"");
                    goodsC.setAllPrice((Float) getOrderItem().get(i).get(4));
