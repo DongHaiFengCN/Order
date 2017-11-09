@@ -1,22 +1,29 @@
 package com.zm.order.view;
 
+import android.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.couchbase.lite.Document;
 import com.zm.order.R;
+import com.zm.order.view.adapter.SeekT9DialogAdapter;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import bean.Goods;
+import bean.kitchenmanage.dishes.DishesTasteC;
 import bean.kitchenmanage.order.GoodsC;
 import bean.kitchenmanage.order.OrderC;
 import butterknife.BindView;
@@ -35,9 +42,12 @@ public class SeekT9Adapter extends BaseAdapter {
     private int number=1;
     private int point = 1;
     private float total;
+    private String taste ;
+    private List<String> tasteList;
     private List<SparseArray<Object>> list = new ArrayList<>();
     private SeekT9OrderItem orderItem;
-    private boolean isName = false;
+    private boolean isName = false,isTaste = false;
+    int pos ;
 
     public SeekT9Adapter(MainActivity context) {
         this.activity = context;
@@ -134,88 +144,20 @@ public class SeekT9Adapter extends BaseAdapter {
         viewHolder.viewTj.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                tasteList = new ArrayList<String>();
+                if (mData.get(position).getDishesC().getTasteList() != null){
+                    for (int i = 0; i <  mData.get(position).getDishesC().getTasteList().size(); i++){
+                        Document document = CDBHelper.getDocByID(activity.getApplicationContext(),mData.get(position).getDishesC().getTasteList().get(i).toString());
+                        tasteList.add(document.getString("tasteName"));
+                    }
 
+                    dialog(tasteList,position,s,viewHolder);
 
-                mData.get(position).setCount(mData.get(position).getCount()+1);
-
-                viewHolder.viewShu.setText(mData.get(position).getCount()+"");
-                if (!viewHolder.viewShu.getText().toString().equals("0")){
-                    viewHolder.viewShu.setVisibility(View.VISIBLE);
-                    viewHolder.viewJian.setVisibility(View.VISIBLE);
+                }else{
+                    setTJ(position,s,viewHolder);
                 }
-                if (activity.getOrderItem().size() == 0 ){
-
-                    if (mData.get(position).getCount() > 0) {//如果选择器的数量不为零，当前的选择的菜品加入订单列表
-
-                        s.put(0, mData.get(position).getDishesC().getDishesName());
-                        s.put(1, "默认");
-                        s.put(2, 1+"");
-                        s.put(3, mData.get(position).getDishesC().getPrice());
-                        s.put(4, mData.get(position).getCount() * mData.get(position).getDishesC().getPrice());
-                        activity.getOrderItem().add(s);
-                        //购物车计数器数据更新
-                        point =  activity.getPoint();
-                        point++;
-                        activity.setPoint(point);
-                        //计算总价
-                        total = activity.getTotal();
-                        total += 1 * mData.get(position).getDishesC().getPrice();
-                        activity.setTotal(total);
-
-                    }
-
-                }else {
-
-                    mData.get(position).setCount(Integer.parseInt(viewHolder.viewShu.getText().toString()));
-
-                    number = mData.get(position).getCount();
-
-                    for (int i = 0; i< activity.getOrderItem().size();i++) {
-                        if (activity.getOrderItem().get(i).get(0).toString().equals(mData.get(position).getDishesC().getDishesName())){
-                            activity.getOrderItem().get(i).put(2, number++);
-                            number = Integer.parseInt(activity.getOrderItem().get(i).get(2).toString());
-                            activity.getOrderItem().get(i).put(4,number*mData.get(position).getDishesC().getPrice());
-                            total = activity.getTotal();
-                            total += 1 * mData.get(position).getDishesC().getPrice();
-                            activity.setTotal(total);
-                            isName = true;
-                            //购物车计数器数据更新
-                            point =  activity.getPoint();
-                            if (point==0){
-                                point++;
-                                activity.setPoint(point);
-                            }
-                            break;
-                        }else{
-                            isName = false;
-                        }
-                    }
-
-                    if (isName == false){
-
-                        number = mData.get(position).getCount();
-
-                        if (number != -1) {//如果选择器的数量不为零，当前的选择的菜品加入订单列表
-
-                            s.put(0, mData.get(position).getDishesC().getDishesName());
-                            s.put(1, "默认");
-                            s.put(2, 1+"");
-                            s.put(3, mData.get(position).getDishesC().getPrice());
-                            s.put(4, number * mData.get(position).getDishesC().getPrice());
-                            activity.getOrderItem().add(s);
-                            //购物车计数器数据更新
-                            point =  activity.getPoint();
-                            point++;
-                            activity.setPoint(point);
-                            //计算总价
-                            total = activity.getTotal();
-                            total += 1 * mData.get(position).getDishesC().getPrice();;
-                            activity.setTotal(total);
-                        }
 
 
-                    }
-                }
 
 
 
@@ -271,6 +213,140 @@ public class SeekT9Adapter extends BaseAdapter {
         });
 
         return convertView;
+    }
+
+
+
+    private void setTJ(int position , SparseArray<Object> s,ViewHolder viewHolder){
+        mData.get(position).setCount(mData.get(position).getCount()+1);
+
+        viewHolder.viewShu.setText(mData.get(position).getCount()+"");
+        if (!viewHolder.viewShu.getText().toString().equals("0")){
+            viewHolder.viewShu.setVisibility(View.VISIBLE);
+            viewHolder.viewJian.setVisibility(View.VISIBLE);
+        }
+        if (activity.getOrderItem().size() == 0 ){
+
+            if (mData.get(position).getCount() > 0) {//如果选择器的数量不为零，当前的选择的菜品加入订单列表
+
+                s.put(0, mData.get(position).getDishesC().getDishesName());
+                s.put(1, taste);
+                s.put(2, 1+"");
+                s.put(3, mData.get(position).getDishesC().getPrice());
+                s.put(4, mData.get(position).getCount() * mData.get(position).getDishesC().getPrice());
+                activity.getOrderItem().add(s);
+                Log.e("Aaaaa",taste);
+                //购物车计数器数据更新
+                point =  activity.getPoint();
+                point++;
+                activity.setPoint(point);
+                //计算总价
+                total = activity.getTotal();
+                total += 1 * mData.get(position).getDishesC().getPrice();
+                activity.setTotal(total);
+
+            }
+
+        }else {
+
+            mData.get(position).setCount(Integer.parseInt(viewHolder.viewShu.getText().toString()));
+
+            number = mData.get(position).getCount();
+
+            for (int i = 0; i< activity.getOrderItem().size();i++) {
+                if (activity.getOrderItem().get(i).get(0).toString().equals(mData.get(position).getDishesC().getDishesName())){
+                    activity.getOrderItem().get(i).put(2, number++);
+                    number = Integer.parseInt(activity.getOrderItem().get(i).get(2).toString());
+                    activity.getOrderItem().get(i).put(4,number*mData.get(position).getDishesC().getPrice());
+                    total = activity.getTotal();
+                    total += 1 * mData.get(position).getDishesC().getPrice();
+                    activity.setTotal(total);
+                    isName = true;
+                    //购物车计数器数据更新
+                    point =  activity.getPoint();
+                    if (point==0){
+                        point++;
+                        activity.setPoint(point);
+                    }
+                    break;
+                }else{
+                    isName = false;
+                }
+            }
+
+            if (isName == false){
+
+                number = mData.get(position).getCount();
+
+                if (number != -1) {//如果选择器的数量不为零，当前的选择的菜品加入订单列表
+
+                    s.put(0, mData.get(position).getDishesC().getDishesName());
+                    s.put(1, taste);
+                    s.put(2, 1+"");
+                    s.put(3, mData.get(position).getDishesC().getPrice());
+                    s.put(4, number * mData.get(position).getDishesC().getPrice());
+                    activity.getOrderItem().add(s);
+                    //购物车计数器数据更新
+                    point =  activity.getPoint();
+                    point++;
+                    activity.setPoint(point);
+                    //计算总价
+                    total = activity.getTotal();
+                    total += 1 * mData.get(position).getDishesC().getPrice();;
+                    activity.setTotal(total);
+                }
+
+
+            }
+        }
+    }
+
+    //自定义弹窗
+    public void dialog(final List<String> mData, final int position , final SparseArray<Object> s, final ViewHolder viewHolder) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        View view = View
+                .inflate(activity, R.layout.view_t9_dialog, null);//设置弹窗布局
+        builder.setView(view);
+        builder.setCancelable(true);
+        RecyclerView rlv_caipin = view.findViewById(R.id.rlv_caipin);
+        rlv_caipin.setLayoutManager(new LinearLayoutManager(activity));
+        SeekT9DialogAdapter seekT9DialogAdapter = new SeekT9DialogAdapter(activity,mData);
+
+        seekT9DialogAdapter.setmOnItemOlickListener(new SeekT9DialogAdapter.OnItemOlickListener() {
+            @Override
+            public void onItemClick(int position) {
+                pos = position;
+            }
+        });
+        rlv_caipin.setAdapter(seekT9DialogAdapter);
+        //取消或确定按钮监听事件处理
+        final AlertDialog dialog = builder.create();
+        Button btn_cancel = view
+                .findViewById(R.id.view_caipin_but);//取消按钮
+        btn_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+
+            }
+        });
+
+
+        Button btn_comfirm = view
+                .findViewById(R.id.view_caipin_but_ok);//确定按钮
+
+        btn_comfirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                taste = mData.get(pos);
+                isTaste = true;
+                dialog.dismiss();
+                setTJ(position,s,viewHolder);
+            }
+        });
+        dialog.show();
     }
 
     interface SeekT9OnClickListener {

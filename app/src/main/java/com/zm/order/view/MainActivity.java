@@ -298,11 +298,11 @@ public class MainActivity extends AppCompatActivity {
 
                    GoodsC goodsC = new GoodsC();
                    goodsC.setDishesName(getOrderItem().get(i).get(0).toString());
-                   goodsC.setDishesTaste("默认");
+                   goodsC.setDishesTaste(getOrderItem().get(i).get(1).toString());
                    goodsC.setDishesCount(Integer.parseInt(getOrderItem().get(i).get(2).toString()));
-                   Log.e("Aaaa",getOrderItem().get(i).get(4)+"");
+                   Log.e("Aaaa",getOrderItem().get(i).get(1)+"");
                    goodsC.setAllPrice((Float) getOrderItem().get(i).get(4));
-                   goodsC.setChannelId("wangbo08");
+                   goodsC.setChannelId(myApp.getCompany_ID());
                    goodsC.setClassName("GoodsC");
                    CDBHelper.createAndUpdate(getApplicationContext(),goodsC);
                    orderC.addGoods(goodsC);
@@ -311,7 +311,7 @@ public class MainActivity extends AppCompatActivity {
                orderC.setOrderState(1);
                orderC.setOrderType(1);
                orderC.setTableNo(myApp.getTable_sel_obj().getTableNum());
-               orderC.setChannelId("wangbo08");
+               orderC.setChannelId(myApp.getCompany_ID());
                orderC.setClassName("OrderC");
                CDBHelper.createAndUpdate(getApplicationContext(),orderC);
 
