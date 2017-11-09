@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -292,40 +293,31 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-
-               OrderC orderC = new OrderC();
-               for (int i = 0 ; i< getOrderItem().size();i++){
-
-                   GoodsC goodsC = new GoodsC();
-                   goodsC.setDishesName(getOrderItem().get(i).get(0).toString());
-                   if (getOrderItem().get(i).get(1) == null){
-                       goodsC.setDishesTaste(null);
-                   }else {
-                       goodsC.setDishesTaste(getOrderItem().get(i).get(1).toString());
-                   }
-                   goodsC.setDishesCount(Integer.parseInt(getOrderItem().get(i).get(2).toString()));
-                   Log.e("Aaaa",getOrderItem().get(i).get(1)+"");
-                   goodsC.setAllPrice((Float) getOrderItem().get(i).get(4));
-                   goodsC.setChannelId(myApp.getCompany_ID());
-                   goodsC.setClassName("GoodsC");
-                   CDBHelper.createAndUpdate(getApplicationContext(),goodsC);
-                   orderC.addGoods(goodsC);
-               }
-               orderC.setAllPrice(total);
-               orderC.setOrderState(1);
-               orderC.setOrderType(1);
-               orderC.setTableNo(myApp.getTable_sel_obj().getTableNum());
-               orderC.setChannelId(myApp.getCompany_ID());
-               orderC.setClassName("OrderC");
-               CDBHelper.createAndUpdate(getApplicationContext(),orderC);
-
-
-                Intent intent = new Intent(MainActivity.this, PayActivity.class);
-                startActivity(intent);
-
                 if (total > 0) {
 
+                   OrderC orderC = new OrderC(myApp.getCompany_ID());
+                   for (int i = 0 ; i< getOrderItem().size();i++){
 
+                       GoodsC goodsC = new GoodsC();
+                       goodsC.setDishesName(getOrderItem().get(i).get(0).toString());
+                       if (getOrderItem().get(i).get(1) == null){
+                           goodsC.setDishesTaste(null);
+                       }else {
+                           goodsC.setDishesTaste(getOrderItem().get(i).get(1).toString());
+                       }
+                       goodsC.setDishesCount(Integer.parseInt(getOrderItem().get(i).get(2).toString()));
+                       Log.e("Aaaa",getOrderItem().get(i).get(1)+"");
+                       goodsC.setAllPrice((Float) getOrderItem().get(i).get(4));
+                       CDBHelper.createAndUpdate(getApplicationContext(),goodsC);
+                       orderC.addGoods(goodsC);
+                   }
+                   orderC.setAllPrice(total);
+                   orderC.setOrderState(1);
+                   orderC.setOrderType(1);
+                   orderC.setTableNo(myApp.getTable_sel_obj().getTableNum());
+                   orderC.setChannelId(myApp.getCompany_ID());
+                   orderC.setClassName("OrderC");
+                   CDBHelper.createAndUpdate(getApplicationContext(),orderC);
                     //如果order列表开启状态就关闭
                     if (!flag) {
                         linearLayout.setAnimation(AnimationUtil.moveToViewBottom());
@@ -342,6 +334,35 @@ public class MainActivity extends AppCompatActivity {
 
                         flag = true;
                     }
+
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    View view1 = getLayoutInflater().inflate(R.layout.view_pay_dialog,null);
+                    builder.setView(view1);
+                    builder.setCancelable(true);
+                    final AlertDialog dialog = builder.create();
+                    Button shi = view1.findViewById(R.id.view_pay_shi);
+                    Button fou = view1.findViewById(R.id.view_pay_fou);
+                    shi.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(MainActivity.this, PayActivity.class);
+                            startActivityForResult(intent,1);
+                            dialog.dismiss();
+                        }
+                    });
+                    fou.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(MainActivity.this, DeskActivity.class);
+                            startActivity(intent);
+                            dialog.dismiss();
+                            finish();
+                        }
+                    });
+                    dialog.show();
+
+
 
                 } else {
 
@@ -376,9 +397,10 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
 
-        if (resultCode == RESULT_OK) {
+        if (resultCode == RESULT_OK && requestCode == 1) {
 
-            clearOrder();
+            Toast.makeText(this,"111",Toast.LENGTH_LONG).show();
+
 
 
         }
