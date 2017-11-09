@@ -261,8 +261,8 @@ public class PayActivity extends AppCompatActivity {
             if (order.getInt("orderState") == 1) {
 
                 total += order.getFloat("allPrice");
-
                 Array a = order.getArray("goodsList");
+
                 List<Object> l = a.toList();
 
                 //获取当前订单下goods集合下所有的菜品
@@ -280,28 +280,6 @@ public class PayActivity extends AppCompatActivity {
             }
 
         }
-
-        //加获取所有的订单下的菜品
-
-        for (int i1 = 0; i1 < orderList.size(); i1++) {
-
-            Document order = orderList.get(i1);
-            Array a = order.getArray("goodsList");
-            List<Object> l = a.toList();
-
-            //获取当前订单下goods集合下所有的菜品
-
-             for (Object o : l){
-
-                HashMap h = (HashMap) o;
-
-                orderDishesList.add(h);
-
-                MyLog.e("菜品：  "+h.get("dishesName").toString());
-
-            }
-        }
-
 
     }
 
@@ -361,7 +339,7 @@ public class PayActivity extends AppCompatActivity {
             //充值
             if (flag == 2) {
 
-                Rechange(data);
+                turnRechange(data);
 
             } else if (flag == 1) {
 
@@ -576,7 +554,7 @@ public class PayActivity extends AppCompatActivity {
      *
      * @param data
      */
-    private void Rechange(Intent data) {
+    private void turnRechange(Intent data) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View view = getLayoutInflater().inflate(R.layout.view_payactivity_memberdishes_rechange_dialog, null);
