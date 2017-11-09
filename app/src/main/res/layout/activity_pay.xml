@@ -6,13 +6,12 @@
     android:orientation="vertical">
 
     <android.support.design.widget.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay"
-        app:elevation="0dp"
         android:background="@color/paycolor"
-        android:id="@+id/appBarLayout"
-       >
+        android:theme="@style/AppTheme.AppBarOverlay"
+        app:elevation="0dp">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
@@ -26,26 +25,26 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textColor="@color/textColor"
                 android:text="@string/title_activity_pay"
+                android:textColor="@color/textColor"
                 android:textSize="16sp" />
         </android.support.v7.widget.Toolbar>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="130dp"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
+                android:gravity="bottom|left"
+                android:paddingLeft="16dp"
                 android:text="桌/牌：大厅一号"
+                android:textColor="@color/md_white"
                 android:textSize="12sp"
                 android:typeface="monospace"
-                android:gravity="bottom|left"
-                android:textColor="@color/md_white"
-                android:paddingLeft="16dp"
 
                 />
 
@@ -53,34 +52,30 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="2"
-                android:orientation="horizontal"
-                >
+                android:orientation="horizontal">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:text="消费金额：￥"
-                    android:typeface="sans"
-                    android:textSize="28sp"
-                    android:textColor="@color/md_white"
-                    android:gravity="center"
                     android:layout_marginLeft="16dp"
-                    />
+                    android:gravity="center"
+                    android:text="消费金额：￥"
+                    android:textColor="@color/md_white"
+                    android:textSize="28sp"
+                    android:typeface="sans" />
 
                 <TextView
                     android:id="@+id/total_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:text="80.00"
-                    android:typeface="sans"
-                    android:textSize="28sp"
-                    android:textColor="@color/md_white"
                     android:gravity="center"
-                    />
+                    android:text="80.00"
+                    android:textColor="@color/md_white"
+                    android:textSize="28sp"
+                    android:typeface="sans" />
             </LinearLayout>
 
         </LinearLayout>
-
-
 
 
     </android.support.design.widget.AppBarLayout>

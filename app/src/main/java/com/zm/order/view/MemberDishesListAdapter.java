@@ -72,11 +72,11 @@ public class MemberDishesListAdapter extends BaseAdapter {
         }
 
         SparseArray sparseArray = (SparseArray) list.get(i);
-        viewHold.dishesname.setText(sparseArray.get(0).toString());
-        viewHold.dishestotalprice.setText(sparseArray.get(4).toString());
-        viewHold.saleprice.setText(sparseArray.get(6).toString());
+        viewHold.dishesname.setText(sparseArray.get(1).toString());
+        viewHold.dishestotalprice.setText(sparseArray.get(2).toString());
+        viewHold.saleprice.setText(sparseArray.get(3).toString());
 
-        if((int)sparseArray.get(5) == 1){
+        if((boolean)sparseArray.get(4)){
 
             viewHold.issale.setVisibility(View.VISIBLE);
         }
