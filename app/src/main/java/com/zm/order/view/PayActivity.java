@@ -223,10 +223,7 @@ public class PayActivity extends AppCompatActivity {
         }
 
 
-
-
         //包含的订单
-
 
     }
 
@@ -305,6 +302,8 @@ public class PayActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
+
+                turnMainActivity();
 
                 finish();
 
@@ -695,12 +694,6 @@ public class PayActivity extends AppCompatActivity {
     }
 
     public void turnMainActivity() {
-
-        try {
-            Thread.sleep(800);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
         //携带参数返回到MainActivity
         setResult(RESULT_OK, null);
