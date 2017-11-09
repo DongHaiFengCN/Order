@@ -1,5 +1,6 @@
 package com.zm.order.view;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -366,22 +367,28 @@ public class SeekT9Fragment extends Fragment {
         }
     }
 
-    class MyGridAdapter extends RecyclerView.Adapter {
+    static class MyGridAdapter extends RecyclerView.Adapter {
 
 
         private int index = -1;
-        private SeekT9DialogAdapter.OnItemOlickListener mOnItemOlickListener = null;
+        private Activity activity;
+        private List<String> tasteList;
+
+        private OnItemOlickListener mOnItemOlickListener = null;
 
 
+        public interface OnItemOlickListener {
 
+            void onItemClick(int position);
+        }
 
-        public void setmOnItemOlickListener(SeekT9DialogAdapter.OnItemOlickListener listener) {
+        public void setmOnItemOlickListener(OnItemOlickListener listener) {
             this.mOnItemOlickListener = listener;
         }
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             HolderView holderView;
-            View convertView = LayoutInflater.from(getActivity()).inflate(R.layout.item_dialog_girdview, null);
+            View convertView = LayoutInflater.from(activity).inflate(R.layout.item_dialog_girdview, null);
             holderView = new HolderView(convertView);
             return holderView;
         }
