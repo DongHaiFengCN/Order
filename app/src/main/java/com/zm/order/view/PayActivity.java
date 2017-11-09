@@ -59,15 +59,12 @@ import untils.MyLog;
  */
 
 public class PayActivity extends AppCompatActivity {
-
     @BindView(R.id.fact_tv)
     TextView factTv;
     @BindView(R.id.discount_tv)
     TextView discountTv;
     @BindView(R.id.total_tv)
     TextView totalTv;
-    @BindView(R.id.textView)
-    TextView textView;
     @BindView(R.id.associator_tv)
     TextView associatorTv;
     @BindView(R.id.action_tv)
@@ -109,6 +106,7 @@ public class PayActivity extends AppCompatActivity {
             super.handleMessage(msg);
 
             if (msg.what == RESULT_OK) {
+
                 //显示原价
                 totalTv.setText(total + "");
             }
@@ -125,6 +123,7 @@ public class PayActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_pay);
+
         ButterKnife.bind(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -158,9 +157,6 @@ public class PayActivity extends AppCompatActivity {
         dialog = new AlertDialog.Builder(PayActivity.this);
         dialog.setView(getLayoutInflater().inflate(R.layout.view_print_dialog, null)).create();
 
-        //显示原价
-        totalTv.setText(total + "");
-
         StringBuilder stringBuilder = new StringBuilder("实际支付：");
 
         //显示操作后价格
@@ -178,15 +174,55 @@ public class PayActivity extends AppCompatActivity {
 
         Iterator i = l.iterator();
 
+        CheckOrderC checkOrderC = null;
+
         while (i.hasNext()){
-            CheckOrderC c = (CheckOrderC) i.next();
+            checkOrderC = (CheckOrderC) i.next();
 
-            if(!c.getTableNo().equals(myApplication.getTable_sel_obj().getTableNum())){
+            if(checkOrderC.getTableNo().equals(myApplication.getTable_sel_obj().getTableNum())){
 
-                i.remove();
+                break;
+
             }
 
         }
+
+        //订单提交时间
+        MyLog.e("订单提交时间: "+checkOrderC.getCheckTime());
+        //桌号
+        MyLog.e("桌号: "+checkOrderC.getTableNo());
+        //实收
+        MyLog.e("实收: "+checkOrderC.getNeedPay());
+        //应收
+        MyLog.e("应收: "+checkOrderC.getPay());
+
+        //支付详情
+        MyLog.e(" PromotionDetailC 支付详情~~~~~~~~~~~ ");
+        PromotionDetailC promotionDetail = checkOrderC.getPromotionDetail();
+        MyLog.e("优惠金额： "+promotionDetail.getDiscounts());
+        MyLog.e("折扣率： "+promotionDetail.getDisrate());
+
+        MyLog.e("PayDetailC 支付细节~~~~~~~~~~~ ");
+
+        List<PayDetailC> payDetailList = promotionDetail.getPayDetailList();
+
+        for (int j = 0; j < payDetailList.size(); j++) {
+
+            MyLog.e("第 "+j+" 支付方式");
+
+            PayDetailC p = payDetailList.get(j);
+
+            MyLog.e("支付类型 "+p.getPayTypes());
+
+            MyLog.e("支付钱数 "+p.getSubtotal());
+
+        }
+
+
+
+        //包含的订单
+
+
 
 
 
@@ -210,6 +246,7 @@ public class PayActivity extends AppCompatActivity {
         //获取餐桌编号
         final TableC tableC = myApplication.getTable_sel_obj();
 
+        //获取包含桌号xx的所有订单
         orderList = idbManager.getOrderListBelongToTable("tableNo", tableC.getTableNum());
 
         promotionCList =  idbManager.getByClassName("PromotionC");
@@ -225,41 +262,44 @@ public class PayActivity extends AppCompatActivity {
 
                 total += order.getFloat("allPrice");
 
-            }else{
+                Array a = order.getArray("goodsList");
+                List<Object> l = a.toList();
 
-                i.remove();
+                //获取当前订单下goods集合下所有的菜品
+
+                for (Object o : l){
+
+                    HashMap h = (HashMap) o;
+
+                    orderDishesList.add(h);
+
+                    MyLog.e("菜品：  "+h.get("dishesName").toString());
+
+                }
+
             }
 
         }
-
-
 
         //加获取所有的订单下的菜品
 
         for (int i1 = 0; i1 < orderList.size(); i1++) {
 
             Document order = orderList.get(i1);
-
             Array a = order.getArray("goodsList");
-
-
             List<Object> l = a.toList();
 
             //获取当前订单下goods集合下所有的菜品
 
-            for (Object o : l){
+             for (Object o : l){
 
                 HashMap h = (HashMap) o;
 
                 orderDishesList.add(h);
 
-                MyLog.e("菜品：  "+h.get("dishesId").toString());
-
+                MyLog.e("菜品：  "+h.get("dishesName").toString());
 
             }
-
-
-
         }
 
 
@@ -633,12 +673,9 @@ public class PayActivity extends AppCompatActivity {
 
 
 
-                } else if(r < total){//余额不足走其他支付方式，并设置是否使用当前全部余额
+                } else if(r < total){//余额不足走其他支付方式
 
                     all.setVisibility(View.VISIBLE);
-
-
-
 
 
                 }
@@ -724,7 +761,7 @@ public class PayActivity extends AppCompatActivity {
 
 
     @OnClick({R.id.associator, R.id.discount, R.id.action, R.id.ivalipay, R.id.ivwechat, R.id.cash})
-    public void onClick(View view) throws CouchbaseLiteException {
+    public void onClick(View view){
         switch (view.getId()) {
 
             //会员的支付方式
@@ -751,7 +788,11 @@ public class PayActivity extends AppCompatActivity {
                 //支付宝支付
                 setPayDetail(3,total);
 
-                submitCheckOrder();
+                try {
+                    submitCheckOrder();
+                } catch (CouchbaseLiteException e) {
+                    e.printStackTrace();
+                }
 
                 break;
             case R.id.ivwechat:
@@ -759,7 +800,11 @@ public class PayActivity extends AppCompatActivity {
                 //微信支付
                 setPayDetail(4,total);
 
-                submitCheckOrder();
+                try {
+                    submitCheckOrder();
+                } catch (CouchbaseLiteException e) {
+                    e.printStackTrace();
+                }
 
                 break;
             case R.id.cash:
@@ -767,7 +812,14 @@ public class PayActivity extends AppCompatActivity {
                 //现金支付
                 setPayDetail(1,total);
 
-                submitCheckOrder();
+                try {
+                    submitCheckOrder();
+                } catch (CouchbaseLiteException e) {
+                    e.printStackTrace();
+                }
+
+
+                show();
                 break;
         }
     }
@@ -840,22 +892,38 @@ public class PayActivity extends AppCompatActivity {
 
         Date date = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
         float all = Float.valueOf(totalTv.getText().toString());
+
+
         CheckOrderC checkOrder = new CheckOrderC();
         checkOrder.setChannelId(myApplication.getCompany_ID());
         checkOrder.setCheckTime(formatter.format(date));
         checkOrder.setClassName("CheckOrderC");
 
-        checkOrder.setNeedPay(total);
+
+        MyLog.e("总价："+all);
+        //总共优惠
+
+
+        float d = all-total;
+
         checkOrder.setPay(all);
+
+        checkOrder.setNeedPay(total);
+
+        MyLog.e("应支付："+checkOrder.getPay());
+
+        MyLog.e("实际支付："+checkOrder.getNeedPay());
+
         checkOrder.setTableNo(myApplication.getTable_sel_obj().getTableNum());
 
         //将当前桌下的订单状态设置成提交,并保存
 
-        for (Document d :orderList){
+        for (Document d1 :orderList){
 
-            d.setInt("orderState",0);
-            idbManager.save(d);
+            d1.setInt("orderState",0);
+            idbManager.save(d1);
 
         }
         //营销细节
@@ -863,8 +931,11 @@ public class PayActivity extends AppCompatActivity {
         p.setChannelId(myApplication.getCompany_ID());
         p.setClassName("PromotionDetailC");
 
-        //总共优惠
-        p.setDisrate((int) (all-total));
+
+
+        p.setDiscounts(d);
+
+        p.setDisrate(disrate);
 
         //支付方式集合
         p.setPayDetailList(payDetailList);
@@ -872,15 +943,13 @@ public class PayActivity extends AppCompatActivity {
         //折扣率
         p.setDisrate(disrate);
 
-        CDBHelper.createAndUpdate(getApplicationContext(),p);
-
         checkOrder.setPromotionDetail(p);
 
-
+        CDBHelper.createAndUpdate(getApplicationContext(),p);
         CDBHelper.createAndUpdate(getApplicationContext(),checkOrder);
 
         //打印账单
-        printOrder();
+       // printOrder();
 
 
     }
