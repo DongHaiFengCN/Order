@@ -63,7 +63,7 @@ public class OrderDragAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         HolderView view;
         if (convertView == null) {
             view = new HolderView();
@@ -82,7 +82,7 @@ public class OrderDragAdapter extends BaseAdapter {
         view.select_ln.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mOnItemClickListener.onItemClick(doc.getString("dishesName"),doc.getFloat("price"));
+                mOnItemClickListener.onItemClick(doc.getString("dishesName"),doc.getFloat("price"),position);
             }
         });
         return convertView;
@@ -110,6 +110,6 @@ public class OrderDragAdapter extends BaseAdapter {
 
     public  interface OnItemClickListener {
 
-        void onItemClick(String name,float price);
+        void onItemClick(String name,float price,int position);
     }
 }
