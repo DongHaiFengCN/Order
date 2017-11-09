@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -19,8 +21,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.couchbase.lite.Array;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Document;
+import com.couchbase.lite.Expression;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
@@ -28,18 +32,26 @@ import com.google.zxing.common.BitMatrix;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 import com.zm.order.R;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 import application.MyApplication;
+import bean.kitchenmanage.order.CheckOrderC;
+import bean.kitchenmanage.order.PayDetailC;
+import bean.kitchenmanage.order.PromotionDetailC;
+import bean.kitchenmanage.promotion.PromotionC;
 import bean.kitchenmanage.table.TableC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import model.CDBHelper;
 import model.DBFactory;
 import model.DatabaseSource;
 import model.IDBManager;
+import model.ProgressBarasyncTask;
 import untils.MyLog;
 
 /**
@@ -74,9 +86,9 @@ public class PayActivity extends AppCompatActivity {
     @BindView(R.id.cash)
     ImageView cash;
 
+
     private AlertDialog.Builder dialog;
     private AlertDialog dg;
-    private AlertDialog.Builder alertDialog;
     private Bitmap bitmap = null;
     private static final int DISTCOUNT = 0;
     private static final int SALE = 1;
@@ -85,6 +97,35 @@ public class PayActivity extends AppCompatActivity {
     private Intent stashItent;
 
     private List<Document> orderList;
+
+    private IDBManager idbManager;
+
+    private  MyApplication myApplication;
+
+    private int disrate;
+
+    private float restPay = 0f;
+
+    private List<Document> promotionCList;
+
+    //更新总价
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+
+            if (msg.what == RESULT_OK) {
+                //显示原价
+                totalTv.setText(total + "");
+            }
+
+        }
+    };
+
+    //每增加一种支付方式创建一个支付详情，例如充值卡余额不足，剩下的部分用的现金。
+    private List<PayDetailC> payDetailList = new ArrayList<>();
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,59 +138,31 @@ public class PayActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-
         //取消分割阴影
         getSupportActionBar().setElevation(0);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             toolbar.setElevation(0);
         }
 
-        IDBManager idbManager = DBFactory.get(DatabaseSource.CouchBase, getApplicationContext());
+        idbManager = DBFactory.get(DatabaseSource.CouchBase, getApplicationContext());
 
-        MyApplication myApplication = (MyApplication) getApplication();
+        myApplication = (MyApplication) getApplication();
 
-        //获取餐桌编号
-        TableC tableC = myApplication.getTable_sel_obj();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
 
-        //获取当前餐桌所有订单的集合
+                    getAll();
+                    Message m = handler.obtainMessage();
+                    m.what = RESULT_OK;
+                    handler.sendMessage(m);
 
-        orderList = idbManager.getOrderListBelongToTable("tableNo", tableC.getTableNum());
-
-        Iterator<Document> i = orderList.iterator();
-
-        while (i.hasNext()){
-
-            Document order = i.next();
-
-            //刚下单没有买单的订单的总价
-            if (order.getInt("orderState") == 1) {
-
-                total += order.getFloat("allPrice");
-
-                MyLog.e(order.getFloat("allPrice") + "");
-
-            }else {
-
-                //将结帐的订单从当前列表移除
-
-                i.remove();
             }
-
-        }
-
-
+        }).start();
 
         //创建打印dialog
         dialog = new AlertDialog.Builder(PayActivity.this);
         dialog.setView(getLayoutInflater().inflate(R.layout.view_print_dialog, null)).create();
-
-        //支付宝收款码,网络获取**********
-
-        String alipayId = "qwhhh";
-
-        //转化二维码
-        bitmap = encodeAsBitmap(alipayId);
-
 
         //显示原价
         totalTv.setText(total + "");
@@ -159,9 +172,94 @@ public class PayActivity extends AppCompatActivity {
         //显示操作后价格
         factTv.setText(stringBuilder.append(total));
 
+    }
+
+    //测试抹零付款基础的数据
+    public void show(){
+
+       List<CheckOrderC> l = CDBHelper.getObjByClass(getApplicationContext(),CheckOrderC.class);
+
+        Iterator i = l.iterator();
+
+        while (i.hasNext()){
+            CheckOrderC c = (CheckOrderC) i.next();
+
+            if(!c.getTableNo().equals(myApplication.getTable_sel_obj().getTableNum())){
+
+                i.remove();
+            }
+
+        }
+
+
 
     }
 
+
+    /**
+     * 准备所有的数据
+     *
+     * @param
+     */
+    private void getAll() {
+
+        //支付宝收款码,网络获取**********
+
+        String alipayId = "qwhhh";
+
+        //转化二维码
+        bitmap = encodeAsBitmap(alipayId);
+
+        //获取餐桌编号
+        final TableC tableC = myApplication.getTable_sel_obj();
+
+        orderList = idbManager.getOrderListBelongToTable("tableNo", tableC.getTableNum());
+
+        promotionCList =  idbManager.getByClassName("PromotionC");
+
+        Iterator<Document> i = orderList.iterator();
+
+        while (i.hasNext()) {
+
+            Document order = i.next();
+
+            //当前桌下没有买单的订单的总价
+            if (order.getInt("orderState") == 1) {
+
+                total += order.getFloat("allPrice");
+
+            }else{
+
+                //展示没有下单的订单，提交订单的时候将 orderState 设置 0 已买单
+
+                i.remove();
+            }
+
+        }
+
+
+
+        //加获取所有的订单下的菜品
+        List<Document> list= new ArrayList<>();
+        for (int i1 = 0; i1 < orderList.size(); i1++) {
+
+            Document order = orderList.get(i1);
+
+            Array a = order.getArray("goodsList");
+
+
+
+            for(int j = 0 ; j< order.getArray("goodsList").count();j++){
+
+
+            }
+
+
+
+        }
+
+
+    }
 
     public void showDialog() {
 
@@ -253,7 +351,7 @@ public class PayActivity extends AppCompatActivity {
         factTv.setText("实际支付：" + total + "元");
 
         //设置会员按钮不可用
-        //associator.setEnabled(false);
+        associator.setEnabled(false);
 
         //未设置会员的优惠信息时展示不可用
         if (TextUtils.isEmpty(associatorTv.getText().toString())) {
@@ -298,11 +396,15 @@ public class PayActivity extends AppCompatActivity {
 
         //遍历订单中包含的会员菜品
 
-        List list = (List) stashItent.getSerializableExtra("Order");
+        //List list = (List) stashItent.getSerializableExtra("Order");
 
+        //
+
+
+/*
         for (int j = 0; j < list.size(); j++) {
 
-            SparseArray<Object> s = (SparseArray<Object>) list.get(j);
+           // SparseArray<Object> s = (SparseArray<Object>) list.get(j);
 
             String name = (String) s.get(0);
 
@@ -344,7 +446,7 @@ public class PayActivity extends AppCompatActivity {
                 saleTotal += (float) s.get(4);
             }
 
-        }
+        }*/
 
         //展示享受折扣的列表
 
@@ -357,9 +459,9 @@ public class PayActivity extends AppCompatActivity {
 
         ListView listView = view.findViewById(R.id.memberdisheslist_lv);
 
-        MemberDishesListAdapter memberDishesListAdapter = new MemberDishesListAdapter(list, this);
+       // MemberDishesListAdapter memberDishesListAdapter = new MemberDishesListAdapter(list, this);
 
-        listView.setAdapter(memberDishesListAdapter);
+        //listView.setAdapter(memberDishesListAdapter);
 
         t.setText(total_sb.append(saleTotal));
 
@@ -391,8 +493,7 @@ public class PayActivity extends AppCompatActivity {
 
                 associatorTv.setText(disrate + "/折");
 
-                //会员消费记录
-                SubmitMemberConsumeInfo(members);
+
             }
         });
 
@@ -401,18 +502,20 @@ public class PayActivity extends AppCompatActivity {
 
 
     /**
-     * 充值卡操作
+     * 充值卡扣款功能
      *
      * @param data
      */
     private void Rechange(Intent data) {
 
-
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View view = getLayoutInflater().inflate(R.layout.view_payactivity_memberdishes_rechange_dialog, null);
 
         final float r = data.getFloatExtra("remainder", 0f);
 
         final String tel = data.getStringExtra("tel");
+
+        final TextView all = view.findViewById(R.id.useAll);
 
         TextView remainder_tv = view.findViewById(R.id.remainder_tv);
 
@@ -422,7 +525,7 @@ public class PayActivity extends AppCompatActivity {
 
         rechangepay_tv.setText(total + "");
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
         builder.setTitle("扣款明细表");
         builder.setView(view);
         builder.setPositiveButton("确定扣款", null);
@@ -432,16 +535,26 @@ public class PayActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialogInterface, int i) {
 
 
+
+
             }
         });
 
         final AlertDialog alertDialog = builder.show();
+        all.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
+                restPay = total - r;
+
+                alertDialog.dismiss();
+            }
+        });
         alertDialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                if (r >= total) {
+                if (r >= total) {//余额扣款
 
                     IDBManager idbManager = DBFactory.get(DatabaseSource.CouchBase, PayActivity.this);
                     Document members = idbManager.getMembers(tel);
@@ -451,48 +564,112 @@ public class PayActivity extends AppCompatActivity {
 
                     try {
                         idbManager.save(members);
+
                     } catch (CouchbaseLiteException e) {
                         e.printStackTrace();
                     }
 
-                    //会员消费记录
-                    SubmitMemberConsumeInfo(members);
-
-                    //提交订单及打印
-                    SubmitOrder();
-
                     Toast.makeText(PayActivity.this, "扣款成功！", Toast.LENGTH_SHORT).show();
+
+                    //会员卡支付
+                    setPayDetail(6);
+
+                    //提交checkorder
+                    submitCheckOrder();
 
                     alertDialog.dismiss();
 
-                } else {
-                    Toast.makeText(PayActivity.this, "余额不足！", Toast.LENGTH_SHORT).show();
+
+
+                } else if(r < total){//余额不足走其他支付方式
+
+                    all.setVisibility(View.VISIBLE);
+
+
 
                 }
 
             }
+
+
         });
     }
 
-    /**
-     * 设置会员消费记录
-     *
-     * @param d
-     */
-    private void SubmitMemberConsumeInfo(Document d) {
 
-        Document consumLog = new Document();
+    /**
+     * 提交结账信息
+     */
+    public void submitCheckOrder() {
+
+        Date date = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        float needPay = Float.valueOf(totalTv.getText().toString());
+        CheckOrderC checkOrder = new CheckOrderC();
+        checkOrder.setChannelId(myApplication.getCompany_ID());
+        checkOrder.setCheckTime(formatter.format(date));
+        checkOrder.setClassName("CheckOrderC");
+        checkOrder.setNeedPay(needPay);
+        checkOrder.setPay(total);
+        checkOrder.setTableNo(myApplication.getTable_sel_obj().getTableNum());
+
+        //营销细节
+        PromotionDetailC p = new PromotionDetailC();
+        p.setChannelId(myApplication.getCompany_ID());
+        p.setClassName("PromotionDetailC");
+
+        //总共优惠
+        p.setDisrate((int) (total-needPay));
+
+        //支付方式集合
+        p.setPayDetailList(payDetailList);
+
+        //折扣率
+        p.setDisrate(disrate);
+
+        CDBHelper.createAndUpdate(getApplicationContext(),p);
+
+        checkOrder.setPromotionDetail(p);
+
+
+        CDBHelper.createAndUpdate(getApplicationContext(),checkOrder);
+
+        //打印账单
+        printOrder();
 
 
     }
 
     /**
-     * 提交打印订单
+     * 打印账单
      */
-    private void SubmitOrder() {
 
-        Document checkOrder = new Document();
+    private void printOrder() {
 
+        View dialog = getLayoutInflater().inflate(R.layout.view_alipay_dialog, null);
+        ImageView imageView = dialog.findViewById(R.id.encode);
+        imageView.setImageBitmap(bitmap);
+
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(PayActivity.this);
+        alertDialog.setView(dialog);
+        alertDialog.setPositiveButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+        alertDialog.setNegativeButton("确定支付", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+                ProgressBarasyncTask progressBarasyncTask = new ProgressBarasyncTask(PayActivity.this);
+              //  progressBarasyncTask.setDate(intent);
+                progressBarasyncTask.execute();
+
+            }
+        });
+
+        alertDialog.show();
 
     }
 
@@ -511,65 +688,6 @@ public class PayActivity extends AppCompatActivity {
     }
 
 
-/*    @OnClick({R.id.discount, R.id.associator, R.id.discount, R.id.fact_tv, R.id.ivalipay, R.id.ivwechat, R.id.cash})
-    public void onClick(View view) {
-        switch (view.getId()) {
-
-            //抹零
-            case R.id.discount:
-
-                Discount();
-
-                break;
-            //会员卡
-            case R.id.associator:
-
-                Intent sale = new Intent();
-                sale.setClass(PayActivity.this, SaleActivity.class);
-                startActivityForResult(sale, SALE);
-
-                break;
-
-            case R.id.ivalipay:
-
-                View dialog = getLayoutInflater().inflate(R.layout.view_alipay_dialog, null);
-                ImageView imageView = dialog.findViewById(R.id.encode);
-                imageView.setImageBitmap(bitmap);
-
-                alertDialog = new AlertDialog.Builder(PayActivity.this);
-                alertDialog.setView(dialog);
-                alertDialog.setPositiveButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                    }
-                });
-                alertDialog.setNegativeButton("确定支付", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                    *//*    ProgressBarasyncTask progressBarasyncTask = new ProgressBarasyncTask(PayActivity.this);
-                        progressBarasyncTask.setDate(intent);
-                        progressBarasyncTask.execute();*//*
-
-                    }
-                });
-
-                alertDialog.show();
-
-                break;
-            case R.id.ivwechat:
-
-                Toast.makeText(PayActivity.this, "ivwechat", Toast.LENGTH_SHORT).show();
-
-                break;
-            case R.id.cash:
-
-                Toast.makeText(PayActivity.this, "cash", Toast.LENGTH_SHORT).show();
-
-                break;
-        }
-    }*/
 
     private void Discount() {
         Intent discount = new Intent();
@@ -607,6 +725,8 @@ public class PayActivity extends AppCompatActivity {
     @OnClick({R.id.associator, R.id.discount, R.id.action, R.id.ivalipay, R.id.ivwechat, R.id.cash})
     public void onClick(View view) {
         switch (view.getId()) {
+
+            //会员的支付方式
             case R.id.associator:
 
                 Intent sale = new Intent();
@@ -616,22 +736,104 @@ public class PayActivity extends AppCompatActivity {
                 break;
             case R.id.discount:
 
+                //抹零
+
                 Discount();
 
                 break;
             case R.id.action:
 
+                //活动
+                setAction();
+
                 break;
             case R.id.ivalipay:
+
+                //支付宝支付
+                setPayDetail(3);
+
+                submitCheckOrder();
 
                 break;
             case R.id.ivwechat:
 
+                //微信支付
+                setPayDetail(4);
+
+                submitCheckOrder();
+
                 break;
             case R.id.cash:
 
+
                 break;
         }
+    }
+
+
+    /**
+     *活动扣款
+     */
+    private void setAction() {
+
+
+        final ActionListAdapter a = new ActionListAdapter(promotionCList,PayActivity.this);
+
+        View v = getLayoutInflater().inflate(R.layout.view_payactivity_action_dialog,null);
+        ListView l = v.findViewById(R.id.action_lv);
+        a.setListView(l);
+        l.setAdapter(a);
+
+        AlertDialog.Builder d = new AlertDialog.Builder(this);
+        d.setView(v);
+        d.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+        d.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+
+               int [] flag = a.getFlag();
+
+                for(int f : flag){
+
+                    MyLog.e(f+"");
+
+                }
+            }
+        });
+        d.show();
+
+    }
+
+    /**
+     * 设置支付细节
+     * @param type
+     */
+    private void setPayDetail(int type) {
+        //支付细节
+        PayDetailC p = new PayDetailC();
+        p.setClassName("PayDetailC");
+        p.setChannelId(myApplication.getCompany_ID());
+        p.setPayTypes(type);
+
+        //支付尾款
+        if(restPay != 0){
+
+            p.setSubtotal(restPay);
+
+        }else {//支付全款
+
+            p.setSubtotal(total);
+
+        }
+
+        CDBHelper.createAndUpdate(getApplicationContext(),p);
+        payDetailList.add(p);
     }
 }
 

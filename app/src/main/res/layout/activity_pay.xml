@@ -186,6 +186,7 @@
         android:layout_height="@dimen/viewhight"
         android:background="@drawable/background_pay_select"
         android:clickable="true"
+        android:onClick="onClick"
         android:orientation="horizontal">
 
         <TextView

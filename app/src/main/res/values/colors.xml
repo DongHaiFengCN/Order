@@ -13,6 +13,7 @@
     <color name="lucency">#00000000</color>
 
 
+    <color name="link">#3366FF</color>
     <color name="colorText">#ffffff</color>
     <color name="md_white">#ffffff</color>
     <color name="menu_item_press">#2e000000</color>
