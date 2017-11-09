@@ -147,12 +147,12 @@ public class DishesC implements Serializable {
 		this.specialty = specialty;
 	}
 
-	public List<String> getTasteIdList() {
+	public List<String> getTasteList() {
 		return tasteList;
 	}
 
-	public void setTasteIdList(List<String> tasteIdList) {
-		this.tasteList = tasteIdList;
+	public void setTasteList(List<String> tasteList) {
+		this.tasteList = tasteList;
 	}
 
 	public void addTastId(String id)

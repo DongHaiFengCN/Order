@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    >
+    android:orientation="vertical">
     <!--<android.support.v7.widget.RecyclerView
         android:id="@+id/activity_seek_list"
         android:layout_width="match_parent"
@@ -15,169 +14,166 @@
         android:id="@+id/activity_seek_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/activity_seek_edit"
-        />
+        android:layout_weight="1" />
 
 
     <EditText
+        android:layout_weight="2"
         android:id="@+id/activity_seek_edit"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@drawable/background_select"
-        android:gravity="center"
+        android:layout_height="match_parent"
         android:layout_centerInParent="true"
-        android:textSize="22sp"
-        android:layout_margin="20sp"
+        android:background="@drawable/background_select"
         android:focusable="false"
-
+        android:gravity="center"
+        android:textSize="22sp"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
         />
 
 
-
     <TableLayout
-        android:layout_below="@+id/activity_seek_edit"
         android:id="@+id/tl_key_grid"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@+id/activity_seek_edit"
+        android:layout_marginTop="10dp"
         android:visibility="visible"
-        android:layout_above="@+id/linearLayout3"
-        android:layout_marginTop="20sp"
-        >
+        android:layout_weight="1.3" >
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="50sp"
+            android:layout_height="50dp"
             android:layout_weight="1">
 
             <ImageView
                 android:id="@+id/ibtn_key_1"
+                style="@style/style_public_1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                style="@style/style_public_1"
                 android:background="@drawable/bg_key_selector"
-                android:src="@mipmap/icon_key_1"
-                />
+                android:src="@mipmap/icon_key_1" />
 
             <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
                 android:id="@+id/ibtn_key_2"
                 style="@style/style_public_1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:background="@drawable/bg_key_selector"
                 android:src="@mipmap/icon_key_2" />
 
             <ImageView
                 android:id="@+id/ibtn_key_3"
+                style="@style/style_public_1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                style="@style/style_public_1"
                 android:background="@drawable/bg_key_selector"
                 android:src="@mipmap/icon_key_3" />
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="50sp"
+            android:layout_height="50dp"
             android:layout_weight="1">
 
             <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
                 android:id="@+id/ibtn_key_4"
                 style="@style/style_public_1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:background="@drawable/bg_key_selector"
                 android:src="@mipmap/icon_key_4" />
 
             <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
                 android:id="@+id/ibtn_key_5"
                 style="@style/style_public_1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:background="@drawable/bg_key_selector"
                 android:src="@mipmap/icon_key_5" />
 
             <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
                 android:id="@+id/ibtn_key_6"
                 style="@style/style_public_1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:background="@drawable/bg_key_selector"
                 android:src="@mipmap/icon_key_6" />
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="50sp"
+            android:layout_height="50dp"
             android:layout_weight="1">
 
             <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
                 android:id="@+id/ibtn_key_7"
                 style="@style/style_public_1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:background="@drawable/bg_key_selector"
                 android:src="@mipmap/icon_key_7" />
 
             <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
                 android:id="@+id/ibtn_key_8"
                 style="@style/style_public_1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:background="@drawable/bg_key_selector"
                 android:src="@mipmap/icon_key_8" />
 
             <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
                 android:id="@+id/ibtn_key_9"
                 style="@style/style_public_1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:background="@drawable/bg_key_selector"
                 android:src="@mipmap/icon_key_9" />
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="50sp"
+            android:layout_height="50dp"
             android:layout_weight="1">
 
             <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
                 android:id="@+id/ibtn_key_l"
                 style="@style/style_public_1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:background="@drawable/bg_key_selector"
                 android:src="@mipmap/icon_key_l" />
 
             <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
                 android:id="@+id/ibtn_key_0"
                 style="@style/style_public_1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:background="@drawable/bg_key_selector"
                 android:src="@mipmap/icon_key_0" />
 
             <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
                 android:id="@+id/ibtn_key_r"
                 style="@style/style_public_1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:background="@drawable/bg_key_selector"
                 android:src="@mipmap/icon_key_r" />
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="50sp"
+            android:layout_height="50dp"
             android:layout_weight="1">
 
             <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
                 android:id="@+id/ibtn_key_del"
                 style="@style/style_public_1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:background="@drawable/bg_key_selector"
                 android:src="@mipmap/icon_key_del" />
         </TableRow>
     </TableLayout>
 
-</RelativeLayout>
+</LinearLayout>

@@ -302,7 +302,6 @@ public class MainActivity extends AppCompatActivity {
                    goodsC.setDishesCount(Integer.parseInt(getOrderItem().get(i).get(2).toString()));
                    Log.e("Aaaa",getOrderItem().get(i).get(4)+"");
                    goodsC.setAllPrice((Float) getOrderItem().get(i).get(4));
-
                    goodsC.setChannelId("wangbo08");
                    goodsC.setClassName("GoodsC");
                    CDBHelper.createAndUpdate(getApplicationContext(),goodsC);
