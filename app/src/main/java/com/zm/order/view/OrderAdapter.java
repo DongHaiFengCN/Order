@@ -92,8 +92,12 @@ public class OrderAdapter extends BaseAdapter {
             viewHold = (ViewHold) view.getTag();
         }
         viewHold.name.setText(orderItem.get(i).get(0).toString());
+        if (orderItem.get(i).get(1) == null){
+            viewHold.taste.setText("");
+        }else{
+            viewHold.taste.setText(orderItem.get(i).get(1).toString());
+        }
 
-        viewHold.taste.setText(orderItem.get(i).get(1).toString());
 
         viewHold.number.setNumber(orderItem.get(i).get(2).toString());
 

@@ -230,12 +230,15 @@ public class SeekT9Adapter extends BaseAdapter {
             if (mData.get(position).getCount() > 0) {//如果选择器的数量不为零，当前的选择的菜品加入订单列表
 
                 s.put(0, mData.get(position).getDishesC().getDishesName());
-                s.put(1, taste);
+                if (tasteList.size() == 0){
+                    s.put(1, null);
+                }else{
+                    s.put(1, tasteList.get(pos));
+                }
                 s.put(2, 1+"");
                 s.put(3, mData.get(position).getDishesC().getPrice());
                 s.put(4, mData.get(position).getCount() * mData.get(position).getDishesC().getPrice());
                 activity.getOrderItem().add(s);
-                Log.e("Aaaaa",taste);
                 //购物车计数器数据更新
                 point =  activity.getPoint();
                 point++;
@@ -281,7 +284,11 @@ public class SeekT9Adapter extends BaseAdapter {
                 if (number != -1) {//如果选择器的数量不为零，当前的选择的菜品加入订单列表
 
                     s.put(0, mData.get(position).getDishesC().getDishesName());
-                    s.put(1, taste);
+                    if (tasteList.size() == 0){
+                        s.put(1, null);
+                    }else{
+                        s.put(1, tasteList.get(pos));
+                    }
                     s.put(2, 1+"");
                     s.put(3, mData.get(position).getDishesC().getPrice());
                     s.put(4, number * mData.get(position).getDishesC().getPrice());

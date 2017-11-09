@@ -34,11 +34,13 @@ import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
 import com.couchbase.lite.Ordering;
 import com.zm.order.R;
+import com.zm.order.view.adapter.MyGridAdapter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import bean.Goods;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -61,27 +63,24 @@ public class OrderFragment extends Fragment implements IMainView {
     @BindView(R.id.order_list)
     ListView orderList;
     private DishesKindAdapter leftAdapter;
-    //private DishesAdapter dishesAdapter;
     private OrderDragAdapter orderDragAdapter;
-    private List<String> dishesKindName;
+    private List<Object> getDishesIdList;
+    private List<String> tasteList;
     private View view;
     private String taste = "默认";
     private List<SparseArray<Object>> orderItem = new ArrayList<>();
-    public OrderAdapter o;
     private int point = 0;
     private float total = 0.0f;
-    private TextView point_tv;
-    private TextView total_tv;
-    private boolean flag = true;
     private List<String> titleList = new ArrayList<>();
     List<Object> DishesIdList;
+    private List<Goods> myGoodsList;
+    private List<String> dishesIdList;
+    private int pos;
     @Override
     public View onCreateView(LayoutInflater inflater,  ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.frame_order,null);
         ButterKnife.bind(this, view);
-        point_tv = getActivity().findViewById(R.id.point);
-        total_tv = getActivity().findViewById(R.id.total_tv);
-
+        myGoodsList = new ArrayList<>();
         //initData();
         initView();
         IMainPresenter iMainView = new MainPresenterImpl(this);
@@ -105,7 +104,7 @@ public class OrderFragment extends Fragment implements IMainView {
        // final GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);//设置每行展示3个
         //dishesAdapter = new DishesAdapter(getActivity());
 
-        dishesKindName = new ArrayList<>();
+        tasteList = new ArrayList<>();
 
         leftAdapter = new DishesKindAdapter();
         titleList = CDBHelper.getIdsByWhere(getActivity(),
@@ -137,7 +136,7 @@ public class OrderFragment extends Fragment implements IMainView {
                 dishesRv.setLayoutManager(manager);*/
 
 
-                final List<String> dishesIdList=new ArrayList<>();
+                dishesIdList=new ArrayList<>();
                 //获取点击的菜品类别的Document
                 Document KindDocument= CDBHelper.getDocByID(getActivity(),titleList.get(position));
                 //获取此Document下的菜品Id号
@@ -155,7 +154,6 @@ public class OrderFragment extends Fragment implements IMainView {
                 orderDragAdapter = new OrderDragAdapter(getActivity(),KindDocument);
 
                 orderDragAdapter.setMlistDishesId(dishesIdList);
-
 
                 dishesRv.setAdapter(orderDragAdapter);
                 orderDragAdapter.setOnItemClickListener(new OrderDragAdapter.OnItemClickListener() {
@@ -205,13 +203,14 @@ public class OrderFragment extends Fragment implements IMainView {
     private void showDialog(final String name, final float price) {
 
         final float[] l = {0.0f};
-
+        getDishesIdList = new ArrayList<>();
         view = LayoutInflater.from(getActivity()).inflate(R.layout.view_item_dialog, null);
 
         final TextView price_tv = view.findViewById(R.id.price);
 
         final AmountView amountView = view.findViewById(R.id.amount_view);
-
+        getDishesIdList.clear();
+        tasteList.clear();
         price_tv.setText("总计 " +amountView.getAmount()*price+" 元");
         amountView.getAmount();
         l[0] = amountView.getAmount()*price;
@@ -228,26 +227,35 @@ public class OrderFragment extends Fragment implements IMainView {
 
             }
         });
+        for (int i = 0;i < dishesIdList.size();i++){//dishesIdList.size() size 2
 
+            Document document = CDBHelper.getDocByID(getActivity().getApplicationContext(), dishesIdList.get(i).toString());
+            if (document.getArray("tasteList") != null){
+                getDishesIdList = document.getArray("tasteList").toList();
+            }
 
-        RadioGroup group = view.findViewById(R.id.radioGroup);
+        }
+        if (getDishesIdList != null) {
+            for (int i = 0; i < getDishesIdList.size(); i++) {
+                Document document = CDBHelper.getDocByID(getActivity().getApplicationContext(), getDishesIdList.get(i).toString());
+                tasteList.add(document.getString("tasteName"));
+            }
 
-        //选择口味
-        group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        } else {
+
+        }
+
+        final GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);//设置每行展示3个
+        RecyclerView recyclerView = view.findViewById(R.id.view_dialog_recycler);
+        recyclerView.setLayoutManager(manager);
+        MyGridAdapter myGridAdapter = new MyGridAdapter(getActivity(),tasteList);
+        myGridAdapter.setmOnItemOlickListener(new MyGridAdapter.OnItemOlickListener() {
             @Override
-            public void onCheckedChanged(RadioGroup radioGroup, @IdRes int i) {
-
-                if (i == R.id.Spicy) {
-
-                    taste = "微辣";
-
-                } else if (i == R.id.hot) {
-
-                    taste = "辣";
-
-                }
+            public void onItemClick(int position) {
+                pos = position;
             }
         });
+        recyclerView.setAdapter(myGridAdapter);
 
         AlertDialog.Builder builder = new AlertDialog
                 .Builder(getActivity());
@@ -263,7 +271,11 @@ public class OrderFragment extends Fragment implements IMainView {
                 if (sum != 0) {//如果选择器的数量不为零，当前的选择的菜品加入订单列表
                     final SparseArray<Object> s = new SparseArray<>();//查下这个怎么用
                     s.put(0, name);
-                    s.put(1, taste);
+                    if (tasteList.size() == 0){
+                        s.put(1, null);
+                    }else{
+                        s.put(1, tasteList.get(pos));
+                    }
                     s.put(2, sum + "");
                     s.put(3, price);
                     s.put(4, sum * price);
