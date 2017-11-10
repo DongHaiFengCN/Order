@@ -39,6 +39,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import application.MyApplication;
+import bean.kitchenmanage.member.ConsumLogC;
 import bean.kitchenmanage.order.CheckOrderC;
 import bean.kitchenmanage.order.PayDetailC;
 import bean.kitchenmanage.order.PromotionDetailC;
@@ -100,6 +101,7 @@ public class PayActivity extends AppCompatActivity {
     private List<Document> promotionCList;
     private TableC tableC;
     List<HashMap> orderDishesList = new ArrayList<>();
+    private  CheckOrderC checkOrder = new CheckOrderC();
 
     //更新总价
     private Handler handler = new Handler() {
@@ -111,6 +113,7 @@ public class PayActivity extends AppCompatActivity {
 
                 //显示原价
                 totalTv.setText(total + "");
+                factTv.setText("实际支付：" + total + "元");
             }
 
         }
@@ -222,11 +225,7 @@ public class PayActivity extends AppCompatActivity {
 
         }
 
-
-        //包含的订单
-
     }
-
 
     /**
      * 准备所有的数据
@@ -310,7 +309,6 @@ public class PayActivity extends AppCompatActivity {
                 break;
 
             case R.id.reset:
-
 
                 break;
             default:
@@ -398,15 +396,12 @@ public class PayActivity extends AppCompatActivity {
         List<SparseArray> list = new ArrayList<>();
 
 
-        IDBManager idbManager = DBFactory.get(DatabaseSource.CouchBase, this);
-
         //返回的会员菜品
 
         List<String> stringList = data.getStringArrayListExtra("DishseList");
 
         //会员电话
         final String tel = data.getStringExtra("tel");
-
 
         List<String> memberDishes = new ArrayList<>();
 
@@ -422,7 +417,6 @@ public class PayActivity extends AppCompatActivity {
 
         MyLog.e("折扣率：" + disrate);
 
-
         //遍历订单中包含的会员菜品
 
         for (int j = 0; j < orderDishesList.size(); j++) {
@@ -435,14 +429,14 @@ public class PayActivity extends AppCompatActivity {
             HashMap h = orderDishesList.get(j);
 
             String name = h.get("dishesName").toString();
-
+            float sum = Float.valueOf(String.valueOf(h.get("allPrice")));
             //1 设置菜品的名称
 
             s.put(1, name);
 
-
+            //2 设置菜品的原价
+            s.put(2, sum);
             MyLog.e("订单菜名：" + name);
-
 
             //遍历所会员菜品找匹配的打折菜品
 
@@ -453,20 +447,13 @@ public class PayActivity extends AppCompatActivity {
 
                     MyLog.e("订单中包含打折的菜品名称：" + name);
 
-                    float sum = (float) h.get("allPrice");
-
                     MyLog.e("折前价格：" + sum);
-
-                    //2 设置菜品的原价
-
-                    s.put(2, sum);
 
                     sum = (sum * disrate) / 100f;
 
                     MyLog.e("折后前价格：" + sum);
 
-                    //3 设置菜品的折扣
-
+                    //3 设置菜品的折扣价格
                     s.put(3, sum);
                     //是打折的直接添加到折扣总价中
 
@@ -479,30 +466,41 @@ public class PayActivity extends AppCompatActivity {
                     s.put(4, true);
 
                     break;
-
                 }
-
             }
 
             //不是打折菜品的时候直接将价格加到总价
 
             if (!isSale) {
 
-                total += (float) h.get("allPrice");
+                s.put(3, 0f);
+
+                total += sum;
 
                 s.put(4, false);
             }
-
+            list.add(s);
 
         }
 
+        //获取会员
+        final Document members = idbManager.getMembers(tel);
+
         //展示享受折扣的列表
 
-        StringBuilder total_sb = new StringBuilder("折后金额：￥");
+        StringBuilder total_sb = new StringBuilder("折扣价：￥");
 
         View view = getLayoutInflater().inflate(R.layout.view_payactivity_memberdishes_sale_dialog, null);
 
-        TextView t = view.findViewById(R.id.saletotalprice_tv);
+        final TextView balance = view.findViewById(R.id.balance);
+
+        final float remainder = members.getFloat("remainder");
+
+        balance.setText("余额："+remainder);
+
+        //支付价格大于卡内余额，且卡内余额大于零，显示使用卡内全部余额
+
+        final TextView t = view.findViewById(R.id.saletotalprice_tv);
 
         ListView listView = view.findViewById(R.id.memberdisheslist_lv);
 
@@ -522,39 +520,114 @@ public class PayActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
 
-
-            }
-        });
-
-
-        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-
-                IDBManager idbManager = DBFactory.get(DatabaseSource.CouchBase, PayActivity.this);
-
-                Document members = idbManager.getMembers(tel);
-
                 factTv.setText("实际支付：" + total + "元");
 
-                associatorTv.setText(disrate + "/折");
-
-
             }
         });
 
-        builder.show();
+        AlertDialog builder1 = builder.show();
+        builder1.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                //余额不足状态下
+
+                if(total > remainder&&remainder>0) {
+
+                    //支付价格大于卡内余额，且卡内余额大于零，显示使用卡内全部余额
+                    AlertDialog.Builder a = new AlertDialog.Builder(PayActivity.this);
+                    a.setTitle("卡内余额不足！");
+                    a.setMessage("使用卡内全部余额？");
+                    a.setPositiveButton("是", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                            try {
+                                //会员剩余金额清零
+                                members.setFloat("remainder", 0f);
+                                idbManager.save(members);
+
+                            } catch (CouchbaseLiteException e) {
+                                e.printStackTrace();
+                            }
+
+                            //会员消费记录
+                            setConsumLog(members, remainder);
+
+                            //消费支付细节 6会员消费,计算剩余部分
+                            total = total-remainder;
+
+                            setPayDetail(6,total);
+
+                        }
+                    });
+                    a.setNegativeButton("否", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                        }
+                    });
+                    a.show();
+
+                }else{//余额充足
+
+                    //会员剩余金额清零
+                    members.setFloat("remainder",remainder - total);
+                    try {
+                        idbManager.save(members);
+                    } catch (CouchbaseLiteException e) {
+                        e.printStackTrace();
+                    }
+                    Toast.makeText(PayActivity.this,"支付成功！",Toast.LENGTH_SHORT);
+                    //会员消费记录
+                    setConsumLog(members, total);
+
+                    //消费支付细节 6会员消费
+                    setPayDetail(6,total);
+
+                    //提交订单
+
+                    try {
+
+                        submitCheckOrder();
+
+                    } catch (CouchbaseLiteException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
     }
 
+    /**
+     * 设置会员消费记录
+     * @param members 会员
+     * @param consum 消费金额
+     */
+
+    private void setConsumLog(Document members, float consum) {
+
+        ConsumLogC consumLogC = new ConsumLogC();
+        consumLogC.setClassName("ConsumLogC");
+        consumLogC.setChannelId(myApplication.getCompany_ID());
+        consumLogC.setMembersId(members.getId());
+        consumLogC.setCardNo(members.getString("cardNum"));
+        consumLogC.setOrderNo(checkOrder.get_id());
+        consumLogC.setCardConsum(consum);
+        consumLogC.setTime(new Date());
+        CDBHelper.createAndUpdate(myApplication,consumLogC);
+    }
 
     /**
      * 充值卡扣款功能
      *
      * @param data
      */
+
     private void turnRechange(Intent data) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
         View view = getLayoutInflater().inflate(R.layout.view_payactivity_memberdishes_rechange_dialog, null);
 
         //当前卡中余额的数量
@@ -571,7 +644,6 @@ public class PayActivity extends AppCompatActivity {
         TextView rechangepay_tv = view.findViewById(R.id.rechangepay_tv);
 
         rechangepay_tv.setText(total + "");
-
 
         builder.setTitle("扣款明细表");
         builder.setView(view);
@@ -612,13 +684,13 @@ public class PayActivity extends AppCompatActivity {
                 alertDialog.dismiss();
             }
         });
+
         alertDialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 if (r >= total) {//余额扣款
 
-                    IDBManager idbManager = DBFactory.get(DatabaseSource.CouchBase, PayActivity.this);
                     Document members = idbManager.getMembers(tel);
 
                     //更新余额
@@ -652,13 +724,10 @@ public class PayActivity extends AppCompatActivity {
 
 
                 }
-
             }
-
 
         });
     }
-
 
     /**
      * 打印账单
@@ -793,6 +862,10 @@ public class PayActivity extends AppCompatActivity {
                     }
                 }).start();
 
+                Intent intent = new Intent(PayActivity.this,DeskActivity.class);
+                startActivity(intent);
+                finish();
+
                 break;
         }
     }
@@ -860,15 +933,12 @@ public class PayActivity extends AppCompatActivity {
      * <p>
      * 设置order的状态为买单
      */
-    public void submitCheckOrder() throws CouchbaseLiteException {
+    public CheckOrderC submitCheckOrder() throws CouchbaseLiteException {
 
         Date date = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         float all = Float.valueOf(totalTv.getText().toString());
-
-
-        CheckOrderC checkOrder = new CheckOrderC();
         checkOrder.setChannelId(myApplication.getCompany_ID());
         checkOrder.setCheckTime(formatter.format(date));
         checkOrder.setClassName("CheckOrderC");
@@ -923,6 +993,7 @@ public class PayActivity extends AppCompatActivity {
         // printOrder();
 
 
+        return checkOrder;
     }
 
     /**
