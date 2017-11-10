@@ -31,6 +31,7 @@ import com.google.zxing.common.BitMatrix;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 import com.zm.order.R;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -53,6 +54,7 @@ import model.DatabaseSource;
 import model.IDBManager;
 import model.ProgressBarasyncTask;
 import untils.MyLog;
+import untils.Tool;
 
 /**
  * @author 董海峰
@@ -257,7 +259,7 @@ public class PayActivity extends AppCompatActivity {
             //当前桌下没有买单的订单的总价
             if (order.getInt("orderState") == 1) {
 
-                total += order.getFloat("allPrice");
+                total = order.getFloat("allPrice");
                 Array a = order.getArray("goodsList");
 
                 List<Object> l = a.toList();
@@ -435,8 +437,11 @@ public class PayActivity extends AppCompatActivity {
             s.put(1, name);
 
             //2 设置菜品的原价
+
+
+
             s.put(2, sum);
-            MyLog.e("订单菜名：" + name);
+         //   MyLog.e("订单菜名：" + name);
 
             //遍历所会员菜品找匹配的打折菜品
 
@@ -445,16 +450,18 @@ public class PayActivity extends AppCompatActivity {
                 //找到打折的
                 if (name.equals(memberDishes.get(i))) {
 
-                    MyLog.e("订单中包含打折的菜品名称：" + name);
+                   // MyLog.e("订单中包含打折的菜品名称：" + name);
 
-                    MyLog.e("折前价格：" + sum);
+                  //  MyLog.e("折前价格：" + sum);
+                    BigDecimal b1 = new BigDecimal(sum);
+                    BigDecimal b2 = new BigDecimal(disrate/100f);
 
-                    sum = (sum * disrate) / 100f;
+                 //   MyLog.e("折后前价格：" + sum);
 
-                    MyLog.e("折后前价格：" + sum);
-
+                    sum = b1.subtract(b2).floatValue();
                     //3 设置菜品的折扣价格
-                    s.put(3, sum);
+
+                    s.put(3,sum);
                     //是打折的直接添加到折扣总价中
 
                     total += sum;
@@ -515,7 +522,7 @@ public class PayActivity extends AppCompatActivity {
         builder.setTitle("折扣明细表");
 
         builder.setView(view);
-
+        builder.setPositiveButton("确定",null);
         builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -525,8 +532,9 @@ public class PayActivity extends AppCompatActivity {
             }
         });
 
-        AlertDialog builder1 = builder.show();
-        builder1.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+        final AlertDialog builder1 = builder.show();
+
+        builder1.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -558,6 +566,9 @@ public class PayActivity extends AppCompatActivity {
                             total = total-remainder;
 
                             setPayDetail(6,total);
+                            builder1.dismiss();
+
+                            factTv.setText("实际支付：" + total + "元");
 
                         }
                     });
@@ -569,31 +580,35 @@ public class PayActivity extends AppCompatActivity {
                     });
                     a.show();
 
-                }else{//余额充足
+                }else{//余额充足,转跳主界面
 
                     //会员剩余金额清零
-                    members.setFloat("remainder",remainder - total);
+
+                    members.setFloat("remainder", Tool.substrct(remainder,total));
                     try {
                         idbManager.save(members);
                     } catch (CouchbaseLiteException e) {
                         e.printStackTrace();
+                    }finally {
+                        Toast.makeText(PayActivity.this,"支付成功！",Toast.LENGTH_SHORT);
                     }
-                    Toast.makeText(PayActivity.this,"支付成功！",Toast.LENGTH_SHORT);
+
                     //会员消费记录
                     setConsumLog(members, total);
 
                     //消费支付细节 6会员消费
                     setPayDetail(6,total);
 
-                    //提交订单
+                    //结单
 
                     try {
-
                         submitCheckOrder();
-
                     } catch (CouchbaseLiteException e) {
                         e.printStackTrace();
                     }
+                    builder1.dismiss();
+
+                    turnMainActivity();
                 }
             }
         });
@@ -694,7 +709,7 @@ public class PayActivity extends AppCompatActivity {
                     Document members = idbManager.getMembers(tel);
 
                     //更新余额
-                    members.setFloat("remainder", r - total);
+                    members.setFloat("remainder", Tool.substrct(r,total));
 
                     try {
                         idbManager.save(members);
@@ -853,14 +868,7 @@ public class PayActivity extends AppCompatActivity {
                 }
 
 
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
 
-                        show();
-
-                    }
-                }).start();
 
                 Intent intent = new Intent(PayActivity.this,DeskActivity.class);
                 startActivity(intent);
@@ -891,6 +899,7 @@ public class PayActivity extends AppCompatActivity {
 
             }
         });
+
         d.setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -933,7 +942,7 @@ public class PayActivity extends AppCompatActivity {
      * <p>
      * 设置order的状态为买单
      */
-    public CheckOrderC submitCheckOrder() throws CouchbaseLiteException {
+    public void submitCheckOrder() throws CouchbaseLiteException {
 
         Date date = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -948,15 +957,16 @@ public class PayActivity extends AppCompatActivity {
         //总共优惠
 
 
-        float d = all - total;
-
         checkOrder.setPay(all);
 
         checkOrder.setNeedPay(total);
 
-        MyLog.e("应支付：" + checkOrder.getPay());
+       /* MyLog.e("应支付：" + checkOrder.getPay());
 
-        MyLog.e("实际支付：" + checkOrder.getNeedPay());
+        MyLog.e("实际支付：" + checkOrder.getNeedPay());*/
+
+        BigDecimal A = new BigDecimal(Float.toString(all));
+        BigDecimal T = new BigDecimal(Float.toString(total));
 
         checkOrder.setTableNo(myApplication.getTable_sel_obj().getTableNum());
 
@@ -974,7 +984,7 @@ public class PayActivity extends AppCompatActivity {
         p.setClassName("PromotionDetailC");
 
 
-        p.setDiscounts(d);
+        p.setDiscounts(A.subtract(T).floatValue());
 
         p.setDisrate(disrate);
 
@@ -993,7 +1003,14 @@ public class PayActivity extends AppCompatActivity {
         // printOrder();
 
 
-        return checkOrder;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                show();
+
+            }
+        }).start();
     }
 
     /**

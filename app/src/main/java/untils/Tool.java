@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -80,5 +81,29 @@ public class Tool {
      }
 
         return true;
+    }
+    //减法
+    public static float substrct(float a,float b){
+
+        BigDecimal b1 = new BigDecimal(a);
+        BigDecimal b2 = new BigDecimal(b);
+        return b1.subtract(b2).floatValue();
+
+    }
+    //乘法
+    public static float multiply(float a,float b){
+
+        BigDecimal b1 = new BigDecimal(a);
+        BigDecimal b2 = new BigDecimal(b);
+        return b1.multiply(b2).floatValue();
+
+    }
+    //除法
+    public static float divide(float a,float b){
+
+        BigDecimal b1 = new BigDecimal(a);
+        BigDecimal b2 = new BigDecimal(b);
+        return b1.divide(b2).floatValue();
+
     }
 }

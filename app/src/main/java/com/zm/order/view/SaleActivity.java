@@ -193,8 +193,8 @@ public class SaleActivity extends AppCompatActivity {
 
         //获取会员信息
           // Document members = idbManager.getMembers(etAmountphone.getText().toString());
-             Document members = idbManager.getMembers("18660198063");
-        //  Document members = idbManager.getMembers("123456");
+           //  Document members = idbManager.getMembers("17605413611");
+          Document members = idbManager.getMembers("123456");
 
 
         if (Tool.isNotEmpty(members)) {
@@ -376,7 +376,7 @@ public class SaleActivity extends AppCompatActivity {
             }
 
            // intent.putExtra("tel", etAmountphone.getText().toString());
-            intent.putExtra("tel", "18660198063");
+            intent.putExtra("tel", "17605413611");
             //折扣卡返回折扣率及支持的菜品列表
 
             if (CardTypeFlag == 1) {
