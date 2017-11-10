@@ -259,7 +259,7 @@ public class PayActivity extends AppCompatActivity {
             //当前桌下没有买单的订单的总价
             if (order.getInt("orderState") == 1) {
 
-                total = order.getFloat("allPrice");
+                total += order.getFloat("allPrice");
                 Array a = order.getArray("goodsList");
 
                 List<Object> l = a.toList();
