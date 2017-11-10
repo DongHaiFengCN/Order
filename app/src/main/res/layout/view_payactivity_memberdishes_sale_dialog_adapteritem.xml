@@ -38,9 +38,8 @@
         android:layout_weight="1"
         android:gravity="center"
         android:padding="8dp"
-        android:visibility="invisible"
         android:src="@mipmap/carrot"
-       />
+        android:visibility="invisible" />
 </LinearLayout>
 
 

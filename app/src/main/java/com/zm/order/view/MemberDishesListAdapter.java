@@ -74,7 +74,16 @@ public class MemberDishesListAdapter extends BaseAdapter {
         SparseArray sparseArray = (SparseArray) list.get(i);
         viewHold.dishesname.setText(sparseArray.get(1).toString());
         viewHold.dishestotalprice.setText(sparseArray.get(2).toString());
-        viewHold.saleprice.setText(sparseArray.get(3).toString());
+
+        //折扣价格
+        if((float)sparseArray.get(3) == 0f){
+            viewHold.saleprice.setText("--");
+        }else {
+
+            viewHold.saleprice.setText(sparseArray.get(3)+"");
+        }
+
+
 
         if((boolean)sparseArray.get(4)){
 
