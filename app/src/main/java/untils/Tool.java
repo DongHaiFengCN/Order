@@ -112,6 +112,17 @@ public class Tool {
 
     }
 
+    /**
+     *
+     *
+     * map 转换成 Bean
+     *
+     * @param map
+     * @param beanClass
+     * @return
+     * @throws Exception
+     */
+
     public static Object mapToObject(Map<String, Object> map, Class<?> beanClass) throws Exception {
         if (map == null)
             return null;

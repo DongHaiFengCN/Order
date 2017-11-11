@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.couchbase.lite.Array;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Document;
+import com.couchbase.lite.Expression;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
@@ -106,7 +107,9 @@ public class PayActivity extends AppCompatActivity {
 
     private List<Document> promotionCList;
     private TableC tableC;
-    List<HashMap> orderDishesList = new ArrayList<>();
+    List<GoodsC> orderDishesList = new ArrayList<>();
+
+    //List<HashMap> orderDishesList = new ArrayList<>();
     private  CheckOrderC checkOrder = new CheckOrderC();
 
     //更新总价
@@ -268,41 +271,24 @@ public class PayActivity extends AppCompatActivity {
         bitmap = encodeAsBitmap(alipayId);
 
         //获取包含桌号xx的所有订单
-        orderList = idbManager.getOrderListBelongToTable("tableNo", tableC.getTableNum(),1);
-        MyLog.e("1"+orderList.size());
+        List<OrderC> orderCList = CDBHelper.getObjByWhere(getApplicationContext(),Expression.property("className").equalTo("OrderC").and(Expression.property("tableNo").equalTo(tableC.getTableNum())).and(Expression.property("orderState").equalTo(1)),null,OrderC.class);
+
+        for(OrderC orderC:orderCList){
+
+            checkOrder.addOrder(orderC);
+
+            total += orderC.getAllPrice();
 
 
+            //获取当前订单下goods集合下所有的菜品
+            for (GoodsC o : orderC.getGoodsList()) {
 
-        promotionCList = idbManager.getByClassName("PromotionC");
-
-        Iterator<Document> i = orderList.iterator();
-
-        while (i.hasNext()) {
-
-            Document order = i.next();
-
-            try {
-                checkOrder.addOrder((OrderC) Tool.mapToObject(order.toMap(), OrderC.class));
-            } catch (Exception e) {
-                e.printStackTrace();
+                orderDishesList.add(o);
             }
 
-            total += order.getFloat("allPrice");
-                Array a = order.getArray("goodsList");
-
-                List<Object> l = a.toList();
-
-                //获取当前订单下goods集合下所有的菜品
-                for (Object o : l) {
-
-                    HashMap h = (HashMap) o;
-                    orderDishesList.add(h);
-                    MyLog.e("菜品：  " + h.get("dishesName").toString());
-                }
-
-          //  }
-
         }
+
+        promotionCList = idbManager.getByClassName("PromotionC");
 
     }
 
@@ -452,10 +438,10 @@ public class PayActivity extends AppCompatActivity {
             SparseArray<Object> s = new SparseArray<>();
 
             //获取订单下goods的菜品名称
-            HashMap h = orderDishesList.get(j);
+            GoodsC h = orderDishesList.get(j);
 
-            String name = h.get("dishesName").toString();
-            float sum = Float.valueOf(String.valueOf(h.get("allPrice")));
+            String name = h.getDishesName();
+            float sum = Float.valueOf(String.valueOf(h.getAllPrice()));
             //1 设置菜品的名称
 
             s.put(1, name);
@@ -551,7 +537,7 @@ public class PayActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
 
-                factTv.setText("实际支付：" + total + "元");
+                //factTv.setText("实际支付：" + total + "元");
 
             }
         });
@@ -589,10 +575,11 @@ public class PayActivity extends AppCompatActivity {
                             //消费支付细节 6会员消费,计算剩余部分
                             total = total-remainder;
 
-                            setPayDetail(6,total);
+                            setPayDetail(6,remainder);
                             builder1.dismiss();
 
-                            factTv.setText("实际支付：" + total + "元");
+                           // factTv.setText("实际支付：" + total + "元");
+                            turnMainActivity();
 
                         }
                     });
@@ -604,9 +591,8 @@ public class PayActivity extends AppCompatActivity {
                     });
                     a.show();
 
-                }else{//余额充足,转跳主界面
+                }else if(remainder >= total){//余额充足,转跳主界面
 
-                    //会员剩余金额清零
 
                     members.setFloat("remainder", Tool.substrct(remainder,total));
                     try {
@@ -980,36 +966,20 @@ public class PayActivity extends AppCompatActivity {
         MyLog.e("总价：" + all);
         //总共优惠
 
-
-
         checkOrder.setPay(all);
 
         checkOrder.setNeedPay(total);
 
-       /* MyLog.e("应支付：" + checkOrder.getPay());
-
-        MyLog.e("实际支付：" + checkOrder.getNeedPay());*/
 
         BigDecimal A = new BigDecimal(Float.toString(all));
         BigDecimal T = new BigDecimal(Float.toString(total));
 
         checkOrder.setTableNo(myApplication.getTable_sel_obj().getTableNum());
+        for(OrderC orderC: checkOrder.getOrderList()){
 
-
-        //将当前桌下的订单状态设置成提交,并保存
-        if(checkOrder.getOrderList() != null){
-
-            for (OrderC d1 : checkOrder.getOrderList()) {
-
-                d1.setOrderState(0);
-                CDBHelper.createAndUpdate(getApplicationContext(),d1);
-            }
+            orderC.setOrderState(0);
+            CDBHelper.createAndUpdate(getApplicationContext(),orderC);
         }
-    /*    for(Document document: orderList){
-
-            document.setInt("orderState",0);
-            idbManager.save(document);
-        }*/
 
         //营销细节
         PromotionDetailC p = new PromotionDetailC();

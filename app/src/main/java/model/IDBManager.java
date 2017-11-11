@@ -46,5 +46,5 @@ public interface IDBManager<T> {
 
 
 
-    Document getTable(String values);
+
 }

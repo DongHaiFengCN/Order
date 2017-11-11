@@ -193,8 +193,8 @@ public class SaleActivity extends AppCompatActivity {
 
         //获取会员信息
           // Document members = idbManager.getMembers(etAmountphone.getText().toString());
-           //  Document members = idbManager.getMembers("17605413611");
-          Document members = idbManager.getMembers("18660198063");
+             Document members = idbManager.getMembers("17605413611");
+         // Document members = idbManager.getMembers("18660198063");
 
 
         if (Tool.isNotEmpty(members)) {

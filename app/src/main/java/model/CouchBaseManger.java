@@ -303,34 +303,6 @@ public class CouchBaseManger<T> implements IDBManager {
 
 
     @Override
-    public Document getTable(String values) {
-        Document doc = null;
-        Query query= Query.select(SelectResult.expression(Expression.meta().getId()))
-                .from(DataSource.database(database))
-                .where(Expression.property("className").equalTo("TableC").and(Expression.property("tableNum").equalTo(values)));
-
-        try {
-            ResultSet resultSet= query.run();
-            Result result;
-
-            if ((result=resultSet.next())!=null){
-
-                String cardId = result.getString(0);
-                doc=database.getDocument(cardId);
-                // MyLog.e("数据库查询结果 Name "+doc.getString("name"));
-                //MyLog.e("数据库查询结果 mPassword "+doc.getString("mPassword"));
-
-            }
-
-
-        } catch (CouchbaseLiteException e) {
-            e.printStackTrace();
-        }
-
-        return doc;
-    }
-
-    @Override
     public Object getById(String id) {
 
         return database != null?database.getDocument(id):null;
