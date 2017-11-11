@@ -41,7 +41,6 @@ import java.util.TimerTask;
 
 import application.MyApplication;
 import bean.Goods;
-import bean.Orders;
 import bean.kitchenmanage.order.GoodsC;
 import bean.kitchenmanage.order.OrderC;
 import bean.kitchenmanage.table.TableC;
@@ -83,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
     private List<Document> orderList;
     private TableC tableC;
     private OrderC orderC ;
-    private List<Orders> ordersList = new ArrayList<>();
     private List<GoodsC> goodsList = new ArrayList<>();
     List<HashMap> orderDishesList = new ArrayList<>();
     private List<Document> promotionCList;
