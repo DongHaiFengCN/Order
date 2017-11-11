@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bean.Goods;
+import bean.kitchenmanage.order.GoodsC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -268,17 +269,16 @@ public class OrderFragment extends Fragment implements IMainView {
                 int sum = amountView.getAmount();
 
                 if (sum != 0) {//如果选择器的数量不为零，当前的选择的菜品加入订单列表
-                    final SparseArray<Object> s = new SparseArray<>();//查下这个怎么用
-                    s.put(0, name);
+                    GoodsC goodsC = new GoodsC();
+                    goodsC.setDishesName(name);
                     if (tasteList.size() == 0){
-                        s.put(1, null);
+                        goodsC.setDishesTaste(null);
                     }else{
-                        s.put(1, tasteList.get(pos));
+                        goodsC.setDishesTaste(tasteList.get(pos));
                     }
-                    s.put(2, sum + "");
-                    s.put(3, price);
-                    s.put(4, sum * price);
-                    ((MainActivity) getActivity()).getOrderItem().add(s);
+                    goodsC.setDishesCount(sum);
+                    goodsC.setAllPrice(sum * price);
+                    ((MainActivity)getActivity()).getGoodsList().add(goodsC);
                     //购物车计数器数据更新
                     point =  (((MainActivity) getActivity()).getPoint());
                     point++;
