@@ -1,14 +1,19 @@
 package untils;
 
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 项目名称：Order
@@ -106,4 +111,29 @@ public class Tool {
         return b1.divide(b2).floatValue();
 
     }
+
+    public static Object mapToObject(Map<String, Object> map, Class<?> beanClass) throws Exception {
+        if (map == null)
+            return null;
+
+        Object obj = beanClass.newInstance();
+
+        Field[] fields = obj.getClass().getDeclaredFields();
+        for (Field field : fields) {
+            int mod = field.getModifiers();
+            if(Modifier.isStatic(mod) || Modifier.isFinal(mod)){
+                continue;
+            }
+
+            field.setAccessible(true);
+            field.set(obj, map.get(field.getName()));
+        }
+
+        return obj;
+    }
+
+
+
+
+
 }
