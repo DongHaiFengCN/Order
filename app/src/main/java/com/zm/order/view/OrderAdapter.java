@@ -1,7 +1,5 @@
 package com.zm.order.view;
 
-import android.app.Activity;
-import android.content.Context;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -12,8 +10,12 @@ import android.widget.TextView;
 
 import com.zm.order.R;
 
-import java.util.Iterator;
 import java.util.List;
+
+import bean.DishesKind;
+import bean.kitchenmanage.dishes.DishesC;
+import bean.kitchenmanage.order.GoodsC;
+import model.CDBHelper;
 
 /**
  * 项目名称：Order
@@ -32,7 +34,9 @@ public class OrderAdapter extends BaseAdapter {
      *
      */
     private List<SparseArray<Object>> orderItem;
+    private List<GoodsC> goodsCs;
     private MainActivity context;
+    private int Price = 0;
 
     public void setOnchangeListener(OnchangeListener onchangeListener) {
         this.onchangeListener = onchangeListener;
@@ -46,21 +50,27 @@ public class OrderAdapter extends BaseAdapter {
 
     private OnchangeListener onchangeListener;
 
-    public OrderAdapter(List<SparseArray<Object>> orderItem, MainActivity mainActivity) {
-        this.orderItem = orderItem;
+    public OrderAdapter(){}
+
+    public OrderAdapter(List<GoodsC> goodsCs, MainActivity mainActivity) {
+        this.goodsCs = goodsCs;
         this.context = mainActivity;
     }
+   /* public OrderAdapter(List<SparseArray<Object>> orderItem, MainActivity mainActivity) {
+        this.orderItem = orderItem;
+        this.context = mainActivity;
+    }*/
 
 
     @Override
     public int getCount() {
-        return orderItem.size();
+        return goodsCs == null ? 0 : goodsCs.size();
     }
 
     @Override
     public Object getItem(int i) {
 
-        return orderItem.get(i);
+        return goodsCs.get(i);
     }
 
     @Override
@@ -72,7 +82,7 @@ public class OrderAdapter extends BaseAdapter {
     public View getView(final int i, View view, ViewGroup viewGroup) {
 
 
-        ViewHold  viewHold = null;
+       final ViewHold  viewHold;
 
         if(view == null){
 
@@ -91,31 +101,33 @@ public class OrderAdapter extends BaseAdapter {
 
             viewHold = (ViewHold) view.getTag();
         }
-        viewHold.name.setText(orderItem.get(i).get(0).toString());
-        if (orderItem.get(i).get(1) == null){
+
+        viewHold.name.setText(goodsCs.get(i).getDishesName());
+        if (goodsCs.get(i).getDishesTaste() == null){
             viewHold.taste.setText("");
         }else{
-            viewHold.taste.setText(orderItem.get(i).get(1).toString());
+            viewHold.taste.setText(goodsCs.get(i).getDishesTaste());
         }
 
-
-        viewHold.number.setNumber(orderItem.get(i).get(2).toString());
-
-       // viewHold.price.setText(orderItem.get(i).get(4).toString());
+        viewHold.number.setNumber(goodsCs.get(i).getDishesCount()+"");
+        final DishesC dishesC =  CDBHelper.getObjById(context.getApplicationContext(),goodsCs.get(i).getDishesId(), DishesC.class);
         //设置item的点击事件
         viewHold.number.setChangeListener(new AmountView.ChangeListener() {
             @Override
             public void OnChange(int ls,boolean flag) {
 
-                orderItem.get(i).put(2,ls);
-                orderItem.get(i).put(4,ls * (float)orderItem.get(i).get(3));
-                onchangeListener.onchangeListener(flag,(float)orderItem.get(i).get(3),ls);
+
+                goodsCs.get(i).setDishesCount(ls);
+                goodsCs.get(i).setAllPrice(ls * dishesC.getPrice());
+
+                onchangeListener.onchangeListener(flag,dishesC.getPrice() ,ls);
+
                 context.getSeekT9Adapter().notifyDataSetChanged();
 
               if(ls == 0){
-                  orderItem.get(i).put(2,0);
+                  goodsCs.get(i).setDishesCount(0);
                   context.getSeekT9Adapter().notifyDataSetChanged();
-                  orderItem.remove(i);
+                  goodsCs.remove(i);
                   notifyDataSetChanged();
 
               }

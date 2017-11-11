@@ -44,7 +44,6 @@ public class SeekT9Adapter extends BaseAdapter {
     private float total;
     private String taste ;
     private List<String> tasteList;
-    private List<SparseArray<Object>> list = new ArrayList<>();
     private SeekT9OrderItem orderItem;
     private boolean isName = false,isTaste = false;
     int pos ;
@@ -114,10 +113,10 @@ public class SeekT9Adapter extends BaseAdapter {
 
         activity.setT9Adapter(this);
 
-        if (activity.getOrderItem().size() != 0 ){
-            for (int i = 0 ;i< activity.getOrderItem().size() ;i++){
-                if (activity.getOrderItem().get(i).get(0).toString().equals(mData.get(position).getDishesC().getDishesName())) {
-                    viewHolder.viewShu.setText(activity.getOrderItem().get(i).get(2).toString());
+        if (activity.getGoodsList().size() != 0 ){
+            for (int i = 0 ;i< activity.getGoodsList().size() ;i++){
+                if (activity.getGoodsList().get(i).getDishesName().toString().equals(mData.get(position).getDishesC().getDishesName())) {
+                    viewHolder.viewShu.setText(activity.getGoodsList().get(i).getDishesCount()+"");
                     mData.get(position).setCount(Integer.parseInt(viewHolder.viewShu.getText().toString()));
                     break;
                 }else {
@@ -176,23 +175,22 @@ public class SeekT9Adapter extends BaseAdapter {
                     viewHolder.viewJian.setVisibility(View.GONE);
                 }
                 viewHolder.viewShu.setText(mData.get(position).getCount()+"");
-                if (activity.getOrderItem().size() != 0 ){
-                    for (int i = 0 ;i< activity.getOrderItem().size() ;i++){
-                        if (activity.getOrderItem().get(i).get(0).toString().equals(mData.get(position).getDishesC().getDishesName())) {
-                            number = Integer.parseInt(activity.getOrderItem().get(i).get(2).toString());
+                if (activity.getGoodsList().size() != 0 ){
+                    for (int i = 0 ;i< activity.getGoodsList().size() ;i++){
+                        if (activity.getGoodsList().get(i).getDishesName().toString().equals(mData.get(position).getDishesC().getDishesName())) {
+                            number = activity.getGoodsList().get(i).getDishesCount();
                             break;
                         }
                     }
                 }
 
                 number = Integer.parseInt(viewHolder.viewShu.getText().toString());
-                if (activity.getOrderItem().size() != 0 ){
-                    for (int i = 0 ;i< activity.getOrderItem().size() ;i++){
-                        if (activity.getOrderItem().get(i).get(0).toString().equals(mData.get(position).getDishesC().getDishesName())) {
-
-                            activity.getOrderItem().get(i).put(2, number);
-                            number = Integer.parseInt(activity.getOrderItem().get(i).get(2).toString());
-                            activity.getOrderItem().get(i).put(4, number * mData.get(position).getDishesC().getPrice());
+                if (activity.getGoodsList().size() != 0 ){
+                    for (int i = 0 ;i< activity.getGoodsList().size() ;i++){
+                        if (activity.getGoodsList().get(i).getDishesName().toString().equals(mData.get(position).getDishesC().getDishesName())) {
+                            activity.getGoodsList().get(i).setDishesCount(number);
+                            number = activity.getGoodsList().get(i).getDishesCount();
+                            activity.getGoodsList().get(i).setAllPrice(number * mData.get(position).getDishesC().getPrice());
                             total = activity.getTotal();
                             total -= 1 * mData.get(position).getDishesC().getPrice();
                             activity.setTotal(total);
@@ -218,6 +216,7 @@ public class SeekT9Adapter extends BaseAdapter {
 
 
     private void setTJ(int position , SparseArray<Object> s,ViewHolder viewHolder){
+        GoodsC goodsC = new GoodsC();
         mData.get(position).setCount(mData.get(position).getCount()+1);
 
         viewHolder.viewShu.setText(mData.get(position).getCount()+"");
@@ -225,20 +224,23 @@ public class SeekT9Adapter extends BaseAdapter {
             viewHolder.viewShu.setVisibility(View.VISIBLE);
             viewHolder.viewJian.setVisibility(View.VISIBLE);
         }
-        if (activity.getOrderItem().size() == 0 ){
+        if (activity.getGoodsList().size() == 0 ){
 
             if (mData.get(position).getCount() > 0) {//如果选择器的数量不为零，当前的选择的菜品加入订单列表
 
-                s.put(0, mData.get(position).getDishesC().getDishesName());
+
+                goodsC.setDishesName(mData.get(position).getDishesC().getDishesName());
                 if (tasteList.size() == 0){
-                    s.put(1, null);
+                    goodsC.setDishesTaste(null);
                 }else{
-                    s.put(1, tasteList.get(pos));
+                    goodsC.setDishesTaste(tasteList.get(pos));
                 }
-                s.put(2, 1+"");
-                s.put(3, mData.get(position).getDishesC().getPrice());
-                s.put(4, mData.get(position).getCount() * mData.get(position).getDishesC().getPrice());
-                activity.getOrderItem().add(s);
+                goodsC.setDishesCount(1);
+                goodsC.setAllPrice(mData.get(position).getCount() * mData.get(position).getDishesC().getPrice());
+                goodsC.setDishesId(mData.get(position).getDishesC().get_id());
+                activity.getGoodsList().add(goodsC);
+
+                CDBHelper.createAndUpdate(activity.getApplicationContext(), goodsC);
                 //购物车计数器数据更新
                 point =  activity.getPoint();
                 point++;
@@ -256,11 +258,11 @@ public class SeekT9Adapter extends BaseAdapter {
 
             number = mData.get(position).getCount();
 
-            for (int i = 0; i< activity.getOrderItem().size();i++) {
-                if (activity.getOrderItem().get(i).get(0).toString().equals(mData.get(position).getDishesC().getDishesName())){
-                    activity.getOrderItem().get(i).put(2, number++);
-                    number = Integer.parseInt(activity.getOrderItem().get(i).get(2).toString());
-                    activity.getOrderItem().get(i).put(4,number*mData.get(position).getDishesC().getPrice());
+            for (int i = 0; i< activity.getGoodsList().size();i++) {
+                if (activity.getGoodsList().get(i).getDishesName().toString().equals(mData.get(position).getDishesC().getDishesName())){
+                    activity.getGoodsList().get(i).setDishesCount(number++);
+                    number = activity.getGoodsList().get(i).getDishesCount();
+                    activity.getGoodsList().get(i).setAllPrice(number*mData.get(position).getDishesC().getPrice());
                     total = activity.getTotal();
                     total += 1 * mData.get(position).getDishesC().getPrice();
                     activity.setTotal(total);
@@ -283,16 +285,17 @@ public class SeekT9Adapter extends BaseAdapter {
 
                 if (number != -1) {//如果选择器的数量不为零，当前的选择的菜品加入订单列表
 
-                    s.put(0, mData.get(position).getDishesC().getDishesName());
+                    goodsC.setDishesName(mData.get(position).getDishesC().getDishesName());
                     if (tasteList.size() == 0){
-                        s.put(1, null);
+                        goodsC.setDishesTaste(null);
                     }else{
-                        s.put(1, tasteList.get(pos));
+                        goodsC.setDishesTaste(tasteList.get(pos));
                     }
-                    s.put(2, 1+"");
-                    s.put(3, mData.get(position).getDishesC().getPrice());
-                    s.put(4, number * mData.get(position).getDishesC().getPrice());
-                    activity.getOrderItem().add(s);
+                    goodsC.setDishesCount(1);
+                    goodsC.setAllPrice(mData.get(position).getCount() * mData.get(position).getDishesC().getPrice());
+                    goodsC.setDishesId(mData.get(position).getDishesC().get_id());
+                    activity.getGoodsList().add(goodsC);
+                    CDBHelper.createAndUpdate(activity.getApplicationContext(), goodsC);
                     //购物车计数器数据更新
                     point =  activity.getPoint();
                     point++;

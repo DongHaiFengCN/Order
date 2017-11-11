@@ -5,30 +5,22 @@ import android.animation.AnimatorListenerAdapter;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.IdRes;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,14 +31,17 @@ import com.couchbase.lite.Document;
 import com.couchbase.lite.Log;
 import com.zm.order.R;
 
-import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TimerTask;
 
 import application.MyApplication;
+import bean.Goods;
+import bean.Orders;
 import bean.kitchenmanage.order.GoodsC;
 import bean.kitchenmanage.order.OrderC;
 import bean.kitchenmanage.table.TableC;
@@ -87,8 +82,13 @@ public class MainActivity extends AppCompatActivity {
     private IDBManager idbManager;
     private List<Document> orderList;
     private TableC tableC;
+    private OrderC orderC ;
+    private List<Orders> ordersList = new ArrayList<>();
+    private List<GoodsC> goodsList = new ArrayList<>();
     List<HashMap> orderDishesList = new ArrayList<>();
     private List<Document> promotionCList;
+    private String id;
+    private Document document;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
         idbManager = DBFactory.get(DatabaseSource.CouchBase, getApplicationContext());
         myApp = (MyApplication) getApplication();
         tableC = myApp.getTable_sel_obj();
-
+        orderC = new OrderC(myApp.getCompany_ID());
 
         initView();
 
@@ -130,16 +130,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void setOrderAdapter(OrderAdapter orderAdapter){
-        this.orderAdapter = orderAdapter;
-    }
-
-    public OrderAdapter getOrderAdapter(){
-        return orderAdapter;
-    }
-
     public List<SparseArray<Object>> getOrderItem(){
         return orderItem;
+    }
+    public List<GoodsC> getGoodsList(){
+        return goodsList;
     }
     public void setTotal(float total){
         this.total = total;
@@ -175,8 +170,6 @@ public class MainActivity extends AppCompatActivity {
         final ImageView imageView = (ImageView) findViewById(R.id.shade);
 
         final LinearLayout linearLayout = (LinearLayout) findViewById(R.id.orderList);
-
-
         //获取屏幕尺寸
 
         DisplayMetrics dm = new DisplayMetrics();
@@ -191,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
         layoutParams.width = w;
         layoutParams.height = h / 2;
         linearLayout.setLayoutParams(layoutParams);
-        o = new OrderAdapter( getOrderItem(), MainActivity.this);
+        o = new OrderAdapter( getGoodsList(), MainActivity.this);
         car_iv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -383,7 +376,7 @@ public class MainActivity extends AppCompatActivity {
         total_tv.setText("0元");
         total = 0;
 
-        getOrderItem().clear();
+        getGoodsList().clear();
         o.notifyDataSetChanged();
     }
 
@@ -393,33 +386,35 @@ public class MainActivity extends AppCompatActivity {
             CDBHelper.db.inBatch(new TimerTask() {
                 @Override
                 public void run() {
-                    OrderC orderC = new OrderC(myApp.getCompany_ID());
-                    for (int i = 0 ; i< getOrderItem().size();i++){
 
-                        GoodsC goodsC = new GoodsC();
-                        goodsC.setDishesName(getOrderItem().get(i).get(0).toString());
-                        if (getOrderItem().get(i).get(1) == null){
-                            goodsC.setDishesTaste(null);
-                        }else {
-                            goodsC.setDishesTaste(getOrderItem().get(i).get(1).toString());
+                    if (orderDishesList != null){
+                        for (int i = 0; i< orderDishesList.size(); i++){
+                            Log.e("Aaaa",orderDishesList.get(i).size()+"");
                         }
-                        goodsC.setDishesCount(Integer.parseInt(getOrderItem().get(i).get(2).toString()));
-                        goodsC.setAllPrice(Float.parseFloat(getOrderItem().get(i).get(4).toString()));
-                        CDBHelper.createAndUpdate(getApplicationContext(),goodsC);
-                        orderC.addGoods(goodsC);
                     }
-                    orderC.setAllPrice(total);
-                    orderC.setOrderState(1);
-                    orderC.setOrderType(1);
-                    orderC.setTableNo(myApp.getTable_sel_obj().getTableNum());
-                    CDBHelper.createAndUpdate(getApplicationContext(),orderC);
+                    if (document == null){
+                        orderC.setGoodsList(goodsList);
+                        orderC.setAllPrice(total);
+                        orderC.setOrderState(1);
+                        orderC.setOrderType(1);
+                        orderC.setTableNo(myApp.getTable_sel_obj().getTableNum());
+                        id = CDBHelper.createAndUpdate(getApplicationContext(),orderC);
+                    }else{
+                        if (document.getId().equals(id)){
+                            OrderC orderC =  CDBHelper.getObjById(getApplicationContext(),id,OrderC.class);
+                            orderC.setGoodsList(goodsList);
+                            orderC.setAllPrice(total);
+                            CDBHelper.createAndUpdate(getApplicationContext(),orderC);
+                        }
+                    }
+
+
 
                 }
             });
         } catch (CouchbaseLiteException e) {
             e.printStackTrace();
         }
-
 
 
     }
@@ -430,76 +425,8 @@ public class MainActivity extends AppCompatActivity {
 
         if (resultCode == RESULT_OK && requestCode == 1) {
 
-            clearOrder();
-            getSeekT9Adapter().notifyDataSetChanged();
-            Log.e("Aaaa", getOrderItem().size()+"");
-
-            //获取包含桌号xx的所有订单
-            orderList = idbManager.getOrderListBelongToTable("tableNo", tableC.getTableNum());
-
-            promotionCList = idbManager.getByClassName("PromotionC");
-
-            Iterator<Document> i = orderList.iterator();
-            orderDishesList.clear();
-            while (i.hasNext()) {
-
-                Document order = i.next();
-
-                //当前桌下没有买单的订单的总价
-                if (order.getInt("orderState") == 1) {
-
-                    total += order.getFloat("allPrice");
-                    Array a = order.getArray("goodsList");
-
-                    List<Object> l = a.toList();
-
-                    //获取当前订单下goods集合下所有的菜品
-
-                    for (Object o : l) {
-
-                        HashMap h = (HashMap) o;
-
-                        orderDishesList.add(h);
-
-                        MyLog.e("菜品：  " + h.get("dishesName").toString());
-
-                    }
-
-                }
-
-            }
-            Log.e("Aaaa", getOrderItem().size()+"");
-
-            Log.e("Aaaa", orderDishesList.size()+"orderDishesList.size()");
-
-            for (int a = 0 ; a < orderDishesList.size();a++){
-
-                SparseArray<Object> sparseArray = new SparseArray<>();
-                sparseArray.put(0,orderDishesList.get(a).get("dishesName").toString());
-                if(orderDishesList.get(a).get("dishesTaste") == null){
-                    sparseArray.put(1,null);
-                }else{
-                    sparseArray.put(1,orderDishesList.get(a).get("dishesTaste").toString());
-                }
-
-                sparseArray.put(2,orderDishesList.get(a).get("dishesCount").toString());
-                sparseArray.put(3,(Float.parseFloat((orderDishesList.get(a).get("allPrice").toString()))/Float.parseFloat(orderDishesList.get(a).get("dishesCount").toString())));
-                sparseArray.put(4,(Float.parseFloat((orderDishesList.get(a).get("allPrice").toString()))));
-                getOrderItem().add(sparseArray);
-
-            }
-            setTotal(total);
-            setPoint(getOrderItem().size());
-            o.notifyDataSetChanged();
-            Log.e("Aaaa", getOrderItem().size()+"");
-
-            List<Document> doc = CDBHelper.getDocmentsByClassName(getApplicationContext(),"OrderC");
-            for (Document d : doc){
-                CDBHelper.deleDocument(getApplicationContext(),d);
-            }
-            
-
-
+            document = CDBHelper.getDocByID(getApplicationContext(),id);
+            Log.e("document",""+document.getId());
 
         }
 
