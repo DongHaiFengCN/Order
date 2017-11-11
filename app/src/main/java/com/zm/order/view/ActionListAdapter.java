@@ -1,5 +1,6 @@
 package com.zm.order.view;
 
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import com.zm.order.R;
 
 import java.util.List;
 
+import bean.kitchenmanage.promotion.PromotionC;
 import untils.MyLog;
 
 /**
@@ -43,13 +45,15 @@ public class ActionListAdapter extends BaseAdapter {
         super();
         this.list = list;
         this.payActivity = payActivity;
-        flag = new int[list.size()];
+       flag = new int[list.size()];
+       // flag  = new int[20];
     }
 
     @Override
     public int getCount() {
 
         return list.isEmpty()?0:list.size();
+       // return 20;
     }
 
     @Override
@@ -84,17 +88,15 @@ public class ActionListAdapter extends BaseAdapter {
 
             viewHold = (ViewHold) view.getTag();
         }
+      PromotionC promotionC = (PromotionC) list.get(i);
+        viewHold.actionName.setText(promotionC.getPromotionName());
+        viewHold.actionTime.setText(promotionC.getStartTime()+"    /     "+promotionC.getEndTime());
 
-        MyLog.e(i+"");
-        Document document = (Document) list.get(i);
-        viewHold.actionName.setText(document.getString("promotionName"));
-        viewHold.actionTime.setText(document.getString("startTime")+"    /     "+document.getString("endTime"));
-
-        if(document.getInt("promotionType") == 1){
+        if(promotionC.getPromotionType() == 1){
 
             viewHold.actionType.setText("打折");
 
-        }else if(document.getInt("promotionType") == 2){
+        }else if(promotionC.getPromotionType()  == 2){
 
             viewHold.actionType.setText("赠券");
 
@@ -108,6 +110,17 @@ public class ActionListAdapter extends BaseAdapter {
                 if(flag[i] == 0){
 
                     flag[i] = 1;
+
+                    for (int j = 0; j < flag.length; j++) {
+
+                        if(j != i && flag[j] == 1){
+
+                            flag[j] = 0;
+
+                        }
+
+                    }
+                    notifyDataSetChanged();
 
                 }else{
 
