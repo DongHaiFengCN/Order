@@ -58,18 +58,6 @@
             />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/useAll"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="4dp"
-        android:text="点击使用卡中所有余额"
-        android:background="@color/menu_item_press"
-        android:gravity="center"
-        android:textColor="@color/md_white"
-        android:visibility="invisible"
-
-        />
 
 
 </LinearLayout>

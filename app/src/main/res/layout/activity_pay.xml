@@ -201,7 +201,6 @@
             android:layout_weight="1"
             android:gravity="center|right"
             android:paddingRight="16dp"
-            android:textColor="@color/grey_color1"
             android:textSize="16sp"
             android:typeface="serif" />
 

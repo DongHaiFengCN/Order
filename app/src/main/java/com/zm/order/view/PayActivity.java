@@ -390,6 +390,13 @@ public class PayActivity extends AppCompatActivity {
 
             associatorTv.setText("减免后不可选");
         }
+
+        //设置活动不可用
+        action.setEnabled(false);
+        if(TextUtils.isEmpty(actionTv.getText().toString())){
+
+            actionTv.setText("不可选");
+        }
     }
 
     /**
@@ -555,7 +562,7 @@ public class PayActivity extends AppCompatActivity {
                     //支付价格大于卡内余额，且卡内余额大于零，显示使用卡内全部余额
                     AlertDialog.Builder a = new AlertDialog.Builder(PayActivity.this);
                     a.setTitle("卡内余额不足！");
-                    a.setMessage("使用卡内全部余额？");
+                    a.setMessage("使用卡内全部"+remainder+"元？");
                     a.setPositiveButton("是", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
@@ -578,7 +585,11 @@ public class PayActivity extends AppCompatActivity {
                             setPayDetail(6,remainder);
                             builder1.dismiss();
 
-                           // factTv.setText("实际支付：" + total + "元");
+                            //使用会员后活动不可选
+                            action.setEnabled(false);
+                            actionTv.setText("不可选");
+
+                            factTv.setText("实际支付：" + total + "元");
                             turnMainActivity();
 
                         }
@@ -619,6 +630,8 @@ public class PayActivity extends AppCompatActivity {
                     builder1.dismiss();
 
                     turnMainActivity();
+
+
                 }
             }
         });
@@ -660,8 +673,6 @@ public class PayActivity extends AppCompatActivity {
 
         final String tel = data.getStringExtra("tel");
 
-        final TextView all = view.findViewById(R.id.useAll);
-
         TextView remainder_tv = view.findViewById(R.id.remainder_tv);
 
         remainder_tv.setText(r + "");
@@ -684,39 +695,12 @@ public class PayActivity extends AppCompatActivity {
 
         final AlertDialog alertDialog = builder.show();
 
-
-        //扣除当前全部余额，
-        all.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                //当前会员充值卡余额清零
-
-                Document d = idbManager.getMembers(tel);
-
-                d.setFloat("remainder", 0f);
-                try {
-                    idbManager.save(d);
-
-                } catch (CouchbaseLiteException e) {
-                    e.printStackTrace();
-                }
-
-                //设置还需支付的钱数
-
-                total -= r;
-
-                alertDialog.dismiss();
-            }
-        });
-
+        final Document members = idbManager.getMembers(tel);
         alertDialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 if (r >= total) {//余额扣款
-
-                    Document members = idbManager.getMembers(tel);
 
                     //更新余额
                     members.setFloat("remainder", Tool.substrct(r,total));
@@ -730,6 +714,9 @@ public class PayActivity extends AppCompatActivity {
 
                     Toast.makeText(PayActivity.this, "扣款成功！", Toast.LENGTH_SHORT).show();
 
+                    //设置消费记录
+                    setConsumLog(members,total);
+
                     //会员卡支付
                     setPayDetail(6, total);
 
@@ -741,11 +728,52 @@ public class PayActivity extends AppCompatActivity {
                     }
 
                     alertDialog.dismiss();
+                    turnMainActivity();
 
 
-                } else if (r < total) {//余额不足走其他支付方式
+                }else if(total > r &&r > 0) {
 
-                    all.setVisibility(View.VISIBLE);
+                        //支付价格大于卡内余额，且卡内余额大于零，显示使用卡内全部余额
+                        AlertDialog.Builder a = new AlertDialog.Builder(PayActivity.this);
+                        a.setTitle("余额不足！");
+                        a.setMessage("使用卡内全部"+r+"元？");
+                        a.setPositiveButton("是", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                                try {
+                                    //会员剩余金额清零
+                                    members.setFloat("remainder", 0f);
+                                    idbManager.save(members);
+
+                                } catch (CouchbaseLiteException e) {
+                                    e.printStackTrace();
+                                }
+
+                                //会员消费记录
+                                setConsumLog(members, r);
+
+                                //使用会员后活动不可选
+                                action.setEnabled(false);
+                                actionTv.setText("不可选");
+                                //消费支付细节 6会员消费,计算剩余部分
+                                total = total-r;
+
+                                factTv.setText("实际支付：" + total + "元");
+
+                                setPayDetail(6,r);
+                                alertDialog.dismiss();
+                                turnMainActivity();
+
+                            }
+                        });
+                        a.setNegativeButton("否", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        });
+                        a.show();
 
 
                 }
@@ -1002,18 +1030,8 @@ public class PayActivity extends AppCompatActivity {
         CDBHelper.createAndUpdate(getApplicationContext(), p);
         CDBHelper.createAndUpdate(getApplicationContext(), checkOrder);
 
-        //打印账单
-        // printOrder();
+        //打印订单
 
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-                show();
-
-            }
-        }).start();
     }
 
     /**
