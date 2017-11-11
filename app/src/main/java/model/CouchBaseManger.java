@@ -1,6 +1,7 @@
 package model;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.DataSource;
@@ -8,10 +9,13 @@ import com.couchbase.lite.Database;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
 import com.couchbase.lite.Query;
+import com.couchbase.lite.ReadOnlyDictionary;
 import com.couchbase.lite.Replicator;
 import com.couchbase.lite.Result;
 import com.couchbase.lite.ResultSet;
 import com.couchbase.lite.SelectResult;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -20,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import application.MyApplication;
+import bean.kitchenmanage.order.OrderC;
 import untils.MyLog;
 
 /**
@@ -271,11 +276,11 @@ public class CouchBaseManger<T> implements IDBManager {
     }
 
     @Override
-    public List<Document> getOrderListBelongToTable(String key, String values) {
+    public List<Document> getOrderListBelongToTable(String key, String values,int status) {
         List<Document> documentList = new ArrayList<>();
         Query query= Query.select(SelectResult.expression(Expression.meta().getId()))
                 .from(DataSource.database(database))
-                .where(Expression.property("className").equalTo("OrderC").and(Expression.property(key).equalTo(values)));
+                .where(Expression.property("className").equalTo("OrderC").and(Expression.property(key).equalTo(values)).and(Expression.property("orderState").equalTo(status)));
 
         try {
             ResultSet resultSet= query.run();
@@ -295,6 +300,7 @@ public class CouchBaseManger<T> implements IDBManager {
 
         return documentList;
     }
+
 
     @Override
     public Document getTable(String values) {

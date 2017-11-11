@@ -9,6 +9,8 @@ import com.couchbase.lite.Document;
 
 import java.util.List;
 
+import bean.kitchenmanage.order.OrderC;
+
 /**
  * 项目名称：Order
  * 类描述：
@@ -40,7 +42,9 @@ public interface IDBManager<T> {
 
     void setContext(Context context);
 
-    List<Document> getOrderListBelongToTable(String key,String values);
+    List<Document> getOrderListBelongToTable(String key,String values,int status);
+
+
 
     Document getTable(String values);
 }

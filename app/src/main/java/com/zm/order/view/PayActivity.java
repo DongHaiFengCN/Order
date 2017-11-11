@@ -40,8 +40,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import application.MyApplication;
+import bean.Goods;
+import bean.Order;
 import bean.kitchenmanage.member.ConsumLogC;
 import bean.kitchenmanage.order.CheckOrderC;
+import bean.kitchenmanage.order.GoodsC;
+import bean.kitchenmanage.order.OrderC;
 import bean.kitchenmanage.order.PayDetailC;
 import bean.kitchenmanage.order.PromotionDetailC;
 import bean.kitchenmanage.table.TableC;
@@ -201,6 +205,26 @@ public class PayActivity extends AppCompatActivity {
                 //应收
                 MyLog.e("应收: " + checkOrderC.getPay());
 
+                //菜
+                List<OrderC> f = checkOrderC.getOrderList();
+
+                if(f != null){
+
+                    for(OrderC orderC :f){
+
+
+                        MyLog.e("&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+
+                        for(GoodsC goodsC:orderC.getGoodsList()){
+
+                            MyLog.e(goodsC.getDishesName());
+                        }
+
+
+                    }
+                }
+
+
                 //支付详情
                 MyLog.e(" PromotionDetailC 支付详情~~~~~~~~~~~ ");
                 PromotionDetailC promotionDetail = checkOrderC.getPromotionDetail();
@@ -243,10 +267,11 @@ public class PayActivity extends AppCompatActivity {
         //转化二维码
         bitmap = encodeAsBitmap(alipayId);
 
-
-
         //获取包含桌号xx的所有订单
-        orderList = idbManager.getOrderListBelongToTable("tableNo", tableC.getTableNum());
+        orderList = idbManager.getOrderListBelongToTable("tableNo", tableC.getTableNum(),1);
+        MyLog.e("1"+orderList.size());
+
+
 
         promotionCList = idbManager.getByClassName("PromotionC");
 
@@ -256,27 +281,26 @@ public class PayActivity extends AppCompatActivity {
 
             Document order = i.next();
 
-            //当前桌下没有买单的订单的总价
-            if (order.getInt("orderState") == 1) {
+            try {
+                checkOrder.addOrder((OrderC) Tool.mapToObject(order.toMap(), OrderC.class));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-                total += order.getFloat("allPrice");
+            total += order.getFloat("allPrice");
                 Array a = order.getArray("goodsList");
 
                 List<Object> l = a.toList();
 
                 //获取当前订单下goods集合下所有的菜品
-
                 for (Object o : l) {
 
                     HashMap h = (HashMap) o;
-
                     orderDishesList.add(h);
-
                     MyLog.e("菜品：  " + h.get("dishesName").toString());
-
                 }
 
-            }
+          //  }
 
         }
 
@@ -441,7 +465,7 @@ public class PayActivity extends AppCompatActivity {
 
 
             s.put(2, sum);
-         //   MyLog.e("订单菜名：" + name);
+            //   MyLog.e("订单菜名：" + name);
 
             //遍历所会员菜品找匹配的打折菜品
 
@@ -450,13 +474,13 @@ public class PayActivity extends AppCompatActivity {
                 //找到打折的
                 if (name.equals(memberDishes.get(i))) {
 
-                   // MyLog.e("订单中包含打折的菜品名称：" + name);
+                    // MyLog.e("订单中包含打折的菜品名称：" + name);
 
-                  //  MyLog.e("折前价格：" + sum);
+                    //  MyLog.e("折前价格：" + sum);
                     BigDecimal b1 = new BigDecimal(sum);
                     BigDecimal b2 = new BigDecimal(disrate/100f);
 
-                 //   MyLog.e("折后前价格：" + sum);
+                    //   MyLog.e("折后前价格：" + sum);
 
                     sum = b1.subtract(b2).floatValue();
                     //3 设置菜品的折扣价格
@@ -957,6 +981,7 @@ public class PayActivity extends AppCompatActivity {
         //总共优惠
 
 
+
         checkOrder.setPay(all);
 
         checkOrder.setNeedPay(total);
@@ -970,14 +995,22 @@ public class PayActivity extends AppCompatActivity {
 
         checkOrder.setTableNo(myApplication.getTable_sel_obj().getTableNum());
 
+
         //将当前桌下的订单状态设置成提交,并保存
+        if(checkOrder.getOrderList() != null){
 
-        for (Document d1 : orderList) {
+            for (OrderC d1 : checkOrder.getOrderList()) {
 
-            d1.setInt("orderState", 0);
-            idbManager.save(d1);
-
+                d1.setOrderState(0);
+                CDBHelper.createAndUpdate(getApplicationContext(),d1);
+            }
         }
+    /*    for(Document document: orderList){
+
+            document.setInt("orderState",0);
+            idbManager.save(document);
+        }*/
+
         //营销细节
         PromotionDetailC p = new PromotionDetailC();
         p.setChannelId(myApplication.getCompany_ID());

@@ -435,7 +435,7 @@ public class MainActivity extends AppCompatActivity {
             Log.e("Aaaa", getOrderItem().size()+"");
 
             //获取包含桌号xx的所有订单
-            orderList = idbManager.getOrderListBelongToTable("tableNo", tableC.getTableNum());
+          //  orderList = idbManager.getOrderListBelongToTable("tableNo", tableC.getTableNum());
 
             promotionCList = idbManager.getByClassName("PromotionC");
 
