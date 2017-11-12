@@ -44,6 +44,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import application.MyApplication;
+import bean.DishesKind;
 import bean.Goods;
 import bean.Order;
 import bean.kitchenmanage.member.ConsumLogC;
@@ -53,6 +54,9 @@ import bean.kitchenmanage.order.OrderC;
 import bean.kitchenmanage.order.PayDetailC;
 import bean.kitchenmanage.order.PromotionDetailC;
 import bean.kitchenmanage.promotion.PromotionC;
+import bean.kitchenmanage.promotion.PromotionDishesC;
+import bean.kitchenmanage.promotion.PromotionDishesKindC;
+import bean.kitchenmanage.promotion.PromotionRuleC;
 import bean.kitchenmanage.table.TableC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -96,6 +100,8 @@ public class PayActivity extends AppCompatActivity {
     @BindView(R.id.table_number)
     TextView tableNumber;
 
+    List<PromotionRuleC> promotionRuleCList;
+    private float copy;
     private AlertDialog.Builder dialog;
     private AlertDialog dg;
     private Bitmap bitmap = null;
@@ -115,7 +121,7 @@ public class PayActivity extends AppCompatActivity {
     private  CheckOrderC checkOrder = new CheckOrderC();
 
     //营销细节
-    PromotionDetailC p = new PromotionDetailC();
+    PromotionDetailC promotionD = new PromotionDetailC();
 
     //更新总价
     private Handler handler = new Handler() {
@@ -176,7 +182,7 @@ public class PayActivity extends AppCompatActivity {
                 Message m = handler.obtainMessage();
                 m.what = RESULT_OK;
                 handler.sendMessage(m);
-
+                show();
             }
         }).start();
 
@@ -303,7 +309,7 @@ public class PayActivity extends AppCompatActivity {
 
         promotionCList = CDBHelper.getObjByClass(getApplicationContext(),PromotionC.class);
 
-        Iterator iterator = promotionCList.iterator();
+       /* Iterator iterator = promotionCList.iterator();
 
         //筛选活动时间
         while (iterator.hasNext()){
@@ -327,7 +333,7 @@ public class PayActivity extends AppCompatActivity {
                 iterator.remove();
 
             }
-        }
+        }*/
 
 
 
@@ -476,7 +482,7 @@ public class PayActivity extends AppCompatActivity {
         }
 
         //获取折扣率
-        final int disrate = data.getIntExtra("disrate", 3);
+        disrate = data.getIntExtra("disrate", 3);
 
         MyLog.e("折扣率：" + disrate);
 
@@ -674,8 +680,9 @@ public class PayActivity extends AppCompatActivity {
                     builder1.dismiss();
 
                     turnMainActivity();
+                }else {
 
-
+                    Toast.makeText(PayActivity.this,"请充值！",Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -820,6 +827,9 @@ public class PayActivity extends AppCompatActivity {
                         a.show();
 
 
+                }else {
+
+                    Toast.makeText(PayActivity.this,"请充值！",Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -963,13 +973,21 @@ public class PayActivity extends AppCompatActivity {
      */
     private void setAction() {
 
+
+
+        final PromotionC[] promotion = {null};
         //加载活动
 
         final ActionListAdapter a = new ActionListAdapter(promotionCList, PayActivity.this);
         View v = getLayoutInflater().inflate(R.layout.view_payactivity_action_dialog, null);
+
+        final TextView showTv =v.findViewById(R.id.show_tv);
+
         ListView l = v.findViewById(R.id.action_lv);
         a.setListView(l);
         l.setAdapter(a);
+
+
 
         AlertDialog.Builder d = new AlertDialog.Builder(this);
         d.setView(v);
@@ -979,44 +997,217 @@ public class PayActivity extends AppCompatActivity {
 
             }
         });
+        d.setPositiveButton("确定",null);
 
-        d.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+       final AlertDialog dialog = d.show();
+        dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
+            public void onClick(View view) {
 
-                PromotionC promotion = null;
 
-                int[] flag = a.getFlag();
 
-                //找到当前的活动
+                if(promotion[0] != null){
 
-                for (int j = 0; j < flag.length; j++) {
+                    if(promotion[0].getPromotionType() == 1){     //打折状态
 
-                    if(flag[j] == 1){
 
-                        MyLog.e("位置"+j);
+                        //计算出减免的金额
 
-                        promotion = promotionCList.get(j);
+                        total = Tool.substrct(total,copy);
 
-                        break;
+                        factTv.setText("实际支付：" + total + "元");
+
+                        dialog.dismiss();
+
+
+/*
+                        if(promotion[0].getCountMode() == 1){//消费金额
+
+
+
+                            total = Tool.substrct(total,copy);
+
+                            factTv.setText("实际支付：" + total + "元");
+
+
+
+                            dialog.dismiss();
+
+
+
+                        }else if(promotion[0].getCountMode() == 2){//菜品金额
+
+                            total = Tool.substrct(total,copy);
+
+                            factTv.setText("实际支付：" + total + "元");
+
+                            dialog.dismiss();
+                        }*/
+
+
+                    }else if(promotion[0].getPromotionType() == 2){//赠券
+
+
+
+
+                    }
+
+                    //营销设置活动选择的活动
+                    promotionD.setPromotion(promotion[0]);
+
+                    dialog.dismiss();
+
+                }else {
+                    Toast.makeText(PayActivity.this,"请选择活动再按确定",Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+
+
+        a.setCallback(new ActionListAdapter.Callback() {
+            @Override
+            public void click(int p) {
+
+                //设置临时变量
+
+                //规则详情
+                promotion[0] = promotionCList.get(p);
+
+                promotionRuleCList =Tool.Sort(promotion[0].getPromotionRuleList());
+
+                if(promotion[0].getPromotionType() == 1){//折扣
+
+                    copy = total;
+
+                    if(promotion[0].getCountMode() == 1){//消费金额
+
+                        for (int i = 0; i < promotionCList.size(); i++) {
+
+                            if(total >= promotionRuleCList.get(i).getCounts()){
+
+
+                                disrate = promotionRuleCList.get(i).getCounts();
+
+                                //计算减免
+                                copy = Tool.substrct(total,promotionRuleCList.get(i).getCounts());
+
+                                copy=copy*(100-promotionRuleCList.get(i).getCounts())/100;
+
+                                //展示当前的减免
+
+                                showTv.setText("满足满"+promotionRuleCList.get(i).getCounts()+"减免"+copy);
+
+                               break;
+                            }
+
+                        }
+
+
+                    }else if(promotion[0].getCountMode() == 2){//菜品金额
+
+                        copy = 0f;
+
+                       List<PromotionDishesC> allDishes = new ArrayList<>();
+
+                        List<PromotionDishesKindC> dishesKindList = promotion[0].getPromotionDishesKindList();
+
+                        if(dishesKindList != null){
+
+                        for (int i = 0; i < dishesKindList.size(); i++) {
+
+                            PromotionDishesKindC promotionDishesKindC = dishesKindList.get(i);
+
+                            //启用状态下
+                            if(promotionDishesKindC.getIschecked() == 1){
+
+                                List<PromotionDishesC> list = promotionDishesKindC.getPromotionDishesList();
+
+                                //菜品不为空
+                                if(list != null){
+
+                                    for (int j = 0; j < list.size(); j++) {
+
+                                        PromotionDishesC promotionDishesC = list.get(j);
+
+                                        //设置启用
+                                        if(promotionDishesC.getIschecked() == 1){
+
+                                            //符合条件的全部筛选出来
+                                            allDishes.add(promotionDishesC);
+
+                                        }
+                                    }
+
+                                }
+                            }
+                        }
+
+                      //计算折扣菜品价格
+
+                            for (int j = 0; j < orderDishesList.size(); j++) {
+
+                                boolean isSale = false;
+
+                              //  SparseArray<Object> s = new SparseArray<>();
+
+                                //获取订单下goods的菜品名称
+                                GoodsC h = orderDishesList.get(j);
+
+                                String name = h.getDishesName();
+
+                                //遍历所活动菜品找匹配的打折菜品
+
+                                for (int i = 0; i < allDishes.size(); i++) {
+
+                                    //找到打折的
+                                    if (name.equals(allDishes.get(i))) {
+
+                                        copy += h.getAllPrice();
+
+                                        break;
+                                    }
+                                }
+
+                            }
+
+                            //计算折扣
+
+                            for (int i = 0; i < promotionCList.size(); i++) {
+
+                                if(total >= promotionRuleCList.get(i).getCounts()){
+
+
+                                    disrate = promotionRuleCList.get(i).getCounts();
+
+                                    //计算减免
+                                    copy = Tool.substrct(total,promotionRuleCList.get(i).getCounts());
+
+                                    copy=copy*(100-promotionRuleCList.get(i).getCounts())/100;
+
+                                    //展示当前的减免
+
+                                    showTv.setText("满足满"+promotionRuleCList.get(i).getCounts()+"减免"+copy);
+
+                                    break;
+                                }
+
+                            }
+
+
+
 
                     }
                 }
+                }else {
 
-                //打折
-
-                if(promotion.getPromotionType() == 1){
-
-
-
-
-                }else if(promotion.getPromotionType() == 2){//赠券
+                    //赠券
 
                     final AlertDialog.Builder builder = new AlertDialog.Builder(PayActivity.this);
 
-                    View view = getLayoutInflater().inflate(R.layout.view_payactivity_promotion_dialog,null);
+                    View view1 = getLayoutInflater().inflate(R.layout.view_payactivity_promotion_dialog, null);
 
-                    final EditText promtionEt = view.findViewById(R.id.promotion_et);
+                    final EditText promtionEt = view1.findViewById(R.id.promotion_et);
 
                     builder.setTitle("输入优惠金额");
                     builder.setNegativeButton("使用",null);
@@ -1030,7 +1221,7 @@ public class PayActivity extends AppCompatActivity {
                     final AlertDialog builder1 = builder.show();
 
                     //使用优惠券减免账单
-                    final PromotionC finalPromotion = promotion;
+
                     builder1.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -1040,6 +1231,7 @@ public class PayActivity extends AppCompatActivity {
                                 promtionEt.setError("不能为空");
 
                             }else {
+
 
                                 float promotionPrice = Float.valueOf(promtionEt.getText().toString());
 
@@ -1056,11 +1248,11 @@ public class PayActivity extends AppCompatActivity {
 
                                 }else {
 
-                                    //设置营销细节
-                                    p.setPromotion(finalPromotion);
+                                    copy = 0f;
 
                                     //设置实际支付的价格
-                                    total -= promotionPrice;
+
+                                    copy = Tool.substrct(total,promotionPrice);
 
                                     //赠券
                                     setPayDetail(8,promotionPrice);
@@ -1078,9 +1270,11 @@ public class PayActivity extends AppCompatActivity {
                         }
                     });
                 }
+
             }
         });
-        d.show();
+
+
     }
 
     private void associatorNotDisplay() {
@@ -1145,23 +1339,23 @@ public class PayActivity extends AppCompatActivity {
 
         //营销细节
 
-        p.setChannelId(myApplication.getCompany_ID());
-        p.setClassName("PromotionDetailC");
+        promotionD.setChannelId(myApplication.getCompany_ID());
+        promotionD.setClassName("PromotionDetailC");
 
 
-        p.setDiscounts(A.subtract(T).floatValue());
+        promotionD.setDiscounts(A.subtract(T).floatValue());
 
-        p.setDisrate(disrate);
+        promotionD.setDisrate(disrate);
 
         //支付方式集合
-        p.setPayDetailList(payDetailList);
+        promotionD.setPayDetailList(payDetailList);
 
         //折扣率
-        p.setDisrate(disrate);
+        promotionD.setDisrate(disrate);
 
-        checkOrder.setPromotionDetail(p);
+        checkOrder.setPromotionDetail(promotionD);
 
-        CDBHelper.createAndUpdate(getApplicationContext(), p);
+        CDBHelper.createAndUpdate(getApplicationContext(), promotionD);
         CDBHelper.createAndUpdate(getApplicationContext(), checkOrder);
         //打印订单
     }

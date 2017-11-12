@@ -40,6 +40,7 @@ public class ActionListAdapter extends BaseAdapter {
     private List list;
     PayActivity payActivity;
     int [] flag;
+
     public ActionListAdapter(List list, PayActivity payActivity) {
 
         super();
@@ -109,6 +110,8 @@ public class ActionListAdapter extends BaseAdapter {
 
                 if(flag[i] == 0){
 
+                    callback.click(i);
+
                     flag[i] = 1;
 
                     for (int j = 0; j < flag.length; j++) {
@@ -158,4 +161,13 @@ public class ActionListAdapter extends BaseAdapter {
 
 
     }
+
+    public void setCallback(Callback callback) {
+        this.callback = callback;
+    }
+
+    Callback callback;
+    public interface Callback {
+         public void click(int p);
+     }
 }

@@ -15,6 +15,10 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import bean.Order;
+import bean.kitchenmanage.promotion.PromotionC;
+import bean.kitchenmanage.promotion.PromotionRuleC;
+
 /**
  * 项目名称：Order
  * 类描述：
@@ -112,7 +116,34 @@ public class Tool {
 
     }
 
+    //排序
+    public static List<PromotionRuleC> Sort(List<PromotionRuleC> list){
 
+        if(list.size() == 1){
+            return list;
+        }
+
+            //从大到小排序
+            if(list.size()>0)
+            {
+                PromotionRuleC tmp = null;
+                for(int i=0;i<list.size();i++)
+                {
+                    for(int j=i+1;j<list.size();j++)
+                    {
+                        if(list.get(i).getCounts()<list.get(j).getCounts())
+                        {
+                            tmp = list.get(i);
+                            list.set(i,list.get(j));
+                            list.set(j,tmp);
+                        }
+                    }
+                }
+            }
+
+
+        return list;
+    }
 
 
 
