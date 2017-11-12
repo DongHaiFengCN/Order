@@ -1010,7 +1010,6 @@ public class PayActivity extends AppCompatActivity {
 
                     if(promotion[0].getPromotionType() == 1){     //打折状态
 
-
                         //计算出减免的金额
 
                         total = Tool.substrct(total,copy);
@@ -1020,35 +1019,12 @@ public class PayActivity extends AppCompatActivity {
                         dialog.dismiss();
 
 
-/*
-                        if(promotion[0].getCountMode() == 1){//消费金额
-
-
-
-                            total = Tool.substrct(total,copy);
-
-                            factTv.setText("实际支付：" + total + "元");
-
-
-
-                            dialog.dismiss();
-
-
-
-                        }else if(promotion[0].getCountMode() == 2){//菜品金额
-
-                            total = Tool.substrct(total,copy);
-
-                            factTv.setText("实际支付：" + total + "元");
-
-                            dialog.dismiss();
-                        }*/
-
-
                     }else if(promotion[0].getPromotionType() == 2){//赠券
 
 
+                        //确认设置支付金额
 
+                        total = copy;
 
                     }
 
@@ -1085,7 +1061,6 @@ public class PayActivity extends AppCompatActivity {
                         for (int i = 0; i < promotionCList.size(); i++) {
 
                             if(total >= promotionRuleCList.get(i).getCounts()){
-
 
                                 disrate = promotionRuleCList.get(i).getCounts();
 

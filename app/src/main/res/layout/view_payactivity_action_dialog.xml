@@ -64,7 +64,7 @@
             android:id="@+id/show_tv"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="满足xx，优惠后价格100"
+            android:text="满足xx减免xx"
             android:textColor="@color/md_white"
             android:gravity="center"
 
