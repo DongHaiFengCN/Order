@@ -22,7 +22,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.couchbase.lite.Array;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
@@ -37,16 +36,10 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import application.MyApplication;
-import bean.DishesKind;
-import bean.Goods;
-import bean.Order;
 import bean.kitchenmanage.member.ConsumLogC;
 import bean.kitchenmanage.order.CheckOrderC;
 import bean.kitchenmanage.order.GoodsC;
@@ -182,7 +175,7 @@ public class PayActivity extends AppCompatActivity {
                 Message m = handler.obtainMessage();
                 m.what = RESULT_OK;
                 handler.sendMessage(m);
-               // show();
+
             }
         }).start();
 
@@ -520,13 +513,16 @@ public class PayActivity extends AppCompatActivity {
                     // MyLog.e("订单中包含打折的菜品名称：" + name);
 
                     //  MyLog.e("折前价格：" + sum);
-          /*          BigDecimal b1 = new BigDecimal(sum);
+               /*     BigDecimal b1 = new BigDecimal(sum);
+
                     BigDecimal b2 = new BigDecimal(disrate/100f);*/
 
-                    //   MyLog.e("折后前价格：" + sum);
+                       MyLog.e("折后前价格：" + sum);
 
+                    float d = Tool.divide(disrate,100f);
 
-                    sum = Tool.substrct(sum,disrate/100f);
+                    sum = Tool.multiply(sum,d);
+
                    // sum = b1.subtract(b2).floatValue();
                     //3 设置菜品的折扣价格
 
@@ -642,7 +638,7 @@ public class PayActivity extends AppCompatActivity {
                             actionTv.setText("不可选");
 
                             factTv.setText("实际支付：" + total + "元");
-                            turnMainActivity();
+                           // turnMainActivity();
 
                         }
                     });
@@ -816,7 +812,6 @@ public class PayActivity extends AppCompatActivity {
 
                                 setPayDetail(6,r);
                                 alertDialog.dismiss();
-                                turnMainActivity();
 
                             }
                         });
@@ -1346,6 +1341,8 @@ public class PayActivity extends AppCompatActivity {
 
         CDBHelper.createAndUpdate(getApplicationContext(), promotionD);
         CDBHelper.createAndUpdate(getApplicationContext(), checkOrder);
+
+        show();
         //打印订单
     }
     /**
