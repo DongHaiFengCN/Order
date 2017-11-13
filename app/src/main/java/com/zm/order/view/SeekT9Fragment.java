@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TimerTask;
 
+import bean.DishesKind;
 import bean.Goods;
 import bean.kitchenmanage.dishes.DishesC;
 import bean.kitchenmanage.order.GoodsC;
@@ -198,6 +199,9 @@ public class SeekT9Fragment extends Fragment {
                     goodsC.setDishesCount(sum);
                     goodsC.setAllPrice(sum * price);
                     goodsC.setDishesId(myGoodsList.get(p).getDishesC().get_id());
+                    DishesKind dishesKind =  CDBHelper.getObjById(getActivity().getApplicationContext(),myGoodsList.get(p).getDishesC().getDishesKindId(), DishesKind.class);
+                    goodsC.setDishesKindName(dishesKind.getName());
+                    Log.e("dishesKindName",dishesKind.getName());
                     mainActivity.getGoodsList().add(goodsC);
                     //购物车计数器数据更新
                     point = (((MainActivity) getActivity()).getPoint());

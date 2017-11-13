@@ -15,6 +15,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,6 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TimerTask;
 
+import bean.DishesKind;
 import bean.Goods;
 import bean.kitchenmanage.order.GoodsC;
 import butterknife.BindView;
@@ -266,6 +268,9 @@ public class OrderFragment extends Fragment implements IMainView {
                     goodsC.setDishesCount(sum);
                     goodsC.setAllPrice(sum * price);
                     goodsC.setDishesId(doc.getId());
+                    DishesKind dishesKind  = CDBHelper.getObjById(getActivity().getApplicationContext(),doc.getString("dishesKindId"), DishesKind.class);
+                    goodsC.setDishesKindName(dishesKind.getName());
+                    Log.e("dishesKindName",dishesKind.getName());
                     ((MainActivity)getActivity()).getGoodsList().add(goodsC);
                     //购物车计数器数据更新
                     point =  (((MainActivity) getActivity()).getPoint());

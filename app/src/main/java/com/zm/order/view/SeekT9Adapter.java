@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import bean.DishesKind;
 import bean.Goods;
 import bean.kitchenmanage.dishes.DishesTasteC;
 import bean.kitchenmanage.order.GoodsC;
@@ -243,6 +244,9 @@ public class SeekT9Adapter extends BaseAdapter {
                 goodsC.setDishesCount(1);
                 goodsC.setAllPrice(mData.get(position).getCount() * mData.get(position).getDishesC().getPrice());
                 goodsC.setDishesId(mData.get(position).getDishesC().get_id());
+                DishesKind dishesKind  = CDBHelper.getObjById(activity.getApplicationContext(),mData.get(position).getDishesC().getDishesKindId(), DishesKind.class);
+                goodsC.setDishesKindName(dishesKind.getName());
+                Log.e("dishesKindName",dishesKind.getName());
                 activity.getGoodsList().add(goodsC);
 
                 CDBHelper.createAndUpdate(activity.getApplicationContext(), goodsC);
@@ -299,6 +303,9 @@ public class SeekT9Adapter extends BaseAdapter {
                     goodsC.setDishesCount(1);
                     goodsC.setAllPrice(mData.get(position).getCount() * mData.get(position).getDishesC().getPrice());
                     goodsC.setDishesId(mData.get(position).getDishesC().get_id());
+                    DishesKind dishesKind  = CDBHelper.getObjById(activity.getApplicationContext(),mData.get(position).getDishesC().getDishesKindId(), DishesKind.class);
+                    goodsC.setDishesKindName(dishesKind.getName());
+                    Log.e("dishesKindName",dishesKind.getName());
                     activity.getGoodsList().add(goodsC);
                     CDBHelper.createAndUpdate(activity.getApplicationContext(), goodsC);
                     //购物车计数器数据更新
