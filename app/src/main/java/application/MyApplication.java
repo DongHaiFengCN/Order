@@ -57,7 +57,7 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
     private Database database = null;
     private Replicator replicator;
     //private String Company_ID="zmsy010";
-    private String Company_ID="zmsy";
+    private String Company_ID="zmsy13";
     private TableC table_sel_obj;
 
     public ExecutorService mExecutor;

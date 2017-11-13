@@ -113,7 +113,7 @@ public class SaleActivity extends AppCompatActivity {
 
 
 
-        setData();
+      //  setData();
         // 创建EventHandler对象
         eventHandler = new EventHandler() {
             public void afterEvent(int event, final int result, final Object data) {
@@ -192,9 +192,9 @@ public class SaleActivity extends AppCompatActivity {
         etcode.setCursorVisible(false);
 
         //获取会员信息
-          // Document members = idbManager.getMembers(etAmountphone.getText().toString());
+          Document members = idbManager.getMembers(etAmountphone.getText().toString());
             // Document members = idbManager.getMembers("17605413611");
-          Document members = idbManager.getMembers("8888");
+         /// Document members = idbManager.getMembers("8888");
 
 
         if (Tool.isNotEmpty(members)) {
@@ -313,6 +313,8 @@ public class SaleActivity extends AppCompatActivity {
 
                 } else {
 
+                    setData();
+
                     SMSSDK.getVerificationCode("86", etAmountphone.getText().toString());
 
                     if(inputMethodManager.isActive()){
@@ -375,8 +377,8 @@ public class SaleActivity extends AppCompatActivity {
 
             }
 
-           // intent.putExtra("tel", etAmountphone.getText().toString());
-            intent.putExtra("tel", "8888");
+            intent.putExtra("tel", etAmountphone.getText().toString());
+           // intent.putExtra("tel", "8888");
             //折扣卡返回折扣率及支持的菜品列表
 
             if (CardTypeFlag == 1) {
