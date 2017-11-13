@@ -1,20 +1,12 @@
 package com.zm.order.view;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.IdRes;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -22,12 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RadioGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,24 +26,18 @@ import com.couchbase.lite.Ordering;
 import com.zm.order.R;
 import com.zm.order.view.adapter.MyGridAdapter;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TimerTask;
 
-import bean.DishesKind;
 import bean.Goods;
+import bean.kitchenmanage.dishes.DishesKindC;
 import bean.kitchenmanage.order.GoodsC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.Unbinder;
 import model.CDBHelper;
-import model.DBFactory;
-import model.DatabaseSource;
-import model.IDBManager;
 import presenter.IMainPresenter;
 import presenter.MainPresenterImpl;
-import untils.AnimationUtil;
 
 /**
  * Created by lenovo on 2017/10/26.
@@ -103,6 +85,7 @@ public class OrderFragment extends Fragment implements IMainView {
 
     }
 
+    @Override
     public void initView() {
 
 
@@ -122,8 +105,10 @@ public class OrderFragment extends Fragment implements IMainView {
         orderList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                if(DishesIdList!=null)
+                if(DishesIdList!=null){
                     DishesIdList.clear();
+                }
+
                 leftAdapter.changeSelected(position);
 
                 try {
@@ -140,8 +125,10 @@ public class OrderFragment extends Fragment implements IMainView {
                                 //增强for循环读取id
                                 for(Object DishesId:DishesIdList)
                                 {
-                                    if(DishesId==null)
+                                    if(DishesId==null){
                                         continue;
+                                    }
+
                                     dishesIdList.add(DishesId.toString());
                                 }
                             }
@@ -268,9 +255,9 @@ public class OrderFragment extends Fragment implements IMainView {
                     goodsC.setDishesCount(sum);
                     goodsC.setAllPrice(sum * price);
                     goodsC.setDishesId(doc.getId());
-                    DishesKind dishesKind  = CDBHelper.getObjById(getActivity().getApplicationContext(),doc.getString("dishesKindId"), DishesKind.class);
-                    goodsC.setDishesKindName(dishesKind.getName());
-                    Log.e("dishesKindName",dishesKind.getName());
+                    DishesKindC dishesKind  = CDBHelper.getObjById(getActivity().getApplicationContext(),doc.getString("dishesKindId"), DishesKindC.class);
+                    goodsC.setDishesKindName(dishesKind.getKindName());
+                    Log.e("dishesKindName",dishesKind.getKindName());
                     ((MainActivity)getActivity()).getGoodsList().add(goodsC);
                     //购物车计数器数据更新
                     point =  (((MainActivity) getActivity()).getPoint());

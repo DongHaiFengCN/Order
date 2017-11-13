@@ -12,7 +12,6 @@ import com.zm.order.R;
 
 import java.util.List;
 
-import bean.DishesKind;
 import bean.kitchenmanage.dishes.DishesC;
 import bean.kitchenmanage.order.GoodsC;
 import model.CDBHelper;

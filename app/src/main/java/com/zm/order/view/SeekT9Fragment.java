@@ -29,9 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TimerTask;
 
-import bean.DishesKind;
 import bean.Goods;
 import bean.kitchenmanage.dishes.DishesC;
+import bean.kitchenmanage.dishes.DishesKindC;
 import bean.kitchenmanage.order.GoodsC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -81,9 +81,9 @@ public class SeekT9Fragment extends Fragment {
 
     private String taste = "默认";
     private float total = 0.0f;
-    public int point = 1, pos,p;
+    public int point = 1, pos;
     private List<DishesC> mlistSearchDishesObj;
-    private List<Goods> myGoodsList;
+    private List<GoodsC> myGoodsList;
     private List<String> tasteList;
     private SeekT9Adapter seekT9Adapter;
     View view;
@@ -116,8 +116,7 @@ public class SeekT9Fragment extends Fragment {
             @Override
             public void OnClickListener(View view, String name, float price,int pos) {
                 view.setBackgroundResource(R.color.lucency);
-                p = pos;
-                showDialog(name, price);
+                showDialog(name, price,pos);
             }
 
         });
@@ -132,14 +131,14 @@ public class SeekT9Fragment extends Fragment {
      * @param name  传入的菜品的名称
      * @param price 传入的菜品的价格
      */
-    private void showDialog(final String name, final float price) {
+    private void showDialog(final String name, final float price,int p) {
         final float[] l = {0.0f};
         tasteList = new ArrayList<>();
         view = LayoutInflater.from(getActivity()).inflate(R.layout.view_item_dialog, null);
 
         final TextView price_tv = view.findViewById(R.id.price);
 
-
+        final DishesC dishesC = CDBHelper.getObjById(getActivity().getApplicationContext(),myGoodsList.get(p).getDishesId(),DishesC.class);
         final AmountView amountView = view.findViewById(R.id.amount_view);
         price_tv.setText("总计 " + amountView.getAmount() * price + " 元");
         l[0] = amountView.getAmount() * price;
@@ -156,14 +155,12 @@ public class SeekT9Fragment extends Fragment {
 
             }
         });
-        for (int a = 0; a < myGoodsList.size(); a++) {
-            if (myGoodsList.get(a).getDishesC().getTasteList() != null) {
-                for (int i = 0; i < myGoodsList.get(a).getDishesC().getTasteList().size(); i++) {
-                    Document document = CDBHelper.getDocByID(getActivity().getApplicationContext(), myGoodsList.get(a).getDishesC().getTasteList().get(i).toString());
-                    tasteList.add(document.getString("tasteName"));
-                }
-
+        if (dishesC.getTasteList() != null) {
+            for (int i = 0; i < dishesC.getTasteList().size(); i++) {
+                Document document = CDBHelper.getDocByID(getActivity().getApplicationContext(), dishesC.getTasteList().get(i).toString());
+                tasteList.add(document.getString("tasteName"));
             }
+
         }
         final GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);//设置每行展示3个
         RecyclerView recyclerView = view.findViewById(R.id.view_dialog_recycler);
@@ -198,10 +195,10 @@ public class SeekT9Fragment extends Fragment {
                     }
                     goodsC.setDishesCount(sum);
                     goodsC.setAllPrice(sum * price);
-                    goodsC.setDishesId(myGoodsList.get(p).getDishesC().get_id());
-                    DishesKind dishesKind =  CDBHelper.getObjById(getActivity().getApplicationContext(),myGoodsList.get(p).getDishesC().getDishesKindId(), DishesKind.class);
-                    goodsC.setDishesKindName(dishesKind.getName());
-                    Log.e("dishesKindName",dishesKind.getName());
+                    goodsC.setDishesId(dishesC.get_id());
+                    DishesKindC dishesKindC =  CDBHelper.getObjById(getActivity().getApplicationContext(),dishesC.getDishesKindId(), DishesKindC.class);
+                    goodsC.setDishesKindName(dishesKindC.getKindName());
+                    Log.e("dishesKindName",dishesKindC.getKindName());
                     mainActivity.getGoodsList().add(goodsC);
                     //购物车计数器数据更新
                     point = (((MainActivity) getActivity()).getPoint());
@@ -243,12 +240,13 @@ public class SeekT9Fragment extends Fragment {
                             .and(Expression.property("dishesNameCode9").like(search + "%")), null, DishesC.class);
                     for (DishesC obj : dishesCs) {
                         //mlistSearchDishesObj.add(obj);
-                        if (obj.getTasteList() != null)
+                        if(obj.get_id() != null){
                             Log.e("T9Fragment", "kouwei size=" + obj.getTasteList().size());
-                        Goods goodsObj = new Goods();
-                        goodsObj.setCount(0);
-                        goodsObj.setDishesC(obj);
-                        myGoodsList.add(goodsObj);
+                            GoodsC goodsObj = new GoodsC();
+                            goodsObj.setDishesCount(0);
+                            goodsObj.setDishesId(obj.get_id());
+                            myGoodsList.add(goodsObj);
+                        }
                     }
                     seekT9Adapter.setmData(myGoodsList);
                     seekT9Adapter.notifyDataSetChanged();
