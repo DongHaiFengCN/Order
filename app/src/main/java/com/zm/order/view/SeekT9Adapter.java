@@ -46,7 +46,7 @@ public class SeekT9Adapter extends BaseAdapter {
     private List<String> tasteList;
     private SeekT9OrderItem orderItem;
     private boolean isName = false,isTaste = false;
-    int pos ;
+    private int pos,p ;
 
     public SeekT9Adapter(MainActivity context) {
         this.activity = context;
@@ -63,6 +63,10 @@ public class SeekT9Adapter extends BaseAdapter {
     public void setmData(List<Goods> mData) {
 
         this.mData = mData;
+    }
+
+    private int getPosition(){
+        return p;
     }
 
     public List<Goods> getmData(){
@@ -104,9 +108,10 @@ public class SeekT9Adapter extends BaseAdapter {
 
             @Override
             public void onClick(View v) {
+
                 v.setBackgroundResource(R.color.lucency);
                 if (listener != null) {
-                    listener.OnClickListener(v,mData.get(position).getDishesC().getDishesName(), mData.get(position).getDishesC().getPrice());
+                    listener.OnClickListener(v,mData.get(position).getDishesC().getDishesName(), mData.get(position).getDishesC().getPrice(),position);
                 }
             }
         });
@@ -166,6 +171,7 @@ public class SeekT9Adapter extends BaseAdapter {
         viewHolder.viewJian.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 if (mData.get(position).getCount() > 0){
                     mData.get(position).setCount(mData.get(position).getCount()-1);
                 }
@@ -200,7 +206,6 @@ public class SeekT9Adapter extends BaseAdapter {
                                 number = 1;
                             }
                             activity.setPoint(point);
-                            notifyDataSetChanged();
                             break;
                         }
                     }
@@ -360,7 +365,7 @@ public class SeekT9Adapter extends BaseAdapter {
     }
 
     interface SeekT9OnClickListener {
-        void OnClickListener(View view,String name, float price);
+        void OnClickListener(View view,String name, float price,int pos);
     }
 
     interface SeekT9OrderItem{

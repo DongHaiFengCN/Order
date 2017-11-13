@@ -19,6 +19,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
 import com.zm.order.R;
@@ -26,6 +27,7 @@ import com.zm.order.view.adapter.MyGridAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimerTask;
 
 import bean.Goods;
 import bean.kitchenmanage.dishes.DishesC;
@@ -78,7 +80,7 @@ public class SeekT9Fragment extends Fragment {
 
     private String taste = "默认";
     private float total = 0.0f;
-    public int point = 1, pos;
+    public int point = 1, pos,p;
     private List<DishesC> mlistSearchDishesObj;
     private List<Goods> myGoodsList;
     private List<String> tasteList;
@@ -109,11 +111,11 @@ public class SeekT9Fragment extends Fragment {
         myGoodsList = new ArrayList<>();
 
         activitySeekList.setAdapter(seekT9Adapter);
-
         seekT9Adapter.setListener(new SeekT9Adapter.SeekT9OnClickListener() {
             @Override
-            public void OnClickListener(View view, String name, float price) {
+            public void OnClickListener(View view, String name, float price,int pos) {
                 view.setBackgroundResource(R.color.lucency);
+                p = pos;
                 showDialog(name, price);
             }
 
@@ -195,6 +197,7 @@ public class SeekT9Fragment extends Fragment {
                     }
                     goodsC.setDishesCount(sum);
                     goodsC.setAllPrice(sum * price);
+                    goodsC.setDishesId(myGoodsList.get(p).getDishesC().get_id());
                     mainActivity.getGoodsList().add(goodsC);
                     //购物车计数器数据更新
                     point = (((MainActivity) getActivity()).getPoint());
@@ -227,30 +230,33 @@ public class SeekT9Fragment extends Fragment {
 
     // 查询方法
     public void search(final String search) {
+        myGoodsList.clear();
+        try {
+            CDBHelper.db.inBatch(new TimerTask() {
+                @Override
+                public void run() {
+                    List<DishesC> dishesCs = CDBHelper.getObjByWhere(getActivity().getApplicationContext(), Expression.property("className").equalTo("DishesC")
+                            .and(Expression.property("dishesNameCode9").like(search + "%")), null, DishesC.class);
+                    for (DishesC obj : dishesCs) {
+                        //mlistSearchDishesObj.add(obj);
+                        if (obj.getTasteList() != null)
+                            Log.e("T9Fragment", "kouwei size=" + obj.getTasteList().size());
+                        Goods goodsObj = new Goods();
+                        goodsObj.setCount(0);
+                        goodsObj.setDishesC(obj);
+                        myGoodsList.add(goodsObj);
+                    }
+                    seekT9Adapter.setmData(myGoodsList);
+                    seekT9Adapter.notifyDataSetChanged();
+                }
+            });
+        } catch (CouchbaseLiteException e) {
+            e.printStackTrace();
+        }
 
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
 
-                myGoodsList.clear();
 //        List<Document> documentList=CDBHelper.getDocmentsByWhere((getActivity().getApplicationContext(), Expression.property("className").equalTo("DishesC")
 //                .and(Expression.property("dishesNameCode9").like(search+"%")),null,DishesC.class);
-
-                List<DishesC> dishesCs = CDBHelper.getObjByWhere(getActivity().getApplicationContext(), Expression.property("className").equalTo("DishesC")
-                        .and(Expression.property("dishesNameCode9").like(search + "%")), null, DishesC.class);
-                for (DishesC obj : dishesCs) {
-                    //mlistSearchDishesObj.add(obj);
-                    if (obj.getTasteList() != null)
-                        Log.e("T9Fragment", "kouwei size=" + obj.getTasteList().size());
-                    Goods goodsObj = new Goods();
-                    goodsObj.setCount(0);
-                    goodsObj.setDishesC(obj);
-                    myGoodsList.add(goodsObj);
-                }
-                seekT9Adapter.setmData(myGoodsList);
-                seekT9Adapter.notifyDataSetChanged();
-            }
-        });
 
 
     }

@@ -8,6 +8,7 @@ import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -84,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
     private List<GoodsC> goodsList = new ArrayList<>();
     private String id;
     private Document document;
+    private Handler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +106,8 @@ public class MainActivity extends AppCompatActivity {
         });
         myApp = (MyApplication) getApplication();
         orderC = new OrderC(myApp.getCompany_ID());
+        mHandler = new Handler();
+
         initView();
 
         select(isFlag);
@@ -182,23 +186,28 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 //初始化订单的数据，绑定数据源的信息。
                 o.notifyDataSetChanged();
-                Iterator<SparseArray<Object>> iterator = getOrderItem().iterator();
+                mHandler.post(new TimerTask() {
+                    @Override
+                    public void run() {
+                        Iterator<GoodsC> iterator = getGoodsList().iterator();
 
-                while (iterator.hasNext()){
-                    SparseArray<Object> sparseArray = iterator.next();
-                    if (sparseArray.get(2).toString().equals("0")){
-                        iterator.remove();
+                        while (iterator.hasNext()){
+                            GoodsC goodsC = iterator.next();
+                            if (goodsC.getDishesCount() == 0){
+                                iterator.remove();
+                                break;
+                            }
 
-                        break;
+                        }
+                        for (int i = 0; 0<getGoodsList().size();i++){
+                            if (getGoodsList().get(i).getDishesCount() == 0 ){
+                                getGoodsList().remove(i);
+                            }
+                            break;
+                        }
+
                     }
-
-                }
-                for (int i = 0;0<orderItem.size();i++){
-                    if (orderItem.get(i).get(2).toString().equals("0")){
-                        orderItem.remove(i);
-                    }
-                    break;
-                }
+                });
 
                 o.notifyDataSetChanged();
                 order_lv = (ListView) findViewById(R.id.order_lv);

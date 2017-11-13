@@ -30,6 +30,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
 import com.couchbase.lite.Ordering;
@@ -39,6 +40,7 @@ import com.zm.order.view.adapter.MyGridAdapter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimerTask;
 
 import bean.Goods;
 import bean.kitchenmanage.order.GoodsC;
@@ -117,62 +119,46 @@ public class OrderFragment extends Fragment implements IMainView {
         //左侧点击事件监听
         orderList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
                 if(DishesIdList!=null)
                     DishesIdList.clear();
                 leftAdapter.changeSelected(position);
 
+                try {
+                    CDBHelper.db.inBatch(new TimerTask() {
+                        @Override
+                        public void run() {
+                            dishesIdList=new ArrayList<>();
+                            //获取点击的菜品类别的Document
+                            Document KindDocument= CDBHelper.getDocByID(getActivity(),titleList.get(position));
+                            //获取此Document下的菜品Id号
+                            if(KindDocument.getArray("dishesListId")!=null)
+                            {
+                                DishesIdList= KindDocument.getArray("dishesListId").toList();
+                                //增强for循环读取id
+                                for(Object DishesId:DishesIdList)
+                                {
+                                    if(DishesId==null)
+                                        continue;
+                                    dishesIdList.add(DishesId.toString());
+                                }
+                            }
+                            orderDragAdapter = new OrderDragAdapter(getActivity(),KindDocument);
 
+                            orderDragAdapter.setMlistDishesId(dishesIdList);
 
-                /*准确定位到指定位置，并且将指定位置的item置顶，
-                    若直接调用scrollToPosition(...)方法，则不会置顶。*/
-                //manager.scrollToPositionWithOffset(position, 0);
-                //  manager.setStackFromEnd(true);
-
-              /*  manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-                    @Override
-                    public int getSpanSize(int position) {
-
-                        return dishesAdapter.getItemViewType(position);
-                    }
-                });
-                dishesRv.setLayoutManager(manager);*/
-
-
-                dishesIdList=new ArrayList<>();
-                //获取点击的菜品类别的Document
-                Document KindDocument= CDBHelper.getDocByID(getActivity(),titleList.get(position));
-                //获取此Document下的菜品Id号
-                if(KindDocument.getArray("dishesListId")!=null)
-                {
-                    DishesIdList= KindDocument.getArray("dishesListId").toList();
-                    //增强for循环读取id
-                    for(Object DishesId:DishesIdList)
-                    {
-                        if(DishesId==null)
-                            continue;
-                        dishesIdList.add(DishesId.toString());
-                    }
+                            dishesRv.setAdapter(orderDragAdapter);
+                            orderDragAdapter.setOnItemClickListener(new OrderDragAdapter.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(String name, float price,int position) {
+                                    showDialog(name,price,position);
+                                }
+                            });
+                        }
+                    });
+                } catch (CouchbaseLiteException e) {
+                    e.printStackTrace();
                 }
-                orderDragAdapter = new OrderDragAdapter(getActivity(),KindDocument);
-
-                orderDragAdapter.setMlistDishesId(dishesIdList);
-
-                dishesRv.setAdapter(orderDragAdapter);
-                orderDragAdapter.setOnItemClickListener(new OrderDragAdapter.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(String name, float price,int position) {
-                        showDialog(name,price,position);
-                    }
-                });
-               /* dishesAdapter.setOnItemClickListener(new DishesAdapter.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(View view, String name, float price) {
-                        showDialog(name, price);
-                    }
-
-                });*/
-
 
             }
 
@@ -246,6 +232,7 @@ public class OrderFragment extends Fragment implements IMainView {
 
         }
         final GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);//设置每行展示3个
+        final Document doc = CDBHelper.getDocByID(getActivity(),dishesIdList.get(position));
         RecyclerView recyclerView = view.findViewById(R.id.view_dialog_recycler);
         recyclerView.setLayoutManager(manager);
         MyGridAdapter myGridAdapter = new MyGridAdapter(getActivity(),tasteList);
@@ -278,6 +265,7 @@ public class OrderFragment extends Fragment implements IMainView {
                     }
                     goodsC.setDishesCount(sum);
                     goodsC.setAllPrice(sum * price);
+                    goodsC.setDishesId(doc.getId());
                     ((MainActivity)getActivity()).getGoodsList().add(goodsC);
                     //购物车计数器数据更新
                     point =  (((MainActivity) getActivity()).getPoint());
