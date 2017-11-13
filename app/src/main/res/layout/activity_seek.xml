@@ -14,7 +14,7 @@
         android:id="@+id/activity_seek_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1" />
+        android:layout_weight="1.2" />
 
 
     <EditText
@@ -39,140 +39,249 @@
         android:layout_below="@+id/activity_seek_edit"
         android:layout_marginTop="10dp"
         android:visibility="visible"
-        android:layout_weight="1.3" >
+        android:layout_weight="1.1" >
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="match_parent"
             android:layout_weight="1">
 
-            <ImageView
+            <RelativeLayout
                 android:id="@+id/ibtn_key_1"
-                style="@style/style_public_1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                style="@style/style_public_1"
                 android:background="@drawable/bg_key_selector"
-                android:src="@mipmap/icon_key_1" />
+                >
+                <ImageView
 
-            <ImageView
+                    android:layout_width="40sp"
+                    android:layout_height="30sp"
+                    android:layout_centerInParent="true"
+                    android:src="@mipmap/icon_key_1" />
+
+            </RelativeLayout>
+            <RelativeLayout
                 android:id="@+id/ibtn_key_2"
-                style="@style/style_public_1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                style="@style/style_public_1"
                 android:background="@drawable/bg_key_selector"
-                android:src="@mipmap/icon_key_2" />
+                >
+                <ImageView
 
-            <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="30dp"
+                    android:layout_centerInParent="true"
+                    android:src="@mipmap/icon_key_2" />
+
+
+            </RelativeLayout>
+            <RelativeLayout
                 android:id="@+id/ibtn_key_3"
-                style="@style/style_public_1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                style="@style/style_public_1"
                 android:background="@drawable/bg_key_selector"
-                android:src="@mipmap/icon_key_3" />
+                >
+
+                <ImageView
+
+                    android:layout_width="40dp"
+                    android:layout_height="30dp"
+                    android:layout_centerInParent="true"
+                    android:src="@mipmap/icon_key_3" />
+            </RelativeLayout>
+
+
+
+
+
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="match_parent"
             android:layout_weight="1">
 
-            <ImageView
+            <RelativeLayout
                 android:id="@+id/ibtn_key_4"
-                style="@style/style_public_1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                style="@style/style_public_1"
                 android:background="@drawable/bg_key_selector"
-                android:src="@mipmap/icon_key_4" />
+                >
+                <ImageView
 
-            <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="30dp"
+                    android:layout_centerInParent="true"
+                    android:src="@mipmap/icon_key_4" />
+
+            </RelativeLayout>
+            <RelativeLayout
                 android:id="@+id/ibtn_key_5"
-                style="@style/style_public_1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                style="@style/style_public_1"
                 android:background="@drawable/bg_key_selector"
-                android:src="@mipmap/icon_key_5" />
+                >
+                <ImageView
 
-            <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="30dp"
+                    android:src="@mipmap/icon_key_5"
+                    android:layout_centerInParent="true"/>
+
+            </RelativeLayout>
+            <RelativeLayout
                 android:id="@+id/ibtn_key_6"
-                style="@style/style_public_1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                style="@style/style_public_1"
                 android:background="@drawable/bg_key_selector"
-                android:src="@mipmap/icon_key_6" />
+                >
+
+                <ImageView
+
+                    android:layout_width="40dp"
+                    android:layout_height="30dp"
+                    android:src="@mipmap/icon_key_6"
+                    android:layout_centerInParent="true"/>
+            </RelativeLayout>
+
+
+
+
+
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="match_parent"
             android:layout_weight="1">
 
-            <ImageView
+            <RelativeLayout
                 android:id="@+id/ibtn_key_7"
-                style="@style/style_public_1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                style="@style/style_public_1"
                 android:background="@drawable/bg_key_selector"
-                android:src="@mipmap/icon_key_7" />
+                >
 
-            <ImageView
+                <ImageView
+
+                    android:layout_width="40dp"
+                    android:layout_height="30dp"
+                    android:layout_centerInParent="true"
+                    android:src="@mipmap/icon_key_7" />
+            </RelativeLayout>
+            <RelativeLayout
                 android:id="@+id/ibtn_key_8"
-                style="@style/style_public_1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                style="@style/style_public_1"
                 android:background="@drawable/bg_key_selector"
-                android:src="@mipmap/icon_key_8" />
+                >
+                <ImageView
 
-            <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="30dp"
+                    android:src="@mipmap/icon_key_8"
+                    android:layout_centerInParent="true"/>
+
+            </RelativeLayout>
+            <RelativeLayout
                 android:id="@+id/ibtn_key_9"
-                style="@style/style_public_1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                style="@style/style_public_1"
                 android:background="@drawable/bg_key_selector"
-                android:src="@mipmap/icon_key_9" />
+                >
+
+                <ImageView
+
+                    android:layout_width="40dp"
+                    android:layout_height="30dp"
+                    android:src="@mipmap/icon_key_9"
+                    android:layout_centerInParent="true"/>
+            </RelativeLayout>
+
+
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="match_parent"
             android:layout_weight="1">
 
-            <ImageView
+            <RelativeLayout
                 android:id="@+id/ibtn_key_l"
-                style="@style/style_public_1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                style="@style/style_public_1"
                 android:background="@drawable/bg_key_selector"
-                android:src="@mipmap/icon_key_l" />
+                >
 
-            <ImageView
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="30dp"
+                    android:layout_centerInParent="true"
+                    android:src="@mipmap/icon_key_l" />
+            </RelativeLayout>
+            <RelativeLayout
                 android:id="@+id/ibtn_key_0"
-                style="@style/style_public_1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                style="@style/style_public_1"
                 android:background="@drawable/bg_key_selector"
-                android:src="@mipmap/icon_key_0" />
+                >
+                <ImageView
 
-            <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="30dp"
+                    android:src="@mipmap/icon_key_0"
+                    android:layout_centerInParent="true"/>
+
+            </RelativeLayout>
+            <RelativeLayout
                 android:id="@+id/ibtn_key_r"
-                style="@style/style_public_1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                style="@style/style_public_1"
                 android:background="@drawable/bg_key_selector"
-                android:src="@mipmap/icon_key_r" />
+                >
+
+                <ImageView
+
+                    android:layout_width="40dp"
+                    android:layout_height="30dp"
+                    android:src="@mipmap/icon_key_r"
+                    android:layout_centerInParent="true"/>
+            </RelativeLayout>
+
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="match_parent"
             android:layout_weight="1">
-
-            <ImageView
+            <RelativeLayout
                 android:id="@+id/ibtn_key_del"
                 style="@style/style_public_1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/bg_key_selector"
-                android:src="@mipmap/icon_key_del" />
+                android:background="@drawable/bg_key_selector">
+                <ImageView
+
+                    android:layout_centerInParent="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:src="@mipmap/icon_key_del" />
+
+            </RelativeLayout>
+
+
         </TableRow>
     </TableLayout>
 

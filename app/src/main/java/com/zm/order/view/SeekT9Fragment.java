@@ -1,26 +1,20 @@
 package com.zm.order.view;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,7 +23,6 @@ import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
 import com.zm.order.R;
 import com.zm.order.view.adapter.MyGridAdapter;
-import com.zm.order.view.adapter.SeekT9DialogAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,39 +46,39 @@ public class SeekT9Fragment extends Fragment {
     ListView activitySeekList;
     /* @BindView(R.id.activity_seek_list)
      RecyclerView activitySeekList;*/
+    Unbinder unbinder;
     @BindView(R.id.activity_seek_edit)
     EditText activitySeekEdit;
     @BindView(R.id.ibtn_key_1)
-    ImageView ibtnKey1;
+    RelativeLayout ibtnKey1;
     @BindView(R.id.ibtn_key_2)
-    ImageView ibtnKey2;
+    RelativeLayout ibtnKey2;
     @BindView(R.id.ibtn_key_3)
-    ImageView ibtnKey3;
+    RelativeLayout ibtnKey3;
     @BindView(R.id.ibtn_key_4)
-    ImageView ibtnKey4;
+    RelativeLayout ibtnKey4;
     @BindView(R.id.ibtn_key_5)
-    ImageView ibtnKey5;
+    RelativeLayout ibtnKey5;
     @BindView(R.id.ibtn_key_6)
-    ImageView ibtnKey6;
+    RelativeLayout ibtnKey6;
     @BindView(R.id.ibtn_key_7)
-    ImageView ibtnKey7;
+    RelativeLayout ibtnKey7;
     @BindView(R.id.ibtn_key_8)
-    ImageView ibtnKey8;
+    RelativeLayout ibtnKey8;
     @BindView(R.id.ibtn_key_9)
-    ImageView ibtnKey9;
+    RelativeLayout ibtnKey9;
     @BindView(R.id.ibtn_key_l)
-    ImageView ibtnKeyL;
+    RelativeLayout ibtnKeyL;
     @BindView(R.id.ibtn_key_0)
-    ImageView ibtnKey0;
+    RelativeLayout ibtnKey0;
     @BindView(R.id.ibtn_key_r)
-    ImageView ibtnKeyR;
+    RelativeLayout ibtnKeyR;
     @BindView(R.id.ibtn_key_del)
-    ImageView ibtnKeyDel;
-    Unbinder unbinder;
+    RelativeLayout ibtnKeyDel;
 
     private String taste = "默认";
     private float total = 0.0f;
-    public int point = 1,pos;
+    public int point = 1, pos;
     private List<DishesC> mlistSearchDishesObj;
     private List<Goods> myGoodsList;
     private List<String> tasteList;
@@ -172,7 +165,7 @@ public class SeekT9Fragment extends Fragment {
         final GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);//设置每行展示3个
         RecyclerView recyclerView = view.findViewById(R.id.view_dialog_recycler);
         recyclerView.setLayoutManager(manager);
-        MyGridAdapter myGridAdapter = new MyGridAdapter(getActivity(),tasteList);
+        MyGridAdapter myGridAdapter = new MyGridAdapter(getActivity(), tasteList);
         myGridAdapter.setmOnItemOlickListener(new MyGridAdapter.OnItemOlickListener() {
             @Override
             public void onItemClick(int position) {
@@ -195,9 +188,9 @@ public class SeekT9Fragment extends Fragment {
 
                     GoodsC goodsC = new GoodsC();
                     goodsC.setDishesName(name);
-                    if (tasteList.size() == 0){
+                    if (tasteList.size() == 0) {
                         goodsC.setDishesTaste(null);
-                    }else{
+                    } else {
                         goodsC.setDishesTaste(tasteList.get(pos));
                     }
                     goodsC.setDishesCount(sum);
