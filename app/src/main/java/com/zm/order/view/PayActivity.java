@@ -182,7 +182,7 @@ public class PayActivity extends AppCompatActivity {
                 Message m = handler.obtainMessage();
                 m.what = RESULT_OK;
                 handler.sendMessage(m);
-                show();
+               // show();
             }
         }).start();
 
@@ -520,12 +520,14 @@ public class PayActivity extends AppCompatActivity {
                     // MyLog.e("订单中包含打折的菜品名称：" + name);
 
                     //  MyLog.e("折前价格：" + sum);
-                    BigDecimal b1 = new BigDecimal(sum);
-                    BigDecimal b2 = new BigDecimal(disrate/100f);
+          /*          BigDecimal b1 = new BigDecimal(sum);
+                    BigDecimal b2 = new BigDecimal(disrate/100f);*/
 
                     //   MyLog.e("折后前价格：" + sum);
 
-                    sum = b1.subtract(b2).floatValue();
+
+                    sum = Tool.substrct(sum,disrate/100f);
+                   // sum = b1.subtract(b2).floatValue();
                     //3 设置菜品的折扣价格
 
                     s.put(3,sum);
@@ -1051,20 +1053,32 @@ public class PayActivity extends AppCompatActivity {
                 promotion[0] = promotionCList.get(p);
 
                 promotionRuleCList =Tool.Sort(promotion[0].getPromotionRuleList());
+                MyLog.e("11111111111111");
 
                 if(promotion[0].getPromotionType() == 1){//折扣
+                    MyLog.e("2222222222");
 
                     copy = total;
+                    MyLog.e(promotion[0].getCountMode()+"");
 
                     if(promotion[0].getCountMode() == 1){//消费金额
 
+                        MyLog.e("33333");
+
                         for (int i = 0; i < promotionCList.size(); i++) {
+
+                            MyLog.e("444444");
 
                             if(total >= promotionRuleCList.get(i).getCounts()){
 
+                                MyLog.e("5555");
                                 disrate = promotionRuleCList.get(i).getCounts();
 
                                 //计算减免
+
+                                MyLog.e("总价 "+copy);
+
+                                MyLog.e("条件 "+promotionRuleCList.get(i).getCounts());
                                 copy = Tool.substrct(total,promotionRuleCList.get(i).getCounts());
 
                                 copy=copy*(100-promotionRuleCList.get(i).getCounts())/100;
@@ -1122,7 +1136,7 @@ public class PayActivity extends AppCompatActivity {
 
                             for (int j = 0; j < orderDishesList.size(); j++) {
 
-                                boolean isSale = false;
+                           //     boolean isSale = false;
 
                               //  SparseArray<Object> s = new SparseArray<>();
 
