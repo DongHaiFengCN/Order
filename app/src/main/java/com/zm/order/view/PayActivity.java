@@ -129,7 +129,7 @@ public class PayActivity extends AppCompatActivity {
                     //当前时间段有活动，显示活动的个数
                     actionTv.setVisibility(View.VISIBLE);
 
-                    actionTv.setText("2");
+                    actionTv.setText(promotionCList.size()+"");
                 }
 
             }
@@ -302,7 +302,7 @@ public class PayActivity extends AppCompatActivity {
 
         promotionCList = CDBHelper.getObjByClass(getApplicationContext(),PromotionC.class);
 
-       /* Iterator iterator = promotionCList.iterator();
+       Iterator iterator = promotionCList.iterator();
 
         //筛选活动时间
         while (iterator.hasNext()){
@@ -326,7 +326,7 @@ public class PayActivity extends AppCompatActivity {
                 iterator.remove();
 
             }
-        }*/
+        }
 
 
 
@@ -495,13 +495,7 @@ public class PayActivity extends AppCompatActivity {
             //1 设置菜品的名称
 
             s.put(1, name);
-
-            //2 设置菜品的原价
-
-
-
             s.put(2, sum);
-            //   MyLog.e("订单菜名：" + name);
 
             //遍历所会员菜品找匹配的打折菜品
 
@@ -510,22 +504,11 @@ public class PayActivity extends AppCompatActivity {
                 //找到打折的
                 if (name.equals(memberDishes.get(i))) {
 
-                    // MyLog.e("订单中包含打折的菜品名称：" + name);
-
-                    //  MyLog.e("折前价格：" + sum);
-               /*     BigDecimal b1 = new BigDecimal(sum);
-
-                    BigDecimal b2 = new BigDecimal(disrate/100f);*/
-
                        MyLog.e("折后前价格：" + sum);
 
                     float d = Tool.divide(disrate,100f);
 
                     sum = Tool.multiply(sum,d);
-
-                   // sum = b1.subtract(b2).floatValue();
-                    //3 设置菜品的折扣价格
-
                     s.put(3,sum);
                     //是打折的直接添加到折扣总价中
 
@@ -722,13 +705,13 @@ public class PayActivity extends AppCompatActivity {
 
         final String tel = data.getStringExtra("tel");
 
-        TextView remainder_tv = view.findViewById(R.id.remainder_tv);
+        TextView remainderTv = view.findViewById(R.id.remainder_tv);
 
-        remainder_tv.setText(r + "");
+        remainderTv.setText(r + "");
 
-        TextView rechangepay_tv = view.findViewById(R.id.rechangepay_tv);
+        TextView rechangepayTv = view.findViewById(R.id.rechangepay_tv);
 
-        rechangepay_tv.setText(total + "");
+        rechangepayTv.setText(total + "");
 
         builder.setTitle("扣款明细表");
         builder.setView(view);
@@ -961,6 +944,8 @@ public class PayActivity extends AppCompatActivity {
                 finish();
 
                 break;
+            default:
+                break;
         }
     }
 
@@ -1008,9 +993,11 @@ public class PayActivity extends AppCompatActivity {
                     if(promotion[0].getPromotionType() == 1){     //打折状态
 
                         //计算出减免的金额
+                        MyLog.e("当前总价 "+total);
+                        MyLog.e("减去的部分 "+copy);
 
                         total = Tool.substrct(total,copy);
-
+                        MyLog.e("减后的部分 "+total);
                         factTv.setText("实际支付：" + total + "元");
 
                         dialog.dismiss();
@@ -1019,9 +1006,12 @@ public class PayActivity extends AppCompatActivity {
                     }else if(promotion[0].getPromotionType() == 2){//赠券
 
 
-                        //确认设置支付金额
+                        //赠券
+                        setPayDetail(8,total-copy);
 
                         total = copy;
+                        //界面展示
+                        factTv.setText("实际支付：" + total + "元");
 
                     }
 
@@ -1048,51 +1038,16 @@ public class PayActivity extends AppCompatActivity {
                 promotion[0] = promotionCList.get(p);
 
                 promotionRuleCList =Tool.Sort(promotion[0].getPromotionRuleList());
-                MyLog.e("11111111111111");
+
 
                 if(promotion[0].getPromotionType() == 1){//折扣
-                    MyLog.e("2222222222");
 
-                    copy = total;
-                    MyLog.e(promotion[0].getCountMode()+"");
-
-                    if(promotion[0].getCountMode() == 1){//消费金额
-
-                        MyLog.e("33333");
-
-                        for (int i = 0; i < promotionCList.size(); i++) {
-
-                            MyLog.e("444444");
-
-                            if(total >= promotionRuleCList.get(i).getCounts()){
-
-                                MyLog.e("5555");
-                                disrate = promotionRuleCList.get(i).getCounts();
-
-                                //计算减免
-
-                                MyLog.e("总价 "+copy);
-
-                                MyLog.e("条件 "+promotionRuleCList.get(i).getCounts());
-                                copy = Tool.substrct(total,promotionRuleCList.get(i).getCounts());
-
-                                copy=copy*(100-promotionRuleCList.get(i).getCounts())/100;
-
-                                //展示当前的减免
-
-                                showTv.setText("满足满"+promotionRuleCList.get(i).getCounts()+"减免"+copy);
-
-                               break;
-                            }
-
-                        }
-
-
-                    }else if(promotion[0].getCountMode() == 2){//菜品金额
+                        copy = total;
+                        if(promotion[0].getCountMode() == 2){//菜品金额
 
                         copy = 0f;
 
-                       List<PromotionDishesC> allDishes = new ArrayList<>();
+                        List<PromotionDishesC> allDishes = new ArrayList<>();
 
                         List<PromotionDishesKindC> dishesKindList = promotion[0].getPromotionDishesKindList();
 
@@ -1107,6 +1062,7 @@ public class PayActivity extends AppCompatActivity {
 
                                 List<PromotionDishesC> list = promotionDishesKindC.getPromotionDishesList();
 
+                                MyLog.e("活动菜品长度 "+list.size());
                                 //菜品不为空
                                 if(list != null){
 
@@ -1122,7 +1078,6 @@ public class PayActivity extends AppCompatActivity {
 
                                         }
                                     }
-
                                 }
                             }
                         }
@@ -1130,22 +1085,18 @@ public class PayActivity extends AppCompatActivity {
                       //计算折扣菜品价格
 
                             for (int j = 0; j < orderDishesList.size(); j++) {
-
-                           //     boolean isSale = false;
-
-                              //  SparseArray<Object> s = new SparseArray<>();
-
                                 //获取订单下goods的菜品名称
                                 GoodsC h = orderDishesList.get(j);
 
                                 String name = h.getDishesName();
-
+                                MyLog.e("查找的菜"+name);
                                 //遍历所活动菜品找匹配的打折菜品
 
                                 for (int i = 0; i < allDishes.size(); i++) {
 
                                     //找到打折的
-                                    if (name.equals(allDishes.get(i))) {
+                                    if (h.getDishesId().equals(allDishes.get(i).getDishesId())) {
+                                        MyLog.e("打折的菜"+name);
 
                                         copy += h.getAllPrice();
 
@@ -1156,30 +1107,34 @@ public class PayActivity extends AppCompatActivity {
                             }
 
                             //计算折扣
+                            MyLog.e("规则长度 "+promotionRuleCList.size());
 
-                            for (int i = 0; i < promotionCList.size(); i++) {
+                            MyLog.e("当前总价 "+total);
+                            for (int i = 0; i < promotionRuleCList.size(); i++) {
+
+                                MyLog.e("满 "+promotionRuleCList.get(i).getCounts());
 
                                 if(total >= promotionRuleCList.get(i).getCounts()){
 
-
-                                    disrate = promotionRuleCList.get(i).getCounts();
+                                    //折扣比率
+                                    disrate = promotionRuleCList.get(i).getDiscounts();
 
                                     //计算减免
-                                    copy = Tool.substrct(total,promotionRuleCList.get(i).getCounts());
 
-                                    copy=copy*(100-promotionRuleCList.get(i).getCounts())/100;
+                                    MyLog.e("减免的标准 "+disrate);
+
+
+                                    //减去的价格
+                                    copy=copy*(100-disrate)/100;
 
                                     //展示当前的减免
 
-                                    showTv.setText("满足满"+promotionRuleCList.get(i).getCounts()+"减免"+copy);
+                                    showTv.setText("减免"+copy+"元");
 
                                     break;
                                 }
 
                             }
-
-
-
 
                     }
                 }
@@ -1194,7 +1149,8 @@ public class PayActivity extends AppCompatActivity {
                     final EditText promtionEt = view1.findViewById(R.id.promotion_et);
 
                     builder.setTitle("输入优惠金额");
-                    builder.setNegativeButton("使用",null);
+                    builder.setView(view1);
+                    builder.setPositiveButton("使用",null);
                     builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
@@ -1235,17 +1191,9 @@ public class PayActivity extends AppCompatActivity {
                                     copy = 0f;
 
                                     //设置实际支付的价格
-
                                     copy = Tool.substrct(total,promotionPrice);
-
-                                    //赠券
-                                    setPayDetail(8,promotionPrice);
-
-                                    //界面展示
-                                    factTv.setText("实际支付：" + total + "元");
-
+                                    showTv.setText("减免"+promotionPrice+"元");
                                     builder1.dismiss();
-
                                     associatorNotDisplay();
 
 
@@ -1311,8 +1259,8 @@ public class PayActivity extends AppCompatActivity {
         checkOrder.setNeedPay(total);
 
 
-        BigDecimal A = new BigDecimal(Float.toString(all));
-        BigDecimal T = new BigDecimal(Float.toString(total));
+      /*  BigDecimal A = new BigDecimal(Float.toString(all));
+        BigDecimal T = new BigDecimal(Float.toString(total));*/
 
         checkOrder.setTableNo(myApplication.getTable_sel_obj().getTableNum());
         for(OrderC orderC: checkOrder.getOrderList()){
@@ -1327,7 +1275,8 @@ public class PayActivity extends AppCompatActivity {
         promotionD.setClassName("PromotionDetailC");
 
 
-        promotionD.setDiscounts(A.subtract(T).floatValue());
+       // promotionD.setDiscounts(A.subtract(T).floatValue());
+        promotionD.setDiscounts(Tool.substrct(all,total));
 
         promotionD.setDisrate(disrate);
 

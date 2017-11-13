@@ -64,23 +64,10 @@ public class CouchBaseManger<T> implements IDBManager {
     @Override
     public boolean isLogin(String name, String pass) {
 
-        Document document = new Document();
-
-        document.setString("className","LoginUserBean");
-        document.setString("mName",name);
-        document.setString("mPassword",pass);
-
-        try {
-            database.save(document);
-        } catch (CouchbaseLiteException e) {
-            e.printStackTrace();
-        }
-
-
 
         Query query= Query.select(SelectResult.expression(Expression.meta().getId()))
                 .from(DataSource.database(database))
-                .where(Expression.property("className").equalTo("LoginUserBean").and(Expression.property("mName").equalTo(name).and(Expression.property("mPassword").equalTo(pass))));
+                .where(Expression.property("className").equalTo("UsersC").and(Expression.property("userName").equalTo(name).and(Expression.property("passwd").equalTo(pass))));
         try {
 
             ResultSet resultSet= query.run();
