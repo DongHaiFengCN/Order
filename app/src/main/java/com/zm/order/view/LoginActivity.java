@@ -35,7 +35,6 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //aaaaab
 
         setContentView(R.layout.activity_login);
 
@@ -57,9 +56,6 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
            }
 
 
-           //设置登录用户名称全局变量
-
-        //myApplication.setLoginName(name.getText().toString());
 
 }
 
