@@ -116,26 +116,6 @@ public class PayActivity extends AppCompatActivity {
     //营销细节
     PromotionDetailC promotionD = new PromotionDetailC();
 
-    //更新总价
-    private Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-
-            if (msg.what == RESULT_OK) {
-
-                if(promotionCList.size()>0){
-
-                    //当前时间段有活动，显示活动的个数
-                    actionTv.setVisibility(View.VISIBLE);
-
-                    actionTv.setText(promotionCList.size()+"");
-                }
-
-            }
-
-        }
-    };
 
     //每增加一种支付方式创建一个支付详情，例如充值卡余额不足，剩下的部分用的现金。
     private List<PayDetailC> payDetailList = new ArrayList<>();
@@ -167,26 +147,23 @@ public class PayActivity extends AppCompatActivity {
         tableC = myApplication.getTable_sel_obj();
 
         tableNumber.setText("桌/牌:"+tableC.getTableNum()+"号");
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
 
-                getAll();
-                Message m = handler.obtainMessage();
-                m.what = RESULT_OK;
-                handler.sendMessage(m);
+        getAll();
 
-            }
-        }).start();
+        if(promotionCList.size()>0){
+
+            //当前时间段有活动，显示活动的个数
+            actionTv.setVisibility(View.VISIBLE);
+
+            actionTv.setText(promotionCList.size()+"");
+        }
+
 
         //创建打印dialog
         dialog = new AlertDialog.Builder(PayActivity.this);
         dialog.setView(getLayoutInflater().inflate(R.layout.view_print_dialog, null)).create();
 
         StringBuilder stringBuilder = new StringBuilder("实际支付：");
-
-        //显示操作后价格
-        factTv.setText(stringBuilder.append(total));
 
         //获取包含桌号xx的所有订单
         List<OrderC> orderCList = CDBHelper.getObjByWhere(getApplicationContext(),Expression.property("className").equalTo("OrderC").and(Expression.property("tableNo").equalTo(tableC.getTableNum())).and(Expression.property("orderState").equalTo(1)),null,OrderC.class);
@@ -207,7 +184,8 @@ public class PayActivity extends AppCompatActivity {
         }
         //显示原价
         totalTv.setText(total + "");
-        factTv.setText("实际支付：" + total + "元");
+        //显示操作后价格
+        factTv.setText(stringBuilder.append(total));
     }
 
 
@@ -240,11 +218,13 @@ public class PayActivity extends AppCompatActivity {
                 List<OrderC> f = checkOrderC.getOrderList();
 
                 if(f != null){
+                    int i1 = 0;
 
                     for(OrderC orderC :f){
 
 
-                        MyLog.e("&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+                        i1++;
+                        MyLog.e("订单~~~~~~"+i1);
 
                         for(GoodsC goodsC:orderC.getGoodsList()){
 
@@ -327,7 +307,6 @@ public class PayActivity extends AppCompatActivity {
 
             }
         }
-
 
 
     }
@@ -1032,7 +1011,6 @@ public class PayActivity extends AppCompatActivity {
             @Override
             public void click(int p) {
 
-                //设置临时变量
 
                 //规则详情
                 promotion[0] = promotionCList.get(p);

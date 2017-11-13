@@ -17,6 +17,7 @@ import application.ISharedPreferences;
 import application.MyApplication;
 import presenter.ILoginPresenter;
 import presenter.LoginPresentImpl;
+import untils.MyLog;
 
 /**
  *
@@ -44,6 +45,9 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
           //查看是否有缓存
 
          String flag = myApplication.getSharePreferences().getString("name","");
+        String flag1 = myApplication.getSharePreferences().getString("password","");
+        MyLog.e(flag);
+        MyLog.e(flag1);
 
            if("".equals(flag)){
 
