@@ -41,7 +41,6 @@ public class DeskActivity extends AppCompatActivity {
     private ListView listViewArea;
     private List<AreaC> areaCList;
     private AreaAdapter areaAdapter;
-
     private RecyclerView listViewDesk;
 
 

@@ -6,6 +6,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -28,6 +29,7 @@ import android.widget.Toast;
 import com.couchbase.lite.Array;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Document;
+import com.couchbase.lite.Expression;
 import com.couchbase.lite.Log;
 import com.zm.order.R;
 
@@ -41,6 +43,7 @@ import java.util.TimerTask;
 
 import application.MyApplication;
 import bean.Goods;
+import bean.kitchenmanage.order.CheckOrderC;
 import bean.kitchenmanage.order.GoodsC;
 import bean.kitchenmanage.order.OrderC;
 import bean.kitchenmanage.table.TableC;
@@ -77,14 +80,8 @@ public class MainActivity extends AppCompatActivity {
     private FragmentManager fm;//获得Fragment管理器
     private FragmentTransaction ft; //开启一个事务
     private boolean isFlag = true;
-    private OrderAdapter orderAdapter;
-    private IDBManager idbManager;
-    private List<Document> orderList;
-    private TableC tableC;
     private OrderC orderC ;
     private List<GoodsC> goodsList = new ArrayList<>();
-    List<HashMap> orderDishesList = new ArrayList<>();
-    private List<Document> promotionCList;
     private String id;
     private Document document;
 
@@ -105,11 +102,8 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         });
-        idbManager = DBFactory.get(DatabaseSource.CouchBase, getApplicationContext());
         myApp = (MyApplication) getApplication();
-        tableC = myApp.getTable_sel_obj();
         orderC = new OrderC(myApp.getCompany_ID());
-
         initView();
 
         select(isFlag);
@@ -385,11 +379,6 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
 
-                    if (orderDishesList != null){
-                        for (int i = 0; i< orderDishesList.size(); i++){
-                            Log.e("Aaaa",orderDishesList.get(i).size()+"");
-                        }
-                    }
                     if (document == null){
                         orderC.setGoodsList(goodsList);
                         orderC.setAllPrice(total);
@@ -397,8 +386,10 @@ public class MainActivity extends AppCompatActivity {
                         orderC.setOrderType(1);
                         orderC.setTableNo(myApp.getTable_sel_obj().getTableNum());
                         id = CDBHelper.createAndUpdate(getApplicationContext(),orderC);
+                        Log.e("id",id);
                     }else{
                         if (document.getId().equals(id)){
+
                             OrderC orderC =  CDBHelper.getObjById(getApplicationContext(),id,OrderC.class);
                             orderC.setGoodsList(goodsList);
                             orderC.setAllPrice(total);
@@ -427,6 +418,8 @@ public class MainActivity extends AppCompatActivity {
             Log.e("document",""+document.getId());
 
         }
+
+
 
     }
 
