@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TimerTask;
 
-import bean.Goods;
 import bean.kitchenmanage.dishes.DishesC;
 import bean.kitchenmanage.dishes.DishesKindC;
 import bean.kitchenmanage.order.GoodsC;

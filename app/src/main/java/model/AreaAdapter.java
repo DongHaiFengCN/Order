@@ -42,12 +42,15 @@ public class AreaAdapter extends ArrayAdapter<String> {
 		this.listsLiveQuery = listsLiveQuery();
 		this.listsLiveQuery.addChangeListener(new LiveQueryChangeListener() {
 			@Override
-			public void changed(LiveQueryChange change) {
+			public void changed(LiveQueryChange change)
+			{
 				clear();
 				ResultSet rs = change.getRows();
 				Result result;
-				while ((result = rs.next()) != null) {
+				while ((result = rs.next()) != null)
+				{
 					add(result.getString(0));
+					Log.e("areaAdapter","liveQuery change getRows ="+result.getString(0));
 				}
 				notifyDataSetChanged();
 			}

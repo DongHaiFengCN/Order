@@ -229,8 +229,8 @@ public class SeekT9Adapter extends BaseAdapter {
             viewHolder.viewJian.setVisibility(View.VISIBLE);
         }
         if (activity.getGoodsList().size() == 0 ){
-
-            if (mData.get(position).getDishesCount() > 0) {//如果选择器的数量不为零，当前的选择的菜品加入订单列表
+            //如果选择器的数量不为零，当前的选择的菜品加入订单列表
+            if (mData.get(position).getDishesCount() > 0) {
 
 
                 goodsC.setDishesName(dishesC.getDishesName());
