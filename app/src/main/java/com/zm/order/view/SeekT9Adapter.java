@@ -103,6 +103,7 @@ public class SeekT9Adapter extends BaseAdapter {
         viewHolder.itemSeekInfo.setText(dishesC.getDishesName());
         viewHolder.itemSeekTv.setText(dishesC.getPrice() + "");
         viewHolder.viewShu.setText(""+mData.get(position).getDishesCount());
+
         viewHolder.itemSeekLn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -133,10 +134,10 @@ public class SeekT9Adapter extends BaseAdapter {
             viewHolder.viewShu.setText(mData.get(position).getDishesCount()+"");
         }
 
-        String str = viewHolder.viewShu.getText().toString();
+        final String str = viewHolder.viewShu.getText().toString();
         if (str.equals("0")){
-            viewHolder.viewShu.setVisibility(View.GONE);
-            viewHolder.viewJian.setVisibility(View.GONE);
+            viewHolder.viewShu.setVisibility(View.INVISIBLE);
+            viewHolder.viewJian.setVisibility(View.INVISIBLE);
         }else {
             viewHolder.viewShu.setVisibility(View.VISIBLE);
             viewHolder.viewJian.setVisibility(View.VISIBLE);
@@ -160,59 +161,60 @@ public class SeekT9Adapter extends BaseAdapter {
                     setTJ(position,s,viewHolder);
                 }
 
-
-
-
-
             }
         });
 
         viewHolder.viewJian.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dishesC =  CDBHelper.getObjById(activity.getApplicationContext(),mData.get(position).getDishesId(),DishesC.class);
-                if (mData.get(position).getDishesCount() > 0){
-                    mData.get(position).setDishesCount(mData.get(position).getDishesCount()-1);
-                }
 
-                if (mData.get(position).getDishesCount() <= 0){
-                    viewHolder.viewShu.setVisibility(View.GONE);
-                    viewHolder.viewJian.setVisibility(View.GONE);
-                }
-                viewHolder.viewShu.setText(mData.get(position).getDishesCount()+"");
-                if (activity.getGoodsList().size() != 0 ){
-                    for (int i = 0 ;i< activity.getGoodsList().size() ;i++){
-                        if (activity.getGoodsList().get(i).getDishesName().toString().equals(dishesC.getDishesName())) {
-                            number = activity.getGoodsList().get(i).getDishesCount();
-                            break;
-                        }
+                    dishesC = CDBHelper.getObjById(activity.getApplicationContext(), mData.get(position).getDishesId(), DishesC.class);
+                    if (mData.get(position).getDishesCount() > 0) {
+                        mData.get(position).setDishesCount(mData.get(position).getDishesCount() - 1);
                     }
-                }
 
-                number = Integer.parseInt(viewHolder.viewShu.getText().toString());
-                if (activity.getGoodsList().size() != 0 ){
-                    for (int i = 0 ;i< activity.getGoodsList().size() ;i++){
-                        if (activity.getGoodsList().get(i).getDishesName().toString().equals(dishesC.getDishesName())) {
-                            activity.getGoodsList().get(i).setDishesCount(number);
-                            number = activity.getGoodsList().get(i).getDishesCount();
-                            activity.getGoodsList().get(i).setAllPrice(number * dishesC.getPrice());
-                            total = activity.getTotal();
-                            total -= 1 * dishesC.getPrice();
-                            activity.setTotal(total);
-                            point = activity.getPoint();
-                            if (number == 0){
-                                point--;
-                                number = 1;
+                    if (mData.get(position).getDishesCount() <= 0) {
+                        viewHolder.viewShu.setVisibility(View.INVISIBLE);
+                        viewHolder.viewJian.setVisibility(View.INVISIBLE);
+                    }
+                    viewHolder.viewShu.setText(mData.get(position).getDishesCount() + "");
+                    if (activity.getGoodsList().size() != 0) {
+                        for (int i = 0; i < activity.getGoodsList().size(); i++) {
+                            if (activity.getGoodsList().get(i).getDishesName().toString().equals(dishesC.getDishesName())) {
+                                number = activity.getGoodsList().get(i).getDishesCount();
+                                break;
                             }
-                            activity.setPoint(point);
-                            break;
                         }
                     }
 
+                    number = Integer.parseInt(viewHolder.viewShu.getText().toString());
+                    if (activity.getGoodsList().size() != 0) {
+                        for (int i = 0; i < activity.getGoodsList().size(); i++) {
+                            if (activity.getGoodsList().get(i).getDishesName().toString().equals(dishesC.getDishesName())) {
+                                activity.getGoodsList().get(i).setDishesCount(number);
+                                number = activity.getGoodsList().get(i).getDishesCount();
+                                activity.getGoodsList().get(i).setAllPrice(number * dishesC.getPrice());
+                                total = activity.getTotal();
+                                total -= 1 * dishesC.getPrice();
+                                activity.setTotal(total);
+                                point = activity.getPoint();
+                                if (number == 0) {
+                                    point--;
+                                    number = 1;
+                                }
+                                activity.setPoint(point);
+                                break;
+                            }
+                        }
+
+                    }
+
+
                 }
 
-            }
         });
+
+
 
         return convertView;
     }
