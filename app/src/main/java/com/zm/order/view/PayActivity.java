@@ -50,6 +50,7 @@ import bean.kitchenmanage.promotion.PromotionC;
 import bean.kitchenmanage.promotion.PromotionDishesC;
 import bean.kitchenmanage.promotion.PromotionDishesKindC;
 import bean.kitchenmanage.promotion.PromotionRuleC;
+import bean.kitchenmanage.qrcode.qrcodeC;
 import bean.kitchenmanage.table.TableC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -272,11 +273,18 @@ public class PayActivity extends AppCompatActivity {
     private void getAll() {
 
         //支付宝收款码,网络获取**********
+        String alipayId;
 
-        String alipayId = "qwhhh";
+        List<qrcodeC> qrcodeList = CDBHelper.getObjByClass(getApplicationContext(),qrcodeC.class);
 
-        //转化二维码
-        bitmap = encodeAsBitmap(alipayId);
+        if(!qrcodeList.isEmpty()){
+
+            alipayId = qrcodeList.get(0).getZfbUrl();
+            //转化二维码
+            bitmap = encodeAsBitmap(alipayId);
+
+        }
+
 
         //营销方式
 
@@ -336,10 +344,6 @@ public class PayActivity extends AppCompatActivity {
                 turnMainActivity();
 
                 finish();
-
-                break;
-
-            case R.id.reset:
 
                 break;
             default:
@@ -801,30 +805,10 @@ public class PayActivity extends AppCompatActivity {
 
     private void printOrder() {
 
-        View dialog = getLayoutInflater().inflate(R.layout.view_alipay_dialog, null);
-        ImageView imageView = dialog.findViewById(R.id.encode);
-        imageView.setImageBitmap(bitmap);
+        ProgressBarasyncTask progressBarasyncTask = new ProgressBarasyncTask(PayActivity.this);
+        progressBarasyncTask.setDate(checkOrder);
+        progressBarasyncTask.execute();
 
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(PayActivity.this);
-        alertDialog.setView(dialog);
-        alertDialog.setPositiveButton("取消", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-
-            }
-        });
-        alertDialog.setNegativeButton("确定支付", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-
-                ProgressBarasyncTask progressBarasyncTask = new ProgressBarasyncTask(PayActivity.this);
-                //  progressBarasyncTask.setDate(intent);
-                progressBarasyncTask.execute();
-
-            }
-        });
-
-        alertDialog.show();
 
     }
 
@@ -886,25 +870,73 @@ public class PayActivity extends AppCompatActivity {
             case R.id.ivalipay:
 
                 //支付宝支付
-                setPayDetail(3, total);
 
-                try {
-                    submitCheckOrder();
-                } catch (CouchbaseLiteException e) {
-                    e.printStackTrace();
-                }
+                View alipayView = getLayoutInflater().inflate(R.layout.view_alipay_dialog, null);
+                ImageView alipayIv = alipayView.findViewById(R.id.encode);
+                alipayIv.setImageBitmap(bitmap);
 
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(PayActivity.this);
+                alertDialog.setView(alipayView);
+                alertDialog.setPositiveButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+                alertDialog.setNegativeButton("确定支付", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                        setPayDetail(3, total);
+
+                        try {
+                            submitCheckOrder();
+                        } catch (CouchbaseLiteException e) {
+                            e.printStackTrace();
+                        }
+
+
+                    }
+                });
+
+                alertDialog.show();
                 break;
             case R.id.ivwechat:
 
                 //微信支付
-                setPayDetail(4, total);
 
-                try {
-                    submitCheckOrder();
-                } catch (CouchbaseLiteException e) {
-                    e.printStackTrace();
-                }
+                View wechatView = getLayoutInflater().inflate(R.layout.view_alipay_dialog, null);
+                ImageView wechatIv = wechatView.findViewById(R.id.encode);
+                wechatIv.setImageBitmap(bitmap);
+
+                AlertDialog.Builder wechatDialog = new AlertDialog.Builder(PayActivity.this);
+                wechatDialog.setView(wechatView);
+                wechatDialog.setPositiveButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+                wechatDialog.setNegativeButton("确定支付", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+
+                        setPayDetail(4, total);
+
+                        try {
+                            submitCheckOrder();
+                        } catch (CouchbaseLiteException e) {
+                            e.printStackTrace();
+                        }
+
+
+                    }
+                });
+
+                wechatDialog.show();
+
+
 
                 break;
             case R.id.cash:
@@ -918,9 +950,7 @@ public class PayActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                Intent intent = new Intent(PayActivity.this,DeskActivity.class);
-                startActivity(intent);
-                finish();
+
 
                 break;
             default:
@@ -1236,10 +1266,6 @@ public class PayActivity extends AppCompatActivity {
 
         checkOrder.setNeedPay(total);
 
-
-      /*  BigDecimal A = new BigDecimal(Float.toString(all));
-        BigDecimal T = new BigDecimal(Float.toString(total));*/
-
         checkOrder.setTableNo(myApplication.getTable_sel_obj().getTableNum());
         for(OrderC orderC: checkOrder.getOrderList()){
 
@@ -1269,8 +1295,29 @@ public class PayActivity extends AppCompatActivity {
         CDBHelper.createAndUpdate(getApplicationContext(), promotionD);
         CDBHelper.createAndUpdate(getApplicationContext(), checkOrder);
 
-        show();
-        //打印订单
+      //  show();
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("打印总账单");
+        builder.setPositiveButton("打印", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                printOrder();
+            }
+        });
+        builder.setNegativeButton("否", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+
+        //跳转主界面
+
+        Intent intent = new Intent(PayActivity.this,DeskActivity.class);
+        startActivity(intent);
+        finish();
     }
     /**
      * 字符串生成二维码图片
