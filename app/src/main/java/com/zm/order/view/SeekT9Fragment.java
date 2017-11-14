@@ -96,8 +96,6 @@ public class SeekT9Fragment extends Fragment {
         View view = inflater.inflate(R.layout.activity_seek, container, false);
 
         unbinder = ButterKnife.bind(this, view);
-       /* point_tv = getActivity().findViewById(R.id.point);
-        total_tv = getActivity().findViewById(R.id.total_tv);*/
         mHandler = new Handler();
         initView();
         return view;
@@ -147,8 +145,8 @@ public class SeekT9Fragment extends Fragment {
             @Override
             public void OnChange(int ls, boolean flag) {
 
-
-                l[0] = ls * price;//实时计算当前菜品选择不同数量后的单品总价
+                //实时计算当前菜品选择不同数量后的单品总价
+                l[0] = ls * price;
 
                 price_tv.setText("总计 " + l[0] + " 元");
 
@@ -161,7 +159,8 @@ public class SeekT9Fragment extends Fragment {
             }
 
         }
-        final GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);//设置每行展示3个
+        //设置每行展示3个
+        final GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);
         RecyclerView recyclerView = view.findViewById(R.id.view_dialog_recycler);
         recyclerView.setLayoutManager(manager);
         MyGridAdapter myGridAdapter = new MyGridAdapter(getActivity(), tasteList);
@@ -182,8 +181,8 @@ public class SeekT9Fragment extends Fragment {
             public void onClick(DialogInterface dialogInterface, int i) {
                 mainActivity = (MainActivity) getActivity();
                 int sum = amountView.getAmount();
-
-                if (sum != 0) {//如果选择器的数量不为零，当前的选择的菜品加入订单列表
+                //如果选择器的数量不为零，当前的选择的菜品加入订单列表
+                if (sum != 0) {
 
                     GoodsC goodsC = new GoodsC();
                     goodsC.setDishesName(name);
@@ -238,14 +237,10 @@ public class SeekT9Fragment extends Fragment {
                     List<DishesC> dishesCs = CDBHelper.getObjByWhere(getActivity().getApplicationContext(), Expression.property("className").equalTo("DishesC")
                             .and(Expression.property("dishesNameCode9").like(search + "%")), null, DishesC.class);
                     for (DishesC obj : dishesCs) {
-                        //mlistSearchDishesObj.add(obj);
-                        if(obj.get_id() != null){
-                            Log.e("T9Fragment", "kouwei size=" + obj.getTasteList().size());
                             GoodsC goodsObj = new GoodsC();
                             goodsObj.setDishesCount(0);
                             goodsObj.setDishesId(obj.get_id());
                             myGoodsList.add(goodsObj);
-                        }
                     }
                     seekT9Adapter.setmData(myGoodsList);
                     seekT9Adapter.notifyDataSetChanged();
@@ -355,6 +350,9 @@ public class SeekT9Fragment extends Fragment {
                     activitySeekEdit.getText().delete(length - 1, length);
                 }
 
+                break;
+
+            default:
                 break;
         }
     }
