@@ -242,9 +242,12 @@ public class SeekT9Adapter extends BaseAdapter {
                 goodsC.setDishesCount(1);
                 goodsC.setAllPrice(mData.get(position).getDishesCount() * dishesC.getPrice());
                 goodsC.setDishesId(dishesC.get_id());
-                DishesKindC dishesKind  = CDBHelper.getObjById(activity.getApplicationContext(),dishesC.getDishesKindId(), DishesKindC.class);
-                goodsC.setDishesKindName(dishesKind.getKindName());
-                Log.e("dishesKindName",dishesKind.getKindName());
+                if (dishesC.getDishesKindId()!=null){
+                    DishesKindC dishesKind  = CDBHelper.getObjById(activity.getApplicationContext(),dishesC.getDishesKindId(), DishesKindC.class);
+                    goodsC.setDishesKindName(dishesKind.getKindName());
+                    Log.e("dishesKindName",dishesKind.getKindName());
+                }
+
                 activity.getGoodsList().add(goodsC);
 
                 CDBHelper.createAndUpdate(activity.getApplicationContext(), goodsC);

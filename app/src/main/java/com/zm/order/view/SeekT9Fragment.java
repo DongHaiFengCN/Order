@@ -194,9 +194,11 @@ public class SeekT9Fragment extends Fragment {
                     goodsC.setDishesCount(sum);
                     goodsC.setAllPrice(sum * price);
                     goodsC.setDishesId(dishesC.get_id());
-                    DishesKindC dishesKindC =  CDBHelper.getObjById(getActivity().getApplicationContext(),dishesC.getDishesKindId(), DishesKindC.class);
-                    goodsC.setDishesKindName(dishesKindC.getKindName());
-                    Log.e("dishesKindName",dishesKindC.getKindName());
+                    if (dishesC.getDishesKindId()!=null) {
+                        DishesKindC dishesKindC = CDBHelper.getObjById(getActivity().getApplicationContext(), dishesC.getDishesKindId(), DishesKindC.class);
+                        goodsC.setDishesKindName(dishesKindC.getKindName());
+                        Log.e("dishesKindName", dishesKindC.getKindName());
+                    }
                     mainActivity.getGoodsList().add(goodsC);
                     //购物车计数器数据更新
                     point = (((MainActivity) getActivity()).getPoint());
