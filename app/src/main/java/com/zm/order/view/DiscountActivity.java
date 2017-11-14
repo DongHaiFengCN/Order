@@ -69,6 +69,8 @@ public class DiscountActivity extends AppCompatActivity {
 
         totalTv.setText(stashTotal+"");
 
+        discountEt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(totalTv.length()-2)});
+
         discountEt.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -91,11 +93,14 @@ public class DiscountActivity extends AppCompatActivity {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-                c = charSequence;
+
             }
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+
+
 
             }
 
@@ -108,13 +113,6 @@ public class DiscountActivity extends AppCompatActivity {
                     if(stashTotal >= Float.valueOf(discountEt.getText().toString())){
 
                         totalTv.setText((stashTotal-Float.valueOf(discountEt.getText().toString()))+"");
-
-                    }else {
-
-                        //设置输入的长度
-                        discountEt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(totalTv.length()-1)});
-
-
 
                     }
 
