@@ -102,12 +102,17 @@ public class DeskActivity extends AppCompatActivity {
                 uiHandler.sendMessage(msg);
             }
         });
-        areaAdapter.setSelectItem(0);
-        showDeskListView(areaAdapter.getItem(0));
+        if(areaAdapter.getCount()>0)
+        {
+            areaAdapter.setSelectItem(0);
+            showDeskListView(areaAdapter.getItem(0));
+        }
+
     }
 
     private void showDeskListView(String areaId)
     {
+
         long starttime = System.currentTimeMillis();
         LiveTableRecyclerAdapter tableadapter=new LiveTableRecyclerAdapter(this,db,areaId);
         tableadapter.setOnItemClickListener(new LiveTableRecyclerAdapter.onRecyclerViewItemClickListener()
@@ -117,6 +122,7 @@ public class DeskActivity extends AppCompatActivity {
             {
                 TableC tableC=(TableC)data;
                 tableC.setState(2);
+                MyLog.e("onItemClick tableId="+tableC.get_id());
                 CDBHelper.createAndUpdate(getApplicationContext(),tableC);
                 myapp.setTable_sel_obj(tableC);
 
@@ -152,9 +158,6 @@ public class DeskActivity extends AppCompatActivity {
                                 // TODO Auto-generated method stub
                             }
                         }).show();
-
-
-
             }
         });
         long endTime1 = System.currentTimeMillis();
