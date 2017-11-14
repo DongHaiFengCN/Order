@@ -112,7 +112,9 @@ public class DiscountActivity extends AppCompatActivity {
                     }else {
 
                         //设置输入的长度
-                        discountEt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(c.length())});
+                        discountEt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(c.length()-1)});
+
+
 
                     }
 
