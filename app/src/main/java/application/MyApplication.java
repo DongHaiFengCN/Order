@@ -52,12 +52,12 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
     private static final String TAG = Application.class.getSimpleName();
 
     private final static boolean SYNC_ENABLED = true;
-    private final static String DATABASE_NAME = "KitchenDB";
+    private final static String DATABASE_NAME = "KitchenDB15";
     private final static String SYNCGATEWAY_URL = "blip://123.207.174.171:4984/kitchen/";
     private Database database = null;
     private Replicator replicator;
     //private String Company_ID="zmsy010";
-    private String Company_ID="zmsy13";
+    private String Company_ID="zmsy15";
     private TableC table_sel_obj;
 
     public ExecutorService mExecutor;
