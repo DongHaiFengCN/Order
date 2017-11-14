@@ -53,6 +53,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
 
 
          myApplication = (MyApplication) getApplication();
+      //  myApplication.cancleSharePreferences();
 
           //查看是否有缓存
 
@@ -140,7 +141,13 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
             @Override
             public void onClick(View view) {
 
-                iLoginPresenter.doLogin();
+                myApplication.mExecutor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        iLoginPresenter.doLogin();
+                    }
+                });
+
 
             }
         });
@@ -168,24 +175,20 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
     @Override
     public void success() {
 
+        List<UsersC> usersCList = CDBHelper.getObjByWhere(getApplicationContext(),
+                Expression.property("className")
+                        .equalTo("UsersC"),null, UsersC.class);
+        for(UsersC u : usersCList){
+
+            if(u.getUserName().equals(userNumber)){
+                myApplication.setUsersC(u);
+                break;
+            }
+        }
         Intent intent = new Intent(this,DeskActivity.class);
         startActivity(intent);
         finish();
-        myApplication.mExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                List<UsersC> usersCList = CDBHelper.getObjByWhere(getApplicationContext(),
-                        Expression.property("className")
-                        .equalTo("UsersC"),null, UsersC.class);
-                for(UsersC u : usersCList){
-
-                    if(u.getUserName().equals(userNumber)){
-                        myApplication.setUsersC(u);
-                        break;
-                    }
-                }
-            }
-        });
+;
 
     }
 
