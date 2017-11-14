@@ -156,9 +156,11 @@ public class SeekT9Adapter extends BaseAdapter {
                     }
 
                     dialog(tasteList,position,s,viewHolder);
+                    activity.getOrderAdapter().notifyDataSetChanged();
 
                 }else{
                     setTJ(position,s,viewHolder);
+                    activity.getOrderAdapter().notifyDataSetChanged();
                 }
 
             }
@@ -208,6 +210,7 @@ public class SeekT9Adapter extends BaseAdapter {
                         }
 
                     }
+                activity.getOrderAdapter().notifyDataSetChanged();
 
 
                 }
@@ -283,6 +286,9 @@ public class SeekT9Adapter extends BaseAdapter {
                     point =  activity.getPoint();
                     if (point==0){
                         point++;
+                        activity.setPoint(point);
+                    }else{
+                        point = activity.getGoodsList().size();
                         activity.setPoint(point);
                     }
                     break;
