@@ -167,7 +167,9 @@ public class PayActivity extends AppCompatActivity {
         StringBuilder stringBuilder = new StringBuilder("实际支付：");
 
         //获取包含桌号xx的所有订单
-        List<OrderC> orderCList = CDBHelper.getObjByWhere(getApplicationContext(),Expression.property("className").equalTo("OrderC").and(Expression.property("tableNo").equalTo(tableC.getTableNum())).and(Expression.property("orderState").equalTo(1)),null,OrderC.class);
+        List<OrderC> orderCList = CDBHelper.getObjByWhere(getApplicationContext(),Expression.property("className")
+                .equalTo("OrderC").and(Expression.property("tableNo").equalTo(tableC.getTableNum()))
+                .and(Expression.property("orderState").equalTo(1)),null,OrderC.class);
 
         for(OrderC orderC:orderCList){
 
@@ -819,6 +821,14 @@ public class PayActivity extends AppCompatActivity {
 
         finish();
     }
+    public void turnDesk(){
+
+        //跳转主界面
+
+        Intent intent = new Intent(PayActivity.this,DeskActivity.class);
+        startActivity(intent);
+        finish();
+    }
 
 
     /**
@@ -942,15 +952,33 @@ public class PayActivity extends AppCompatActivity {
             case R.id.cash:
 
                 //现金支付
-                setPayDetail(1, total);
 
-                try {
-                    submitCheckOrder();
-                } catch (CouchbaseLiteException e) {
-                    e.printStackTrace();
-                }
+                AlertDialog.Builder cashDialog = new AlertDialog.Builder(PayActivity.this);
+
+                cashDialog.setPositiveButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+                cashDialog.setNegativeButton("确定支付", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
 
 
+                        setPayDetail(1, total);
+
+                        try {
+                            submitCheckOrder();
+                        } catch (CouchbaseLiteException e) {
+                            e.printStackTrace();
+                        }
+
+
+                    }
+                });
+
+                cashDialog.show();
 
                 break;
             default:
@@ -1310,14 +1338,17 @@ public class PayActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
 
+
+                //跳转主界面
+
+                Intent intent = new Intent(PayActivity.this,DeskActivity.class);
+                startActivity(intent);
+                finish();
+
             }
         });
+        builder.show();
 
-        //跳转主界面
-
-        Intent intent = new Intent(PayActivity.this,DeskActivity.class);
-        startActivity(intent);
-        finish();
     }
     /**
      * 字符串生成二维码图片

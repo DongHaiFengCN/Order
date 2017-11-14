@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import application.MyApplication;
 import bean.kitchenmanage.order.CheckOrderC;
 import bean.kitchenmanage.order.GoodsC;
 import bean.kitchenmanage.order.OrderC;
@@ -40,7 +41,6 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
     private BluetoothSocket socket;
     private PayActivity payActivity;
     private CheckOrderC checkOrderC;
-    private String ml =".0";
     private String str; //临时变量
     private float total;
 
@@ -97,12 +97,12 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
 
         if(true){ //支付成功
 
-            flag = "ok";
-            String waiter ="董海峰";
-            String peopleSum = "8";
+            MyApplication m = (MyApplication) payActivity.getApplicationContext();
+            String waiter =m.getUsersC().getEmployeeName();
+
             String tableNumber = checkOrderC.getTableNo();
 
-            //List list = (ArrayList<SparseArray<Object>>) intent.getSerializableExtra("Order");
+
 
             List<OrderC> list = checkOrderC.getOrderList();
 
@@ -116,15 +116,14 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
             PrintUtils.selectCommand(PrintUtils.ALIGN_LEFT);
             PrintUtils.printText(PrintUtils.printTwoData("订单编号", OrderId()+"\n"));
             PrintUtils.printText(PrintUtils.printTwoData("下单时间", getFormatDate()+"\n"));
-            PrintUtils.printText(PrintUtils.printTwoData("人数："+peopleSum, "收银员："+waiter+"\n"));
+            PrintUtils.printText(PrintUtils.printTwoData("人数："+m.getTable_sel_obj().getCurrentPersions(), "收银员："+waiter+"\n"));
             PrintUtils.printText("--------------------------------\n");
             PrintUtils.selectCommand(PrintUtils.BOLD);
             PrintUtils.printText(PrintUtils.printThreeData("项目", "数量", "金额\n"));
             PrintUtils.printText("--------------------------------\n");
             PrintUtils.selectCommand(PrintUtils.BOLD_CANCEL);
-            for (int i = 0; i < list.size(); i++) {
 
-                // SparseArray<Object> s = (SparseArray<Object>) list.get(i);
+            for (int i = 0; i < list.size(); i++) {
 
                 List<GoodsC> goodsCList = list.get(i).getGoodsList();
 
@@ -137,17 +136,16 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
 
                 }
 
-               // PrintUtils.printText(PrintUtils.printThreeData(s.get(0).toString(), s.get(2).toString(), s.get(4).toString()+"\n"));
             }
             PrintUtils.printText("--------------------------------\n");
             PrintUtils.printText(PrintUtils.printTwoData("合计", total+"\n"));
-           // PrintUtils.printText(PrintUtils.printTwoData("抹零", "0"+ml+"\n"));
             PrintUtils.printText("--------------------------------\n");
             PrintUtils.printText(PrintUtils.printTwoData("实收", checkOrderC.getNeedPay()+"\n"));
             PrintUtils.printText("--------------------------------\n");
           /*  PrintUtils.selectCommand(PrintUtils.ALIGN_LEFT);
             PrintUtils.printText("备注：");
             PrintUtils.printText("\n\n\n\n\n");*/
+            PrintUtils.printText("\n\n\n\n");
             PrintUtils.closeOutputStream();
 
             try {
@@ -172,13 +170,10 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
     @Override
     protected void onPostExecute(String result) {
 
-          if(!result.equals("ok")){
-
-              Toast.makeText(payActivity,"支付失败！", Toast.LENGTH_LONG).show();
-          }else {
-              payActivity.turnMainActivity();
-          }
         payActivity.closeDialog();
+        payActivity.turnDesk();
+
+
 
 
     }
