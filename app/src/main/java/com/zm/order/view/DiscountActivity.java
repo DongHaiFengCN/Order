@@ -91,11 +91,16 @@ public class DiscountActivity extends AppCompatActivity {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-                c = charSequence;
+
             }
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+
+
+
+
 
             }
 
@@ -111,11 +116,7 @@ public class DiscountActivity extends AppCompatActivity {
 
                     }else {
 
-                        //设置输入的长度
-                        discountEt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(totalTv.length()-1)});
-
-
-
+                        discountEt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(totalTv.length())});
                     }
 
                 }else {
