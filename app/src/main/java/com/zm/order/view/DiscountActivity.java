@@ -69,6 +69,8 @@ public class DiscountActivity extends AppCompatActivity {
 
         totalTv.setText(stashTotal+"");
 
+        discountEt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(totalTv.length()-2)});
+
         discountEt.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -100,8 +102,6 @@ public class DiscountActivity extends AppCompatActivity {
 
 
 
-
-
             }
 
             @Override
@@ -114,9 +114,6 @@ public class DiscountActivity extends AppCompatActivity {
 
                         totalTv.setText((stashTotal-Float.valueOf(discountEt.getText().toString()))+"");
 
-                    }else {
-
-                        discountEt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(totalTv.length())});
                     }
 
                 }else {
