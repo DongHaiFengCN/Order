@@ -6,7 +6,6 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AlertDialog;
@@ -27,37 +26,23 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.couchbase.lite.Array;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Document;
-import com.couchbase.lite.Expression;
 import com.couchbase.lite.Log;
 import com.zm.order.R;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TimerTask;
 
 import application.MyApplication;
-import bean.Goods;
-import bean.kitchenmanage.order.CheckOrderC;
 import bean.kitchenmanage.order.GoodsC;
 import bean.kitchenmanage.order.OrderC;
-import bean.kitchenmanage.table.TableC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import model.CDBHelper;
-import model.DBFactory;
-import model.DatabaseSource;
-import model.IDBManager;
-import presenter.IMainPresenter;
-import presenter.MainPresenterImpl;
 import untils.AnimationUtil;
-import untils.MyLog;
 
 public class MainActivity extends AppCompatActivity {
 

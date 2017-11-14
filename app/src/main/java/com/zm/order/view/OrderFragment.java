@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TimerTask;
 
-import bean.Goods;
 import bean.kitchenmanage.dishes.DishesKindC;
 import bean.kitchenmanage.order.GoodsC;
 import butterknife.BindView;
@@ -60,14 +59,12 @@ public class OrderFragment extends Fragment implements IMainView {
     private float total = 0.0f;
     private List<String> titleList = new ArrayList<>();
     List<Object> DishesIdList;
-    private List<Goods> myGoodsList;
     private List<String> dishesIdList;
     private int pos;
     @Override
     public View onCreateView(LayoutInflater inflater,  ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.frame_order,null);
         ButterKnife.bind(this, view);
-        myGoodsList = new ArrayList<>();
         //initData();
         initView();
         IMainPresenter iMainView = new MainPresenterImpl(this);
