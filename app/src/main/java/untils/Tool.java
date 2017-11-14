@@ -1,22 +1,13 @@
 package untils;
 
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
-import bean.Order;
-import bean.kitchenmanage.promotion.PromotionC;
 import bean.kitchenmanage.promotion.PromotionRuleC;
 
 /**

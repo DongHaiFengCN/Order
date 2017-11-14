@@ -49,6 +49,7 @@ public class DiscountActivity extends AppCompatActivity {
     private float stashTotal;
     private CharSequence c;
     private InputMethodManager inputMethodManager;
+    private  float total ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +62,8 @@ public class DiscountActivity extends AppCompatActivity {
 
 
         inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+
+
 
         stashTotal = getIntent().getFloatExtra("Total", 0);
 
@@ -102,7 +105,7 @@ public class DiscountActivity extends AppCompatActivity {
 
                 if(!TextUtils.isEmpty(discountEt.getText().toString())){
 
-                    if(getTextTotal() >= Float.valueOf(discountEt.getText().toString())){
+                    if(stashTotal >= Float.valueOf(discountEt.getText().toString())){
 
                         totalTv.setText((stashTotal-Float.valueOf(discountEt.getText().toString()))+"");
 
@@ -110,7 +113,7 @@ public class DiscountActivity extends AppCompatActivity {
 
                         //设置输入的长度
                         discountEt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(c.length())});
-                        Toast.makeText(DiscountActivity.this,"输入的数字超出当前总价！",Toast.LENGTH_SHORT).show();
+
                     }
 
                 }else {
@@ -166,8 +169,8 @@ public class DiscountActivity extends AppCompatActivity {
             case android.R.id.home:
 
                 finish();
-
                 break;
+
             case R.id.reset:
 
                 reset();
@@ -231,6 +234,8 @@ public class DiscountActivity extends AppCompatActivity {
                 setResult(RESULT_OK, intent);
                 finish();
 
+                break;
+            default:
                 break;
         }
     }

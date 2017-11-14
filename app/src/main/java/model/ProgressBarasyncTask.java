@@ -3,23 +3,22 @@ package model;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.Intent;
 import android.os.AsyncTask;
-import android.util.SparseArray;
 import android.widget.Toast;
+
+import com.zm.order.view.PayActivity;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import okhttp3.OkHttpClient;
+import bean.kitchenmanage.order.CheckOrderC;
+import bean.kitchenmanage.order.GoodsC;
+import bean.kitchenmanage.order.OrderC;
 import untils.BluetoothUtil;
 import untils.MyLog;
-import untils.OkHttpController;
 import untils.PrintUtils;
-import com.zm.order.view.PayActivity;
 
 /**
  * 项目名称：Order
@@ -40,7 +39,7 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
     private BluetoothDevice device;
     private BluetoothSocket socket;
     private PayActivity payActivity;
-    private Intent intent;
+    private CheckOrderC checkOrderC;
     private String ml =".0";
     private String str; //临时变量
     private float total;
@@ -85,12 +84,9 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        total = intent.getFloatExtra("total",0);
+        total = checkOrderC.getPay();
         str = String.valueOf(total);
         MyLog.e(str);
-
-        //抹零
-       // setMl();
 
         onPrint();
 
@@ -104,9 +100,11 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
             flag = "ok";
             String waiter ="董海峰";
             String peopleSum = "8";
-            String tableNumber = intent.getStringExtra("tableNumber");
+            String tableNumber = checkOrderC.getTableNo();
 
-            List list = (ArrayList<SparseArray<Object>>) intent.getSerializableExtra("Order");
+            //List list = (ArrayList<SparseArray<Object>>) intent.getSerializableExtra("Order");
+
+            List<OrderC> list = checkOrderC.getOrderList();
 
             PrintUtils.selectCommand(PrintUtils.RESET);
             PrintUtils.selectCommand(PrintUtils.LINE_SPACING_DEFAULT);
@@ -126,18 +124,30 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
             PrintUtils.selectCommand(PrintUtils.BOLD_CANCEL);
             for (int i = 0; i < list.size(); i++) {
 
-                SparseArray<Object> s = (SparseArray<Object>) list.get(i);
-                PrintUtils.printText(PrintUtils.printThreeData(s.get(0).toString(), s.get(2).toString(), s.get(4).toString()+"\n"));
+                // SparseArray<Object> s = (SparseArray<Object>) list.get(i);
+
+                List<GoodsC> goodsCList = list.get(i).getGoodsList();
+
+                for (int j = 0; j < goodsCList.size(); j++) {
+
+                    GoodsC goodsC = goodsCList.get(j);
+
+                    PrintUtils.printText(PrintUtils.printThreeData(goodsC.getDishesName(),goodsC.getDishesCount()+"", goodsC.getAllPrice()+"\n"));
+
+
+                }
+
+               // PrintUtils.printText(PrintUtils.printThreeData(s.get(0).toString(), s.get(2).toString(), s.get(4).toString()+"\n"));
             }
             PrintUtils.printText("--------------------------------\n");
             PrintUtils.printText(PrintUtils.printTwoData("合计", total+"\n"));
-            PrintUtils.printText(PrintUtils.printTwoData("抹零", "0"+ml+"\n"));
+           // PrintUtils.printText(PrintUtils.printTwoData("抹零", "0"+ml+"\n"));
             PrintUtils.printText("--------------------------------\n");
-            PrintUtils.printText(PrintUtils.printTwoData("实收", str+"\n"));
+            PrintUtils.printText(PrintUtils.printTwoData("实收", checkOrderC.getNeedPay()+"\n"));
             PrintUtils.printText("--------------------------------\n");
-            PrintUtils.selectCommand(PrintUtils.ALIGN_LEFT);
+          /*  PrintUtils.selectCommand(PrintUtils.ALIGN_LEFT);
             PrintUtils.printText("备注：");
-            PrintUtils.printText("\n\n\n\n\n");
+            PrintUtils.printText("\n\n\n\n\n");*/
             PrintUtils.closeOutputStream();
 
             try {
@@ -197,11 +207,11 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
 
     /**
      *
-     * @param intent 需要打印的参数
+     * @param checkOrderC 需要打印的参数
      */
-    public void setDate(Intent intent){
+    public void setDate(CheckOrderC checkOrderC){
 
-        this.intent = intent;
+        this.checkOrderC = checkOrderC;
     }
 
 
