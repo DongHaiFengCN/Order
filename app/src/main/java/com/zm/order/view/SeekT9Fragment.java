@@ -235,17 +235,20 @@ public class SeekT9Fragment extends Fragment {
             CDBHelper.db.inBatch(new TimerTask() {
                 @Override
                 public void run() {
-                    List<DishesC> dishesCs = CDBHelper.getObjByWhere(getActivity().getApplicationContext(), Expression.property("className").equalTo("DishesC")
-                            .and(Expression.property("dishesNameCode9").like(search + "%")), null, DishesC.class);
-                    for (DishesC obj : dishesCs) {
-                        //mlistSearchDishesObj.add(obj);
-                        if(obj.get_id() != null){
-                            Log.e("T9Fragment", "kouwei size=" + obj.getTasteList().size());
+                    List<DishesC> dishesCs = CDBHelper.getObjByWhere(getActivity().getApplicationContext(),
+                            Expression.property("className").equalTo("DishesC")
+                            .and(Expression.property("dishesNameCode9").like(search + "%"))
+                            , null,
+                            DishesC.class);
+                    for (DishesC obj : dishesCs)
+                    {
+
+                          //  Log.e("T9Fragment", "kouwei size=" + obj.getTasteList().size());
                             GoodsC goodsObj = new GoodsC();
                             goodsObj.setDishesCount(0);
                             goodsObj.setDishesId(obj.get_id());
                             myGoodsList.add(goodsObj);
-                        }
+
                     }
                     seekT9Adapter.setmData(myGoodsList);
                     seekT9Adapter.notifyDataSetChanged();

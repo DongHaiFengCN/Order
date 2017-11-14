@@ -4,7 +4,6 @@ package untils;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import bean.Order;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
