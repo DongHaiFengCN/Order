@@ -14,12 +14,14 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Document;
 import com.zm.order.R;
 import com.zm.order.view.adapter.SeekT9DialogAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimerTask;
 
 import bean.kitchenmanage.dishes.DishesC;
 import bean.kitchenmanage.dishes.DishesKindC;
@@ -147,21 +149,33 @@ public class SeekT9Adapter extends BaseAdapter {
         viewHolder.viewTj.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dishesC =  CDBHelper.getObjById(activity.getApplicationContext(),mData.get(position).getDishesId(),DishesC.class);
-                tasteList = new ArrayList<String>();
-                if (dishesC.getTasteList() != null){
-                    for (int i = 0; i <  dishesC.getTasteList().size(); i++){
-                        Document document = CDBHelper.getDocByID(activity.getApplicationContext(),dishesC.getTasteList().get(i).toString());
-                        tasteList.add(document.getString("tasteName"));
-                    }
 
-                    dialog(tasteList,position,s,viewHolder);
-                    activity.getOrderAdapter().notifyDataSetChanged();
+                try {
+                    CDBHelper.db.inBatch(new TimerTask() {
+                        @Override
+                        public void run() {
+                            dishesC =  CDBHelper.getObjById(activity.getApplicationContext(), mData.get(position).getDishesId(),DishesC.class);
 
-                }else{
-                    setTJ(position,s,viewHolder);
-                    activity.getOrderAdapter().notifyDataSetChanged();
+                            tasteList = new ArrayList<String>();
+                            if (dishesC.getTasteList() != null){
+                                for (int i = 0; i <  dishesC.getTasteList().size(); i++){
+                                    Document document = CDBHelper.getDocByID(activity.getApplicationContext(),dishesC.getTasteList().get(i).toString());
+                                    tasteList.add(document.getString("tasteName"));
+                                }
+
+                                dialog(tasteList,position,s,viewHolder);
+                                activity.getOrderAdapter().notifyDataSetChanged();
+
+                            }else{
+                                setTJ(position,s,viewHolder);
+                                activity.getOrderAdapter().notifyDataSetChanged();
+                            }
+                        }
+                    });
+                } catch (CouchbaseLiteException e) {
+                    e.printStackTrace();
                 }
+
 
             }
         });
@@ -170,47 +184,59 @@ public class SeekT9Adapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
 
-                    dishesC = CDBHelper.getObjById(activity.getApplicationContext(), mData.get(position).getDishesId(), DishesC.class);
-                    if (mData.get(position).getDishesCount() > 0) {
-                        mData.get(position).setDishesCount(mData.get(position).getDishesCount() - 1);
-                    }
 
-                    if (mData.get(position).getDishesCount() <= 0) {
-                        viewHolder.viewShu.setVisibility(View.INVISIBLE);
-                        viewHolder.viewJian.setVisibility(View.INVISIBLE);
-                    }
-                    viewHolder.viewShu.setText(mData.get(position).getDishesCount() + "");
-                    if (activity.getGoodsList().size() != 0) {
-                        for (int i = 0; i < activity.getGoodsList().size(); i++) {
-                            if (activity.getGoodsList().get(i).getDishesName().toString().equals(dishesC.getDishesName())) {
-                                number = activity.getGoodsList().get(i).getDishesCount();
-                                break;
+                try {
+                    CDBHelper.db.inBatch(new TimerTask() {
+                        @Override
+                        public void run() {
+                            dishesC = CDBHelper.getObjById(activity.getApplicationContext(), mData.get(position).getDishesId(), DishesC.class);
+                            if (mData.get(position).getDishesCount() > 0) {
+                                mData.get(position).setDishesCount(mData.get(position).getDishesCount() - 1);
                             }
-                        }
-                    }
 
-                    number = Integer.parseInt(viewHolder.viewShu.getText().toString());
-                    if (activity.getGoodsList().size() != 0) {
-                        for (int i = 0; i < activity.getGoodsList().size(); i++) {
-                            if (activity.getGoodsList().get(i).getDishesName().toString().equals(dishesC.getDishesName())) {
-                                activity.getGoodsList().get(i).setDishesCount(number);
-                                number = activity.getGoodsList().get(i).getDishesCount();
-                                activity.getGoodsList().get(i).setAllPrice(number * dishesC.getPrice());
-                                total = activity.getTotal();
-                                total -= 1 * dishesC.getPrice();
-                                activity.setTotal(total);
-                                point = activity.getPoint();
-                                if (number == 0) {
-                                    point--;
-                                    number = 1;
+                            if (mData.get(position).getDishesCount() <= 0) {
+                                viewHolder.viewShu.setVisibility(View.INVISIBLE);
+                                viewHolder.viewJian.setVisibility(View.INVISIBLE);
+                            }
+                            viewHolder.viewShu.setText(mData.get(position).getDishesCount() + "");
+                            if (activity.getGoodsList().size() != 0) {
+                                for (int i = 0; i < activity.getGoodsList().size(); i++) {
+                                    if (activity.getGoodsList().get(i).getDishesName().toString().equals(dishesC.getDishesName())) {
+                                        number = activity.getGoodsList().get(i).getDishesCount();
+                                        break;
+                                    }
                                 }
-                                activity.setPoint(point);
-                                break;
                             }
-                        }
 
-                    }
-                activity.getOrderAdapter().notifyDataSetChanged();
+                            number = Integer.parseInt(viewHolder.viewShu.getText().toString());
+                            if (activity.getGoodsList().size() != 0) {
+                                for (int i = 0; i < activity.getGoodsList().size(); i++) {
+                                    if (activity.getGoodsList().get(i).getDishesName().toString().equals(dishesC.getDishesName())) {
+                                        activity.getGoodsList().get(i).setDishesCount(number);
+                                        number = activity.getGoodsList().get(i).getDishesCount();
+                                        activity.getGoodsList().get(i).setAllPrice(number * dishesC.getPrice());
+                                        total = activity.getTotal();
+                                        total -= 1 * dishesC.getPrice();
+                                        activity.setTotal(total);
+                                        point = activity.getPoint();
+                                        if (number == 0) {
+                                            point--;
+                                            number = 1;
+                                        }
+                                        activity.setPoint(point);
+                                        break;
+                                    }
+                                }
+
+                            }
+                            activity.getOrderAdapter().notifyDataSetChanged();
+                        }
+                    });
+                } catch (CouchbaseLiteException e) {
+                    e.printStackTrace();
+                }
+
+
 
 
                 }

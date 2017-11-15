@@ -6,6 +6,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AlertDialog;
@@ -193,6 +194,7 @@ public class MainActivity extends AppCompatActivity {
                                 iterator.remove();
                                 break;
                             }
+
 
                         }
                         for (int i = 0; 0 < getGoodsList().size();i++){
