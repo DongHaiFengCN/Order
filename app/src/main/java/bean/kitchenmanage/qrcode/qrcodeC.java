@@ -27,7 +27,7 @@ public class qrcodeC {
 	/**
 	 *淘宝二维码内容字符串
 	 */
-	private String tbUrl;
+	private String wxUrl;
 	/**
 	 *支付宝二维码内容字符串
 	 */
@@ -84,12 +84,12 @@ public class qrcodeC {
 		this.className = className;
 	}
 
-	public String getTbUrl() {
-		return tbUrl;
+	public String getWxUrl() {
+		return wxUrl;
 	}
 
-	public void setTbUrl(String tbUrl) {
-		this.tbUrl = tbUrl;
+	public void setWxUrl(String wxUrl) {
+		this.wxUrl = wxUrl;
 	}
 
 	public String getZfbUrl() {
