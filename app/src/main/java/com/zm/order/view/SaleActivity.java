@@ -103,6 +103,7 @@ public class SaleActivity extends AppCompatActivity {
       //  setData();
         // 创建EventHandler对象
         eventHandler = new EventHandler() {
+            @Override
             public void afterEvent(int event, final int result, final Object data) {
 
                 if (result == SMSSDK.RESULT_COMPLETE) {

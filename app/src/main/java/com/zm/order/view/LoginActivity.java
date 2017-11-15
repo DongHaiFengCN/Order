@@ -15,15 +15,20 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
+import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
 import com.zm.order.R;
 
+import java.util.Iterator;
 import java.util.List;
 
 import application.ISharedPreferences;
 import application.MyApplication;
 import bean.kitchenmanage.user.UsersC;
 import model.CDBHelper;
+import model.DBFactory;
+import model.DatabaseSource;
+import model.IDBManager;
 import presenter.ILoginPresenter;
 import presenter.LoginPresentImpl;
 import untils.MyLog;
@@ -43,15 +48,46 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
 
     private String userNumber;
     private InputMethodManager inputMethodManager;
+    private Intent intent;
+    private List<UsersC> usersCList;
+
+    private IDBManager idbManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
         setContentView(R.layout.activity_login);
+
+/*
+        idbManager = DBFactory.get(DatabaseSource.CouchBase, this);
+        List<Document> list = idbManager.getByClassName("qrcodeC");
+
+        Iterator<Document> i = list.iterator();
+
+        while(i.hasNext()){
+
+            Document d = i.next();
+
+            if(d.getString("wxUrl") == null){
+
+
+                CDBHelper.deleDocument(getApplicationContext(),d);
+
+            }
+
+
+        }
+
+        List<Document> list1 = idbManager.getByClassName("qrcodeC");
+        MyLog.e("删除后长度 "+list1.size());*/
+
+
+
+
         inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-
-
+        intent = new Intent(this,DeskActivity.class);
+         usersCList = CDBHelper.getObjByWhere(getApplicationContext(),
+                Expression.property("className")
+                        .equalTo("UsersC"),null, UsersC.class);
          myApplication = (MyApplication) getApplication();
       //  myApplication.cancleSharePreferences();
 
@@ -144,6 +180,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
                 myApplication.mExecutor.execute(new Runnable() {
                     @Override
                     public void run() {
+
                         iLoginPresenter.doLogin();
                     }
                 });
@@ -175,21 +212,16 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
     @Override
     public void success() {
 
-        List<UsersC> usersCList = CDBHelper.getObjByWhere(getApplicationContext(),
-                Expression.property("className")
-                        .equalTo("UsersC"),null, UsersC.class);
         for(UsersC u : usersCList){
-
             if(u.getUserName().equals(userNumber)){
                 myApplication.setUsersC(u);
                 break;
             }
         }
-        Intent intent = new Intent(this,DeskActivity.class);
+
         startActivity(intent);
         finish();
-;
-
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
     @Override

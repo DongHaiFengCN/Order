@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -32,7 +30,6 @@ import com.google.zxing.common.BitMatrix;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 import com.zm.order.R;
 
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -98,7 +95,8 @@ public class PayActivity extends AppCompatActivity {
     private float copy;
     private AlertDialog.Builder dialog;
     private AlertDialog dg;
-    private Bitmap bitmap = null;
+    private Bitmap alipayBitmap = null;
+    private Bitmap wechatBitmap = null;
     private static final int DISTCOUNT = 0;
     private static final int SALE = 1;
     private float total = 0.0f;
@@ -277,13 +275,32 @@ public class PayActivity extends AppCompatActivity {
         //支付宝收款码,网络获取**********
         String alipayId;
 
+        //微信支付
+        String wechatId;
+
         List<qrcodeC> qrcodeList = CDBHelper.getObjByClass(getApplicationContext(),qrcodeC.class);
 
         if(!qrcodeList.isEmpty()){
 
             alipayId = qrcodeList.get(0).getZfbUrl();
+            wechatId = qrcodeList.get(0).getWxUrl();
+
+            if(alipayId != null&&!alipayId.isEmpty()){
+
+                alipayBitmap = encodeAsBitmap(alipayId);
+            }
+            if(wechatId != null&&!wechatId.isEmpty()){
+
+                wechatBitmap = encodeAsBitmap(wechatId);
+            }
+
+
+
+            MyLog.e(wechatId);
             //转化二维码
-            bitmap = encodeAsBitmap(alipayId);
+
+
+
 
         }
 
@@ -881,9 +898,11 @@ public class PayActivity extends AppCompatActivity {
 
                 //支付宝支付
 
+                if(alipayBitmap != null){
+
                 View alipayView = getLayoutInflater().inflate(R.layout.view_alipay_dialog, null);
                 ImageView alipayIv = alipayView.findViewById(R.id.encode);
-                alipayIv.setImageBitmap(bitmap);
+                alipayIv.setImageBitmap(alipayBitmap);
 
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(PayActivity.this);
                 alertDialog.setView(alipayView);
@@ -910,14 +929,19 @@ public class PayActivity extends AppCompatActivity {
                 });
 
                 alertDialog.show();
+                }else {
+                    Toast.makeText(PayActivity.this,"没有添加二维码",Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.ivwechat:
 
                 //微信支付
 
-                View wechatView = getLayoutInflater().inflate(R.layout.view_alipay_dialog, null);
+                if(wechatBitmap != null){
+
+                View wechatView = getLayoutInflater().inflate(R.layout.view_wechat_dialog, null);
                 ImageView wechatIv = wechatView.findViewById(R.id.encode);
-                wechatIv.setImageBitmap(bitmap);
+                wechatIv.setImageBitmap(wechatBitmap);
 
                 AlertDialog.Builder wechatDialog = new AlertDialog.Builder(PayActivity.this);
                 wechatDialog.setView(wechatView);
@@ -946,7 +970,9 @@ public class PayActivity extends AppCompatActivity {
 
                 wechatDialog.show();
 
-
+                }else {
+                    Toast.makeText(PayActivity.this,"没有添加二维码",Toast.LENGTH_SHORT).show();
+                }
 
                 break;
             case R.id.cash:
