@@ -52,7 +52,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_toLeftOf="@+id/view_shu"
-                android:visibility="gone">
+                android:visibility="invisible">
                 <ImageView
                     android:layout_width="20sp"
                     android:layout_height="20sp"
@@ -76,13 +76,14 @@
                 android:gravity="center"
                 android:textSize="18sp"
                 android:textColor="@color/md_black_1000"
-                android:visibility="gone"
+                android:visibility="invisible"
                 />
 
             <RelativeLayout
                 android:id="@+id/view_tj"
-                android:layout_width="match_parent"
+                android:layout_width="70dp"
                 android:layout_height="match_parent"
+                android:layout_alignParentRight="true"
                 android:layout_toRightOf="@+id/view_shu">
 
                 <ImageView

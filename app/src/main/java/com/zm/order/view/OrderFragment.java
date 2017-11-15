@@ -252,9 +252,11 @@ public class OrderFragment extends Fragment implements IMainView {
                     goodsC.setDishesCount(sum);
                     goodsC.setAllPrice(sum * price);
                     goodsC.setDishesId(doc.getId());
-                    DishesKindC dishesKind  = CDBHelper.getObjById(getActivity().getApplicationContext(),doc.getString("dishesKindId"), DishesKindC.class);
-                    goodsC.setDishesKindName(dishesKind.getKindName());
-                    Log.e("dishesKindName",dishesKind.getKindName());
+                    if ( doc.getString("dishesKindId") != null) {
+                        DishesKindC dishesKind = CDBHelper.getObjById(getActivity().getApplicationContext(), doc.getString("dishesKindId"), DishesKindC.class);
+                        goodsC.setDishesKindName(dishesKind.getKindName());
+                        Log.e("dishesKindName", dishesKind.getKindName());
+                    }
                     ((MainActivity)getActivity()).getGoodsList().add(goodsC);
                     //购物车计数器数据更新
                     point =  (((MainActivity) getActivity()).getPoint());

@@ -39,6 +39,7 @@ import java.util.TimerTask;
 import application.MyApplication;
 import bean.kitchenmanage.order.GoodsC;
 import bean.kitchenmanage.order.OrderC;
+import bean.kitchenmanage.table.AreaC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import model.CDBHelper;
@@ -110,6 +111,14 @@ public class MainActivity extends AppCompatActivity {
         return seekT9Adapter;
     }
 
+    public void setOrderAdapter(OrderAdapter o){
+        this.o = o;
+
+    }
+
+    public OrderAdapter getOrderAdapter(){
+        return o;
+    }
 
     public List<SparseArray<Object>> getOrderItem(){
         return orderItem;
@@ -147,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
         car_iv = (ImageView) findViewById(R.id.car);
 
         ok_tv = (TextView) findViewById(R.id.ok_tv);
-
+        order_lv = (ListView) findViewById(R.id.order_lv);
         final ImageView imageView = (ImageView) findViewById(R.id.shade);
 
         final LinearLayout linearLayout = (LinearLayout) findViewById(R.id.orderList);
@@ -166,11 +175,13 @@ public class MainActivity extends AppCompatActivity {
         layoutParams.height = h / 2;
         linearLayout.setLayoutParams(layoutParams);
         o = new OrderAdapter( getGoodsList(), MainActivity.this);
+        order_lv.setAdapter(o);
         car_iv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //初始化订单的数据，绑定数据源的信息。
-                o.notifyDataSetChanged();
+                //o.notifyDataSetChanged();
+
                 mHandler.post(new TimerTask() {
                     @Override
                     public void run() {
@@ -184,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
                             }
 
                         }
-                        for (int i = 0; 0<getGoodsList().size();i++){
+                        for (int i = 0; 0 < getGoodsList().size();i++){
                             if (getGoodsList().get(i).getDishesCount() == 0 ){
                                 getGoodsList().remove(i);
                             }
@@ -194,9 +205,36 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-                o.notifyDataSetChanged();
-                order_lv = (ListView) findViewById(R.id.order_lv);
-                order_lv.setAdapter(o);
+                if (flag) {
+
+                    linearLayout.setAnimation(AnimationUtil.moveToViewLocation());
+                    linearLayout.setVisibility(View.VISIBLE);
+                    imageView.setVisibility(View.VISIBLE);
+                    imageView.animate()
+                            .alpha(1f)
+                            .setDuration(400)
+                            .setListener(null);
+                    flag = false;
+
+                } else {
+
+                    linearLayout.setAnimation(AnimationUtil.moveToViewBottom());
+                    linearLayout.setVisibility(View.GONE);
+
+                    imageView.animate()
+                            .alpha(0f)
+                            .setDuration(400)
+                            .setListener(new AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    imageView.setVisibility(View.GONE);
+                                }
+                            });
+
+                    flag = true;
+
+                }
+
                 //监听orderItem的增加删除，设置总价以及总数量, flag ？+ ：-,price 单价 ,sum 当前item的个数。
 
                 o.setOnchangeListener(new OrderAdapter.OnchangeListener() {
@@ -234,35 +272,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
-                if (flag) {
 
-                    linearLayout.setAnimation(AnimationUtil.moveToViewLocation());
-                    linearLayout.setVisibility(View.VISIBLE);
-                    imageView.setVisibility(View.VISIBLE);
-                    imageView.animate()
-                            .alpha(1f)
-                            .setDuration(400)
-                            .setListener(null);
-                    flag = false;
-
-                } else {
-
-                    linearLayout.setAnimation(AnimationUtil.moveToViewBottom());
-                    linearLayout.setVisibility(View.GONE);
-
-                    imageView.animate()
-                            .alpha(0f)
-                            .setDuration(400)
-                            .setListener(new AnimatorListenerAdapter() {
-                                @Override
-                                public void onAnimationEnd(Animator animation) {
-                                    imageView.setVisibility(View.GONE);
-                                }
-                            });
-
-                    flag = true;
-
-                }
             }
         });
 
@@ -379,6 +389,9 @@ public class MainActivity extends AppCompatActivity {
                         orderC.setOrderState(1);
                         orderC.setOrderType(1);
                         orderC.setTableNo(myApp.getTable_sel_obj().getTableNum());
+                        orderC.setTableName(myApp.getTable_sel_obj().getTableName());
+                        AreaC areaC = CDBHelper.getObjById(getApplicationContext(),myApp.getTable_sel_obj().getAreaId(), AreaC.class);
+                        orderC.setAreaName(areaC.getAreaName());
                         id = CDBHelper.createAndUpdate(getApplicationContext(),orderC);
                         Log.e("id",id);
                     }else{

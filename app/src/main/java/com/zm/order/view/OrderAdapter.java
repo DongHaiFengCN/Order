@@ -1,5 +1,6 @@
 package com.zm.order.view;
 
+import android.os.Handler;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -10,7 +11,9 @@ import android.widget.TextView;
 
 import com.zm.order.R;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.TimerTask;
 
 import bean.kitchenmanage.dishes.DishesC;
 import bean.kitchenmanage.order.GoodsC;
@@ -36,6 +39,7 @@ public class OrderAdapter extends BaseAdapter {
     private List<GoodsC> goodsCs;
     private MainActivity context;
     private int Price = 0;
+    private Handler mHandler= new Handler();
 
     public void setOnchangeListener(OnchangeListener onchangeListener) {
         this.onchangeListener = onchangeListener;
@@ -107,8 +111,13 @@ public class OrderAdapter extends BaseAdapter {
         }else{
             viewHold.taste.setText(goodsCs.get(i).getDishesTaste());
         }
+        context.setOrderAdapter(this);
 
         viewHold.number.setNumber(goodsCs.get(i).getDishesCount()+"");
+
+
+
+
         final DishesC dishesC =  CDBHelper.getObjById(context.getApplicationContext(),goodsCs.get(i).getDishesId(), DishesC.class);
         //设置item的点击事件
         viewHold.number.setChangeListener(new AmountView.ChangeListener() {
@@ -124,6 +133,7 @@ public class OrderAdapter extends BaseAdapter {
                 context.getSeekT9Adapter().notifyDataSetChanged();
 
               if(ls == 0){
+
                   goodsCs.get(i).setDishesCount(0);
                   context.getSeekT9Adapter().notifyDataSetChanged();
                   goodsCs.remove(i);

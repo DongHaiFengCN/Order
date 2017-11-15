@@ -32,6 +32,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import bean.kitchenmanage.table.TableC;
+import bean.kitchenmanage.user.UsersC;
 import okhttp3.OkHttpClient;
 import untils.MyLog;
 
@@ -59,6 +60,16 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
     //private String Company_ID="zmsy010";
     private String Company_ID="zmsy15";
     private TableC table_sel_obj;
+
+    public UsersC getUsersC() {
+        return usersC;
+    }
+
+    public void setUsersC(UsersC usersC) {
+        this.usersC = usersC;
+    }
+
+    private UsersC usersC;
 
     public ExecutorService mExecutor;
     OkHttpClient okHttpClient;

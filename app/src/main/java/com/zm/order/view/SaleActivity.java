@@ -100,19 +100,6 @@ public class SaleActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         idbManager = DBFactory.get(DatabaseSource.CouchBase, this);
 
-        List<Document> documentList = idbManager.getDishesKindsByClassName("MembersC");
-
-        for (int i = 0; i < documentList.size(); i++) {
-
-            Document d = documentList.get(i);
-
-
-            MyLog.e(d.getString("tel"));
-
-        }
-
-
-
       //  setData();
         // 创建EventHandler对象
         eventHandler = new EventHandler() {
@@ -193,9 +180,6 @@ public class SaleActivity extends AppCompatActivity {
 
         //获取会员信息
           Document members = idbManager.getMembers(etAmountphone.getText().toString());
-            // Document members = idbManager.getMembers("17605413611");
-         /// Document members = idbManager.getMembers("8888");
-
 
         if (Tool.isNotEmpty(members)) {
 
@@ -298,6 +282,7 @@ public class SaleActivity extends AppCompatActivity {
         }
     }
 
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         SMSSDK.unregisterEventHandler(eventHandler);
@@ -312,8 +297,6 @@ public class SaleActivity extends AppCompatActivity {
                     etAmountphone.setError("号码不能为空");
 
                 } else {
-
-                    setData();
 
                     SMSSDK.getVerificationCode("86", etAmountphone.getText().toString());
 
@@ -336,8 +319,10 @@ public class SaleActivity extends AppCompatActivity {
                     if(inputMethodManager.isActive()){
                         inputMethodManager.hideSoftInputFromWindow(SaleActivity.this.getCurrentFocus().getWindowToken(), 0);
                     }
-                    etcode.setCursorVisible(false);
+                    //etcode.setCursorVisible(false);
                 }
+                break;
+            default:
                 break;
         }
     }
@@ -406,7 +391,9 @@ public class SaleActivity extends AppCompatActivity {
 
             finish();
 
-        } else Toast.makeText(SaleActivity.this, "当前会员无效", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(SaleActivity.this, "当前会员无效", Toast.LENGTH_SHORT).show();
+        }
 
 
     }
