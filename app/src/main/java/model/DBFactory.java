@@ -21,6 +21,8 @@ public class DBFactory {
 
         switch (name){
 
+
+
             case SQLite:
 
                 break;
@@ -37,6 +39,8 @@ public class DBFactory {
 
 
               break;
+            default:
+                break;
 
         }
 

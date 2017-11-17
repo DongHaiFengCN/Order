@@ -177,7 +177,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
             @Override
             public void onClick(View view) {
 
-                myApplication.mExecutor.execute(new Runnable() {
+                myApplication.mExecutor.submit(new Runnable() {
                     @Override
                     public void run() {
 
