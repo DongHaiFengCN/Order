@@ -16,6 +16,7 @@ import com.couchbase.lite.Document;
 import com.couchbase.lite.Log;
 import com.couchbase.lite.ReadOnlyDocument;
 import com.couchbase.lite.Replicator;
+import com.couchbase.lite.ReplicatorChange;
 import com.couchbase.lite.ReplicatorChangeListener;
 import com.couchbase.lite.ReplicatorConfiguration;
 import com.mob.MobApplication;
@@ -53,12 +54,13 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
     private static final String TAG = Application.class.getSimpleName();
 
     private final static boolean SYNC_ENABLED = true;
-    private final static String DATABASE_NAME = "KitchenDB15";
+    private final static String DATABASE_NAME = "KitchenDB40";
     private final static String SYNCGATEWAY_URL = "blip://123.207.174.171:4984/kitchen/";
+    //private final static String SYNCGATEWAY_URL = "blip://192.168.2.216:4984/kitchen/";
     private Database database = null;
     private Replicator replicator;
     //private String Company_ID="zmsy010";
-    private String Company_ID="zmsy15";
+    private String Company_ID="zmsy40";
     private TableC table_sel_obj;
 
     public UsersC getUsersC() {
@@ -140,13 +142,17 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
                 Set<String> changed = new HashSet<>();
 
                 // copy all data from theirs document
-                for (String key : theirs) {
+                for (String key : theirs)
+                {
+                    Log.e("ConflictResolvertheir","key="+key+"value="+theirs.getObject(key));
                     resolved.setObject(key, theirs.getObject(key));
                     changed.add(key);
                 }
 
                 // copy all data from mine which are not in mine document
-                for (String key : mine) {
+                for (String key : mine)
+                {
+                    Log.e("ConflictResolvermine","key="+key+"value="+mine.getObject(key));
                     if (!changed.contains(key))
                         resolved.setObject(key, mine.getObject(key));
                 }
@@ -204,10 +210,16 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
     // --------------------------------------------------
     // ReplicatorChangeListener implementation
     // --------------------------------------------------
+//    @Override
+//    public void changed(Replicator replicator, Replicator.Status status, CouchbaseLiteException error)
+//    {
+//       // Log.e(TAG, "[Todo] Replicator: status -> %s, error -> %s", status, error);
+//
+//    }
     @Override
-    public void changed(Replicator replicator, Replicator.Status status, CouchbaseLiteException error)
+    public void changed(ReplicatorChange change)
     {
-       // Log.e(TAG, "[Todo] Replicator: status -> %s, error -> %s", status, error);
+        // Log.e(TAG, "[Todo] Replicator: status -> %s, error -> %s", status, error);
 
     }
 

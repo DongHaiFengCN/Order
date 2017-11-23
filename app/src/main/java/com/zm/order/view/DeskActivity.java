@@ -120,12 +120,17 @@ public class DeskActivity extends AppCompatActivity {
             @Override
             public void onItemClick(View view,Object data)
             {
-                TableC tableC=(TableC)data;
-                tableC.setState(2);
-                MyLog.e("onItemClick tableId="+tableC.get_id());
-                CDBHelper.createAndUpdate(getApplicationContext(),tableC);
-                myapp.setTable_sel_obj(tableC);
+                String tableId= (String)data;
+               TableC  tableC =  CDBHelper.getObjById(getApplicationContext(),tableId,TableC.class);
+             //   TableC tableC=(TableC)data;
 
+                if(tableC.getState()!=2)
+                {
+                    tableC.setState(2);
+                    CDBHelper.createAndUpdate(getApplicationContext(),tableC);
+
+                }
+                myapp.setTable_sel_obj(tableC);
                 Intent mainIntent = new Intent();
                 mainIntent.setClass(DeskActivity.this, MainActivity.class);
                 startActivity(mainIntent);
@@ -133,7 +138,9 @@ public class DeskActivity extends AppCompatActivity {
             @Override
             public void onItemLongClick(View view,Object data)
             {
-                final TableC tableC=(TableC)data;
+                String tableId = (String)data;
+
+                final TableC tableC=CDBHelper.getObjById(getApplicationContext(),tableId,TableC.class);//TableC)data;
                 if(tableC.getState()==0)//空闲不用弹出消台框
                     return;
                 //// TODO: 2017/10/27 判断是否有未买单情况，一定要强制提示
