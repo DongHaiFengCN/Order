@@ -57,7 +57,15 @@ public class AreaAdapter extends ArrayAdapter<String> {
 		});
 		this.listsLiveQuery.run();
 	}
+	@Override
+	protected void finalize() throws Throwable {
+		if (listsLiveQuery != null) {
+			listsLiveQuery.stop();
+			listsLiveQuery = null;
+		}
 
+		super.finalize();
+	}
 	private LiveQuery listsLiveQuery() {
 		return Query.select(SelectResult.expression(Expression.meta().getId()))
 				.from(DataSource.database(db))

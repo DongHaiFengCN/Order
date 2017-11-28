@@ -23,6 +23,7 @@ package model;
  */
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.couchbase.lite.CouchbaseLiteException;
@@ -170,7 +171,6 @@ public class CDBHelper
         E obj = objectMapper.convertValue(map,aClass);
 
         objList.add(obj);
-
 
       }
 
@@ -544,6 +544,7 @@ public class CDBHelper
     }
     return document.getId();
   }
+
 
   //删除方法
   public static void deleDocument(Context context,Document document)

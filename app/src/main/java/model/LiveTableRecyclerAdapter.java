@@ -80,7 +80,8 @@ public class LiveTableRecyclerAdapter extends RecyclerView.Adapter<LiveTableRecy
     }
     private LiveQuery listsLiveQuery( String areaId)
     {
-        return Query.select(SelectResult.expression(Expression.meta().getId()))
+        return Query.select(SelectResult.expression(Expression.meta().getId()),
+                SelectResult.expression(Expression.property("state")))
                 .from(DataSource.database(db))
                 .where(Expression.property("className").equalTo("TableC")
                         .and(Expression.property("areaId").equalTo(areaId)))
@@ -88,7 +89,7 @@ public class LiveTableRecyclerAdapter extends RecyclerView.Adapter<LiveTableRecy
                 .toLive();
     }
     @Override
-    public LiveTableRecyclerAdapter.TestHolderView onCreateViewHolder(ViewGroup parent, int viewType)
+    public TestHolderView onCreateViewHolder(ViewGroup parent, int viewType)
     {
         View view = LayoutInflater.from(context).inflate(R.layout.list_item_table, parent, false);
 
@@ -124,7 +125,7 @@ public class LiveTableRecyclerAdapter extends RecyclerView.Adapter<LiveTableRecy
         documentList.clear();
     }
     @Override
-    public void onBindViewHolder(LiveTableRecyclerAdapter.TestHolderView holder, int position)
+    public void onBindViewHolder(TestHolderView holder, int position)
     {
 
 
@@ -148,7 +149,8 @@ public class LiveTableRecyclerAdapter extends RecyclerView.Adapter<LiveTableRecy
         }
 
         holder.tv.setText(tableobj.getTableName());
-        holder.itemView.setTag(tableobj);
+       // holder.itemView.setTag(tableobj);
+        holder.itemView.setTag(docId);
 
     }
 
@@ -162,6 +164,7 @@ public class LiveTableRecyclerAdapter extends RecyclerView.Adapter<LiveTableRecy
         protected ImageView img;
         protected TextView tv;
         protected CardView  cardView;
+
         public TestHolderView(View itemView)
         {
             super(itemView);
