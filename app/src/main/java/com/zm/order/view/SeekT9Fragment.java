@@ -236,8 +236,10 @@ public class SeekT9Fragment extends Fragment {
             CDBHelper.db.inBatch(new TimerTask() {
                 @Override
                 public void run() {
-                    List<DishesC> dishesCs = CDBHelper.getObjByWhere(getActivity().getApplicationContext(), Expression.property("className").equalTo("DishesC")
-                            .and(Expression.property("dishesNameCode9").like(search + "%")), null, DishesC.class);
+                    List<DishesC> dishesCs = CDBHelper.getObjByWhere(getActivity().getApplicationContext()
+                            , Expression.property("className").equalTo("DishesC")
+                            .and(Expression.property("dishesNameCode9").like(search + "%"))
+                            , null, DishesC.class);
                     for (DishesC obj : dishesCs) {
                             GoodsC goodsObj = new GoodsC();
                             goodsObj.setDishesCount(0);

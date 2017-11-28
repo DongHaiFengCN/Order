@@ -831,16 +831,19 @@ public class PayActivity extends AppCompatActivity {
 
     }
 
+    //携带参数返回到MainActivity
     public void turnMainActivity() {
 
-        //携带参数返回到MainActivity
+
         setResult(RESULT_OK, null);
 
         finish();
     }
+
+    //跳转主界面
     public void turnDesk(){
 
-        //跳转主界面
+
 
         Intent intent = new Intent(PayActivity.this,DeskActivity.class);
         startActivity(intent);
@@ -1367,9 +1370,7 @@ public class PayActivity extends AppCompatActivity {
 
                 //跳转主界面
 
-                Intent intent = new Intent(PayActivity.this,DeskActivity.class);
-                startActivity(intent);
-                finish();
+              turnDesk();
 
             }
         });
