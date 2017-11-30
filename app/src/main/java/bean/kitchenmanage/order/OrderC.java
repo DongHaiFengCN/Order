@@ -40,10 +40,12 @@ public class OrderC {
 	 * 订单序号，只做同桌多次点餐时使用,第一次下单为序号为1，第二次下单序号为2
 	 */
 	private int orderNum;
+
 	/**
 	 * 每天的流水号，从001开始，按序向后排。按营业时间重新产生序号。
 	 */
-	private int serialNum;
+	private String serialNum;
+
 
 	/**
 	 *打印标志flag为0,未打印，1，代表本地打印完毕,2,代表厨房打印机打印，3，代表两者都已打印
@@ -184,11 +186,11 @@ public class OrderC {
 		this.orderNum = orderNum;
 	}
 
-	public int getSerialNum() {
+	public String getSerialNum() {
 		return serialNum;
 	}
 
-	public void setSerialNum(int serialNum) {
+	public void setSerialNum(String serialNum) {
 		this.serialNum = serialNum;
 	}
 

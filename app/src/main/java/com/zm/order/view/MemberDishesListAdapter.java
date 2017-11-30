@@ -25,7 +25,8 @@ import java.util.List;
 public class MemberDishesListAdapter extends BaseAdapter {
     private List list;
     PayActivity payActivity;
-    public MemberDishesListAdapter(List list,PayActivity payActivity) {
+    public MemberDishesListAdapter(List list,PayActivity payActivity)
+    {
 
         super();
         this.list = list;

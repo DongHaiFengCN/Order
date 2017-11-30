@@ -1304,6 +1304,12 @@ public class PayActivity extends AppCompatActivity {
 
     }
 
+    private void changeTableState()
+    {
+        tableC.setState(0);
+        CDBHelper.createAndUpdate(getApplicationContext(),tableC);
+        myApplication.setTable_sel_obj(tableC);
+    }
     /**
      * 提交结账信息
      * <p>
@@ -1352,7 +1358,9 @@ public class PayActivity extends AppCompatActivity {
         CDBHelper.createAndUpdate(getApplicationContext(), promotionD);
         CDBHelper.createAndUpdate(getApplicationContext(), checkOrder);
 
-      //  show();
+        //  show();
+        //
+       // changeTableState(); 有可能接着在这里吃饭，人还没走，所以不能置闲桌位
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 

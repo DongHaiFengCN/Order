@@ -183,4 +183,12 @@ public class LiveTableRecyclerAdapter extends RecyclerView.Adapter<LiveTableRecy
         void onItemLongClick(View v, Object tag);
     }
 
+
+    public void StopQuery()
+    {
+        if (listsLiveQuery != null) {
+            listsLiveQuery.stop();
+            listsLiveQuery = null;
+        }
+    }
 }

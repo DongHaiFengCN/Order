@@ -20,6 +20,7 @@ import com.couchbase.lite.ReplicatorChange;
 import com.couchbase.lite.ReplicatorChangeListener;
 import com.couchbase.lite.ReplicatorConfiguration;
 import com.mob.MobApplication;
+import com.tencent.bugly.Bugly;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.zm.order.view.LoginActivity;
 
@@ -54,13 +55,13 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
     private static final String TAG = Application.class.getSimpleName();
 
     private final static boolean SYNC_ENABLED = true;
-    private final static String DATABASE_NAME = "KitchenDB40";
+    private final static String DATABASE_NAME = "KitchenDB50";
     private final static String SYNCGATEWAY_URL = "blip://123.207.174.171:4984/kitchen/";
     //private final static String SYNCGATEWAY_URL = "blip://192.168.2.216:4984/kitchen/";
     private Database database = null;
     private Replicator replicator;
     //private String Company_ID="zmsy010";
-    private String Company_ID="zmsy40";
+    private String Company_ID="zmsy50";
     private TableC table_sel_obj;
 
     public UsersC getUsersC() {
@@ -79,7 +80,11 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
     public void onCreate()
     {
         super.onCreate();
-        CrashReport.initCrashReport(getApplicationContext(), "1b0a55dc94", true);
+
+
+       // Bugly.init(getApplicationContext(), "c11c0d8e58", true);
+        CrashReport.initCrashReport(getApplicationContext(), "c11c0d8e58", true);
+
         startSession(DATABASE_NAME, null);
         mExecutor =  Executors.newCachedThreadPool();
 
