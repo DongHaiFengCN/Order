@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TimerTask;
 
+import application.MyApplication;
 import bean.kitchenmanage.dishes.DishesC;
 import bean.kitchenmanage.dishes.DishesKindC;
 import bean.kitchenmanage.order.GoodsC;
@@ -88,6 +90,7 @@ public class SeekT9Fragment extends Fragment {
     View view;
     private MainActivity mainActivity;
     private Handler mHandler = null;
+    private MyApplication myapp;
 
 
     @Nullable
@@ -97,6 +100,8 @@ public class SeekT9Fragment extends Fragment {
 
         unbinder = ButterKnife.bind(this, view);
         mHandler = new Handler();
+        myapp = new MyApplication();
+
         initView();
         return view;
 
@@ -329,6 +334,66 @@ public class SeekT9Fragment extends Fragment {
                 break;
 
             case R.id.ibtn_key_l:
+
+
+                AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
+                View view1 = View
+                        .inflate(getActivity(), R.layout.custom_dc_dialog, null);//设置弹窗布局
+                alert.setView(view1);
+                alert.setCancelable(true);
+                final EditText cm = view1.findViewById(R.id.custom_dc_c);//菜名
+                final EditText jg = view1.findViewById(R.id.custom_dc_t);//价格
+                //取消或确定按钮监听事件处理
+                final AlertDialog dialog = alert.create();
+                Button btn_cancel = view1
+                        .findViewById(R.id.custom_dc_qx);//取消按钮
+                btn_cancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+
+                    }
+                });
+
+
+                Button btn_comfirm = view1
+                        .findViewById(R.id.custom_dc_qd);//确定按钮
+
+                btn_comfirm.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        GoodsC goods = new GoodsC(myapp.getCompany_ID());
+                        if (!cm.getText().toString().equals("")&&cm.getText() != null){
+                            goods.setDishesName(cm.getText().toString());
+                            if (!jg.getText().toString().equals("")&&jg.getText() != null){
+                                goods.setAllPrice(Float.parseFloat(jg.getText().toString()));
+                                goods.setDishesCount(1);
+                                //sgoods.setDishesId();
+                                ((MainActivity)getActivity()).getGoodsList().add(goods);
+                                //购物车计数器数据更新
+                                point = (((MainActivity) getActivity()).getPoint());
+                                point++;
+                                ((MainActivity) getActivity()).setPoint(point);
+
+                                //计算总价
+                                total = ((MainActivity) getActivity()).getTotal();
+                                total += Float.parseFloat(jg.getText().toString());
+                                ((MainActivity) getActivity()).setTotal(total);
+
+
+                                dialog.dismiss();
+                            }else{
+                                Toast.makeText(getActivity(),"价格为空",Toast.LENGTH_LONG).show();
+                            }
+
+                        }else{
+                            Toast.makeText(getActivity(),"菜名为空",Toast.LENGTH_LONG).show();
+                        }
+
+                    }
+                });
+                dialog.show();
 
                 break;
 

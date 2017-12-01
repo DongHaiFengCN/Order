@@ -77,14 +77,17 @@ public class OrderDragAdapter extends BaseAdapter {
             view = (HolderView) convertView.getTag();
         }
         final Document doc = CDBHelper.getDocByID(context,mlistDishesId.get(position));
-        view.name.setText(doc.getString("dishesName"));
-        view.price.setText(doc.getFloat("price")+" 元/份");
-        view.select_ln.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mOnItemClickListener.onItemClick(doc.getString("dishesName"),doc.getFloat("price"),position);
-            }
-        });
+        if(doc != null){
+            view.name.setText(doc.getString("dishesName"));
+            view.price.setText(doc.getFloat("price")+" 元/份");
+
+            view.select_ln.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mOnItemClickListener.onItemClick(doc.getString("dishesName"),doc.getFloat("price"),position);
+                }
+            });
+        }
         return convertView;
     }
 

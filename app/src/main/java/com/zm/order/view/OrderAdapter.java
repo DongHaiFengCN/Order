@@ -117,34 +117,65 @@ public class OrderAdapter extends BaseAdapter {
 
 
 
-
-        final DishesC dishesC =  CDBHelper.getObjById(context.getApplicationContext(),goodsCs.get(i).getDishesId(), DishesC.class);
-        //设置item的点击事件
-        viewHold.number.setChangeListener(new AmountView.ChangeListener() {
-            @Override
-            public void OnChange(int ls,boolean flag) {
+        if (goodsCs.get(i).getDishesId() != null){
+            DishesC dishesC = null;
+            dishesC =  CDBHelper.getObjById(context.getApplicationContext(),goodsCs.get(i).getDishesId(), DishesC.class);
 
 
-                goodsCs.get(i).setDishesCount(ls);
-                goodsCs.get(i).setAllPrice(ls * dishesC.getPrice());
-
-                onchangeListener.onchangeListener(flag,dishesC.getPrice() ,ls);
-
-                context.getSeekT9Adapter().notifyDataSetChanged();
-
-              if(ls == 0){
-
-                  goodsCs.get(i).setDishesCount(0);
-                  context.getSeekT9Adapter().notifyDataSetChanged();
-                  goodsCs.remove(i);
-                  notifyDataSetChanged();
-
-              }
+            //设置item的点击事件
+                final DishesC finalDishesC = dishesC;
+                viewHold.number.setChangeListener(new AmountView.ChangeListener() {
+                @Override
+                public void OnChange(int ls,boolean flag) {
 
 
+                    goodsCs.get(i).setDishesCount(ls);
+                    goodsCs.get(i).setAllPrice(ls * finalDishesC.getPrice());
 
-            }
-        });
+                    onchangeListener.onchangeListener(flag, finalDishesC.getPrice() ,ls);
+
+                    context.getSeekT9Adapter().notifyDataSetChanged();
+
+                  if(ls == 0){
+
+                      goodsCs.get(i).setDishesCount(0);
+                      context.getSeekT9Adapter().notifyDataSetChanged();
+                      goodsCs.remove(i);
+                      notifyDataSetChanged();
+
+                  }
+
+
+
+                }
+            });
+        }else{
+            final float price = goodsCs.get(i).getAllPrice();
+            //设置item的点击事件
+            viewHold.number.setChangeListener(new AmountView.ChangeListener() {
+                @Override
+                public void OnChange(int ls,boolean flag) {
+
+                    goodsCs.get(i).setDishesCount(ls);
+                    goodsCs.get(i).setAllPrice(ls * price );
+
+                    onchangeListener.onchangeListener(flag, price ,ls);
+
+
+                    if(ls == 0){
+
+                        goodsCs.get(i).setDishesCount(0);
+                        goodsCs.remove(i);
+                        notifyDataSetChanged();
+
+                    }
+
+
+
+                }
+            });
+
+        }
         return view;
     }
 

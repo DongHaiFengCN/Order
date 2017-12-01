@@ -9,6 +9,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -85,9 +86,12 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
 
         inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         intent = new Intent(this,DeskActivity.class);
-         usersCList = CDBHelper.getObjByWhere(getApplicationContext(),
+        usersCList = CDBHelper.getObjByWhere(getApplicationContext(),
                 Expression.property("className")
                         .equalTo("UsersC"),null, UsersC.class);
+        for (int i = 0; i<usersCList.size();i++){
+            Log.e("Login",usersCList.get(i).getUserName().toString()+"null");
+        }
          myApplication = (MyApplication) getApplication();
       //  myApplication.cancleSharePreferences();
 
