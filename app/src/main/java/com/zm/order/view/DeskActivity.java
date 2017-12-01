@@ -28,6 +28,7 @@ import com.zm.order.R;
 import java.util.List;
 
 import application.MyApplication;
+import bean.kitchenmanage.order.OrderC;
 import bean.kitchenmanage.table.AreaC;
 import bean.kitchenmanage.table.TableC;
 import model.AreaAdapter;
@@ -42,7 +43,7 @@ public class DeskActivity extends AppCompatActivity {
     private List<AreaC> areaCList;
     private AreaAdapter areaAdapter;
     private RecyclerView listViewDesk;
-
+    private LiveTableRecyclerAdapter tableadapter;
 
     private MyApplication myapp;
 
@@ -114,16 +115,17 @@ public class DeskActivity extends AppCompatActivity {
     {
 
         long starttime = System.currentTimeMillis();
-        LiveTableRecyclerAdapter tableadapter=new LiveTableRecyclerAdapter(this,db,areaId);
+        if(tableadapter!=null)
+            tableadapter.StopQuery();
+
+        tableadapter=new LiveTableRecyclerAdapter(this,db,areaId);
         tableadapter.setOnItemClickListener(new LiveTableRecyclerAdapter.onRecyclerViewItemClickListener()
         {
             @Override
             public void onItemClick(View view,Object data)
             {
                 String tableId= (String)data;
-               TableC  tableC =  CDBHelper.getObjById(getApplicationContext(),tableId,TableC.class);
-             //   TableC tableC=(TableC)data;
-
+                TableC  tableC =  CDBHelper.getObjById(getApplicationContext(),tableId,TableC.class);
                 if(tableC.getState()!=2)
                 {
                     tableC.setState(2);
@@ -139,32 +141,67 @@ public class DeskActivity extends AppCompatActivity {
             public void onItemLongClick(View view,Object data)
             {
                 String tableId = (String)data;
-
-                final TableC tableC=CDBHelper.getObjById(getApplicationContext(),tableId,TableC.class);//TableC)data;
+                final TableC tableC=CDBHelper.getObjById(getApplicationContext(),tableId,TableC.class);
+                myapp.setTable_sel_obj(tableC);
                 if(tableC.getState()==0)//空闲不用弹出消台框
                     return;
-                //// TODO: 2017/10/27 判断是否有未买单情况，一定要强制提示
 
-                android.app.AlertDialog.Builder dialog1 = new android.app.AlertDialog.Builder(DeskActivity.this);
-                dialog1.setTitle("是否消台？").setCancelable(false);
-                dialog1.setNegativeButton("是",
-                        new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
+                List<OrderC> orderCList= CDBHelper.getObjByWhere(getApplicationContext(),
+                        Expression.property("className").equalTo("OrderC")
+                                .and(Expression.property("tableNo").equalTo(tableC.getTableNum()))
+                                .and(Expression.property("orderState").equalTo(1))
+                        ,null
+                        ,OrderC.class);
+
+                if(orderCList.size()>0)//有未买单订单，可以买单
+                {
+                    android.app.AlertDialog.Builder dialog1 = new android.app.AlertDialog.Builder(DeskActivity.this);
+                    dialog1.setTitle("是否买单？").setCancelable(false);
+                    dialog1.setNegativeButton("是",
+                            new DialogInterface.OnClickListener()
                             {
-                                tableC.setState(0);
-                                CDBHelper.createAndUpdate(getApplicationContext(),tableC);
-                                myapp.setTable_sel_obj(tableC);
-                            }
-                        }).setPositiveButton("否",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface arg0, int arg1)
+                                @Override
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    Intent mainIntent = new Intent();
+                                    mainIntent.setClass(DeskActivity.this, PayActivity.class);
+                                    startActivity(mainIntent);
+                                }
+                            }).setPositiveButton("否",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface arg0, int arg1)
+                                {
+                                    // TODO Auto-generated method stub
+                                }
+                            }).show();
+                }
+                else
+                {
+                    android.app.AlertDialog.Builder dialog1 = new android.app.AlertDialog.Builder(DeskActivity.this);
+                    dialog1.setTitle("是否消台？").setCancelable(false);
+                    dialog1.setNegativeButton("是",
+                            new DialogInterface.OnClickListener()
                             {
-                                // TODO Auto-generated method stub
-                            }
-                        }).show();
+                                @Override
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    tableC.setState(0);
+                                    CDBHelper.createAndUpdate(getApplicationContext(),tableC);
+                                    myapp.setTable_sel_obj(tableC);
+                                }
+                            }).setPositiveButton("否",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface arg0, int arg1)
+                                {
+                                    // TODO Auto-generated method stub
+                                }
+                            }).show();
+                }
+
+
+
             }
         });
         long endTime1 = System.currentTimeMillis();

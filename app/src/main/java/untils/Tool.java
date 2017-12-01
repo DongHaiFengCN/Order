@@ -5,10 +5,16 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.couchbase.lite.Expression;
+
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
+import bean.kitchenmanage.order.OrderNum;
 import bean.kitchenmanage.promotion.PromotionRuleC;
+import model.CDBHelper;
 
 /**
  * 项目名称：Order

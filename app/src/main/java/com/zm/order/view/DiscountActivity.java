@@ -244,21 +244,21 @@ public class DiscountActivity extends AppCompatActivity {
      * 判断是否满足抹零条件
      * @param t
      */
-  public void compareTotal(float t){
+      public void compareTotal(float t){
 
 
-      if(stashTotal > t){
+          if(stashTotal > t){
 
-          int stash = (int) (stashTotal/t);
+              int stash = (int) (stashTotal/t);
 
-          totalTv.setText(String.valueOf(stash*t));
+              totalTv.setText(String.valueOf(stash*t));
 
-      }else {
+          }else {
 
-          Toast.makeText(DiscountActivity.this,"不满足条件！",Toast.LENGTH_SHORT).show();
+              Toast.makeText(DiscountActivity.this,"不满足条件！",Toast.LENGTH_SHORT).show();
 
+          }
       }
-  }
 
 
 

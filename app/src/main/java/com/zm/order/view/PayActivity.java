@@ -831,16 +831,19 @@ public class PayActivity extends AppCompatActivity {
 
     }
 
+    //携带参数返回到MainActivity
     public void turnMainActivity() {
 
-        //携带参数返回到MainActivity
+
         setResult(RESULT_OK, null);
 
         finish();
     }
+
+    //跳转主界面
     public void turnDesk(){
 
-        //跳转主界面
+
 
         Intent intent = new Intent(PayActivity.this,DeskActivity.class);
         startActivity(intent);
@@ -1301,6 +1304,12 @@ public class PayActivity extends AppCompatActivity {
 
     }
 
+    private void changeTableState()
+    {
+        tableC.setState(0);
+        CDBHelper.createAndUpdate(getApplicationContext(),tableC);
+        myApplication.setTable_sel_obj(tableC);
+    }
     /**
      * 提交结账信息
      * <p>
@@ -1349,7 +1358,9 @@ public class PayActivity extends AppCompatActivity {
         CDBHelper.createAndUpdate(getApplicationContext(), promotionD);
         CDBHelper.createAndUpdate(getApplicationContext(), checkOrder);
 
-      //  show();
+        //  show();
+        //
+       // changeTableState(); 有可能接着在这里吃饭，人还没走，所以不能置闲桌位
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -1367,9 +1378,7 @@ public class PayActivity extends AppCompatActivity {
 
                 //跳转主界面
 
-                Intent intent = new Intent(PayActivity.this,DeskActivity.class);
-                startActivity(intent);
-                finish();
+              turnDesk();
 
             }
         });

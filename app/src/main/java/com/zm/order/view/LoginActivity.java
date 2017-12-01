@@ -18,6 +18,8 @@ import android.widget.EditText;
 
 import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
+import com.tencent.bugly.Bugly;
+import com.tencent.bugly.crashreport.CrashReport;
 import com.zm.order.R;
 
 import java.util.Iterator;

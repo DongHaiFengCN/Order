@@ -29,10 +29,13 @@ import android.widget.Toast;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Document;
+import com.couchbase.lite.Expression;
 import com.couchbase.lite.Log;
 import com.zm.order.R;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TimerTask;
@@ -40,6 +43,7 @@ import java.util.TimerTask;
 import application.MyApplication;
 import bean.kitchenmanage.order.GoodsC;
 import bean.kitchenmanage.order.OrderC;
+import bean.kitchenmanage.order.OrderNum;
 import bean.kitchenmanage.table.AreaC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -378,14 +382,82 @@ public class MainActivity extends AppCompatActivity {
         o.notifyDataSetChanged();
     }
 
+    private   String getOrderSerialNum()
+    {
+        String orderNum=null;
+        SimpleDateFormat formatter=new SimpleDateFormat("yyyy-MM-dd");
+
+        List<OrderNum> orderNumList = CDBHelper.getObjByWhere(getApplicationContext(),Expression.property("className").equalTo("OrderNum")
+                ,null
+                ,OrderNum.class);
+        if(orderNumList.size()<=0)//第一次使用
+        {
+            OrderNum obj = new OrderNum(myApp.getCompany_ID());
+            String time=formatter.format(new Date());
+            obj.setDate(time);
+            obj.setNum(1);
+            CDBHelper.createAndUpdate(getApplicationContext(),obj);
+            orderNum =  "001";
+
+        }
+        else//有数据，判断是不是当天
+        {
+            OrderNum obj = orderNumList.get(0);
+            String olderDate = obj.getDate();
+            String newDate =  formatter.format(new Date());
+            int num = obj.getNum();
+            if(!newDate.equals(olderDate))//不是一天的，
+            {
+                obj.setNum(1);
+                obj.setDate(newDate);
+                CDBHelper.createAndUpdate(getApplicationContext(),obj);
+                orderNum =  "001";
+            }
+            else//同一天
+            {
+                int newNum = num+1;
+                obj.setNum(newNum);
+                CDBHelper.createAndUpdate(getApplicationContext(),obj);
+                orderNum = String.format("%3d", newNum).replace(" ", "0");
+            }
+        }
+
+        return orderNum;
+
+    }
 
     private void saveOrder(){
         try {
             CDBHelper.db.inBatch(new TimerTask() {
                 @Override
-                public void run() {
+                public void run()
+                {
 
-                    if (document == null){
+                    List<OrderC> orderCList=CDBHelper.getObjByWhere(getApplicationContext(),
+                            Expression.property("className").equalTo("OrderC")
+                                    .and(Expression.property("orderState").equalTo(1))
+                                    .and(Expression.property("tableNo").equalTo(myApp.getTable_sel_obj().getTableNum()))
+                            ,null
+                            ,OrderC.class);
+
+
+
+                    if (document == null)
+                    {
+
+                        if(orderCList.size()>0)
+                        {
+                            orderC.setOrderNum(orderCList.get(0).getOrderNum()+1);
+                            orderC.setSerialNum(orderCList.get(0).getSerialNum());
+                        }
+                        else
+                        {
+                            orderC.setOrderNum(1);
+                            orderC.setSerialNum(getOrderSerialNum());
+                        }
+
+
+
                         orderC.setGoodsList(goodsList);
                         orderC.setAllPrice(total);
                         orderC.setOrderState(1);
@@ -396,8 +468,11 @@ public class MainActivity extends AppCompatActivity {
                         orderC.setAreaName(areaC.getAreaName());
                         id = CDBHelper.createAndUpdate(getApplicationContext(),orderC);
                         Log.e("id",id);
-                    }else{
-                        if (document.getId().equals(id)){
+                    }
+                    else//
+                    {
+                        if (document.getId().equals(id))
+                        {
 
                             OrderC orderC =  CDBHelper.getObjById(getApplicationContext(),id,OrderC.class);
                             orderC.setGoodsList(goodsList);
@@ -421,7 +496,8 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
 
-        if (resultCode == RESULT_OK && requestCode == 1) {
+        if (resultCode == RESULT_OK && requestCode == 1)
+        {
 
             document = CDBHelper.getDocByID(getApplicationContext(),id);
             Log.e("document",""+document.getId());
