@@ -39,6 +39,8 @@ public class BluetoothUtil {
         for (BluetoothDevice device : devices) {
 
             if (device.getAddress().equals(Innerprinter_Address)) {
+
+
                 innerprinter_device = device;
                 break;
             }

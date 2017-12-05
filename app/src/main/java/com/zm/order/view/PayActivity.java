@@ -1,5 +1,7 @@
 package com.zm.order.view;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -30,6 +32,7 @@ import com.google.zxing.common.BitMatrix;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 import com.zm.order.R;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,6 +51,7 @@ import bean.kitchenmanage.promotion.PromotionDishesC;
 import bean.kitchenmanage.promotion.PromotionDishesKindC;
 import bean.kitchenmanage.promotion.PromotionRuleC;
 import bean.kitchenmanage.qrcode.qrcodeC;
+import bean.kitchenmanage.table.AreaC;
 import bean.kitchenmanage.table.TableC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -57,6 +61,7 @@ import model.DBFactory;
 import model.DatabaseSource;
 import model.IDBManager;
 import model.ProgressBarasyncTask;
+import untils.BluetoothUtil;
 import untils.MyLog;
 import untils.Tool;
 
@@ -144,8 +149,9 @@ public class PayActivity extends AppCompatActivity {
         myApplication = (MyApplication) getApplication();
         //获取餐桌编号
         tableC = myApplication.getTable_sel_obj();
+        AreaC areaCs = CDBHelper.getObjById(getApplicationContext(),tableC.getAreaId(), AreaC.class);
 
-        tableNumber.setText("桌/牌:"+tableC.getTableNum()+"号");
+        tableNumber.setText(areaCs.getAreaName()+"桌/牌:"+tableC.getTableNum()+"号");
 
         getAll();
 
@@ -1361,7 +1367,10 @@ public class PayActivity extends AppCompatActivity {
         //  show();
         //
        // changeTableState(); 有可能接着在这里吃饭，人还没走，所以不能置闲桌位
+        BluetoothAdapter btAdapter = BluetoothUtil.getBTAdapter();
+         BluetoothDevice device = BluetoothUtil.getDevice(btAdapter);
 
+        if(device != null){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         builder.setTitle("打印总账单");
@@ -1378,11 +1387,14 @@ public class PayActivity extends AppCompatActivity {
 
                 //跳转主界面
 
-              turnDesk();
 
             }
         });
-        builder.show();
+        builder.show();}else {
+            turnDesk();
+
+
+        }
 
     }
     /**
