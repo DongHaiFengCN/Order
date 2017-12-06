@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import com.zm.order.R;
 
 import untils.MyLog;
+import untils.Tool;
 
 /**
  * 项目名称：Order
@@ -184,15 +185,18 @@ public class AmountView extends LinearLayout implements View.OnClickListener {
         int i = v.getId();
         flag = false;
         amount = Float.parseFloat(etAmount.getText().toString());
+
+
         if (i == R.id.btnDecrease) {
-            if (amount > 0) {
-                amount--;
+            if (amount >= 1.0f) {
+
+                amount =MyBigDecimal.sub(amount,1.0f,1);
                 etAmount.setText(amount + "");
                 changeListener.OnChange(amount,false);
             }
         } else if (i == R.id.btnIncrease) {
             if (amount < goods_storage) {
-                amount++;
+                amount = amount+1.0f;
                 etAmount.setText(amount + "");
                 changeListener.OnChange(amount,true);
             }

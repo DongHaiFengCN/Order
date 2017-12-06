@@ -133,7 +133,8 @@ public class MainActivity extends AppCompatActivity {
     }
     public void setTotal(float total){
         this.total = total;
-        total_tv.setText(total + "元");
+        String to = MyBigDecimal.round(total+"",2);
+        total_tv.setText(to + "元");
     }
 
     public float getTotal(){
@@ -250,15 +251,15 @@ public class MainActivity extends AppCompatActivity {
                         if (flag) {
 
                             total += price;
-
-                            total_tv.setText(total + "元");
+                            String to = MyBigDecimal.round(total+"",2);
+                            total_tv.setText(to + "元");
 
 
                         } else {
 
                             total -= price;
-
-                            total_tv.setText(total + "元");
+                            String to = MyBigDecimal.round(total+"",2);
+                            total_tv.setText(to + "元");
 
                             if (sum == 0) {
 

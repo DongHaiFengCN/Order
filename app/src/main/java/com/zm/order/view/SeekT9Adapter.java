@@ -271,7 +271,9 @@ public class SeekT9Adapter extends BaseAdapter {
                     goodsC.setDishesTaste(tasteList.get(pos));
                 }
                 goodsC.setDishesCount(1);
-                goodsC.setAllPrice(mData.get(position).getDishesCount() * dishesC.getPrice());
+                String all = MyBigDecimal.mul(mData.get(position).getDishesCount()+"",dishesC.getPrice()+"",2);
+
+                goodsC.setAllPrice(Float.parseFloat(all));
                 goodsC.setDishesId(dishesC.get_id());
                 if (dishesC.getDishesKindId()!=null){
                     DishesKindC dishesKind  = CDBHelper.getObjById(activity.getApplicationContext(),dishesC.getDishesKindId(), DishesKindC.class);
@@ -288,7 +290,8 @@ public class SeekT9Adapter extends BaseAdapter {
                 activity.setPoint(point);
                 //计算总价
                 total = activity.getTotal();
-                total += 1 * dishesC.getPrice();
+                String all1 = MyBigDecimal.mul(1+"",dishesC.getPrice()+"",2);
+                total += Float.parseFloat(all1);
                 activity.setTotal(total);
 
             }
@@ -303,9 +306,12 @@ public class SeekT9Adapter extends BaseAdapter {
                 if (activity.getGoodsList().get(i).getDishesName().toString().equals(dishesC.getDishesName())){
                     activity.getGoodsList().get(i).setDishesCount(number++);
                     number = activity.getGoodsList().get(i).getDishesCount();
-                    activity.getGoodsList().get(i).setAllPrice(number*dishesC.getPrice());
+                    String all = MyBigDecimal.mul(number+"",dishesC.getPrice()+"",2);
+
+                    activity.getGoodsList().get(i).setAllPrice(Float.parseFloat(all));
                     total = activity.getTotal();
-                    total += 1 * dishesC.getPrice();
+                    String all1 = MyBigDecimal.mul(1+"",dishesC.getPrice()+"",2);
+                    total += Float.parseFloat(all1);
                     activity.setTotal(total);
                     isName = true;
                     //购物车计数器数据更新
@@ -336,7 +342,9 @@ public class SeekT9Adapter extends BaseAdapter {
                         goodsC.setDishesTaste(tasteList.get(pos));
                     }
                     goodsC.setDishesCount(1);
-                    goodsC.setAllPrice(mData.get(position).getDishesCount() * dishesC.getPrice());
+                    String all = MyBigDecimal.mul(mData.get(position).getDishesCount()+"",dishesC.getPrice()+"",2);
+
+                    goodsC.setAllPrice(Float.parseFloat(all));
                     goodsC.setDishesId(dishesC.get_id());
                     DishesKindC dishesKind  = CDBHelper.getObjById(activity.getApplicationContext(),dishesC.getDishesKindId(), DishesKindC.class);
                     goodsC.setDishesKindName(dishesKind.getKindName());
@@ -349,7 +357,8 @@ public class SeekT9Adapter extends BaseAdapter {
                     activity.setPoint(point);
                     //计算总价
                     total = activity.getTotal();
-                    total += 1 * dishesC.getPrice();;
+                    String all1 = MyBigDecimal.mul(1+"",dishesC.getPrice()+"",2);
+                    total += Float.parseFloat(all1);
                     activity.setTotal(total);
                 }
 

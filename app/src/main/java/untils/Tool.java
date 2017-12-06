@@ -93,7 +93,7 @@ public class Tool {
 
         BigDecimal b1 = new BigDecimal(a);
         BigDecimal b2 = new BigDecimal(b);
-        return b1.subtract(b2).floatValue();
+        return b1.subtract(b2).setScale(1).floatValue();
 
     }
     //乘法

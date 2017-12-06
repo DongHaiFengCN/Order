@@ -130,13 +130,14 @@ public class OrderAdapter extends BaseAdapter {
 
 
                     goodsCs.get(i).setDishesCount(ls);
-                    goodsCs.get(i).setAllPrice(ls * finalDishesC.getPrice());
+
+                    goodsCs.get(i).setAllPrice(MyBigDecimal.mul(ls,finalDishesC.getPrice(),2));
 
                     onchangeListener.onchangeListener(flag, finalDishesC.getPrice() ,ls);
 
                     context.getSeekT9Adapter().notifyDataSetChanged();
 
-                  if(ls == 0){
+                  if(ls <= 0){
 
                       goodsCs.get(i).setDishesCount(0);
                       context.getSeekT9Adapter().notifyDataSetChanged();
@@ -157,12 +158,12 @@ public class OrderAdapter extends BaseAdapter {
                 public void OnChange(float ls,boolean flag) {
 
                     goodsCs.get(i).setDishesCount(ls);
-                    goodsCs.get(i).setAllPrice(ls * price );
+                    goodsCs.get(i).setAllPrice(MyBigDecimal.mul(ls,price,2));
 
                     onchangeListener.onchangeListener(flag, price ,ls);
 
 
-                    if(ls == 0){
+                    if(ls <= 0){
 
                         goodsCs.get(i).setDishesCount(0);
                         goodsCs.remove(i);

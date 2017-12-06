@@ -142,8 +142,9 @@ public class SeekT9Fragment extends Fragment {
 
         final DishesC dishesC = CDBHelper.getObjById(getActivity().getApplicationContext(),myGoodsList.get(p).getDishesId(),DishesC.class);
         final AmountView amountView = view.findViewById(R.id.amount_view);
-        price_tv.setText("总计 " + amountView.getAmount() * price + " 元");
-        l[0] = amountView.getAmount() * price;
+        String all = MyBigDecimal.mul(amountView.getAmount()+"",price+"",2);
+        price_tv.setText("总计 " + Float.parseFloat(all) + " 元");
+        l[0] = Float.parseFloat(all);
         //增删选择器的数据改变的监听方法
 
         amountView.setChangeListener(new AmountView.ChangeListener() {
@@ -151,7 +152,8 @@ public class SeekT9Fragment extends Fragment {
             public void OnChange(float ls, boolean flag) {
 
                 //实时计算当前菜品选择不同数量后的单品总价
-                l[0] = ls * price;
+                String all = MyBigDecimal.mul(ls+"",price+"",2);
+                l[0] = Float.parseFloat(all);
 
                 price_tv.setText("总计 " + l[0] + " 元");
 
@@ -197,7 +199,8 @@ public class SeekT9Fragment extends Fragment {
                         goodsC.setDishesTaste(tasteList.get(pos));
                     }
                     goodsC.setDishesCount(sum);
-                    goodsC.setAllPrice(sum * price);
+                    String all = MyBigDecimal.mul(sum+"",price+"",2);
+                    goodsC.setAllPrice(Float.parseFloat(all));
                     goodsC.setDishesId(dishesC.get_id());
                     if (dishesC.getDishesKindId()!=null) {
                         DishesKindC dishesKindC = CDBHelper.getObjById(getActivity().getApplicationContext(), dishesC.getDishesKindId(), DishesKindC.class);

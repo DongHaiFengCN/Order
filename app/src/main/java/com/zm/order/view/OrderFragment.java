@@ -186,17 +186,19 @@ public class OrderFragment extends Fragment implements IMainView {
         final AmountView amountView = view.findViewById(R.id.amount_view);
         getDishesIdList.clear();
         tasteList.clear();
-        price_tv.setText("总计 " +amountView.getAmount()*price+" 元");
+        String all = MyBigDecimal.mul(amountView.getAmount()+"",price+"",2);
+
+        price_tv.setText("总计 " +Float.parseFloat(all)+" 元");
         amountView.getAmount();
-        l[0] = amountView.getAmount()*price;
+        l[0] = Float.parseFloat(all);
         //增删选择器的数据改变的监听方法
 
         amountView.setChangeListener(new AmountView.ChangeListener() {
             @Override
             public void OnChange(float ls, boolean flag) {
 
-
-                l[0] = ls * price;//实时计算当前菜品选择不同数量后的单品总价
+                String all = MyBigDecimal.mul(ls+"",price+"",2);
+                l[0] = Float.parseFloat(all);//实时计算当前菜品选择不同数量后的单品总价
 
                 price_tv.setText("总计 " + l[0] + " 元");
 
@@ -250,7 +252,8 @@ public class OrderFragment extends Fragment implements IMainView {
                         goodsC.setDishesTaste(tasteList.get(pos));
                     }
                     goodsC.setDishesCount(sum);
-                    goodsC.setAllPrice(sum * price);
+                    String all = MyBigDecimal.mul(sum+"",price+"",2);
+                    goodsC.setAllPrice(Float.parseFloat(all));
                     goodsC.setDishesId(doc.getId());
                     if ( doc.getString("dishesKindId") != null) {
                         DishesKindC dishesKind = CDBHelper.getObjById(getActivity().getApplicationContext(), doc.getString("dishesKindId"), DishesKindC.class);
