@@ -236,14 +236,20 @@ public class SeekT9Fragment extends Fragment {
 
     // 查询方法
     public void search(final String search) {
-        myGoodsList.clear();
+
+
         try {
             CDBHelper.db.inBatch(new TimerTask() {
                 @Override
                 public void run() {
+                    if(search.length()<2)
+                        return;
+
+                    myGoodsList.clear();
+
                     List<DishesC> dishesCs = CDBHelper.getObjByWhere(getActivity().getApplicationContext()
                             , Expression.property("className").equalTo("DishesC")
-                            .and(Expression.property("dishesNameCode9").like(search + "%"))
+                            .and(Expression.property("dishesNameCode9").like("%"+search + "%"))
                             , null, DishesC.class);
                     for (DishesC obj : dishesCs) {
                             GoodsC goodsObj = new GoodsC();
@@ -415,7 +421,7 @@ public class SeekT9Fragment extends Fragment {
                     search(activitySeekEdit.getText().toString());
                 }
                 if (length == 1) {
-                    search("o");
+                    search("oo");
                     activitySeekEdit.getText().delete(length - 1, length);
                 }
 
