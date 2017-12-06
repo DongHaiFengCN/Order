@@ -245,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
 
                 o.setOnchangeListener(new OrderAdapter.OnchangeListener() {
                     @Override
-                    public void onchangeListener(boolean flag, float price, int sum) {
+                    public void onchangeListener(boolean flag, float price, float sum) {
 
                         if (flag) {
 

@@ -193,7 +193,7 @@ public class OrderFragment extends Fragment implements IMainView {
 
         amountView.setChangeListener(new AmountView.ChangeListener() {
             @Override
-            public void OnChange(int ls, boolean flag) {
+            public void OnChange(float ls, boolean flag) {
 
 
                 l[0] = ls * price;//实时计算当前菜品选择不同数量后的单品总价
@@ -239,7 +239,7 @@ public class OrderFragment extends Fragment implements IMainView {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
 
-                int sum = amountView.getAmount();
+                float sum = amountView.getAmount();
 
                 if (sum != 0) {//如果选择器的数量不为零，当前的选择的菜品加入订单列表
                     GoodsC goodsC = new GoodsC();

@@ -39,7 +39,7 @@ public class GoodsC {
 	/**
 	 * 所选菜品个数
 	 */
-	private int DishesCount;
+	private float DishesCount;
 	/**
 	 * 所选菜品个数总价
 	 */
@@ -143,11 +143,11 @@ public class GoodsC {
 		this.dishesTaste = dishesTaste;
 	}
 
-	public int getDishesCount() {
+	public float getDishesCount() {
 		return DishesCount;
 	}
 
-	public void setDishesCount(int dishesCount) {
+	public void setDishesCount(float dishesCount) {
 		DishesCount = dishesCount;
 	}
 

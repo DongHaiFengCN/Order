@@ -126,7 +126,7 @@ public class OrderAdapter extends BaseAdapter {
                 final DishesC finalDishesC = dishesC;
                 viewHold.number.setChangeListener(new AmountView.ChangeListener() {
                 @Override
-                public void OnChange(int ls,boolean flag) {
+                public void OnChange(float ls,boolean flag) {
 
 
                     goodsCs.get(i).setDishesCount(ls);
@@ -154,7 +154,7 @@ public class OrderAdapter extends BaseAdapter {
             //设置item的点击事件
             viewHold.number.setChangeListener(new AmountView.ChangeListener() {
                 @Override
-                public void OnChange(int ls,boolean flag) {
+                public void OnChange(float ls,boolean flag) {
 
                     goodsCs.get(i).setDishesCount(ls);
                     goodsCs.get(i).setAllPrice(ls * price );
@@ -197,7 +197,7 @@ public class OrderAdapter extends BaseAdapter {
    // flag ？+ ：-,price 单价 ,sum 当前item的商品的个数。
     interface OnchangeListener{
 
-       void onchangeListener(boolean flag,float price,int sum);
+       void onchangeListener(boolean flag,float price,float sum);
     }
 
 

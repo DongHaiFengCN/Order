@@ -29,11 +29,11 @@ import untils.MyLog;
 
 public class AmountView extends LinearLayout implements View.OnClickListener {
 
-    public int getAmount() {
+    public float getAmount() {
         return amount;
     }
 
-    private int amount = 1; //购买数量
+    private float amount = 1; //购买数量
     private int goods_storage = 10; //实际场景由数据库提供，默认设置为10
 
     public EditText getEtAmount() {
@@ -114,7 +114,7 @@ public class AmountView extends LinearLayout implements View.OnClickListener {
                     return;
 
 
-                amount = Integer.valueOf(editable.toString());
+                amount = Float.valueOf(editable.toString());
 
                 if (amount > goods_storage) {
 
@@ -183,7 +183,7 @@ public class AmountView extends LinearLayout implements View.OnClickListener {
         }
         int i = v.getId();
         flag = false;
-        amount = Integer.valueOf(etAmount.getText().toString());
+        amount = Float.parseFloat(etAmount.getText().toString());
         if (i == R.id.btnDecrease) {
             if (amount > 0) {
                 amount--;
@@ -211,7 +211,7 @@ public class AmountView extends LinearLayout implements View.OnClickListener {
 
     interface ChangeListener{
 
-        void OnChange(int ls,boolean flag);
+        void OnChange(float ls,boolean flag);
 
     }
 

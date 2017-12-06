@@ -39,7 +39,7 @@ public class SeekT9Adapter extends BaseAdapter {
     private List<GoodsC> mData;
     private MainActivity activity;
     private SeekT9OnClickListener listener;
-    private int number=1;
+    private float number=1;
     private int point = 1;
     private float total;
     private String taste ;
@@ -123,14 +123,14 @@ public class SeekT9Adapter extends BaseAdapter {
             for (int i = 0 ;i< activity.getGoodsList().size() ;i++){
                 if (activity.getGoodsList().get(i).getDishesName().toString().equals(dishesC.getDishesName())) {
                     viewHolder.viewShu.setText(activity.getGoodsList().get(i).getDishesCount()+"");
-                    mData.get(position).setDishesCount(Integer.parseInt(viewHolder.viewShu.getText().toString()));
+                    mData.get(position).setDishesCount(Float.parseFloat(viewHolder.viewShu.getText().toString()));
                     break;
                 }else {
                     mData.get(position).setDishesCount(0);
                     viewHolder.viewShu.setText(mData.get(position).getDishesCount()+"");
                 }
             }
-            number = Integer.parseInt(viewHolder.viewShu.getText().toString());
+            number = Float.parseFloat(viewHolder.viewShu.getText().toString());
         }else{
             mData.get(position).setDishesCount(0);
             viewHolder.viewShu.setText(mData.get(position).getDishesCount()+"");
@@ -208,7 +208,7 @@ public class SeekT9Adapter extends BaseAdapter {
                                 }
                             }
 
-                            number = Integer.parseInt(viewHolder.viewShu.getText().toString());
+                            number = Float.parseFloat(viewHolder.viewShu.getText().toString());
                             if (activity.getGoodsList().size() != 0) {
                                 for (int i = 0; i < activity.getGoodsList().size(); i++) {
                                     if (activity.getGoodsList().get(i).getDishesName().toString().equals(dishesC.getDishesName())) {
@@ -295,7 +295,7 @@ public class SeekT9Adapter extends BaseAdapter {
 
         }else {
 
-            mData.get(position).setDishesCount(Integer.parseInt(viewHolder.viewShu.getText().toString()));
+            mData.get(position).setDishesCount(Float.parseFloat(viewHolder.viewShu.getText().toString()));
 
             number = mData.get(position).getDishesCount();
 

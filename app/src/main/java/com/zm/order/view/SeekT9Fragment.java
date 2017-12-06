@@ -148,7 +148,7 @@ public class SeekT9Fragment extends Fragment {
 
         amountView.setChangeListener(new AmountView.ChangeListener() {
             @Override
-            public void OnChange(int ls, boolean flag) {
+            public void OnChange(float ls, boolean flag) {
 
                 //实时计算当前菜品选择不同数量后的单品总价
                 l[0] = ls * price;
@@ -185,7 +185,7 @@ public class SeekT9Fragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 mainActivity = (MainActivity) getActivity();
-                int sum = amountView.getAmount();
+                float sum = amountView.getAmount();
                 //如果选择器的数量不为零，当前的选择的菜品加入订单列表
                 if (sum != 0) {
 
