@@ -83,6 +83,13 @@ public class DeskActivity extends AppCompatActivity {
     private void initWidget()
     {
         db = myapp.getDatabase();
+
+        List<AreaC> list = CDBHelper.getObjByClass(getApplicationContext(),AreaC.class);
+        if(list!=null)
+        {
+            for(AreaC obj:list)
+                Log.e("for*****","areaName="+obj.getAreaName());
+        }
         if(db == null) throw new IllegalArgumentException();
         areaAdapter = new AreaAdapter(this, db);
 

@@ -55,8 +55,10 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
     private static final String TAG = Application.class.getSimpleName();
 
     private final static boolean SYNC_ENABLED = true;
-    private final static String DATABASE_NAME = "GYSZDB";
+    private final static String DATABASE_NAME = "GYSZDB002";
     private String Company_ID="gysz";
+
+
 
 //     private final static String DATABASE_NAME = "KitchenDB550";
 //    private String Company_ID="zmsy50";
@@ -188,8 +190,10 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 
         ReplicatorConfiguration config = new ReplicatorConfiguration(database, uri);
         List<String> channels =new ArrayList<>();
-        channels.add(getCompany_ID());
+
         MyLog.d("companyid="+getCompany_ID());
+        channels.add(getCompany_ID());
+
         config.setChannels(channels);
 
         config.setReplicatorType(ReplicatorConfiguration.ReplicatorType.PUSH_AND_PULL);

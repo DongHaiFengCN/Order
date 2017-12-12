@@ -67,7 +67,8 @@ public class AreaAdapter extends ArrayAdapter<String> {
 		super.finalize();
 	}
 	private LiveQuery listsLiveQuery() {
-		return Query.select(SelectResult.expression(Expression.meta().getId()))
+		return Query.select(SelectResult.expression(Expression.meta().getId())
+				,SelectResult.expression(Expression.property("areaName")))
 				.from(DataSource.database(db))
 				.where(Expression.property("className").equalTo("AreaC"))
 				.orderBy(Ordering.property("areaNum").ascending())
