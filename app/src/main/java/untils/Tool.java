@@ -91,25 +91,25 @@ public class Tool {
     //减法
     public static float substrct(float a,float b){
 
-        BigDecimal b1 = new BigDecimal(a);
-        BigDecimal b2 = new BigDecimal(b);
-        return b1.subtract(b2).setScale(1).floatValue();
+        BigDecimal b1 = new BigDecimal(a+"");
+        BigDecimal b2 = new BigDecimal(b+"");
+        return b1.subtract(b2).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
 
     }
     //乘法
     public static float multiply(float a,float b){
 
-        BigDecimal b1 = new BigDecimal(a);
-        BigDecimal b2 = new BigDecimal(b);
-        return b1.multiply(b2).floatValue();
+        BigDecimal b1 = new BigDecimal(a+"");
+        BigDecimal b2 = new BigDecimal(b+"");
+        return b1.multiply(b2).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
 
     }
     //除法
     public static float divide(float a,float b){
 
-        BigDecimal b1 = new BigDecimal(a);
-        BigDecimal b2 = new BigDecimal(b);
-        return b1.divide(b2).floatValue();
+        BigDecimal b1 = new BigDecimal(a+"");
+        BigDecimal b2 = new BigDecimal(b+"");
+        return b1.divide(b2).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
 
     }
 
