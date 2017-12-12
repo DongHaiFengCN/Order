@@ -56,12 +56,16 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 
     private final static boolean SYNC_ENABLED = true;
     private final static String DATABASE_NAME = "GYSZDB";
+    private String Company_ID="gysz";
+
+//     private final static String DATABASE_NAME = "KitchenDB550";
+//    private String Company_ID="zmsy50";
     private final static String SYNCGATEWAY_URL = "blip://123.207.174.171:4984/kitchen/";
     //private final static String SYNCGATEWAY_URL = "blip://192.168.2.216:4984/kitchen/";
     private Database database = null;
     private Replicator replicator;
     //private String Company_ID="zmsy010";
-    private String Company_ID="gysz";
+
     private TableC table_sel_obj;
 
     public UsersC getUsersC() {
@@ -111,7 +115,7 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 
     private void openDatabase(String dbname) {
         DatabaseConfiguration config = new DatabaseConfiguration(getApplicationContext());
-       //config.setConflictResolver(getConflictResolver());
+       config.setConflictResolver(getConflictResolver());
         try {
             database = new Database(dbname, config);
         } catch (CouchbaseLiteException e) {
@@ -162,7 +166,7 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
                         resolved.setObject(key, mine.getObject(key));
                 }
 
-                Log.e(TAG, "ConflictResolver.resolve() resolved -> %s", resolved.toMap());
+               // Log.e(TAG, "ConflictResolver.resolve() resolved -> %s", resolved.toMap());
 
                 return resolved;
             }
