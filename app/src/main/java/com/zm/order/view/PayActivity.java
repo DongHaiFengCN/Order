@@ -849,7 +849,9 @@ public class PayActivity extends AppCompatActivity {
     //跳转主界面
     public void turnDesk(){
 
-
+       TableC obj = myApplication.getTable_sel_obj();
+       obj.setState(0);
+       CDBHelper.createAndUpdate(getApplicationContext(),tableC);
 
         Intent intent = new Intent(PayActivity.this,DeskActivity.class);
         startActivity(intent);

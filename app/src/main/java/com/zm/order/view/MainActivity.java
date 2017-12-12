@@ -31,6 +31,7 @@ import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
 import com.couchbase.lite.Log;
+import com.couchbase.lite.Ordering;
 import com.zm.order.R;
 
 import java.text.SimpleDateFormat;
@@ -438,7 +439,7 @@ public class MainActivity extends AppCompatActivity {
                             Expression.property("className").equalTo("OrderC")
                                     .and(Expression.property("orderState").equalTo(1))
                                     .and(Expression.property("tableNo").equalTo(myApp.getTable_sel_obj().getTableNum()))
-                            ,null
+                            , Ordering.property("createdTime").descending()
                             ,OrderC.class);
 
 
