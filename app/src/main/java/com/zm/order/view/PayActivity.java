@@ -1070,7 +1070,7 @@ public class PayActivity extends AppCompatActivity {
                         MyLog.e("当前总价 "+total);
                         MyLog.e("减去的部分 "+copy);
 
-                        total = Tool.substrct(total,copy);
+                        total = MyBigDecimal.sub(total,copy,2);//Tool.substrct(total,copy);
                         MyLog.e("减后的部分 "+total);
                         factTv.setText("实际支付：" + total + "元");
 
