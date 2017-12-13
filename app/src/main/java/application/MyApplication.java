@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Environment;
 import android.widget.Toast;
 
 import com.couchbase.lite.BasicAuthenticator;
@@ -24,6 +25,7 @@ import com.tencent.bugly.Bugly;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.zm.order.view.LoginActivity;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -55,7 +57,7 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
     private static final String TAG = Application.class.getSimpleName();
 
     private final static boolean SYNC_ENABLED = true;
-    private final static String DATABASE_NAME = "GYSZDB002";
+    private final static String DATABASE_NAME = "GYSZDB003";
     private String Company_ID="gysz";
 
 
@@ -117,6 +119,8 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 
     private void openDatabase(String dbname) {
         DatabaseConfiguration config = new DatabaseConfiguration(getApplicationContext());
+        File folder = new File(String.format("%s/SmartKitchenPad", Environment.getExternalStorageDirectory()));
+        config.setDirectory(folder);
        config.setConflictResolver(getConflictResolver());
         try {
             database = new Database(dbname, config);
