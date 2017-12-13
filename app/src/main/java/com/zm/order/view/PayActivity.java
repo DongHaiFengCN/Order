@@ -11,6 +11,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -399,9 +400,12 @@ public class PayActivity extends AppCompatActivity {
 
                 turnRechange(data);
 
+                Log.e("DOAING","充值卡");
+
             } else if (flag == 1) {
 
                 turnSale(data);
+                Log.e("DOAING","折扣卡");
 
             } else {
 
@@ -437,7 +441,6 @@ public class PayActivity extends AppCompatActivity {
         associatorNotDisplay();
         //活动不可用
         actionNotDisplay();
-
 
     }
 
@@ -875,6 +878,8 @@ public class PayActivity extends AppCompatActivity {
      */
 
     private void turnSale() {
+
+
 
         Intent sale = new Intent();
         sale.setClass(PayActivity.this, SaleActivity.class);
@@ -1369,10 +1374,24 @@ public class PayActivity extends AppCompatActivity {
         //  show();
         //
        // changeTableState(); 有可能接着在这里吃饭，人还没走，所以不能置闲桌位
-        BluetoothAdapter btAdapter = BluetoothUtil.getBTAdapter();
+         BluetoothAdapter btAdapter = BluetoothUtil.getBTAdapter();
+         if(!btAdapter.isEnabled()){
+
+             btAdapter.enable();
+
+             try {
+                 Thread.sleep(1000);
+             } catch (InterruptedException e) {
+                 e.printStackTrace();
+             }
+         }
+
          BluetoothDevice device = BluetoothUtil.getDevice(btAdapter);
 
-        if(device != null){
+
+
+       if(device != null){
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         builder.setTitle("打印总账单");
@@ -1392,7 +1411,11 @@ public class PayActivity extends AppCompatActivity {
 
             }
         });
-        builder.show();}else {
+        builder.show();
+
+        }else {
+
+          MyLog.e("打印机？？");
             turnDesk();
 
 
