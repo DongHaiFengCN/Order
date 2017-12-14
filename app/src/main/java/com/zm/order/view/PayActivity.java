@@ -671,7 +671,9 @@ public class PayActivity extends AppCompatActivity {
                     }
                     builder1.dismiss();
 
-                    turnMainActivity();
+                    //turnMainActivity();
+
+                   // turnDesk();
                 }else {
 
                     Toast.makeText(PayActivity.this,"请充值！",Toast.LENGTH_SHORT).show();
@@ -766,12 +768,13 @@ public class PayActivity extends AppCompatActivity {
                     //提交checkorder
                     try {
                         submitCheckOrder();
+
                     } catch (CouchbaseLiteException e) {
                         e.printStackTrace();
                     }
 
                     alertDialog.dismiss();
-                    turnMainActivity();
+
 
 
                 }else if(total > r &&r > 0) {
@@ -1415,7 +1418,7 @@ public class PayActivity extends AppCompatActivity {
 
         }else {
 
-          MyLog.e("打印机？？");
+
             turnDesk();
 
 
