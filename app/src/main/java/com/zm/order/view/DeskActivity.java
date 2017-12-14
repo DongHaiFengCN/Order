@@ -210,10 +210,6 @@ public class DeskActivity extends AppCompatActivity {
 
                                 editText.setError("人数不能为0");
 
-                            }else if(Integer.valueOf(editText.getText().toString()) > max){
-
-                                editText.setError("超过当前最高人数！");
-
                             }else {
 
                                 //设置就餐人数，转跳
