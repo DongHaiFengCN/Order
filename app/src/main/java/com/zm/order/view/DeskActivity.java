@@ -12,11 +12,17 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.couchbase.lite.Database;
 import com.couchbase.lite.Document;
@@ -45,8 +51,8 @@ public class DeskActivity extends AppCompatActivity {
     private RecyclerView listViewDesk;
     private LiveTableRecyclerAdapter tableadapter;
 
-    private MyApplication myapp;
 
+    private MyApplication myapp;
     private Handler uiHandler = new Handler()
     {
         @Override
@@ -70,6 +76,11 @@ public class DeskActivity extends AppCompatActivity {
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_desk);
+
+
+
+
+
 
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         if(actionBar != null){
@@ -132,31 +143,101 @@ public class DeskActivity extends AppCompatActivity {
             public void onItemClick(View view,Object data)
             {
                 String tableId= (String)data;
-                TableC  tableC =  CDBHelper.getObjById(getApplicationContext(),tableId,TableC.class);
+                final TableC  tableC =  CDBHelper.getObjById(getApplicationContext(),tableId,TableC.class);
                 if(tableC.getState()!=2)
                 {
                     tableC.setState(2);
                     CDBHelper.createAndUpdate(getApplicationContext(),tableC);
 
-                }
-                List<OrderC> orderCList= CDBHelper.getObjByWhere(getApplicationContext(),
-                        Expression.property("className").equalTo("OrderC")
-                                .and(Expression.property("tableNo").equalTo(tableC.getTableNum()))
-                                .and(Expression.property("orderState").equalTo(1))
-                        ,null
-                        ,OrderC.class);
-                myapp.setTable_sel_obj(tableC);
-                Log.e("orderCList",orderCList.get(0).getAllPrice()+"");
-                if (orderCList.size() > 0){
-                    Intent mainIntent = new Intent();
-                    mainIntent.setClass(DeskActivity.this, ShowParticularsActivity.class);
-                    startActivity(mainIntent);
-                }else{
 
-                    Intent mainIntent = new Intent();
-                    mainIntent.setClass(DeskActivity.this, MainActivity.class);
-                    startActivity(mainIntent);
+                    final EditText  editText = new EditText(DeskActivity.this);
+
+                    LinearLayout linearLayout =new LinearLayout(DeskActivity.this);
+
+                    //设置控件居中显示
+                    linearLayout.setGravity(Gravity.CENTER);
+
+                    //设置子控件在线性布局下的参数设置对象（什么布局就用什么的）
+
+                    LinearLayout.LayoutParams params =new LinearLayout.LayoutParams(
+
+                            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+                    //设置margins属性
+
+                    params.setMargins(10,10,10,10);
+
+                    //设置控件参数
+                    editText.setLayoutParams(params);
+
+                    //设置输入类型为数字
+                    editText.setInputType((InputType.TYPE_CLASS_NUMBER));
+
+                    //添加控件到布局
+                    linearLayout.addView(editText);
+
+
+                    final int max = tableC.getMaxPersons();
+
+                    editText.setHint("最多人数："+max);
+
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(DeskActivity.this);
+
+
+                    builder.setTitle("设置就餐人数");
+                    builder.setView(linearLayout);
+                    builder.setPositiveButton("确定", null);
+                    builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                        }
+                    });
+
+                    AlertDialog alertDialog = builder.show();
+
+                    //重置点击事件
+
+                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+
+                            if(TextUtils.isEmpty(editText.getText().toString())){
+
+                                editText.setError("人数不能为空");
+
+                            }else if("0".equals(editText.getText().toString())){
+
+                                editText.setError("人数不能为0");
+
+                            }else if(Integer.valueOf(editText.getText().toString()) > max){
+
+                                editText.setError("超过当前最高人数！");
+
+                            }else {
+
+                                //设置就餐人数，转跳
+
+                                tableC.setCurrentPersions(Integer.valueOf(editText.getText().toString()));
+
+                                //设置全局Table
+                                myapp.setTable_sel_obj(tableC);
+
+                                //转跳点餐界面
+                                turnMainActivity();
+                            }
+
+                        }
+                    });
+
+
+
                 }
+
+
+
+                //使用状态下跳到查看订单界面
+
 
 
             }
@@ -236,6 +317,13 @@ public class DeskActivity extends AppCompatActivity {
         listViewDesk.setAdapter(tableadapter);
         long endTime2 = System.currentTimeMillis();
         MyLog.e("time2="+(endTime2- endTime1));
+    }
+
+    private void turnMainActivity() {
+        finish();
+        Intent mainIntent = new Intent();
+        mainIntent.setClass(DeskActivity.this, MainActivity.class);
+        startActivity(mainIntent);
     }
 
     @Override
