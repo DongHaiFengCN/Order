@@ -194,7 +194,7 @@ public class DeskActivity extends AppCompatActivity {
                         }
                     });
 
-                    AlertDialog alertDialog = builder.show();
+                    final AlertDialog alertDialog = builder.show();
 
                     //重置点击事件
 
@@ -223,8 +223,12 @@ public class DeskActivity extends AppCompatActivity {
                                 //设置全局Table
                                 myapp.setTable_sel_obj(tableC);
 
+                                alertDialog.dismiss();
+
                                 //转跳点餐界面
                                 turnMainActivity();
+
+
                             }
 
                         }
@@ -320,7 +324,6 @@ public class DeskActivity extends AppCompatActivity {
     }
 
     private void turnMainActivity() {
-        finish();
         Intent mainIntent = new Intent();
         mainIntent.setClass(DeskActivity.this, MainActivity.class);
         startActivity(mainIntent);
