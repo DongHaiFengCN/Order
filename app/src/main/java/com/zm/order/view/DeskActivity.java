@@ -176,9 +176,8 @@ public class DeskActivity extends AppCompatActivity {
                     linearLayout.addView(editText);
 
 
-                    final int max = tableC.getMaxPersons();
 
-                    editText.setHint("最多人数："+max);
+                    editText.setHint("最多人数："+tableC.getMaxPersons()+"最小人数 : "+tableC.getMinConsum());
 
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(DeskActivity.this);
@@ -209,10 +208,6 @@ public class DeskActivity extends AppCompatActivity {
                             }else if("0".equals(editText.getText().toString())){
 
                                 editText.setError("人数不能为0");
-
-                            }else if(Integer.valueOf(editText.getText().toString()) > max){
-
-                                editText.setError("超过当前最高人数！");
 
                             }else {
 
