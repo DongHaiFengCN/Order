@@ -61,14 +61,14 @@ public class OrderFragment extends Fragment implements IMainView {
     private List<String> titleList = new ArrayList<>();
     List<Object> DishesIdList;
     private List<String> dishesIdList;
-    private int pos;
     private MyApplication myapp;
+    private int pos;
     @Override
     public View onCreateView(LayoutInflater inflater,  ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.frame_order,null);
         ButterKnife.bind(this, view);
         //initData();
-        myapp = (MyApplication)getActivity().getApplication();
+        myapp = (MyApplication) getActivity().getApplication();
         initView();
         IMainPresenter iMainView = new MainPresenterImpl(this);
         iMainView.init();

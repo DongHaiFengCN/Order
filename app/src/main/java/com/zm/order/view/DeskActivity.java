@@ -139,10 +139,26 @@ public class DeskActivity extends AppCompatActivity {
                     CDBHelper.createAndUpdate(getApplicationContext(),tableC);
 
                 }
+                List<OrderC> orderCList= CDBHelper.getObjByWhere(getApplicationContext(),
+                        Expression.property("className").equalTo("OrderC")
+                                .and(Expression.property("tableNo").equalTo(tableC.getTableNum()))
+                                .and(Expression.property("orderState").equalTo(1))
+                        ,null
+                        ,OrderC.class);
                 myapp.setTable_sel_obj(tableC);
-                Intent mainIntent = new Intent();
-                mainIntent.setClass(DeskActivity.this, MainActivity.class);
-                startActivity(mainIntent);
+                Log.e("orderCList",orderCList.get(0).getAllPrice()+"");
+                if (orderCList.size() > 0){
+                    Intent mainIntent = new Intent();
+                    mainIntent.setClass(DeskActivity.this, ShowParticularsActivity.class);
+                    startActivity(mainIntent);
+                }else{
+
+                    Intent mainIntent = new Intent();
+                    mainIntent.setClass(DeskActivity.this, MainActivity.class);
+                    startActivity(mainIntent);
+                }
+
+
             }
             @Override
             public void onItemLongClick(View view,Object data)
