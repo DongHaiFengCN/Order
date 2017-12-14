@@ -289,6 +289,7 @@ public class PayActivity extends AppCompatActivity {
 
         if(!qrcodeList.isEmpty()){
 
+
             alipayId = qrcodeList.get(0).getZfbUrl();
             wechatId = qrcodeList.get(0).getWxUrl();
 
@@ -303,11 +304,8 @@ public class PayActivity extends AppCompatActivity {
 
 
 
-            MyLog.e(wechatId);
+         //   MyLog.e(wechatId);
             //转化二维码
-
-
-
 
         }
 
