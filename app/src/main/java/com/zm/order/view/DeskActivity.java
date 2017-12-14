@@ -232,11 +232,17 @@ public class DeskActivity extends AppCompatActivity {
 
 
 
+                }else {
+                    myapp.setTable_sel_obj(tableC);
+                    //使用状态下跳到查看订单界面
+                    Intent mainIntent = new Intent();
+                    mainIntent.setClass(DeskActivity.this, ShowParticularsActivity.class);
+                    startActivity(mainIntent);
                 }
 
 
 
-                //使用状态下跳到查看订单界面
+
 
 
 
