@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TimerTask;
 
+import application.MyApplication;
 import bean.kitchenmanage.dishes.DishesC;
 import bean.kitchenmanage.dishes.DishesKindC;
 import bean.kitchenmanage.order.GoodsC;
@@ -48,9 +49,11 @@ public class SeekT9Adapter extends BaseAdapter {
     private boolean isName = false,isTaste = false;
     private int pos,p ;
     private DishesC dishesC;
+    private MyApplication myapp;
 
     public SeekT9Adapter(MainActivity context) {
         this.activity = context;
+        myapp = (MyApplication)this.activity.getApplication();
     }
 
     public void setListener(SeekT9OnClickListener listener) {
@@ -250,8 +253,9 @@ public class SeekT9Adapter extends BaseAdapter {
 
 
 
-    private void setTJ(int position , SparseArray<Object> s,ViewHolder viewHolder){
-        GoodsC goodsC = new GoodsC();
+    private void setTJ(int position , SparseArray<Object> s,ViewHolder viewHolder)
+    {
+        GoodsC goodsC = new GoodsC(myapp.getCompany_ID());
         mData.get(position).setDishesCount(mData.get(position).getDishesCount()+1);
 
         viewHolder.viewShu.setText(mData.get(position).getDishesCount()+"");
@@ -261,7 +265,8 @@ public class SeekT9Adapter extends BaseAdapter {
         }
         if (activity.getGoodsList().size() == 0 ){
             //如果选择器的数量不为零，当前的选择的菜品加入订单列表
-            if (mData.get(position).getDishesCount() > 0) {
+            if (mData.get(position).getDishesCount() > 0)
+            {
 
 
                 goodsC.setDishesName(dishesC.getDishesName());

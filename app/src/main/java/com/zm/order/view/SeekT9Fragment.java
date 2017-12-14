@@ -191,7 +191,7 @@ public class SeekT9Fragment extends Fragment {
                 //如果选择器的数量不为零，当前的选择的菜品加入订单列表
                 if (sum != 0) {
 
-                    GoodsC goodsC = new GoodsC();
+                    GoodsC goodsC = new GoodsC(myapp.getCompany_ID());
                     goodsC.setDishesName(name);
                     if (tasteList.size() == 0) {
                         goodsC.setDishesTaste(null);
@@ -255,7 +255,7 @@ public class SeekT9Fragment extends Fragment {
                             .and(Expression.property("dishesNameCode9").like("%"+search + "%"))
                             , null, DishesC.class);
                     for (DishesC obj : dishesCs) {
-                            GoodsC goodsObj = new GoodsC();
+                            GoodsC goodsObj = new GoodsC(myapp.getCompany_ID());
                             goodsObj.setDishesCount(0);
                             goodsObj.setDishesId(obj.get_id());
                             myGoodsList.add(goodsObj);

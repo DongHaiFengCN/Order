@@ -25,7 +25,20 @@
         >
     </android.support.v7.widget.RecyclerView>-->
 
-    <com.zm.order.view.DragView
+  <!--  <com.zm.order.view.DragView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/dishes_rv"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/order_list"
+        android:background="@color/md_white_1000"
+        >
+
+
+    </com.zm.order.view.DragView>-->
+
+    <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:focusableInTouchMode="false"
@@ -37,7 +50,6 @@
         >
 
 
-    </com.zm.order.view.DragView>
-
+    </ListView>
 
 </RelativeLayout>

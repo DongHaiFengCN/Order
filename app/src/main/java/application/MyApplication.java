@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Environment;
 import android.widget.Toast;
 
 import com.couchbase.lite.BasicAuthenticator;
@@ -24,6 +25,7 @@ import com.tencent.bugly.Bugly;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.zm.order.view.LoginActivity;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -55,15 +57,16 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
     private static final String TAG = Application.class.getSimpleName();
 
     private final static boolean SYNC_ENABLED = true;
-    private final static String DATABASE_NAME = "KitchenDB50";
-   // private final static String SYNCGATEWAY_URL = "blip://123.207.174.171:4984/kitchen/";
-    //private final static String SYNCGATEWAY_URL = "blip://192.168.2.216:4984/kitchen/";
-    private final static String SYNCGATEWAY_URL = " blip://60.217.194.246/kitchen/";
+    private final static String DATABASE_NAME = "GYSZDB008";
+    private String Company_ID="gysz";
 
+
+  //  private final static String SYNCGATEWAY_URL = "blip://123.207.174.171:4984/kitchen/";
+    private final static String SYNCGATEWAY_URL = "blip://60.217.194.246:4984/kitchen/";
     private Database database = null;
     private Replicator replicator;
     //private String Company_ID="zmsy010";
-    private String Company_ID="zmsy500";
+
     private TableC table_sel_obj;
 
     public UsersC getUsersC() {
@@ -113,7 +116,9 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 
     private void openDatabase(String dbname) {
         DatabaseConfiguration config = new DatabaseConfiguration(getApplicationContext());
-       //config.setConflictResolver(getConflictResolver());
+        File folder = new File(String.format("%s/SmartKitchenPad", Environment.getExternalStorageDirectory()));
+        config.setDirectory(folder);
+       config.setConflictResolver(getConflictResolver());
         try {
             database = new Database(dbname, config);
         } catch (CouchbaseLiteException e) {
@@ -164,7 +169,7 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
                         resolved.setObject(key, mine.getObject(key));
                 }
 
-                Log.e(TAG, "ConflictResolver.resolve() resolved -> %s", resolved.toMap());
+               // Log.e(TAG, "ConflictResolver.resolve() resolved -> %s", resolved.toMap());
 
                 return resolved;
             }
@@ -186,8 +191,10 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 
         ReplicatorConfiguration config = new ReplicatorConfiguration(database, uri);
         List<String> channels =new ArrayList<>();
-        channels.add(getCompany_ID());
+
         MyLog.d("companyid="+getCompany_ID());
+        channels.add(getCompany_ID());
+
         config.setChannels(channels);
 
         config.setReplicatorType(ReplicatorConfiguration.ReplicatorType.PUSH_AND_PULL);
