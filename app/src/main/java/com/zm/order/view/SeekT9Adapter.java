@@ -220,6 +220,9 @@ public class SeekT9Adapter extends BaseAdapter {
                                         activity.getGoodsList().get(i).setDishesCount(number);
                                         number = activity.getGoodsList().get(i).getDishesCount();
                                         activity.getGoodsList().get(i).setAllPrice(number * dishesC.getPrice());
+                                        if (activity.getGoodsList().get(i).getDishesCount() == 0.0){
+                                            activity.getGoodsList().remove(i);
+                                        }
                                         total = activity.getTotal();
                                         total -= 1 * dishesC.getPrice();
                                         activity.setTotal(total);
@@ -259,6 +262,8 @@ public class SeekT9Adapter extends BaseAdapter {
 
         mData.get(position).setDishesCount(mData.get(position).getDishesCount()+1);
         GoodsC goodsC = new GoodsC(myapp.getCompany_ID());
+        String gID = CDBHelper.createAndUpdate(activity.getApplicationContext(),goodsC);
+        goodsC.set_id(gID);
         viewHolder.viewShu.setText(mData.get(position).getDishesCount()+"");
         if (!viewHolder.viewShu.getText().toString().equals("0")){
             viewHolder.viewShu.setVisibility(View.VISIBLE);
@@ -286,10 +291,7 @@ public class SeekT9Adapter extends BaseAdapter {
                     goodsC.setDishesKindName(dishesKind.getKindName());
                     Log.e("dishesKindName",dishesKind.getKindName());
                 }
-
                 activity.getGoodsList().add(goodsC);
-
-                CDBHelper.createAndUpdate(activity.getApplicationContext(), goodsC);
                 //购物车计数器数据更新
                 point =  activity.getPoint();
                 point++;
@@ -356,7 +358,6 @@ public class SeekT9Adapter extends BaseAdapter {
                     goodsC.setDishesKindName(dishesKind.getKindName());
                     Log.e("dishesKindName",dishesKind.getKindName());
                     activity.getGoodsList().add(goodsC);
-                    CDBHelper.createAndUpdate(activity.getApplicationContext(), goodsC);
                     //购物车计数器数据更新
                     point =  activity.getPoint();
                     point++;

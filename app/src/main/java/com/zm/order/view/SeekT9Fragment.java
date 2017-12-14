@@ -193,6 +193,8 @@ public class SeekT9Fragment extends Fragment {
 
                 if (sum != 0) {//如果选择器的数量不为零，当前的选择的菜品加入订单列表
                     GoodsC goodsC = new GoodsC(myapp.getCompany_ID());
+                    String gID = CDBHelper.createAndUpdate(getActivity().getApplicationContext(),goodsC);
+                    goodsC.set_id(gID);
                     goodsC.setDishesName(name);
                     if (tasteList.size() == 0){
                         goodsC.setDishesTaste(null);
