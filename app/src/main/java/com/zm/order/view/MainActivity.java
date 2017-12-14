@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
         return seekT9Adapter;
     }
 
-    public void setOrderAdapter(OrderAdapter o){
+    public void setOrderAdapter(OrderAdapter o) {
         this.o = o;
 
     }
@@ -382,6 +382,7 @@ public class MainActivity extends AppCompatActivity {
 
         getGoodsList().clear();
         o.notifyDataSetChanged();
+        seekT9Adapter.notifyDataSetChanged();
     }
 
     private   String getOrderSerialNum()

@@ -49,11 +49,11 @@ public class SeekT9Adapter extends BaseAdapter {
     private boolean isName = false,isTaste = false;
     private int pos,p ;
     private DishesC dishesC;
-    private MyApplication myapp;
+    private MyApplication myapp ;
 
     public SeekT9Adapter(MainActivity context) {
         this.activity = context;
-        myapp = (MyApplication)this.activity.getApplication();
+        myapp = (MyApplication) activity.getApplication();
     }
 
     public void setListener(SeekT9OnClickListener listener) {
@@ -104,6 +104,7 @@ public class SeekT9Adapter extends BaseAdapter {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
+
         dishesC =  CDBHelper.getObjById(activity.getApplicationContext(),mData.get(position).getDishesId(),DishesC.class);
         viewHolder.itemSeekInfo.setText(dishesC.getDishesName());
         viewHolder.itemSeekTv.setText(dishesC.getPrice() + "");
@@ -140,7 +141,8 @@ public class SeekT9Adapter extends BaseAdapter {
         }
 
         final String str = viewHolder.viewShu.getText().toString();
-        if (str.equals("0")){
+        Log.e("viewShu",str);
+        if (str.equals("0.0")){
             viewHolder.viewShu.setVisibility(View.INVISIBLE);
             viewHolder.viewJian.setVisibility(View.INVISIBLE);
         }else {
@@ -253,20 +255,19 @@ public class SeekT9Adapter extends BaseAdapter {
 
 
 
-    private void setTJ(int position , SparseArray<Object> s,ViewHolder viewHolder)
-    {
-        GoodsC goodsC = new GoodsC(myapp.getCompany_ID());
-        mData.get(position).setDishesCount(mData.get(position).getDishesCount()+1);
+    private void setTJ(int position , SparseArray<Object> s,ViewHolder viewHolder){
 
+        mData.get(position).setDishesCount(mData.get(position).getDishesCount()+1);
+        GoodsC goodsC = new GoodsC(myapp.getCompany_ID());
         viewHolder.viewShu.setText(mData.get(position).getDishesCount()+"");
         if (!viewHolder.viewShu.getText().toString().equals("0")){
             viewHolder.viewShu.setVisibility(View.VISIBLE);
             viewHolder.viewJian.setVisibility(View.VISIBLE);
         }
         if (activity.getGoodsList().size() == 0 ){
+
             //如果选择器的数量不为零，当前的选择的菜品加入订单列表
-            if (mData.get(position).getDishesCount() > 0)
-            {
+            if (mData.get(position).getDishesCount() > 0) {
 
 
                 goodsC.setDishesName(dishesC.getDishesName());

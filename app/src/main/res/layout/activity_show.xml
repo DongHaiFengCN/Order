@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="8"
+        android:background="@color/colorPrimaryDark"
+        android:id="@+id/appBarLayout">
+        <ImageView
+            android:id="@+id/show_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:background="@drawable/animback"
+            android:layout_marginLeft="20dp"
+            />
+
+            <TextView
+                android:id="@+id/toolbar_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textColor="@color/textColor"
+                android:text="菜品详情"
+                android:gravity="center"
+                android:layout_centerInParent="true"
+                android:textSize="26sp" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_weight="8"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/show_tv_sl"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textSize="22sp"
+            android:textColor="@color/colorPrimary"
+            />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_weight="3"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_weight="9"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="菜品名称"
+                android:gravity="center"
+                android:textSize="22dp"
+                android:textColor="@color/md_black_1000"
+                />
+            <TextView
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="菜品单价"
+                android:gravity="center"
+                android:textSize="22dp"
+                android:textColor="@color/md_black_1000"
+                />
+            <TextView
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="菜品数量"
+                android:gravity="center"
+                android:textSize="22dp"
+                android:textColor="@color/md_black_1000"
+                />
+
+
+        </LinearLayout>
+
+        <ListView
+            android:layout_weight="1"
+            android:layout_marginTop="10dp"
+            android:id="@+id/show_listView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+        </ListView>
+    </LinearLayout>
+
+
+
+    <LinearLayout
+        android:layout_weight="8"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/show_but_dc"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="继续点餐"
+            />
+
+        <Button
+            android:id="@+id/show_but_md"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="买单"
+            />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -100,7 +100,7 @@ public class SeekT9Fragment extends Fragment {
 
         unbinder = ButterKnife.bind(this, view);
         mHandler = new Handler();
-        myapp = new MyApplication();
+        myapp = (MyApplication) getActivity().getApplication();
 
         initView();
         return view;
@@ -112,8 +112,9 @@ public class SeekT9Fragment extends Fragment {
 
         mlistSearchDishesObj = new ArrayList<>();
         myGoodsList = new ArrayList<>();
-
+        ((MainActivity) getActivity()).setT9Adapter(seekT9Adapter);
         activitySeekList.setAdapter(seekT9Adapter);
+
         seekT9Adapter.setListener(new SeekT9Adapter.SeekT9OnClickListener() {
             @Override
             public void OnClickListener(View view, String name, float price,int pos) {
@@ -142,6 +143,7 @@ public class SeekT9Fragment extends Fragment {
 
         final DishesC dishesC = CDBHelper.getObjById(getActivity().getApplicationContext(),myGoodsList.get(p).getDishesId(),DishesC.class);
         final AmountView amountView = view.findViewById(R.id.amount_view);
+        amountView.setNumber(myGoodsList.get(p).getDishesCount()+"");
         String all = MyBigDecimal.mul(amountView.getAmount()+"",price+"",2);
         price_tv.setText("总计 " + Float.parseFloat(all) + " 元");
         l[0] = Float.parseFloat(all);
@@ -188,28 +190,26 @@ public class SeekT9Fragment extends Fragment {
             public void onClick(DialogInterface dialogInterface, int i) {
                 mainActivity = (MainActivity) getActivity();
                 float sum = amountView.getAmount();
-                //如果选择器的数量不为零，当前的选择的菜品加入订单列表
-                if (sum != 0) {
 
+                if (sum != 0) {//如果选择器的数量不为零，当前的选择的菜品加入订单列表
                     GoodsC goodsC = new GoodsC(myapp.getCompany_ID());
                     goodsC.setDishesName(name);
-                    if (tasteList.size() == 0) {
+                    if (tasteList.size() == 0){
                         goodsC.setDishesTaste(null);
-                    } else {
+                    }else{
                         goodsC.setDishesTaste(tasteList.get(pos));
                     }
                     goodsC.setDishesCount(sum);
                     String all = MyBigDecimal.mul(sum+"",price+"",2);
                     goodsC.setAllPrice(Float.parseFloat(all));
                     goodsC.setDishesId(dishesC.get_id());
-                    if (dishesC.getDishesKindId()!=null) {
-                        DishesKindC dishesKindC = CDBHelper.getObjById(getActivity().getApplicationContext(), dishesC.getDishesKindId(), DishesKindC.class);
-                        goodsC.setDishesKindName(dishesKindC.getKindName());
-                        Log.e("dishesKindName", dishesKindC.getKindName());
+                    if ( dishesC.getDishesKindId() != null) {
+                        DishesKindC dishesKind = CDBHelper.getObjById(getActivity().getApplicationContext(), dishesC.getDishesKindId(), DishesKindC.class);
+                        goodsC.setDishesKindName(dishesKind.getKindName());
                     }
-                    mainActivity.getGoodsList().add(goodsC);
+                    ((MainActivity)getActivity()).getGoodsList().add(goodsC);
                     //购物车计数器数据更新
-                    point = (((MainActivity) getActivity()).getPoint());
+                    point =  (((MainActivity) getActivity()).getPoint());
                     point++;
                     ((MainActivity) getActivity()).setPoint(point);
 
@@ -219,12 +219,13 @@ public class SeekT9Fragment extends Fragment {
                     ((MainActivity) getActivity()).setTotal(total);
 
                     //刷新订单数据源
-                    ((MainActivity) getActivity()).getSeekT9Adapter().notifyDataSetChanged();
+                    //o.notifyDataSetChanged();
 
                 } else {
 
                     Toast.makeText(getActivity(), "没有选择商品数量！", Toast.LENGTH_SHORT).show();
                 }
+
             }
         });
         builder.show();
