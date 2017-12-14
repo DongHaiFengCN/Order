@@ -3,6 +3,7 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:id="@+id/item_show_lin"
     >
 
     <TextView
@@ -12,7 +13,7 @@
         android:layout_height="50dp"
         android:text="菜品名称"
         android:gravity="center"
-        android:textSize="18dp"
+        android:textSize="15dp"
         />
     <TextView
         android:id="@+id/item_show_dj"
@@ -21,7 +22,7 @@
         android:layout_height="50dp"
         android:text="菜品单价"
         android:gravity="center"
-        android:textSize="18dp"
+        android:textSize="15dp"
         />
     <TextView
         android:id="@+id/item_show_sl"
@@ -30,7 +31,14 @@
         android:layout_height="50dp"
         android:text="菜品数量"
         android:gravity="center"
-        android:textSize="18dp"
+        android:textSize="15dp"
+        />
+
+    <ImageView
+        android:id="@+id/item_show_img"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1.3"
         />
 
 

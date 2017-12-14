@@ -98,6 +98,8 @@ public class MainActivity extends AppCompatActivity {
         });
         myApp = (MyApplication) getApplication();
         orderC = new OrderC(myApp.getCompany_ID());
+        String oId = CDBHelper.createAndUpdate(getApplicationContext(),orderC);
+        orderC.set_id(oId);
         mHandler = new Handler();
 
         initView();
@@ -337,6 +339,7 @@ public class MainActivity extends AppCompatActivity {
 
                             Intent intent = new Intent(MainActivity.this, PayActivity.class);
                             startActivityForResult(intent,1);
+                            finish();
                             dialog.dismiss();
                         }
                     });
@@ -458,9 +461,13 @@ public class MainActivity extends AppCompatActivity {
                             orderC.setOrderNum(1);
                             orderC.setSerialNum(getOrderSerialNum());
                         }
+                        Log.e("goodsList","goodsList---"+goodsList.size());
 
-
-
+                        for(GoodsC obj:goodsList)
+                        {
+                            obj.setOrder(orderC.get_id());
+                            CDBHelper.createAndUpdate(getApplicationContext(),obj);
+                        }
                         orderC.setGoodsList(goodsList);
                         orderC.setAllPrice(total);
                         orderC.setOrderState(1);
@@ -478,6 +485,11 @@ public class MainActivity extends AppCompatActivity {
                         {
 
                             OrderC orderC =  CDBHelper.getObjById(getApplicationContext(),id,OrderC.class);
+                            for(GoodsC obj:goodsList)
+                            {
+                                obj.setOrder(orderC.get_id());
+                                CDBHelper.createAndUpdate(getApplicationContext(),obj);
+                            }
                             orderC.setGoodsList(goodsList);
                             orderC.setAllPrice(total);
                             CDBHelper.createAndUpdate(getApplicationContext(),orderC);

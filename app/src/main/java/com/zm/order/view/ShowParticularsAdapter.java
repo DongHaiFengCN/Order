@@ -5,6 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.zm.order.R;
@@ -21,6 +23,11 @@ public class ShowParticularsAdapter extends BaseAdapter {
 
     private Activity activity;
     private List<GoodsC> goodsCs;
+    private OnLinClickListener linClickListener;
+
+    public void setLinClickListener(OnLinClickListener linClickListener){
+        this.linClickListener = linClickListener;
+    }
 
     public ShowParticularsAdapter(Activity activity){
         this.activity = activity;
@@ -46,7 +53,7 @@ public class ShowParticularsAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder viewHolder;
+        final ViewHolder viewHolder;
         if (convertView == null){
             convertView = LayoutInflater.from(activity).inflate(R.layout.item_show_particulars,null);
             viewHolder = new ViewHolder();
@@ -57,15 +64,32 @@ public class ShowParticularsAdapter extends BaseAdapter {
         viewHolder.dj = convertView.findViewById(R.id.item_show_dj);
         viewHolder.mc = convertView.findViewById(R.id.item_show_mc);
         viewHolder.sl = convertView.findViewById(R.id.item_show_sl);
+        viewHolder.item_show_lin = convertView.findViewById(R.id.item_show_lin);
+        viewHolder.item_show_img = convertView.findViewById(R.id.item_show_img);
 
         viewHolder.dj.setText(goodsCs.get(position).getAllPrice()+"");
         viewHolder.mc.setText(goodsCs.get(position).getDishesName());
         viewHolder.sl.setText(goodsCs.get(position).getDishesCount()+"");
+        viewHolder.item_show_img.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //linClickListener.getLinClick(viewHolder.item_show_img);
+
+
+            }
+        });
+
         return convertView;
     }
 
     class ViewHolder{
         private TextView mc,dj,sl;
+        private LinearLayout item_show_lin;
+        private ImageView item_show_img;
 
+    }
+
+    interface OnLinClickListener{
+        void getLinClick(ImageView imageView);
     }
 }

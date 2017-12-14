@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 
 import application.MyApplication;
+import bean.kitchenmanage.order.OrderC;
 
 public class CDBHelper
 {
@@ -642,7 +643,9 @@ public class CDBHelper
   }
 
 
-  private static class SingletonHolder
+
+
+    private static class SingletonHolder
   {
     private final static CDBHelper single=new CDBHelper();
   }
