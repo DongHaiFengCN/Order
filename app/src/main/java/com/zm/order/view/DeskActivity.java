@@ -221,6 +221,7 @@ public class DeskActivity extends AppCompatActivity {
 
                                 //设置全局Table
                                 myapp.setTable_sel_obj(tableC);
+                                CDBHelper.createAndUpdate(getApplicationContext(),tableC);
 
                                 alertDialog.dismiss();
 

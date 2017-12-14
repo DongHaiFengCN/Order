@@ -57,11 +57,11 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
     private static final String TAG = Application.class.getSimpleName();
 
     private final static boolean SYNC_ENABLED = true;
-    private final static String DATABASE_NAME = "GYSZDB008";
+    private final static String DATABASE_NAME = "GYSZDB019";
     private String Company_ID="gysz";
 
-  //  private final static String SYNCGATEWAY_URL = "blip://123.207.174.171:4984/kitchen/";
-    private final static String SYNCGATEWAY_URL = "blip://60.217.194.246:4984/kitchen/";
+   private final static String SYNCGATEWAY_URL = "blip://123.207.174.171:4984/kitchen/";
+   // private final static String SYNCGATEWAY_URL = "blip://60.217.194.246:4984/kitchen/";
     private Database database = null;
     private Replicator replicator;
     //private String Company_ID="zmsy010";
