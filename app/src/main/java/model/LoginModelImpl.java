@@ -19,7 +19,8 @@ public class LoginModelImpl implements ILoginModel{
 
     String info[];
 
-    public LoginModelImpl(){
+    public LoginModelImpl()
+    {
 
     }
 

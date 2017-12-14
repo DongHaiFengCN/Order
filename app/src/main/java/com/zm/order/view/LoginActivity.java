@@ -49,7 +49,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
     private CheckBox saveloginstatueChk;
     private  MyApplication myApplication;
 
-    private String userNumber;
+    private String userNumber,userPsw;
     private InputMethodManager inputMethodManager;
     private Intent intent;
     private List<UsersC> usersCList;
@@ -84,14 +84,14 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
         MyLog.e("删除后长度 "+list1.size());*/
 
 
-
-
         inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         intent = new Intent(this,DeskActivity.class);
         usersCList = CDBHelper.getObjByWhere(getApplicationContext(),
                 Expression.property("className")
                         .equalTo("UsersC"),null, UsersC.class);
-        for (int i = 0; i<usersCList.size();i++){
+
+        for (int i = 0; i<usersCList.size();i++)
+        {
             Log.e("Login",usersCList.get(i).getUserName().toString()+"null");
         }
          myApplication = (MyApplication) getApplication();
@@ -99,21 +99,29 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
 
           //查看是否有缓存
 
-         String name = myApplication.getSharePreferences().getString("name","");
+        userNumber = myApplication.getSharePreferences().getString("name","");
+        userPsw = myApplication.getSharePreferences().getString("password","");
 
-          MyLog.e(name);
 
           //无缓存
-           if("".equals(name)){
+           if("".equals(userNumber)){
 
                 initView();
 
            }else {
 
                //有缓存
-               userNumber = name;
 
-               this.success();
+
+               initView();
+               name.setText(userNumber);
+               password.setText(userPsw);
+
+
+
+               Log.e("login","num="+userNumber+"_psw="+userPsw);
+
+              // this.success();
            }
 
 
@@ -216,10 +224,13 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
     }
 
     @Override
-    public void success() {
+    public void success()
+    {
 
-        for(UsersC u : usersCList){
-            if(u.getUserName().equals(userNumber)){
+        for(UsersC u : usersCList)
+        {
+            if(u.getUserName().equals(userNumber))
+            {
                 myApplication.setUsersC(u);
                 break;
             }
