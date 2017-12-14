@@ -265,6 +265,7 @@ public class DeskActivity extends AppCompatActivity {
                                 .and(Expression.property("orderState").equalTo(1))
                         ,null
                         ,OrderC.class);
+                Log.e("orderCList","orderCList.size()"+orderCList.size());
 
                 if(orderCList.size()>0)//有未买单订单，可以买单
                 {

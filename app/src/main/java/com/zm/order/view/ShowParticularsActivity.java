@@ -113,7 +113,13 @@ public class ShowParticularsActivity extends Activity {
                             Log.e("orderC.getGoodsList()",orderC.getGoodsList().size()+"");
                         }
                         //4\
-                        CDBHelper.createAndUpdate(getApplicationContext(),orderC);
+
+                        if (orderC.getGoodsList().size() == 0){
+                            CDBHelper.deleDocumentById(getApplicationContext(),orderC.get_id());
+                        }else{
+                            CDBHelper.createAndUpdate(getApplicationContext(),orderC);
+                        }
+
                         CDBHelper.deleDocumentById(getApplicationContext(),goodsC.get_id());
                         //5\
 
