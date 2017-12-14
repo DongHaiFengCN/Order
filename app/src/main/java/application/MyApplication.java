@@ -57,7 +57,7 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
     private static final String TAG = Application.class.getSimpleName();
 
     private final static boolean SYNC_ENABLED = true;
-    private final static String DATABASE_NAME = "GYSZDB008";
+    private final static String DATABASE_NAME = "GYSZDB011";
     private String Company_ID="gysz";
 
   //  private final static String SYNCGATEWAY_URL = "blip://123.207.174.171:4984/kitchen/";
@@ -115,8 +115,8 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 
     private void openDatabase(String dbname) {
         DatabaseConfiguration config = new DatabaseConfiguration(getApplicationContext());
-        File folder = new File(String.format("%s/SmartKitchenPad", Environment.getExternalStorageDirectory()));
-        config.setDirectory(folder);
+        //File folder = new File(String.format("%s/SmartKitchenPad", Environment.getExternalStorageDirectory()));
+       // config.setDirectory(folder);
        config.setConflictResolver(getConflictResolver());
         try {
             database = new Database(dbname, config);

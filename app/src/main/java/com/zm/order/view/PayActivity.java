@@ -1408,7 +1408,7 @@ public class PayActivity extends AppCompatActivity {
 
 
                 //跳转主界面
-
+                turnDesk();
 
             }
         });
