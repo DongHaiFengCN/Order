@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TimerTask;
 
+import application.MyApplication;
 import bean.kitchenmanage.dishes.DishesKindC;
 import bean.kitchenmanage.order.GoodsC;
 import butterknife.BindView;
@@ -61,11 +62,13 @@ public class OrderFragment extends Fragment implements IMainView {
     List<Object> DishesIdList;
     private List<String> dishesIdList;
     private int pos;
+    private MyApplication myapp;
     @Override
     public View onCreateView(LayoutInflater inflater,  ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.frame_order,null);
         ButterKnife.bind(this, view);
         //initData();
+        myapp = (MyApplication)getActivity().getApplication();
         initView();
         IMainPresenter iMainView = new MainPresenterImpl(this);
         iMainView.init();
@@ -244,7 +247,7 @@ public class OrderFragment extends Fragment implements IMainView {
                 float sum = amountView.getAmount();
 
                 if (sum != 0) {//如果选择器的数量不为零，当前的选择的菜品加入订单列表
-                    GoodsC goodsC = new GoodsC();
+                    GoodsC goodsC = new GoodsC(myapp.getCompany_ID());
                     goodsC.setDishesName(name);
                     if (tasteList.size() == 0){
                         goodsC.setDishesTaste(null);
