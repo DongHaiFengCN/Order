@@ -23,6 +23,7 @@ public class ScanActivity extends AppCompatActivity {
         //重要代码，初始化捕获
         captureManager = new CaptureManager(this,mDBV);
         captureManager.initializeFromIntent(getIntent(),savedInstanceState);
+
         captureManager.decode();
     }
 

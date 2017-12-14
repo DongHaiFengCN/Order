@@ -16,6 +16,7 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -23,18 +24,22 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.couchbase.lite.Database;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
 import com.couchbase.lite.Ordering;
 import com.couchbase.lite.Query;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.zm.order.R;
 
 import java.util.List;
 
 import application.MyApplication;
 import bean.kitchenmanage.order.OrderC;
+import bean.kitchenmanage.qrcode.qrcodeC;
 import bean.kitchenmanage.table.AreaC;
 import bean.kitchenmanage.table.TableC;
 import model.AreaAdapter;
@@ -50,6 +55,8 @@ public class DeskActivity extends AppCompatActivity {
     private AreaAdapter areaAdapter;
     private RecyclerView listViewDesk;
     private LiveTableRecyclerAdapter tableadapter;
+
+    private int flag = 0;
 
 
     private MyApplication myapp;
@@ -76,9 +83,6 @@ public class DeskActivity extends AppCompatActivity {
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_desk);
-
-
-
 
 
 
@@ -329,14 +333,105 @@ public class DeskActivity extends AppCompatActivity {
         mainIntent.setClass(DeskActivity.this, MainActivity.class);
         startActivity(mainIntent);
     }
-
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_desk, menu);
+        return true;
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 this.finish(); // back button
-                return true;
+                break;
+            case R.id.action_alipay:
+
+                //Toast.makeText(DeskActivity.this,"alipay",Toast.LENGTH_LONG).show();
+
+                flag = 1;
+                turnScan();
+
+
+                break;
+            case R.id.action_wechat:
+
+                flag = 2;
+                turnScan();
+               // Toast.makeText(DeskActivity.this,"wechat",Toast.LENGTH_LONG).show();
+                break;
+                default:
+                    break;
         }
-        return super.onOptionsItemSelected(item);
+        return true;
+    }
+
+
+    private void turnScan() {
+
+        IntentIntegrator intentIntegrator =  new IntentIntegrator(this);
+
+        intentIntegrator.setOrientationLocked(false);
+        intentIntegrator.setPrompt("请扫描二维码");
+        intentIntegrator.setCaptureActivity(ScanActivity.class); // 设置自定义的activity是ScanActivity
+        intentIntegrator.initiateScan(); // 初始化扫描
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        // 获取解析结果
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        List<qrcodeC> qrcodeCS = CDBHelper.getObjByClass(getApplicationContext(),qrcodeC.class);
+
+
+        if (result != null) {
+
+            String authCode = result.getContents();
+
+            //修改二维码
+            if(qrcodeCS.size()>0){
+
+
+                //支付宝
+                if(flag == 1){
+
+
+                    qrcodeCS.get(0).setZfbUrl(authCode);
+
+
+                }else if(flag == 2){ //微信
+
+                    qrcodeCS.get(0).setWxUrl(authCode);
+                }
+
+                CDBHelper.createAndUpdate(getApplicationContext(),qrcodeCS.get(0));
+
+
+            }else if(qrcodeCS.isEmpty()){//添加二维码
+
+                qrcodeC qrcodeCS1 = new qrcodeC();
+                qrcodeCS1.setChannelId(myapp.getCompany_ID());
+                qrcodeCS1.setClassName("qrcodeC");
+
+                //支付宝
+                if(flag == 1){
+
+                    qrcodeCS1.setZfbUrl(authCode);
+
+
+                }else if(flag == 2){ //微信
+
+                    qrcodeCS1.setWxUrl(authCode);
+
+                }
+                CDBHelper.createAndUpdate(getApplicationContext(),qrcodeCS1);
+
+            }
+
+        }else {
+
+            Toast.makeText(DeskActivity.this,"扫描失败请重试！",Toast.LENGTH_LONG).show();
+        }
+
     }
 }
