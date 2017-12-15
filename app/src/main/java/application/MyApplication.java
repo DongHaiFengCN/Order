@@ -58,13 +58,15 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 
     private final static boolean SYNC_ENABLED = true;
     private final static String DATABASE_NAME = "GYSZDB019";
+
+
+    private final static String SYNCGATEWAY_URL = "blip://60.217.194.246:4984/kitchen/";
+    //private final static String SYNCGATEWAY_URL = "blip://123.207.174.171:4984/kitchen/";
     private String Company_ID="gysz";
 
-   private final static String SYNCGATEWAY_URL = "blip://123.207.174.171:4984/kitchen/";
-   // private final static String SYNCGATEWAY_URL = "blip://60.217.194.246:4984/kitchen/";
     private Database database = null;
     private Replicator replicator;
-    //private String Company_ID="zmsy010";
+
 
     private TableC table_sel_obj;
 
@@ -106,7 +108,7 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 
     private void startSession(String username, String password) {
         openDatabase(username);
-        startReplication(username, password);
+       // startReplication(username, password);
     }
 
     // -------------------------
@@ -115,8 +117,8 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 
     private void openDatabase(String dbname) {
         DatabaseConfiguration config = new DatabaseConfiguration(getApplicationContext());
-        File folder = new File(String.format("%s/SmartKitchenPad", Environment.getExternalStorageDirectory()));
-        config.setDirectory(folder);
+        //File folder = new File(String.format("%s/SmartKitchenPad", Environment.getExternalStorageDirectory()));
+        //config.setDirectory(folder);
        config.setConflictResolver(getConflictResolver());
         try {
             database = new Database(dbname, config);

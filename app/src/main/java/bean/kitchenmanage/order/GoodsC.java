@@ -62,6 +62,13 @@ public class GoodsC {
 	 */
 	private String createdTime;
 
+	/**
+	 *退菜标识 0.未退  1.退
+	 */
+	private int retreatGreens;
+
+
+
 	public GoodsC() {
 	}
 
@@ -173,5 +180,13 @@ public class GoodsC {
 
 	public void setIsWaitCall(int isWaitCall) {
 		this.isWaitCall = isWaitCall;
+	}
+
+	public int getRetreatGreens() {
+		return retreatGreens;
+	}
+
+	public void setRetreatGreens(int retreatGreens) {
+		this.retreatGreens = retreatGreens;
 	}
 }

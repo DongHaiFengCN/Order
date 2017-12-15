@@ -2,9 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Order.iml" filepath="$PROJECT_DIR$/Order.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/Order.iml" filepath="$PROJECT_DIR$/.idea/Order.iml" />
-      <module fileurl="file://C:\android-architecture-todo-mvp\OrderTest\Order\Order.iml" filepath="C:\android-architecture-todo-mvp\OrderTest\Order\Order.iml" />
-      <module fileurl="file://C:\android-architecture-todo-mvp\OrderTest\Order\OrderPda.iml" filepath="C:\android-architecture-todo-mvp\OrderTest\Order\OrderPda.iml" />
+      <module fileurl="file://C:/android-architecture-todo-mvp/OrderTest/Order/Order.iml" filepath="C:/android-architecture-todo-mvp/OrderTest/Order/Order.iml" />
+      <module fileurl="file://$PROJECT_DIR$/OrderPda.iml" filepath="$PROJECT_DIR$/OrderPda.iml" />
+      <module fileurl="file://C:/android-architecture-todo-mvp/OrderTest/Order/OrderPda.iml" filepath="C:/android-architecture-todo-mvp/OrderTest/Order/OrderPda.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
