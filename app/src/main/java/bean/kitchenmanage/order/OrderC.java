@@ -1,6 +1,7 @@
 package bean.kitchenmanage.order;
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,9 +13,9 @@ import bean.kitchenmanage.user.UsersC;
  * @Description: 订单类
  * @author loongsun
  * @date 2014-7-28 下午11:44:16
- * 
+ *
  */
-public class OrderC {
+public class OrderC implements Serializable{
     //1、
 	/**
 	 * 公司唯一身份id,用于数据同步,做为唯一管道符
@@ -29,23 +30,19 @@ public class OrderC {
 	 */
 	private String _id;
 
-
-
 	//2、
 	/**
-	 * 订单号，生成规则 datetime+桌位号
+	 * 订单号，生成规则 datetime+桌位号  //
 	 */
 	private String orderID;
 	/**
 	 * 订单序号，只做同桌多次点餐时使用,第一次下单为序号为1，第二次下单序号为2
 	 */
 	private int orderNum;
-
 	/**
 	 * 每天的流水号，从001开始，按序向后排。按营业时间重新产生序号。
 	 */
 	private String serialNum;
-
 
 	/**
 	 *打印标志flag为0,未打印，1，代表本地打印完毕,2,代表厨房打印机打印，3，代表两者都已打印
@@ -78,6 +75,13 @@ public class OrderC {
 
 	//3、
 	private List<GoodsC> goodsList;
+
+	/**
+	 *  退菜
+	 */
+
+	private List<GoodsC> otherGoodsList;
+
 	/**
 	 *点餐员姓名
 	 */
@@ -106,22 +110,17 @@ public class OrderC {
 	 * 预定者信息
 	 */
 	private String reserverId;
+
 	/**
 	 *0,前台主程序所下订单;1、点餐宝所下订单;2、手机所下订单
 	 */
 	private int orderType;
 
-	public int getOrderType() {
-		return orderType;
-	}
-
-	public void setOrderType(int orderType) {
-		this.orderType = orderType;
-	}
 
 	public OrderC()
 	{
 	}
+
 	public OrderC(String company_id) {
 		this.channelId = company_id;
 		this.className="OrderC";
@@ -311,5 +310,27 @@ public class OrderC {
 
 	public void setReserverId(String reserverId) {
 		this.reserverId = reserverId;
+	}
+
+	public int getOrderType() {
+		return orderType;
+	}
+
+	public void setOrderType(int orderType) {
+		this.orderType = orderType;
+	}
+
+	public List<GoodsC> getOtherGoodsList() {
+		return otherGoodsList;
+	}
+
+	public void setOtherGoodsList(List<GoodsC> otherGoodsList) {
+		this.otherGoodsList = otherGoodsList;
+	}
+	public void addOtherGoods(GoodsC obj)
+	{
+		if(otherGoodsList==null)
+			otherGoodsList = new ArrayList<>();
+		otherGoodsList.add(obj);
 	}
 }
