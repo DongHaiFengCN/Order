@@ -8,9 +8,12 @@ import android.widget.TextView;
 import com.couchbase.lite.Expression;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import bean.kitchenmanage.order.OrderNum;
 import bean.kitchenmanage.promotion.PromotionRuleC;
@@ -143,6 +146,52 @@ public class Tool {
     }
 
 
+    /**
+     * 返回最近的一次时间
+     * @param s
+     * @return
+     */
 
+    public static String getLastCheckOrder(List<String> s){
+
+        String MARK = "";
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",
+                Locale.CHINA);
+
+        //date集合
+
+        List<Date> list = new ArrayList<>();
+
+        //返回date集合
+
+        for(int i = 0; i < s.size(); i++ ){
+
+
+            Date d1 = null;
+            try {
+                d1 = simpleDateFormat.parse(s.get(i));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            list.add(d1);
+
+
+
+        }
+
+        Date d = list.get(0);  //0为第一个数组下标
+        for(int j = 1 ; j < list.size() ; j++){
+
+            d=(list.get(j).getTime() < d.getTime()?d:list.get(j));
+
+
+        }
+
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        return formatter.format(d);
+    }
 
 }
