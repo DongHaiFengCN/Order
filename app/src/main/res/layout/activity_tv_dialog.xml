@@ -21,6 +21,39 @@
             android:paddingLeft="20sp"
             />
     </LinearLayout>
+
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/dialog_tuicai"
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="退菜"
+            android:textColor="@color/md_black_1000"
+            android:textSize="20sp"
+            android:background="@null"
+
+            />
+
+        <Button
+            android:id="@+id/dialog_zc"
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="赠菜"
+            android:textColor="@color/md_black_1000"
+            android:textSize="20sp"
+            android:background="@null"
+            />
+
+
+
+    </LinearLayout>
+
     <View
         android:layout_marginTop="20sp"
         android:layout_width="match_parent"
