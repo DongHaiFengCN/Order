@@ -63,9 +63,9 @@ public class GoodsC {
 	private String createdTime;
 
 	/**
-	 *退菜标识 0.未退  1.退
+	 *退菜标识 0.正常  1.退菜 2.赠菜 3.自定义菜
 	 */
-	private int retreatGreens;
+	private int goodsType;
 
 
 
@@ -182,11 +182,11 @@ public class GoodsC {
 		this.isWaitCall = isWaitCall;
 	}
 
-	public int getRetreatGreens() {
-		return retreatGreens;
+	public int getGoodsType() {
+		return goodsType;
 	}
 
-	public void setRetreatGreens(int retreatGreens) {
-		this.retreatGreens = retreatGreens;
+	public void setGoodsType(int goodsType) {
+		this.goodsType = goodsType;
 	}
 }
