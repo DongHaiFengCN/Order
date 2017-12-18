@@ -2,9 +2,11 @@ package com.zm.order.view;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.method.DigitsKeyListener;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,9 +14,11 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.couchbase.lite.Expression;
 import com.zm.order.R;
@@ -25,9 +29,11 @@ import java.util.Date;
 import java.util.List;
 
 import application.MyApplication;
+import bean.kitchenmanage.dishes.DishesC;
+import bean.kitchenmanage.dishes.DishesKindC;
 import bean.kitchenmanage.order.GoodsC;
 import bean.kitchenmanage.order.OrderC;
-import bean.kitchenmanage.order.ReturnOrderC;
+import bean.kitchenmanage.order.RetreatOrderC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -72,78 +78,118 @@ public class ShowParticularsActivity extends Activity {
         adatper.setLinClickListener(new ShowParticularsAdapter.OnLinClickListener() {
             @Override
             public void getLinClick(ImageView imageView) {
-                //getShowImg = imageView;
+                getShowImg = imageView;
             }
         });
-
         showListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                AlertDialog.Builder alertDialog = new AlertDialog.Builder(ShowParticularsActivity.this);
+                final AlertDialog.Builder alertDialog = new AlertDialog.Builder(ShowParticularsActivity.this);
                 View view1 = LayoutInflater.from(ShowParticularsActivity.this).inflate(R.layout.activity_tv_dialog,null);
                 alertDialog.setView(view1);
                 TextView title = view1.findViewById(R.id.dialog_tuicai_title);
-                title.setText("是否退菜");
+                title.setText("请选择退菜或赠菜");
                 final AlertDialog builder = alertDialog.create();
+
+                Button tui = view1.findViewById(R.id.dialog_tuicai);
+                tui.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        builder.dismiss();
+                        AlertDialog.Builder builder = new AlertDialog.Builder(ShowParticularsActivity.this);
+                        final EditText editText = new EditText(ShowParticularsActivity.this);
+                        editText.setText(goodsCList.get(position).getDishesCount()+"");
+                        editText.setKeyListener(new DigitsKeyListener(false,true));
+                        builder.setTitle("请输入退菜数量")
+                                .setView(editText)
+                                .setCancelable(false)
+                                .setPositiveButton("是", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        //1\
+                                        GoodsC goodsC = goodsCList.get(position);
+                                        //2\
+                                        OrderC orderC = CDBHelper.getObjById(getApplicationContext(),goodsC.getOrder(),OrderC.class);
+                                        //3\
+                                        //打印goodslist
+                                        {
+                                            Log.e("orderC.getGoodsList()",orderC.getGoodsList().size()+"");
+                                        }
+
+                                        for (int i = 0;i<orderC.getGoodsList().size();i++){
+
+                                            float sl = MyBigDecimal.sub(goodsCList.get(position).getDishesCount(),Float.parseFloat(editText.getText().toString()),1);
+                                            if (sl > -1){
+
+
+                                                if (sl == 0.0){
+                                                    orderC.getGoodsList().get(i).setGoodsType(1);
+                                                    DishesC dishesC = CDBHelper.getObjById(getApplicationContext(),orderC.getGoodsList().get(i).getDishesId(),DishesC.class);
+                                                    dishesC.setDishesName(dishesC.getDishesName()+"(退)");
+                                                    float all = MyBigDecimal.sub(orderC.getAllPrice(),orderC.getGoodsList().get(i).getAllPrice(),1);
+                                                    orderC.setAllPrice(all);
+                                                    orderC.getGoodsList().get(i).setAllPrice(0);
+                                                    orderC.getGoodsList().get(i).setDishesCount(0);
+
+                                                }else{
+
+                                                    DishesC dishesC = CDBHelper.getObjById(getApplicationContext(),orderC.getGoodsList().get(i).getDishesId(),DishesC.class);
+                                                    float allPrice = MyBigDecimal.mul(dishesC.getPrice(),sl,1);
+                                                    orderC.getGoodsList().get(i).setAllPrice(allPrice);
+                                                    float allPrice1 = MyBigDecimal.mul(dishesC.getPrice(),Float.parseFloat(editText.getText().toString()),1);
+                                                    orderC.getGoodsList().get(i).setDishesCount(sl);
+                                                    orderC.setAllPrice(MyBigDecimal.sub(orderC.getAllPrice(),allPrice1,1));
+                                                }
+
+                                            }else{
+                                                Toast.makeText(ShowParticularsActivity.this,"你输入的数量大于你点的数量，请重新输入！",Toast.LENGTH_LONG).show();
+                                            }
+
+                                        }
+
+                                        //打印goodslist
+                                        {
+                                            Log.e("orderC.getGoodsList()",orderC.getGoodsList().size()+"");
+                                        }
+                                        //4\保存orderC
+
+                                        CDBHelper.createAndUpdate(getApplicationContext(),orderC);
+                                        //5\ 创建退菜记录
+                                        RetreatOrderC retreatOrderC = new RetreatOrderC(myapp.getCompany_ID());
+                                        retreatOrderC.setState(0);
+                                        retreatOrderC.setOrderCId(orderC.get_id());
+                                        //6
+
+                                        //goodsCList.remove(position);
+                                        setAll();
+                                        adatper.notifyDataSetChanged();
+                                        dialog.dismiss();
+                                    }
+                                });
+                        builder.setNegativeButton("否", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                        builder.create().show();
+                    }
+                });
+
+                Button zc = view1.findViewById(R.id.dialog_zc);
+                zc.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        builder.dismiss();
+
+                    }
+                });
+
                 Button shi = view1.findViewById(R.id.dialog_tuicai_qd);
                 shi.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        //1\
-                        GoodsC goodsC = goodsCList.get(position);
-                        //2\
-                        OrderC orderC = CDBHelper.getObjById(getApplicationContext(),goodsC.getOrder(),OrderC.class);
-                        //3\
-                        //打印goodslist
-                        {
-                            Log.e("orderC.getGoodsList()",orderC.getGoodsList().size()+"");
-                        }
-                        for (int i = 0;i<orderC.getGoodsList().size();i++){
 
-                            orderC.getGoodsList().get(i).setRetreatGreens(1);
-
-                            if (orderC.getGoodsList().get(i).getRetreatGreens() == 1){
-                                float all = MyBigDecimal.sub(orderC.getAllPrice(),orderC.getGoodsList().get(i).getAllPrice(),1);
-                                orderC.setAllPrice(all);
-                            }
-
-                        }
-
-
-                        //打印goodslist
-                        {
-                            Log.e("orderC.getGoodsList()",orderC.getGoodsList().size()+"");
-                        }
-                        //4\
-
-                        if (orderC.getGoodsList().size() == 0){
-                            CDBHelper.deleDocumentById(getApplicationContext(),orderC.get_id());
-                        }else{
-                            CDBHelper.createAndUpdate(getApplicationContext(),orderC);
-                        }
-
-                        CDBHelper.deleDocumentById(getApplicationContext(),goodsC.get_id());
-                        //5\
-
-                        ReturnOrderC returnOrderC = new ReturnOrderC(myapp.getCompany_ID());
-                        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        String strtime = df.format(new Date());
-                        returnOrderC.setCheckTime(strtime);
-                        returnOrderC.addGoods(goodsC);
-                        returnOrderC.setTableNo(myapp.getTable_sel_obj().getTableNum());
-                        returnOrderC.setTableName(myapp.getTable_sel_obj().getTableName());
-                        returnOrderC.setOperator(myapp.getUsersC());
-                        returnOrderC.setPay(goodsCList.get(position).getAllPrice());
-                        CDBHelper.createAndUpdate(getApplicationContext(),returnOrderC);
-                        //6
-
-                        if (getShowImg != null){
-                            getShowImg.setBackgroundResource(R.mipmap.icon_show_tui);
-                        }
-
-                        //goodsCList.remove(position);
-                        setAll();
-                        adatper.notifyDataSetChanged();
                         builder.dismiss();
                     }
                 });
@@ -175,6 +221,7 @@ public class ShowParticularsActivity extends Activity {
             for (int i = 0; i < orderC.getGoodsList().size(); i++) {
                 goodsCList.add(orderC.getGoodsList().get(i));
             }
+
             all += orderC.getAllPrice();
         }
         showTvSl.setText("共：" + goodsCList.size() + "道菜，总价："+all+"元");
