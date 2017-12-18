@@ -257,8 +257,20 @@ public class DeskActivity extends AppCompatActivity {
                 String tableId = (String)data;
                 final TableC tableC=CDBHelper.getObjById(getApplicationContext(),tableId,TableC.class);
                 myapp.setTable_sel_obj(tableC);
-                if(tableC.getState()==0)//空闲不用弹出消台框
-                    return;
+
+                //空闲状态下重置上一次未买单状态
+                if(tableC.getState()==0){
+
+
+                    Toast.makeText(DeskActivity.this,"~~~",Toast.LENGTH_LONG).show();
+
+
+
+
+
+
+                }
+
 
                 List<OrderC> orderCList= CDBHelper.getObjByWhere(getApplicationContext(),
                         Expression.property("className").equalTo("OrderC")
