@@ -888,7 +888,7 @@ public class PayActivity extends AppCompatActivity {
     }
 
 
-    @OnClick({R.id.associator, R.id.discount, R.id.action, R.id.ivalipay, R.id.ivwechat, R.id.cash})
+    @OnClick({R.id.associator, R.id.discount, R.id.action, R.id.ivalipay, R.id.ivwechat, R.id.cash,R.id.bankcard})
     public void onClick(View view) {
         switch (view.getId()) {
 
@@ -997,7 +997,7 @@ public class PayActivity extends AppCompatActivity {
                 //现金支付
 
                 AlertDialog.Builder cashDialog = new AlertDialog.Builder(PayActivity.this);
-
+                cashDialog.setTitle("现金支付");
                 cashDialog.setPositiveButton("取消", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -1024,6 +1024,43 @@ public class PayActivity extends AppCompatActivity {
                 cashDialog.show();
 
                 break;
+
+
+            case R.id.bankcard:
+
+                //现金支付
+
+                AlertDialog.Builder bankDialog = new AlertDialog.Builder(PayActivity.this);
+                bankDialog.setTitle("银行卡支付");
+
+                bankDialog.setPositiveButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+                bankDialog.setNegativeButton("确定支付", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+
+                        setPayDetail(2, total);
+
+                        try {
+                            submitCheckOrder();
+                        } catch (CouchbaseLiteException e) {
+                            e.printStackTrace();
+                        }
+
+
+                    }
+                });
+
+                bankDialog.show();
+
+
+                break;
+
             default:
                 break;
         }
@@ -1408,7 +1445,7 @@ public class PayActivity extends AppCompatActivity {
 
 
                 //跳转主界面
-
+                turnDesk();
 
             }
         });
