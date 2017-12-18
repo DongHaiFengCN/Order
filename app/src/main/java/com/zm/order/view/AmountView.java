@@ -35,7 +35,7 @@ public class AmountView extends LinearLayout implements View.OnClickListener {
     }
 
     private float amount = 1; //购买数量
-    private int goods_storage = 100; //实际场景由数据库提供，默认设置为10
+    private int goods_storage = 100; //实际场景由数据库提供，默认设置为100
 
     public EditText getEtAmount() {
         return etAmount;

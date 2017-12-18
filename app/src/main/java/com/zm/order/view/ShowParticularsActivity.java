@@ -99,12 +99,14 @@ public class ShowParticularsActivity extends Activity {
                             Log.e("orderC.getGoodsList()",orderC.getGoodsList().size()+"");
                         }
                         for (int i = 0;i<orderC.getGoodsList().size();i++){
-                            if (orderC.getGoodsList().get(i).getDishesName().equals(goodsCList.get(position).getDishesName())){
 
+                            orderC.getGoodsList().get(i).setRetreatGreens(1);
+
+                            if (orderC.getGoodsList().get(i).getRetreatGreens() == 1){
                                 float all = MyBigDecimal.sub(orderC.getAllPrice(),orderC.getGoodsList().get(i).getAllPrice(),1);
                                 orderC.setAllPrice(all);
-                                orderC.getGoodsList().remove(i);
                             }
+
                         }
 
 
@@ -135,11 +137,11 @@ public class ShowParticularsActivity extends Activity {
                         CDBHelper.createAndUpdate(getApplicationContext(),returnOrderC);
                         //6
 
-                        /*if (getShowImg != null){
+                        if (getShowImg != null){
                             getShowImg.setBackgroundResource(R.mipmap.icon_show_tui);
-                        }*/
+                        }
 
-                        goodsCList.remove(position);
+                        //goodsCList.remove(position);
                         setAll();
                         adatper.notifyDataSetChanged();
                         builder.dismiss();

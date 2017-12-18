@@ -466,6 +466,7 @@ public class MainActivity extends AppCompatActivity {
                         for(GoodsC obj:goodsList)
                         {
                             obj.setOrder(orderC.get_id());
+                            obj.setRetreatGreens(0);
                             CDBHelper.createAndUpdate(getApplicationContext(),obj);
                         }
                         orderC.setGoodsList(goodsList);

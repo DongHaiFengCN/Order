@@ -53,13 +53,18 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
     private InputMethodManager inputMethodManager;
     private Intent intent;
     private List<UsersC> usersCList;
+    private MyApplication myapp;
 
     private IDBManager idbManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
+        myapp = (MyApplication) getApplication();
+        /*UsersC usersC = new UsersC(myapp.getCompany_ID());
+        usersC.setUserName("001");
+        usersC.setPasswd("123456");
+        CDBHelper.createAndUpdate(getApplicationContext(),usersC);*/
 /*
         idbManager = DBFactory.get(DatabaseSource.CouchBase, this);
         List<Document> list = idbManager.getByClassName("qrcodeC");
