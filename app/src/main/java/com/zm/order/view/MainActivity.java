@@ -5,6 +5,10 @@ import android.animation.AnimatorListenerAdapter;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -17,6 +21,7 @@ import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -34,6 +39,7 @@ import com.couchbase.lite.Log;
 import com.couchbase.lite.Ordering;
 import com.zm.order.R;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,11 +51,14 @@ import application.MyApplication;
 import bean.kitchenmanage.order.GoodsC;
 import bean.kitchenmanage.order.OrderC;
 import bean.kitchenmanage.order.OrderNum;
+import bean.kitchenmanage.order.ReturnOrderC;
 import bean.kitchenmanage.table.AreaC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import model.CDBHelper;
 import untils.AnimationUtil;
+import untils.BluetoothUtil;
+import untils.PrintUtils;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -64,6 +73,9 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton delet_bt;
     public  List<SparseArray<Object>> orderItem = new ArrayList<>();
     public  OrderAdapter o;
+    private BluetoothAdapter btAdapter;
+    private BluetoothDevice device;
+    private BluetoothSocket socket;
     private int point = 0;
     private TextView point_tv;
     private float total = 0.0f;
@@ -185,6 +197,58 @@ public class MainActivity extends AppCompatActivity {
         linearLayout.setLayoutParams(layoutParams);
         o = new OrderAdapter( getGoodsList(), MainActivity.this);
         order_lv.setAdapter(o);
+        order_lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+            AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
+                alert.setMessage("是否赠菜")
+                        .setPositiveButton("是", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //1\
+                                GoodsC goodsC = goodsList.get(position);
+                                //2\
+                                //OrderC orderC = CDBHelper.getObjById(getApplicationContext(),goodsC.getOrder(),OrderC.class);
+                                goodsC.setGoodsType(2);
+
+
+                                //3\
+                                //打印goodslist
+                                {
+                                    android.util.Log.e("orderC.getGoodsList()",orderC.getGoodsList().size()+"");
+                                }
+                                for (int i = 0;i<orderC.getGoodsList().size();i++){
+                                    orderC.getGoodsList().get(i).setGoodsType(2);
+                                    float all = MyBigDecimal.sub(orderC.getAllPrice(),orderC.getGoodsList().get(i).getAllPrice(),1);
+                                    orderC.setAllPrice(all);
+                                    orderC.getGoodsList().get(i).setAllPrice(0);
+                                    orderC.getGoodsList().get(i).setDishesCount(0);
+                                }
+
+                                //打印goodslist
+                                {
+                                    android.util.Log.e("orderC.getGoodsList()",orderC.getGoodsList().size()+"");
+                                }
+                                //4\保存orderC
+
+                                CDBHelper.createAndUpdate(getApplicationContext(),orderC);
+
+                                //5
+
+                                o.notifyDataSetChanged();
+                                dialog.dismiss();
+                            }
+                        });
+                alert.setNegativeButton("否", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                alert.create().show();
+
+            }
+        });
         car_iv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -304,7 +368,7 @@ public class MainActivity extends AppCompatActivity {
         ok_tv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                saveOrder();
                 if (total > 0) {
                     //如果order列表开启状态就关闭
                     if (!flag) {
@@ -335,7 +399,6 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onClick(View v) {
 
-                            saveOrder();
 
                             Intent intent = new Intent(MainActivity.this, PayActivity.class);
                             startActivityForResult(intent,1);
@@ -347,14 +410,30 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onClick(View v) {
 
-                            saveOrder();
-
                             Intent intent = new Intent(MainActivity.this, DeskActivity.class);
                             startActivity(intent);
                             dialog.dismiss();
                             finish();
                         }
                     });
+
+                    Button dy = view1.findViewById(R.id.view_pay_dy);
+                    dy.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (setPrintOrder().equals("")){
+                                Toast.makeText(MainActivity.this,"没有链接蓝牙打印机",Toast.LENGTH_LONG).show();
+                            }else {
+                                Intent intent = new Intent(MainActivity.this, DeskActivity.class);
+                                startActivity(intent);
+                                dialog.dismiss();
+                                finish();
+                            }
+
+
+                        }
+                    });
+
                     dialog.show();
 
 
@@ -404,7 +483,6 @@ public class MainActivity extends AppCompatActivity {
             obj.setNum(1);
             CDBHelper.createAndUpdate(getApplicationContext(),obj);
             orderNum =  "001";
-
         }
         else//有数据，判断是不是当天
         {
@@ -431,6 +509,103 @@ public class MainActivity extends AppCompatActivity {
         return orderNum;
 
     }
+
+    private String setPrintOrder(){
+
+        btAdapter = BluetoothUtil.getBTAdapter();
+        if(btAdapter != null){
+
+            device = BluetoothUtil.getDevice(btAdapter);
+            if (device != null){
+                try {
+                    socket = BluetoothUtil.getSocket(device);
+                    PrintUtils.setOutputStream(socket.getOutputStream());
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                onPrint();
+                return "打印成功";
+            }
+
+
+        }
+        return "";
+    }
+
+
+    private void onPrint() {
+
+
+            MyApplication m = (MyApplication)getApplicationContext();
+            String waiter =m.getUsersC().getEmployeeName();
+
+            String tableNumber = orderC.getTableNo();
+            PrintUtils.selectCommand(PrintUtils.RESET);
+            PrintUtils.selectCommand(PrintUtils.LINE_SPACING_DEFAULT);
+            PrintUtils.selectCommand(PrintUtils.ALIGN_CENTER);
+            PrintUtils.printText("肴点点\n\n");
+            PrintUtils.selectCommand(PrintUtils.DOUBLE_HEIGHT_WIDTH);
+            PrintUtils.printText(tableNumber+"号桌\n\n");
+            PrintUtils.selectCommand(PrintUtils.NORMAL);
+            PrintUtils.selectCommand(PrintUtils.ALIGN_LEFT);
+            PrintUtils.printText(PrintUtils.printTwoData("订单编号", OrderId()+"\n"));
+            PrintUtils.printText(PrintUtils.printTwoData("下单时间", getFormatDate()+"\n"));
+            PrintUtils.printText(PrintUtils.printTwoData("人数："+m.getTable_sel_obj().getCurrentPersions(), "收银员："+waiter+"\n"));
+            PrintUtils.printText("--------------------------------\n");
+            PrintUtils.selectCommand(PrintUtils.BOLD);
+            PrintUtils.printText(PrintUtils.printThreeData("项目", "数量", "金额\n"));
+            PrintUtils.printText("--------------------------------\n");
+            PrintUtils.selectCommand(PrintUtils.BOLD_CANCEL);
+
+            List<GoodsC> goodsCList = orderC.getGoodsList();
+
+            for (int j = 0; j < goodsCList.size(); j++) {
+
+                GoodsC goodsC = goodsCList.get(j);
+
+                PrintUtils.printText(PrintUtils.printThreeData(goodsC.getDishesName(),goodsC.getDishesCount()+"", goodsC.getAllPrice()+"\n"));
+
+
+            }
+
+            PrintUtils.printText("--------------------------------\n");
+            PrintUtils.printText(PrintUtils.printTwoData("合计", total+"\n"));
+            PrintUtils.printText("--------------------------------\n");
+            PrintUtils.printText("\n\n\n\n");
+            PrintUtils.closeOutputStream();
+
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+    }
+
+    /**
+     * @return 订单号
+     */
+    public String OrderId(){
+        Date date = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        return formatter.format(date);
+    }
+
+    /**
+     *
+     * @return 时间格式 yyyy-MM-dd HH:mm:ss
+     */
+    public String getFormatDate(){
+        Date date = new Date();
+        if(date != null){
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            return formatter.format(date);
+        }
+
+        return null;
+    }
+
 
     private void saveOrder(){
         try {
@@ -461,12 +636,13 @@ public class MainActivity extends AppCompatActivity {
                             orderC.setOrderNum(1);
                             orderC.setSerialNum(getOrderSerialNum());
                         }
+
                         Log.e("goodsList","goodsList---"+goodsList.size());
 
                         for(GoodsC obj:goodsList)
                         {
                             obj.setOrder(orderC.get_id());
-                            obj.setRetreatGreens(0);
+                            obj.setGoodsType(0);
                             CDBHelper.createAndUpdate(getApplicationContext(),obj);
                         }
                         orderC.setGoodsList(goodsList);
