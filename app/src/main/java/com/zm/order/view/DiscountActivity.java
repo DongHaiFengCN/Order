@@ -10,6 +10,7 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -69,7 +70,7 @@ public class DiscountActivity extends AppCompatActivity {
 
         totalTv.setText(stashTotal+"");
 
-        discountEt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(totalTv.length()-2)});
+        //discountEt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(totalTv.length()-2)});
 
         discountEt.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -108,16 +109,19 @@ public class DiscountActivity extends AppCompatActivity {
             public void afterTextChanged(Editable editable) {
 
 
-                if(!TextUtils.isEmpty(discountEt.getText().toString())){
+               if(!TextUtils.isEmpty(discountEt.getText().toString())){
 
-                    if(stashTotal >= Float.valueOf(discountEt.getText().toString())){
+                    if(!".".equals(editable.charAt(editable.length()-1)+"")){
 
-                        totalTv.setText((stashTotal-Float.valueOf(discountEt.getText().toString()))+"");
+                       if(stashTotal >= Float.valueOf(discountEt.getText().toString())){
 
-                    }
+                           totalTv.setText((stashTotal-Float.valueOf(discountEt.getText().toString()))+"");
+
+                       }
+                   }
+
 
                 }else {
-
 
                     if(discountEt.isCursorVisible()){
 

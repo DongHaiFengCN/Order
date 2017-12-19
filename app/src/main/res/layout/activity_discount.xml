@@ -148,7 +148,7 @@
                 android:background="@color/md_white"
                 android:textColor="@color/md_black_1000"
                 android:gravity="center"
-                android:inputType="number"
+                android:inputType="number|numberDecimal"
                 />
 
 
