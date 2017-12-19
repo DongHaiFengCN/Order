@@ -22,10 +22,13 @@ import com.tencent.bugly.Bugly;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.zm.order.R;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.Iterator;
 import java.util.List;
 
 import application.ISharedPreferences;
+import application.MessageEvent;
 import application.MyApplication;
 import bean.kitchenmanage.user.UsersC;
 import model.CDBHelper;
@@ -61,10 +64,15 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         myapp = (MyApplication) getApplication();
-        /*UsersC usersC = new UsersC(myapp.getCompany_ID());
-        usersC.setUserName("001");
-        usersC.setPasswd("123456");
-        CDBHelper.createAndUpdate(getApplicationContext(),usersC);*/
+    /*    UsersC usersC = new UsersC(myapp.getCompany_ID());
+        usersC.setUserName("101");
+        usersC.setPasswd("123456");*/
+      //  CDBHelper.createAndUpdate(getApplicationContext(),usersC);
+
+
+
+
+
 /*
         idbManager = DBFactory.get(DatabaseSource.CouchBase, this);
         List<Document> list = idbManager.getByClassName("qrcodeC");
