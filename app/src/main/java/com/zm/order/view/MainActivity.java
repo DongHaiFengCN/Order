@@ -517,8 +517,7 @@ public class MainActivity extends AppCompatActivity {
     private void onPrint() {
 
 
-            MyApplication m = (MyApplication)getApplicationContext();
-            String waiter =m.getUsersC().getEmployeeName();
+            String waiter = myApp.getUsersC().getEmployeeName();
 
             String tableNumber = orderC.getTableNo();
             PrintUtils.selectCommand(PrintUtils.RESET);
@@ -531,7 +530,7 @@ public class MainActivity extends AppCompatActivity {
             PrintUtils.selectCommand(PrintUtils.ALIGN_LEFT);
             PrintUtils.printText(PrintUtils.printTwoData("订单编号", OrderId()+"\n"));
             PrintUtils.printText(PrintUtils.printTwoData("下单时间", getFormatDate()+"\n"));
-            PrintUtils.printText(PrintUtils.printTwoData("人数："+m.getTable_sel_obj().getCurrentPersions(), "收银员："+waiter+"\n"));
+            PrintUtils.printText(PrintUtils.printTwoData("人数："+myApp.getTable_sel_obj().getCurrentPersions(), "收银员："+waiter+"\n"));
             PrintUtils.printText("--------------------------------\n");
             PrintUtils.selectCommand(PrintUtils.BOLD);
             PrintUtils.printText(PrintUtils.printThreeData("项目", "数量", "金额\n"));
