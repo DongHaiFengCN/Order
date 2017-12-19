@@ -1,6 +1,5 @@
 package com.zm.order.view;
 
-import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,7 +11,6 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
@@ -24,14 +22,10 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.couchbase.lite.Database;
-import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
-import com.couchbase.lite.Ordering;
-import com.couchbase.lite.Query;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.zm.order.R;
@@ -47,15 +41,12 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import application.MessageEvent;
 import application.MyApplication;
-import bean.kitchenmanage.dishes.DishesC;
 import bean.kitchenmanage.order.CheckOrderC;
 import bean.kitchenmanage.order.OrderC;
 import bean.kitchenmanage.qrcode.qrcodeC;
 import bean.kitchenmanage.table.AreaC;
 import bean.kitchenmanage.table.TableC;
-import bean.kitchenmanage.user.UsersC;
 import model.AreaAdapter;
 import model.CDBHelper;
 import model.LiveTableRecyclerAdapter;

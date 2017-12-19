@@ -16,28 +16,18 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
-import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
-import com.tencent.bugly.Bugly;
-import com.tencent.bugly.crashreport.CrashReport;
 import com.zm.order.R;
 
-import org.greenrobot.eventbus.EventBus;
-
-import java.util.Iterator;
 import java.util.List;
 
 import application.ISharedPreferences;
-import application.MessageEvent;
 import application.MyApplication;
 import bean.kitchenmanage.user.UsersC;
 import model.CDBHelper;
-import model.DBFactory;
-import model.DatabaseSource;
 import model.IDBManager;
 import presenter.ILoginPresenter;
 import presenter.LoginPresentImpl;
-import untils.MyLog;
 
 /**
  *
