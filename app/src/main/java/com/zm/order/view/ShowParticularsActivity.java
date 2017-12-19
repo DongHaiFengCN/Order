@@ -88,11 +88,11 @@ public class ShowParticularsActivity extends Activity {
                 View view1 = LayoutInflater.from(ShowParticularsActivity.this).inflate(R.layout.activity_tv_dialog,null);
                 alertDialog.setView(view1);
                 TextView title = view1.findViewById(R.id.dialog_tuicai_title);
-                title.setText("请选择退菜或赠菜");
+                title.setText("请选择退菜");
                 final AlertDialog builder = alertDialog.create();
 
-                Button tui = view1.findViewById(R.id.dialog_tuicai);
-                tui.setOnClickListener(new View.OnClickListener() {
+                Button shi = view1.findViewById(R.id.dialog_tuicai_qd);
+                shi.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         builder.dismiss();
@@ -175,20 +175,13 @@ public class ShowParticularsActivity extends Activity {
                                     }
                                 });
                         builder.setNegativeButton("否", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                });
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
                         builder.create().show();
-                    }
-                });
-                Button shi = view1.findViewById(R.id.dialog_tuicai_qd);
-                shi.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
 
-                        builder.dismiss();
                     }
                 });
                 Button fou = view1.findViewById(R.id.dialog_tuicai_qx);
@@ -214,16 +207,38 @@ public class ShowParticularsActivity extends Activity {
                         .and(Expression.property("orderState").equalTo(1))
                 , null
                 , OrderC.class);
+
+        boolean flag = false;
         for (OrderC orderC : orderCList) {
 
-            for (int i = 0; i < orderC.getGoodsList().size(); i++) {
-                goodsCList.add(orderC.getGoodsList().get(i));
+            for (GoodsC goodsb : orderC.getGoodsList()) {
+
+                flag = false;
+
+                for (GoodsC goodsC : goodsCList){
+                    if (goodsC.getDishesName().equals(goodsb.getDishesName())) {
+                        float add = MyBigDecimal.add(goodsC.getAllPrice(),goodsb.getAllPrice(),1);
+                        goodsC.setAllPrice(add);
+                        float count = MyBigDecimal.add(goodsC.getDishesCount(),goodsb.getDishesCount(),1);
+                        goodsC.setDishesCount(count);
+                        flag = true;
+
+                        break;
+                    }
+                }
+                if (!flag) {
+                    goodsCList.add(goodsb);
+                }
+
             }
 
             all += orderC.getAllPrice();
         }
+
+
         showTvSl.setText("共：" + goodsCList.size() + "道菜，总价："+all+"元");
     }
+
 
     @OnClick({R.id.show_but_dc, R.id.show_but_md,R.id.show_img})
     public void onClick(View view) {
