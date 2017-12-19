@@ -24,8 +24,8 @@ android {
         }
     }
 }
-repositories{
-    flatDir{
+repositories {
+    flatDir {
         dirs 'libs' //就是你放aar的目录地址
     }
 }
@@ -34,7 +34,7 @@ dependencies {
     //微信
     compile 'com.tencent.mm.opensdk:wechat-sdk-android-with-mta:+'
     //你的其他依赖
-    compile name:'SMSSDK-3.0.0',ext:'aar'
+    compile name: 'SMSSDK-3.0.0', ext: 'aar'
 
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
@@ -60,5 +60,7 @@ dependencies {
     compile 'com.squareup.retrofit2:retrofit:2.3.0'
     compile 'com.squareup.okhttp3:okhttp:3.8.1'
     compile 'com.squareup.retrofit2:converter-gson:2.3.0'
+
+    compile 'org.greenrobot:eventbus:3.0.0'
 
 }

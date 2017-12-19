@@ -152,7 +152,7 @@ public class Tool {
      * @return
      */
 
-    public static String getLastCheckOrder(List<String> s){
+    public static int getLastCheckOrder(List<String> s){
 
         String MARK = "";
 
@@ -181,17 +181,25 @@ public class Tool {
         }
 
         Date d = list.get(0);  //0为第一个数组下标
+        int flag = 0;
         for(int j = 1 ; j < list.size() ; j++){
 
-            d=(list.get(j).getTime() < d.getTime()?d:list.get(j));
+          //  d=(list.get(j).getTime() < d.getTime()?d:list.get(j));
+
+            if(list.get(j).getTime() > d.getTime()){
+
+                d = list.get(j);
+                flag = j;
+
+            }
 
 
         }
 
 
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    //    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        return formatter.format(d);
+        return flag;
     }
 
 }

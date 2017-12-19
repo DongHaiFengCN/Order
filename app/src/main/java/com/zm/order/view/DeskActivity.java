@@ -1,6 +1,6 @@
 package com.zm.order.view;
 
-import android.app.Application;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
@@ -23,21 +22,27 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.couchbase.lite.Database;
-import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
-import com.couchbase.lite.Ordering;
-import com.couchbase.lite.Query;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.zm.order.R;
 
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import application.MyApplication;
+import bean.kitchenmanage.order.CheckOrderC;
 import bean.kitchenmanage.order.OrderC;
 import bean.kitchenmanage.qrcode.qrcodeC;
 import bean.kitchenmanage.table.AreaC;
@@ -46,6 +51,7 @@ import model.AreaAdapter;
 import model.CDBHelper;
 import model.LiveTableRecyclerAdapter;
 import untils.MyLog;
+import untils.Tool;
 
 public class DeskActivity extends AppCompatActivity {
 
@@ -83,7 +89,6 @@ public class DeskActivity extends AppCompatActivity {
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_desk);
-
 
 
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
@@ -256,73 +261,179 @@ public class DeskActivity extends AppCompatActivity {
                 //空闲状态下重置上一次未买单状态
                 if(tableC.getState()==0){
 
+                    //获取今天日期
 
-                    Toast.makeText(DeskActivity.this,"~~~",Toast.LENGTH_LONG).show();
-
-
-
-
+                    Date date = new Date();
+                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
 
-                }
+
+                   Log.e("Test","当前时间："+formatter.format(date));
+                    Log.e("Test"," 当前桌号"+tableC.getTableNum());
+                    //判断有checkorder
+
+                    List<CheckOrderC> checkOrderCS = CDBHelper.getObjByWhere(getApplicationContext()
+                            , Expression.property("className").equalTo("CheckOrderC")
+                                    .and(Expression.property("checkTime").like("%"+formatter.format(date)+ "%"))
+                            , null, CheckOrderC.class);
 
 
-                List<OrderC> orderCList= CDBHelper.getObjByWhere(getApplicationContext(),
-                        Expression.property("className").equalTo("OrderC")
-                                .and(Expression.property("tableNo").equalTo(tableC.getTableNum()))
-                                .and(Expression.property("orderState").equalTo(1))
-                        ,null
-                        ,OrderC.class);
-                Log.e("orderCList","orderCList.size()"+orderCList.size());
+                    Iterator<CheckOrderC> iterator = checkOrderCS.iterator();
 
-                if(orderCList.size()>0)//有未买单订单，可以买单
-                {
-                    android.app.AlertDialog.Builder dialog1 = new android.app.AlertDialog.Builder(DeskActivity.this);
-                    dialog1.setTitle("是否买单？").setCancelable(false);
-                    dialog1.setNegativeButton("是",
-                            new DialogInterface.OnClickListener()
+                    CheckOrderC checkOrderC = null;
+
+                    //移除不是当前桌的订单
+                    while (iterator.hasNext()){
+
+                        CheckOrderC c = iterator.next();
+
+                        if(!c.getTableNo().equals(tableC.getTableNum())){
+                            iterator.remove();
+
+                        }
+                    }
+
+                    if(checkOrderCS.size() > 0){
+
+
+                        List<String> dateList = new ArrayList<>();
+
+                        //获取当前桌订单今日时间集合
+                        for (int i = 0; i < checkOrderCS.size(); i++) {
+
+
+                            dateList.add(checkOrderCS.get(i).getCheckTime());
+
+                        }
+                            for (int i = 0; i < checkOrderCS.size(); i++) {
+
+                                Log.e("Test","今日账单： "+checkOrderCS.get(i).getCheckTime()+" 桌号"+checkOrderCS.get(i).getTableNo());
+                            }
+
+
+                            //得到最近订单的坐标
+                            int f =  Tool.getLastCheckOrder(dateList);
+
+                          //  Log.e("Test","最近一次账单： "+checkOrderCS.get(f).getCheckTime()+" 桌号"+checkOrderCS.get(f).getTableNo());
+
+                            checkOrderC = checkOrderCS.get(f);
+
+
+                    }else {
+
+                        Toast.makeText(DeskActivity.this,"没有记录",Toast.LENGTH_LONG).show();
+                    }
+
+
+
+                  AlertDialog.Builder builder = new AlertDialog.Builder(DeskActivity.this);
+                    builder.setTitle("重置最近一次账单");
+                    final CheckOrderC finalCheckOrderC = checkOrderC;
+                    builder.setNegativeButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+
+                            final ProgressDialog proDialog = android.app.ProgressDialog.show(DeskActivity.this, "重置", "正在配置订单请稍等~");
+
+                            EventBus.getDefault().postSticky(finalCheckOrderC);
+
+                            Thread thread = new Thread()
                             {
                                 @Override
-                                public void onClick(DialogInterface dialog, int which)
+                                public void run()
                                 {
-                                    Intent mainIntent = new Intent();
-                                    mainIntent.setClass(DeskActivity.this, PayActivity.class);
-                                    startActivity(mainIntent);
+                                    try
+                                    {
+                                        sleep(1000);
+                                    } catch (InterruptedException e)
+                                    {
+                                        // TODO 自动生成的 catch 块
+                                        e.printStackTrace();
+                                    }
+                                    proDialog.dismiss();//关闭proDialog
+
+                                    startActivity(new Intent(DeskActivity.this, ResetBillActivity.class));
+
                                 }
-                            }).setPositiveButton("否",
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface arg0, int arg1)
-                                {
-                                    // TODO Auto-generated method stub
-                                }
-                            }).show();
-                }
-                else
-                {
-                    android.app.AlertDialog.Builder dialog1 = new android.app.AlertDialog.Builder(DeskActivity.this);
-                    dialog1.setTitle("是否消台？").setCancelable(false);
-                    dialog1.setNegativeButton("是",
-                            new DialogInterface.OnClickListener()
-                            {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which)
-                                {
-                                    tableC.setState(0);
-                                    CDBHelper.createAndUpdate(getApplicationContext(),tableC);
-                                    myapp.setTable_sel_obj(tableC);
-                                }
-                            }).setPositiveButton("否",
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface arg0, int arg1)
-                                {
-                                    // TODO Auto-generated method stub
-                                }
-                            }).show();
-                }
+                            };
+                            thread.start();
 
 
+
+                        }
+                    });
+                    builder.setPositiveButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                        }
+                    });
+                    builder.show();
+
+
+
+
+
+                }else {//使用&&预定状态
+
+                    List<OrderC> orderCList= CDBHelper.getObjByWhere(getApplicationContext(),
+                            Expression.property("className").equalTo("OrderC")
+                                    .and(Expression.property("tableNo").equalTo(tableC.getTableNum()))
+                                    .and(Expression.property("orderState").equalTo(1))
+                            ,null
+                            ,OrderC.class);
+                    Log.e("orderCList","orderCList.size()"+orderCList.size());
+
+                    if(orderCList.size()>0)//有未买单订单，可以买单
+                    {
+                        android.app.AlertDialog.Builder dialog1 = new android.app.AlertDialog.Builder(DeskActivity.this);
+                        dialog1.setTitle("是否买单？").setCancelable(false);
+                        dialog1.setNegativeButton("是",
+                                new DialogInterface.OnClickListener()
+                                {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which)
+                                    {
+                                        Intent mainIntent = new Intent();
+                                        mainIntent.setClass(DeskActivity.this, PayActivity.class);
+                                        startActivity(mainIntent);
+                                    }
+                                }).setPositiveButton("否",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface arg0, int arg1)
+                                    {
+                                        // TODO Auto-generated method stub
+                                    }
+                                }).show();
+                    }
+                    else
+                    {
+                        android.app.AlertDialog.Builder dialog1 = new android.app.AlertDialog.Builder(DeskActivity.this);
+                        dialog1.setTitle("是否消台？").setCancelable(false);
+                        dialog1.setNegativeButton("是",
+                                new DialogInterface.OnClickListener()
+                                {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which)
+                                    {
+                                        tableC.setState(0);
+                                        CDBHelper.createAndUpdate(getApplicationContext(),tableC);
+                                        myapp.setTable_sel_obj(tableC);
+                                    }
+                                }).setPositiveButton("否",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface arg0, int arg1)
+                                    {
+                                        // TODO Auto-generated method stub
+                                    }
+                                }).show();
+                    }
+
+
+                }
 
             }
         });
@@ -376,6 +487,7 @@ public class DeskActivity extends AppCompatActivity {
     }
 
 
+
     private void turnScan() {
 
         IntentIntegrator intentIntegrator =  new IntentIntegrator(this);
@@ -385,6 +497,13 @@ public class DeskActivity extends AppCompatActivity {
         intentIntegrator.setCaptureActivity(ScanActivity.class); // 设置自定义的activity是ScanActivity
         intentIntegrator.initiateScan(); // 初始化扫描
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
