@@ -283,7 +283,7 @@ public class SeekT9Adapter extends BaseAdapter {
                 }
                 goodsC.setDishesCount(1);
                 String all = MyBigDecimal.mul(mData.get(position).getDishesCount()+"",dishesC.getPrice()+"",2);
-
+                goodsC.setGoodsType(0);
                 goodsC.setAllPrice(Float.parseFloat(all));
                 goodsC.setDishesId(dishesC.get_id());
                 if (dishesC.getDishesKindId()!=null){

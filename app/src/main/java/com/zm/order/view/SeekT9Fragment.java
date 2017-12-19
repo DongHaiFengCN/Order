@@ -204,6 +204,7 @@ public class SeekT9Fragment extends Fragment {
                     goodsC.setDishesCount(sum);
                     String all = MyBigDecimal.mul(sum+"",price+"",2);
                     goodsC.setAllPrice(Float.parseFloat(all));
+                    goodsC.setGoodsType(0);
                     goodsC.setDishesId(dishesC.get_id());
                     if ( dishesC.getDishesKindId() != null) {
                         DishesKindC dishesKind = CDBHelper.getObjById(getActivity().getApplicationContext(), dishesC.getDishesKindId(), DishesKindC.class);

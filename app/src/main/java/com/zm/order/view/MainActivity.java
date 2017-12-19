@@ -51,7 +51,6 @@ import application.MyApplication;
 import bean.kitchenmanage.order.GoodsC;
 import bean.kitchenmanage.order.OrderC;
 import bean.kitchenmanage.order.OrderNum;
-
 import bean.kitchenmanage.table.AreaC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -197,44 +196,25 @@ public class MainActivity extends AppCompatActivity {
         linearLayout.setLayoutParams(layoutParams);
         o = new OrderAdapter( getGoodsList(), MainActivity.this);
         order_lv.setAdapter(o);
-        order_lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        o.setListener(new OrderAdapter.setOnItemListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-            AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
+            public void setListener(final int position) {
+
+                AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
                 alert.setMessage("是否赠菜")
                         .setPositiveButton("是", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+
                                 //1\
                                 GoodsC goodsC = goodsList.get(position);
                                 //2\
                                 //OrderC orderC = CDBHelper.getObjById(getApplicationContext(),goodsC.getOrder(),OrderC.class);
                                 goodsC.setGoodsType(2);
-
-
-                                //3\
-                                //打印goodslist
-                                {
-                                    android.util.Log.e("orderC.getGoodsList()",orderC.getGoodsList().size()+"");
-                                }
-                                for (int i = 0;i<orderC.getGoodsList().size();i++){
-                                    orderC.getGoodsList().get(i).setGoodsType(2);
-                                    float all = MyBigDecimal.sub(orderC.getAllPrice(),orderC.getGoodsList().get(i).getAllPrice(),1);
-                                    orderC.setAllPrice(all);
-                                    orderC.getGoodsList().get(i).setAllPrice(0);
-                                    orderC.getGoodsList().get(i).setDishesCount(0);
-                                }
-
-                                //打印goodslist
-                                {
-                                    android.util.Log.e("orderC.getGoodsList()",orderC.getGoodsList().size()+"");
-                                }
-                                //4\保存orderC
-
-                                CDBHelper.createAndUpdate(getApplicationContext(),orderC);
-
-                                //5
-
+                                goodsC.setDishesName(goodsC.getDishesName()+"(赠)");
+                                total -= goodsC.getAllPrice();
+                                setTotal(total);
+                                goodsC.setAllPrice(0);
                                 o.notifyDataSetChanged();
                                 dialog.dismiss();
                             }
@@ -246,7 +226,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
                 alert.create().show();
-
             }
         });
         car_iv.setOnClickListener(new View.OnClickListener() {
@@ -538,8 +517,7 @@ public class MainActivity extends AppCompatActivity {
     private void onPrint() {
 
 
-            MyApplication m = (MyApplication)getApplicationContext();
-            String waiter =m.getUsersC().getEmployeeName();
+            String waiter = myApp.getUsersC().getEmployeeName();
 
             String tableNumber = orderC.getTableNo();
             PrintUtils.selectCommand(PrintUtils.RESET);
@@ -552,7 +530,7 @@ public class MainActivity extends AppCompatActivity {
             PrintUtils.selectCommand(PrintUtils.ALIGN_LEFT);
             PrintUtils.printText(PrintUtils.printTwoData("订单编号", OrderId()+"\n"));
             PrintUtils.printText(PrintUtils.printTwoData("下单时间", getFormatDate()+"\n"));
-            PrintUtils.printText(PrintUtils.printTwoData("人数："+m.getTable_sel_obj().getCurrentPersions(), "收银员："+waiter+"\n"));
+            PrintUtils.printText(PrintUtils.printTwoData("人数："+myApp.getTable_sel_obj().getCurrentPersions(), "收银员："+waiter+"\n"));
             PrintUtils.printText("--------------------------------\n");
             PrintUtils.selectCommand(PrintUtils.BOLD);
             PrintUtils.printText(PrintUtils.printThreeData("项目", "数量", "金额\n"));
@@ -642,7 +620,6 @@ public class MainActivity extends AppCompatActivity {
                         for(GoodsC obj:goodsList)
                         {
                             obj.setOrder(orderC.get_id());
-                            obj.setGoodsType(0);
                             CDBHelper.createAndUpdate(getApplicationContext(),obj);
                         }
                         orderC.setGoodsList(goodsList);

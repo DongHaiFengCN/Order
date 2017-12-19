@@ -155,8 +155,7 @@ public class DeskActivity extends AppCompatActivity {
                 final TableC  tableC =  CDBHelper.getObjById(getApplicationContext(),tableId,TableC.class);
                 if(tableC.getState()!=2)
                 {
-                    tableC.setState(2);
-                    CDBHelper.createAndUpdate(getApplicationContext(),tableC);
+
 
 
                     final EditText  editText = new EditText(DeskActivity.this);
@@ -222,8 +221,10 @@ public class DeskActivity extends AppCompatActivity {
 
                                 //设置就餐人数，转跳
 
-                                tableC.setCurrentPersions(Integer.valueOf(editText.getText().toString()));
+                                tableC.setState(2);
+                                CDBHelper.createAndUpdate(getApplicationContext(),tableC);
 
+                                tableC.setCurrentPersions(Integer.valueOf(editText.getText().toString()));
                                 //设置全局Table
                                 myapp.setTable_sel_obj(tableC);
                                 CDBHelper.createAndUpdate(getApplicationContext(),tableC);
@@ -248,12 +249,6 @@ public class DeskActivity extends AppCompatActivity {
                     mainIntent.setClass(DeskActivity.this, ShowParticularsActivity.class);
                     startActivity(mainIntent);
                 }
-
-
-
-
-
-
 
             }
             @Override

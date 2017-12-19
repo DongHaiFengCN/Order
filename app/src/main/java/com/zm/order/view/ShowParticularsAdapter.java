@@ -9,15 +9,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.couchbase.lite.Document;
-import com.couchbase.lite.Log;
 import com.zm.order.R;
 
 import java.util.List;
 
-import bean.kitchenmanage.dishes.DishesC;
 import bean.kitchenmanage.order.GoodsC;
-import model.CDBHelper;
 
 /**
  * Created by lenovo on 2017/12/13.
@@ -69,24 +65,10 @@ public class ShowParticularsAdapter extends BaseAdapter {
         viewHolder.mc = convertView.findViewById(R.id.item_show_mc);
         viewHolder.sl = convertView.findViewById(R.id.item_show_sl);
         viewHolder.item_show_lin = convertView.findViewById(R.id.item_show_lin);
-      //  viewHolder.item_show_img = convertView.findViewById(R.id.item_show_img);
 
-
-
-        Document dishesC = CDBHelper.getDocByID(activity,goodsCs.get(position).getDishesId());
-
-
-        viewHolder.dj.setText(dishesC.getFloat("price")+"");
+        viewHolder.dj.setText(goodsCs.get(position).getAllPrice()+"");
         viewHolder.mc.setText(goodsCs.get(position).getDishesName());
         viewHolder.sl.setText(goodsCs.get(position).getDishesCount()+"");
-  /*      viewHolder.item_show_img.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //linClickListener.getLinClick(viewHolder.item_show_img);
-
-
-            }
-        });*/
 
         return convertView;
     }
@@ -94,7 +76,6 @@ public class ShowParticularsAdapter extends BaseAdapter {
     class ViewHolder{
         private TextView mc,dj,sl;
         private LinearLayout item_show_lin;
-        private ImageView item_show_img;
 
     }
 

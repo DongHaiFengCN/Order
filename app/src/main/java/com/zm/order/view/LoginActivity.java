@@ -3,6 +3,8 @@ package com.zm.order.view;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
@@ -16,18 +18,26 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
+import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
+import com.tencent.bugly.Bugly;
+import com.tencent.bugly.crashreport.CrashReport;
 import com.zm.order.R;
 
+import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 
 import application.ISharedPreferences;
 import application.MyApplication;
 import bean.kitchenmanage.user.UsersC;
 import model.CDBHelper;
+import model.DBFactory;
+import model.DatabaseSource;
 import model.IDBManager;
 import presenter.ILoginPresenter;
 import presenter.LoginPresentImpl;
+import untils.MyLog;
 
 /**
  *
@@ -54,15 +64,10 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         myapp = (MyApplication) getApplication();
-    /*    UsersC usersC = new UsersC(myapp.getCompany_ID());
-        usersC.setUserName("101");
-        usersC.setPasswd("123456");*/
-      //  CDBHelper.createAndUpdate(getApplicationContext(),usersC);
-
-
-
-
-
+        /*UsersC usersC = new UsersC(myapp.getCompany_ID());
+        usersC.setUserName("001");
+        usersC.setPasswd("123456");
+        CDBHelper.createAndUpdate(getApplicationContext(),usersC);*/
 /*
         idbManager = DBFactory.get(DatabaseSource.CouchBase, this);
         List<Document> list = idbManager.getByClassName("qrcodeC");
