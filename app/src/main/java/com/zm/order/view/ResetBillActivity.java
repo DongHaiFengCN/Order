@@ -4,10 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -25,7 +23,6 @@ import bean.kitchenmanage.order.GoodsC;
 import bean.kitchenmanage.order.OrderC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import model.CDBHelper;
 
 public class ResetBillActivity extends AppCompatActivity {
@@ -35,8 +32,11 @@ public class ResetBillActivity extends AppCompatActivity {
     TextView timeTv;
     @BindView(R.id.item_info)
     ListView itemInfoLv;
-    @BindView(R.id.total_tv)
-    TextView totalTv;
+    @BindView(R.id.pay_tv)
+    TextView payTv;
+    @BindView(R.id.needpay_tv)
+    TextView needpayTv;
+
 
     private List<OrderC> orderCList;
 
@@ -69,11 +69,12 @@ public class ResetBillActivity extends AppCompatActivity {
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     public void setMessage(CheckOrderC checkOrderC) {
 
-        tableNumberTv.setText(" 桌号："+checkOrderC.getTableNo());
+        tableNumberTv.setText(" 桌号：" + checkOrderC.getTableNo());
 
-        timeTv.setText(" 结账时间："+checkOrderC.getCheckTime());
+        timeTv.setText(" 结账时间：" + checkOrderC.getCheckTime());
 
-        totalTv.setText("实际支付："+checkOrderC.getNeedPay());
+        needpayTv.setText("实付：" + checkOrderC.getNeedPay());
+        payTv.setText("总计："+checkOrderC.getPay());
 
         orderCList = checkOrderC.getOrderList();
 
@@ -113,11 +114,11 @@ public class ResetBillActivity extends AppCompatActivity {
 
         for (int i = 0; i < orderCList.size(); i++) {
 
-           OrderC orderC = orderCList.get(i);
-           orderC.setOrderState(1);
-           CDBHelper.createAndUpdate(getApplicationContext(),orderC);
+            OrderC orderC = orderCList.get(i);
+            orderC.setOrderState(1);
+            CDBHelper.createAndUpdate(getApplicationContext(), orderC);
         }
 
-        startActivity(new Intent(ResetBillActivity.this,PayActivity.class));
+        startActivity(new Intent(ResetBillActivity.this, PayActivity.class));
     }
 }
