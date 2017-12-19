@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.zm.order.view.PayActivity;
@@ -67,7 +68,7 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
 
        if (btAdapter == null) {
 
-           MyLog.e( "本机没有找到蓝牙硬件或驱动!");
+
 
             return "本机没有找到蓝牙硬件或驱动!";
         }
@@ -76,7 +77,6 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
 
        if (device == null) {
 
-           MyLog.e( "请确保InnterPrinter 蓝牙打印设备打开!");
             return "请确保InnterPrinter 蓝牙打印设备打开!";
         }
 
@@ -172,6 +172,7 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
     //主要用于将异步操作任务执行的结果展示给用户
     @Override
     protected void onPostExecute(String result) {
+        Log.e("Test",result);
 
         payActivity.closeDialog();
         payActivity.turnDesk();

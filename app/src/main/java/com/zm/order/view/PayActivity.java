@@ -834,6 +834,8 @@ public class PayActivity extends AppCompatActivity {
 
     private void printOrder() {
 
+        Log.e("Test","OOOOO");
+
         ProgressBarasyncTask progressBarasyncTask = new ProgressBarasyncTask(PayActivity.this);
         progressBarasyncTask.setDate(checkOrder);
         progressBarasyncTask.execute();
@@ -1409,7 +1411,7 @@ public class PayActivity extends AppCompatActivity {
         CDBHelper.createAndUpdate(getApplicationContext(), promotionD);
         CDBHelper.createAndUpdate(getApplicationContext(), checkOrder);
 
-        turnDesk();
+        //turnDesk();
 
         //  show();
         //
@@ -1438,6 +1440,7 @@ public class PayActivity extends AppCompatActivity {
         builder.setPositiveButton("打印", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+
                 printOrder();
             }
         });
@@ -1456,7 +1459,7 @@ public class PayActivity extends AppCompatActivity {
         }else {
 
 
-            turnDesk();
+           turnDesk();
 
 
         }
