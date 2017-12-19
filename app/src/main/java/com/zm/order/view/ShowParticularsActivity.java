@@ -2,6 +2,9 @@ package com.zm.order.view;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -23,6 +26,7 @@ import android.widget.Toast;
 import com.couchbase.lite.Expression;
 import com.zm.order.R;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,6 +42,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import model.CDBHelper;
+import untils.BluetoothUtil;
+import untils.PrintUtils;
 
 /**
  * Created by lenovo on 2017/12/13.
@@ -61,6 +67,10 @@ public class ShowParticularsActivity extends Activity {
     private MyApplication myapp;
     private float all = 0f;
     private ImageView getShowImg;
+    private OrderC orderC;
+    private BluetoothAdapter btAdapter;
+    private BluetoothDevice device;
+    private BluetoothSocket socket;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -210,19 +220,31 @@ public class ShowParticularsActivity extends Activity {
 
         boolean flag = false;
         for (OrderC orderC : orderCList) {
-
+            this.orderC = orderC;
             for (GoodsC goodsb : orderC.getGoodsList()) {
 
                 flag = false;
 
                 for (GoodsC goodsC : goodsCList){
-                    if (goodsC.getDishesName().equals(goodsb.getDishesName())) {
-                        float add = MyBigDecimal.add(goodsC.getAllPrice(),goodsb.getAllPrice(),1);
-                        goodsC.setAllPrice(add);
-                        float count = MyBigDecimal.add(goodsC.getDishesCount(),goodsb.getDishesCount(),1);
-                        goodsC.setDishesCount(count);
-                        flag = true;
+                    if (goodsC.getDishesName().equals(goodsb.getDishesName()) ){
 
+                        if (goodsb.getDishesTaste() != null){
+
+                            if (goodsb.getDishesTaste().equals(goodsC.getDishesTaste())){
+                                float add = MyBigDecimal.add(goodsC.getAllPrice(),goodsb.getAllPrice(),1);
+                                goodsC.setAllPrice(add);
+                                float count = MyBigDecimal.add(goodsC.getDishesCount(),goodsb.getDishesCount(),1);
+                                goodsC.setDishesCount(count);
+                                flag = true;
+                            }
+
+                        }else{
+                            float add = MyBigDecimal.add(goodsC.getAllPrice(),goodsb.getAllPrice(),1);
+                            goodsC.setAllPrice(add);
+                            float count = MyBigDecimal.add(goodsC.getDishesCount(),goodsb.getDishesCount(),1);
+                            goodsC.setDishesCount(count);
+                            flag = true;
+                        }
                         break;
                     }
                 }
@@ -236,11 +258,11 @@ public class ShowParticularsActivity extends Activity {
         }
 
 
-        showTvSl.setText("共：" + goodsCList.size() + "道菜，总价："+all+"元");
+        showTvSl.setText("共：" + goodsCList.size() + "道菜，共："+all+"元");
     }
 
 
-    @OnClick({R.id.show_but_dc, R.id.show_but_md,R.id.show_img})
+    @OnClick({R.id.show_but_dc, R.id.show_but_md,R.id.show_img,R.id.show_but_dy})
     public void onClick(View view) {
         Intent intent;
         switch (view.getId()) {
@@ -261,9 +283,113 @@ public class ShowParticularsActivity extends Activity {
                 finish();
                 break;
 
+            case R.id.show_but_dy:
+
+                setPrintOrder();
+
+                break;
+
             default:
 
                 break;
         }
     }
+
+    private String setPrintOrder(){
+
+        btAdapter = BluetoothUtil.getBTAdapter();
+        if(btAdapter != null){
+
+            device = BluetoothUtil.getDevice(btAdapter);
+            if (device != null){
+                try {
+                    socket = BluetoothUtil.getSocket(device);
+                    PrintUtils.setOutputStream(socket.getOutputStream());
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                onPrint();
+                return "打印成功";
+            }
+
+
+        }
+        return "";
+    }
+
+    private void onPrint() {
+
+
+        String waiter = myapp.getUsersC().getEmployeeName();
+
+        String tableNumber = myapp.getTable_sel_obj().getTableNum();
+        PrintUtils.selectCommand(PrintUtils.RESET);
+        PrintUtils.selectCommand(PrintUtils.LINE_SPACING_DEFAULT);
+        PrintUtils.selectCommand(PrintUtils.ALIGN_CENTER);
+        PrintUtils.printText("肴点点\n\n");
+        PrintUtils.selectCommand(PrintUtils.DOUBLE_HEIGHT_WIDTH);
+        PrintUtils.printText(tableNumber+"号桌\n\n");
+        PrintUtils.selectCommand(PrintUtils.NORMAL);
+        PrintUtils.selectCommand(PrintUtils.ALIGN_LEFT);
+        PrintUtils.printText(PrintUtils.printTwoData("订单编号", OrderId()+"\n"));
+        PrintUtils.printText(PrintUtils.printTwoData("下单时间", getFormatDate()+"\n"));
+        PrintUtils.printText(PrintUtils.printTwoData("人数："+myapp.getTable_sel_obj().getCurrentPersions(), "收银员："+waiter+"\n"));
+        PrintUtils.printText("--------------------------------\n");
+        PrintUtils.selectCommand(PrintUtils.BOLD);
+        PrintUtils.printText(PrintUtils.printThreeData("项目", "数量", "金额\n"));
+        PrintUtils.printText("--------------------------------\n");
+        PrintUtils.selectCommand(PrintUtils.BOLD_CANCEL);
+
+        for (int j = 0; j < goodsCList.size(); j++) {
+
+            GoodsC goodsC = goodsCList.get(j);
+            String taste = "";
+            if (goodsC.getDishesTaste() != null){
+                taste = "("+goodsC.getDishesTaste()+")";
+            }
+
+            PrintUtils.printText(PrintUtils.printThreeData(goodsC.getDishesName()+taste,goodsC.getDishesCount()+"", goodsC.getAllPrice()+"\n"));
+
+
+        }
+
+        PrintUtils.printText("--------------------------------\n");
+        PrintUtils.printText(PrintUtils.printTwoData("合计", all+"\n"));
+        PrintUtils.printText("--------------------------------\n");
+        PrintUtils.printText("\n\n\n\n");
+        PrintUtils.closeOutputStream();
+
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * @return 订单号
+     */
+    public String OrderId(){
+        Date date = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        return formatter.format(date);
+    }
+
+    /**
+     *
+     * @return 时间格式 yyyy-MM-dd HH:mm:ss
+     */
+    public String getFormatDate(){
+        Date date = new Date();
+        if(date != null){
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            return formatter.format(date);
+        }
+
+        return null;
+    }
+
 }
