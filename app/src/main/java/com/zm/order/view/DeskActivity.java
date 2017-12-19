@@ -91,8 +91,6 @@ public class DeskActivity extends AppCompatActivity {
         setContentView(R.layout.activity_desk);
 
 
-        EventBus.getDefault().register(this);
-
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         if(actionBar != null){
             actionBar.setHomeButtonEnabled(true);
@@ -352,7 +350,7 @@ public class DeskActivity extends AppCompatActivity {
                                 {
                                     try
                                     {
-                                        sleep(2000);
+                                        sleep(1000);
                                     } catch (InterruptedException e)
                                     {
                                         // TODO 自动生成的 catch 块
@@ -493,12 +491,6 @@ public class DeskActivity extends AppCompatActivity {
         return true;
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN,sticky = true)
-    public void set(MessageEvent messageEvent){
-
-        Log.e("Test",messageEvent.getMessage());
-
-    }
 
 
     private void turnScan() {
@@ -514,7 +506,7 @@ public class DeskActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        EventBus.getDefault().unregister(this);
+
     }
 
     @Override
