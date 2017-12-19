@@ -1414,7 +1414,7 @@ public class PayActivity extends AppCompatActivity {
         //  show();
         //
        // changeTableState(); 有可能接着在这里吃饭，人还没走，所以不能置闲桌位
-        /* BluetoothAdapter btAdapter = BluetoothUtil.getBTAdapter();
+       BluetoothAdapter btAdapter = BluetoothUtil.getBTAdapter();
          if(!btAdapter.isEnabled()){
 
              btAdapter.enable();
@@ -1459,7 +1459,7 @@ public class PayActivity extends AppCompatActivity {
             turnDesk();
 
 
-        }*/
+        }
 
     }
     /**
