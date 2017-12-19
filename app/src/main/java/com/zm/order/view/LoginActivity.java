@@ -3,6 +3,8 @@ package com.zm.order.view;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
@@ -22,6 +24,7 @@ import com.tencent.bugly.Bugly;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.zm.order.R;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 

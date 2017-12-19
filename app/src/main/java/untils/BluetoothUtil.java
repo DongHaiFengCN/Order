@@ -49,6 +49,7 @@ public class BluetoothUtil {
     }
 
     public static BluetoothSocket getSocket(BluetoothDevice device) throws IOException {
+
         BluetoothSocket socket = device.createRfcommSocketToServiceRecord(PRINTER_UUID);
         socket.connect();
         return socket;

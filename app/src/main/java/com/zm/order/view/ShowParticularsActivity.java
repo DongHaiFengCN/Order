@@ -106,64 +106,72 @@ public class ShowParticularsActivity extends Activity {
                                 .setPositiveButton("是", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        //1\
-                                        GoodsC goodsC = goodsCList.get(position);
-                                        //2\
-                                        OrderC orderC = CDBHelper.getObjById(getApplicationContext(),goodsC.getOrder(),OrderC.class);
-                                        //3\
-                                        //打印goodslist
-                                        {
-                                            Log.e("orderC.getGoodsList()",orderC.getGoodsList().size()+"");
-                                        }
 
-                                        for (int i = 0;i<orderC.getGoodsList().size();i++){
-
-                                            float sl = MyBigDecimal.sub(goodsCList.get(position).getDishesCount(),Float.parseFloat(editText.getText().toString()),1);
-                                            if (sl > -1){
-
-
-                                                if (sl == 0.0){
-                                                    orderC.getGoodsList().get(i).setGoodsType(1);
-                                                    DishesC dishesC = CDBHelper.getObjById(getApplicationContext(),orderC.getGoodsList().get(i).getDishesId(),DishesC.class);
-                                                    dishesC.setDishesName(dishesC.getDishesName()+"(退)");
-                                                    float all = MyBigDecimal.sub(orderC.getAllPrice(),orderC.getGoodsList().get(i).getAllPrice(),1);
-                                                    orderC.setAllPrice(all);
-                                                    orderC.getGoodsList().get(i).setAllPrice(0);
-                                                    orderC.getGoodsList().get(i).setDishesCount(0);
-
-                                                }else{
-
-                                                    DishesC dishesC = CDBHelper.getObjById(getApplicationContext(),orderC.getGoodsList().get(i).getDishesId(),DishesC.class);
-                                                    float allPrice = MyBigDecimal.mul(dishesC.getPrice(),sl,1);
-                                                    orderC.getGoodsList().get(i).setAllPrice(allPrice);
-                                                    float allPrice1 = MyBigDecimal.mul(dishesC.getPrice(),Float.parseFloat(editText.getText().toString()),1);
-                                                    orderC.getGoodsList().get(i).setDishesCount(sl);
-                                                    orderC.setAllPrice(MyBigDecimal.sub(orderC.getAllPrice(),allPrice1,1));
-                                                }
-
-                                            }else{
-                                                Toast.makeText(ShowParticularsActivity.this,"你输入的数量大于你点的数量，请重新输入！",Toast.LENGTH_LONG).show();
+                                        if (goodsCList.get(position).getDishesCount() > 0.0){
+                                            //1\
+                                            GoodsC goodsC = goodsCList.get(position);
+                                            //2\
+                                            OrderC orderC = CDBHelper.getObjById(getApplicationContext(),goodsC.getOrder(),OrderC.class);
+                                            //3\
+                                            //打印goodslist
+                                            {
+                                                Log.e("orderC.getGoodsList()",orderC.getGoodsList().size()+"");
                                             }
 
+                                            for (int i = 0;i < orderC.getGoodsList().size(); i++){
+                                                if (orderC.getGoodsList().get(i).getDishesName().equals(goodsC.getDishesName())){
+                                                    float sl = MyBigDecimal.sub(goodsCList.get(position).getDishesCount(),Float.parseFloat(editText.getText().toString()),1);
+                                                    if (sl > -1){
+
+                                                        if (sl == 0.0){
+                                                            orderC.getGoodsList().get(i).setGoodsType(1);
+                                                            orderC.getGoodsList().get(i).setDishesName(orderC.getGoodsList().get(i).getDishesName()+"(退)");
+                                                            float all = MyBigDecimal.sub(orderC.getAllPrice(),orderC.getGoodsList().get(i).getAllPrice(),1);
+                                                            orderC.setAllPrice(all);
+                                                            orderC.addOtherGoods(orderC.getGoodsList().get(i));
+                                                            orderC.getGoodsList().remove(i);
+
+                                                        }else{
+
+                                                            DishesC dishesC = CDBHelper.getObjById(getApplicationContext(),orderC.getGoodsList().get(i).getDishesId(),DishesC.class);
+                                                            float allPrice = MyBigDecimal.mul(dishesC.getPrice(),sl,1);
+                                                            orderC.getGoodsList().get(i).setAllPrice(allPrice);
+                                                            float allPrice1 = MyBigDecimal.mul(dishesC.getPrice(),Float.parseFloat(editText.getText().toString()),1);
+                                                            orderC.getGoodsList().get(i).setDishesCount(sl);
+                                                            orderC.setAllPrice(MyBigDecimal.sub(orderC.getAllPrice(),allPrice1,1));
+                                                            orderC.addOtherGoods(orderC.getGoodsList().get(i));
+                                                        }
+
+
+
+                                                    }else{
+                                                        Toast.makeText(ShowParticularsActivity.this,"你输入的数量大于你点的数量，请重新输入！",Toast.LENGTH_LONG).show();
+                                                    }
+
+                                                }
+                                            }
+
+                                            //打印goodslist
+                                            {
+                                                Log.e("orderC.getGoodsList()",orderC.getGoodsList().size()+"");
+                                            }
+                                            //4\保存orderC
+
+                                            CDBHelper.createAndUpdate(getApplicationContext(),orderC);
+                                            //5\ 创建退菜记录
+                                            RetreatOrderC retreatOrderC = new RetreatOrderC(myapp.getCompany_ID());
+                                            retreatOrderC.setState(0);
+                                            retreatOrderC.setOrderCId(orderC.get_id());
+                                            //6
+                                            goodsCList.remove(position);
+                                            setAll();
+                                            adatper.notifyDataSetChanged();
+                                            dialog.dismiss();
+                                        }else{
+                                            Toast.makeText(ShowParticularsActivity.this,"菜品数量为0，不可以退菜！",Toast.LENGTH_LONG).show();
                                         }
 
-                                        //打印goodslist
-                                        {
-                                            Log.e("orderC.getGoodsList()",orderC.getGoodsList().size()+"");
-                                        }
-                                        //4\保存orderC
 
-                                        CDBHelper.createAndUpdate(getApplicationContext(),orderC);
-                                        //5\ 创建退菜记录
-                                        RetreatOrderC retreatOrderC = new RetreatOrderC(myapp.getCompany_ID());
-                                        retreatOrderC.setState(0);
-                                        retreatOrderC.setOrderCId(orderC.get_id());
-                                        //6
-
-                                        //goodsCList.remove(position);
-                                        setAll();
-                                        adatper.notifyDataSetChanged();
-                                        dialog.dismiss();
                                     }
                                 });
                         builder.setNegativeButton("否", new DialogInterface.OnClickListener() {
@@ -175,16 +183,6 @@ public class ShowParticularsActivity extends Activity {
                         builder.create().show();
                     }
                 });
-
-                Button zc = view1.findViewById(R.id.dialog_zc);
-                zc.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        builder.dismiss();
-
-                    }
-                });
-
                 Button shi = view1.findViewById(R.id.dialog_tuicai_qd);
                 shi.setOnClickListener(new View.OnClickListener() {
                     @Override

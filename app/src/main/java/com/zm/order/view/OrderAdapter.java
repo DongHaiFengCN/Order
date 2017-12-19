@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.zm.order.R;
@@ -40,6 +41,7 @@ public class OrderAdapter extends BaseAdapter {
     private MainActivity context;
     private int Price = 0;
     private Handler mHandler= new Handler();
+    private setOnItemListener listener;
 
     public void setOnchangeListener(OnchangeListener onchangeListener) {
         this.onchangeListener = onchangeListener;
@@ -49,6 +51,9 @@ public class OrderAdapter extends BaseAdapter {
         orderItem.add(sparseArray);
         notifyDataSetChanged();
 
+    }
+    public void setListener(setOnItemListener listener){
+        this.listener = listener;
     }
 
     private OnchangeListener onchangeListener;
@@ -98,6 +103,7 @@ public class OrderAdapter extends BaseAdapter {
             viewHold.price = view.findViewById(R.id.price);
             viewHold.number =view.findViewById(R.id.amount_view);
             viewHold.number.getEtAmount().setEnabled(false);
+            viewHold.order_lin = view.findViewById(R.id.order_lin);
             view.setTag(viewHold);
 
         }else{
@@ -115,6 +121,12 @@ public class OrderAdapter extends BaseAdapter {
 
         viewHold.number.setNumber(goodsCs.get(i).getDishesCount()+"");
 
+        viewHold.order_lin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.setListener(i);
+            }
+        });
 
 
         if (goodsCs.get(i).getDishesId() != null){
@@ -188,7 +200,7 @@ public class OrderAdapter extends BaseAdapter {
         TextView taste;
 
         TextView price;
-
+        LinearLayout order_lin;
 
         AmountView number;
 
@@ -199,6 +211,10 @@ public class OrderAdapter extends BaseAdapter {
     interface OnchangeListener{
 
        void onchangeListener(boolean flag,float price,float sum);
+    }
+
+    interface setOnItemListener{
+        void setListener(int pos);
     }
 
 

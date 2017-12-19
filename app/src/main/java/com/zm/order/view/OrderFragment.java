@@ -259,6 +259,7 @@ public class OrderFragment extends Fragment implements IMainView {
                     goodsC.setDishesCount(sum);
                     String all = MyBigDecimal.mul(sum+"",price+"",2);
                     goodsC.setAllPrice(Float.parseFloat(all));
+                    goodsC.setGoodsType(0);
                     goodsC.setDishesId(doc.getId());
                     if ( doc.getString("dishesKindId") != null) {
                         DishesKindC dishesKind = CDBHelper.getObjById(getActivity().getApplicationContext(), doc.getString("dishesKindId"), DishesKindC.class);
