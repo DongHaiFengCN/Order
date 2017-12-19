@@ -348,7 +348,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 saveOrder();
-                if (total > 0) {
+                if (total == 0 || getGoodsList().size() > 0) {
                     //如果order列表开启状态就关闭
                     if (!flag) {
                         linearLayout.setAnimation(AnimationUtil.moveToViewBottom());
