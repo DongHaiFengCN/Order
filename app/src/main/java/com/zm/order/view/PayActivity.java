@@ -72,6 +72,8 @@ import untils.Tool;
  */
 
 public class PayActivity extends AppCompatActivity {
+
+    String id;
     @BindView(R.id.fact_tv)
     TextView factTv;
     @BindView(R.id.discount_tv)
@@ -125,6 +127,8 @@ public class PayActivity extends AppCompatActivity {
     //每增加一种支付方式创建一个支付详情，例如充值卡余额不足，剩下的部分用的现金。
     private List<PayDetailC> payDetailList = new ArrayList<>();
 
+
+    ConsumLogC consumLogC;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -688,15 +692,15 @@ public class PayActivity extends AppCompatActivity {
 
     private void setConsumLog(Document members, float consum) {
 
-        ConsumLogC consumLogC = new ConsumLogC();
+        consumLogC = new ConsumLogC();
         consumLogC.setClassName("ConsumLogC");
         consumLogC.setChannelId(myApplication.getCompany_ID());
         consumLogC.setMembersId(members.getId());
         consumLogC.setCardNo(members.getString("cardNum"));
-        consumLogC.setOrderNo(checkOrder.get_id());
+
         consumLogC.setCardConsum(consum);
         consumLogC.setTime(new Date());
-        CDBHelper.createAndUpdate(myApplication,consumLogC);
+
     }
 
     /**
@@ -856,12 +860,15 @@ public class PayActivity extends AppCompatActivity {
     public void turnDesk(){
 
        TableC obj = myApplication.getTable_sel_obj();
+
+       obj.setLastCheckOrderId(id);
        obj.setState(0);
        CDBHelper.createAndUpdate(getApplicationContext(),tableC);
-
         Intent intent = new Intent(PayActivity.this,DeskActivity.class);
         startActivity(intent);
         finish();
+
+
     }
 
 
@@ -1409,7 +1416,15 @@ public class PayActivity extends AppCompatActivity {
         checkOrder.setPromotionDetail(promotionD);
 
         CDBHelper.createAndUpdate(getApplicationContext(), promotionD);
-        CDBHelper.createAndUpdate(getApplicationContext(), checkOrder);
+        id = CDBHelper.createAndUpdate(getApplicationContext(), checkOrder);
+
+        //设置会员消费记录的checkorder ID
+        if(consumLogC != null){
+            consumLogC.setOrderNo(id);
+            CDBHelper.createAndUpdate(myApplication,consumLogC);
+        }
+
+
 
         //turnDesk();
 

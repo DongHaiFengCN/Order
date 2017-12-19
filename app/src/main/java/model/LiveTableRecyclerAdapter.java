@@ -95,11 +95,12 @@ public class LiveTableRecyclerAdapter extends RecyclerView.Adapter<LiveTableRecy
 
         view.setOnClickListener(new View.OnClickListener()
         {   //为每一个item绑定监听
+            @Override
             public void onClick(View v)
             {
                 // TODO 自动生成的方法存根
-                if (itemClickListener != null)
-                itemClickListener.onItemClick(v,v.getTag());
+                if (itemClickListener != null){
+                itemClickListener.onItemClick(v,v.getTag());}
             }
         });
         view.setOnLongClickListener(new View.OnLongClickListener()
@@ -108,9 +109,11 @@ public class LiveTableRecyclerAdapter extends RecyclerView.Adapter<LiveTableRecy
             public boolean onLongClick(View v)
             {
 
-                if (itemClickListener != null)
+                if (itemClickListener != null){
                     itemClickListener.onItemLongClick(v,v.getTag());
-                return false;
+               }
+               return true;
+
             }
         });
 

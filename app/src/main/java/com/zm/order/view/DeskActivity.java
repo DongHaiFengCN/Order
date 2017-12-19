@@ -77,6 +77,9 @@ public class DeskActivity extends AppCompatActivity {
                     String id = (String)msg.obj;
                     showDeskListView(id);
                     break;
+                case 2: //没有订单
+                   Toast.makeText(DeskActivity.this,"没有订单！",Toast.LENGTH_SHORT).show();
+                    break;
                 default:
                     break;
             }
@@ -255,124 +258,140 @@ public class DeskActivity extends AppCompatActivity {
             public void onItemLongClick(View view,Object data)
             {
                 String tableId = (String)data;
-                final TableC tableC=CDBHelper.getObjById(getApplicationContext(),tableId,TableC.class);
+                final TableC tableC = CDBHelper.getObjById(getApplicationContext(),tableId,TableC.class);
                 myapp.setTable_sel_obj(tableC);
 
                 //空闲状态下重置上一次未买单状态
                 if(tableC.getState()==0){
 
-                    //获取今天日期
-
-                    Date date = new Date();
-                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-
-
-
-                   Log.e("Test","当前时间："+formatter.format(date));
-                    Log.e("Test"," 当前桌号"+tableC.getTableNum());
-                    //判断有checkorder
-
-                    List<CheckOrderC> checkOrderCS = CDBHelper.getObjByWhere(getApplicationContext()
-                            , Expression.property("className").equalTo("CheckOrderC")
-                                    .and(Expression.property("checkTime").like("%"+formatter.format(date)+ "%"))
-                            , null, CheckOrderC.class);
-
-
-                    Iterator<CheckOrderC> iterator = checkOrderCS.iterator();
-
-                    CheckOrderC checkOrderC = null;
-
-                    //移除不是当前桌的订单
-                    while (iterator.hasNext()){
-
-                        CheckOrderC c = iterator.next();
-
-                        if(!c.getTableNo().equals(tableC.getTableNum())){
-                            iterator.remove();
-
-                        }
-                    }
-
-                    if(checkOrderCS.size() > 0){
-
-
-                        List<String> dateList = new ArrayList<>();
-
-                        //获取当前桌订单今日时间集合
-                        for (int i = 0; i < checkOrderCS.size(); i++) {
-
-
-                            dateList.add(checkOrderCS.get(i).getCheckTime());
-
-                        }
-                            for (int i = 0; i < checkOrderCS.size(); i++) {
-
-                                Log.e("Test","今日账单： "+checkOrderCS.get(i).getCheckTime()+" 桌号"+checkOrderCS.get(i).getTableNo());
-                            }
-
-
-                            //得到最近订单的坐标
-                            int f =  Tool.getLastCheckOrder(dateList);
-
-                          //  Log.e("Test","最近一次账单： "+checkOrderCS.get(f).getCheckTime()+" 桌号"+checkOrderCS.get(f).getTableNo());
-
-                            checkOrderC = checkOrderCS.get(f);
-
-
-                    }else {
-
-                        Toast.makeText(DeskActivity.this,"没有记录",Toast.LENGTH_LONG).show();
-                    }
-
-
-
-                  AlertDialog.Builder builder = new AlertDialog.Builder(DeskActivity.this);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(DeskActivity.this);
                     builder.setTitle("重置最近一次账单");
-                    final CheckOrderC finalCheckOrderC = checkOrderC;
-                    builder.setNegativeButton("确定", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
 
-
-                            final ProgressDialog proDialog = android.app.ProgressDialog.show(DeskActivity.this, "重置", "正在配置订单请稍等~");
-
-                            EventBus.getDefault().postSticky(finalCheckOrderC);
-
-                            Thread thread = new Thread()
-                            {
-                                @Override
-                                public void run()
-                                {
-                                    try
-                                    {
-                                        sleep(1000);
-                                    } catch (InterruptedException e)
-                                    {
-                                        // TODO 自动生成的 catch 块
-                                        e.printStackTrace();
-                                    }
-                                    proDialog.dismiss();//关闭proDialog
-
-                                    startActivity(new Intent(DeskActivity.this, ResetBillActivity.class));
-
-                                }
-                            };
-                            thread.start();
-
-
-
-                        }
-                    });
+                    builder.setNegativeButton("确定",null);
                     builder.setPositiveButton("取消", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
 
                         }
                     });
-                    builder.show();
+                   final AlertDialog alertDialog = builder.show();
+
+                   alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(new View.OnClickListener() {
+                       @Override
+                       public void onClick(View view) {
+
+
+                           final ProgressDialog proDialog = android.app.ProgressDialog.show(DeskActivity.this, "重置", "正在配置订单请稍等~");
+
+
+                           myapp.mExecutor.execute(new Runnable() {
+                               @Override
+                               public void run() {
+
+                                   CheckOrderC checkOrderC = null;
+
+
+                                   if(tableC.getLastCheckOrderId() == null || tableC.getLastCheckOrderId().isEmpty()){
+
+                                       long startTime=System.currentTimeMillis();//记录开始时间
+
+                                       Date date = new Date();
+                                       SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+
+
+                                       //查询当日的订单
+                                       List<CheckOrderC> checkOrderCS = CDBHelper.getObjByWhere(getApplicationContext()
+                                               , Expression.property("className").equalTo("CheckOrderC")
+                                                       .and(Expression.property("checkTime").like(formatter.format(date)+"%"))
+                                               , null, CheckOrderC.class);
+
+
+                                       long endTime=System.currentTimeMillis();//记录结束时间
+
+                                       float excTime=(float)(endTime-startTime)/1000;
+
+                                       Log.e("执行时间1：",excTime+"s");
+                                       Iterator<CheckOrderC> iterator = checkOrderCS.iterator();
 
 
 
+                                       //移除不是当前桌的订单
+                                       while (iterator.hasNext()){
+
+                                           CheckOrderC c = iterator.next();
+
+                                           if(!c.getTableNo().equals(tableC.getTableNum())){
+
+                                               iterator.remove();
+
+                                           }
+                                       }
+
+                                       if(checkOrderCS.size() > 0){
+
+                                           List<String> dateList = new ArrayList<>();
+
+                                           //获取当前桌订单今日时间集合
+                                           for (int i1 = 0; i1 < checkOrderCS.size(); i1++) {
+
+
+                                               dateList.add(checkOrderCS.get(i1).getCheckTime());
+
+                                           }
+
+                                           long endTime1=System.currentTimeMillis();//记录结束时间
+
+                                           float excTime1=(float)(endTime1-endTime)/1000;
+
+                                           Log.e("执行时间2：",excTime1+"s");
+
+                                           //得到最近订单的坐标
+                                           int f =  Tool.getLastCheckOrder(dateList);
+
+                                           long endTime2=System.currentTimeMillis();//记录结束时间
+
+                                           float excTime2=(float)(endTime2-endTime1)/1000;
+
+                                           Log.e("执行时间3：",excTime2+"s");
+                                           checkOrderC = checkOrderCS.get(f);
+
+                                           EventBus.getDefault().postSticky(checkOrderC);
+                                           startActivity(new Intent(DeskActivity.this, ResetBillActivity.class));
+                                       }else {
+
+                                           Message msg = Message.obtain();
+                                           msg.what = 2;
+                                           uiHandler.sendMessage(msg);
+                                       }
+
+                                   }else {
+
+
+
+                                       checkOrderC = CDBHelper.getObjById(getApplicationContext(),tableC.getLastCheckOrderId(),CheckOrderC.class);
+
+                                       EventBus.getDefault().postSticky(checkOrderC);
+                                       try {
+                                           Thread.sleep(1000);
+                                       } catch (InterruptedException e) {
+                                           e.printStackTrace();
+                                       }
+
+                                       startActivity(new Intent(DeskActivity.this, ResetBillActivity.class));
+
+                                   }
+
+                                   proDialog.dismiss();//关闭proDialog
+
+                               }
+                           });
+
+                           //获取今天日期
+
+                           alertDialog.dismiss();
+
+                       }
+                   });
 
 
                 }else {//使用&&预定状态

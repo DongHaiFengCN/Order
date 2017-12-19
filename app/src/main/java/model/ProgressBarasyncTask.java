@@ -118,7 +118,7 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
             PrintUtils.selectCommand(PrintUtils.NORMAL);
             PrintUtils.selectCommand(PrintUtils.ALIGN_LEFT);
             PrintUtils.printText(PrintUtils.printTwoData("订单编号", OrderId()+"\n"));
-            PrintUtils.printText(PrintUtils.printTwoData("下单时间", getFormatDate()+"\n"));
+            PrintUtils.printText(PrintUtils.printTwoData("下单时间", checkOrderC.getCheckTime()+"\n"));
             PrintUtils.printText(PrintUtils.printTwoData("人数："+m.getTable_sel_obj().getCurrentPersions(), "收银员："+waiter+"\n"));
             PrintUtils.printText("--------------------------------\n");
             PrintUtils.selectCommand(PrintUtils.BOLD);

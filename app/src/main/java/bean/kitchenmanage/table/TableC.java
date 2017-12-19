@@ -71,6 +71,21 @@ public class TableC implements Serializable{
 	 */
 	private List<UsersC> usersList;
 
+
+	public String getLastCheckOrderId() {
+		return lastCheckOrderId;
+	}
+
+	public void setLastCheckOrderId(String lastCheckOrderId) {
+		this.lastCheckOrderId = lastCheckOrderId;
+	}
+
+	/**
+	 * 记录最近一次checkorder订单id
+	 */
+
+	private String lastCheckOrderId;
+
 	public TableC()
 	{
 	}

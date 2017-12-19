@@ -101,7 +101,7 @@
 
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:text="确定重新提交订单"
+        android:text="重新提交订单"
         android:onClick="onClick"
         android:layout_marginBottom="2dp" />
 </LinearLayout>
