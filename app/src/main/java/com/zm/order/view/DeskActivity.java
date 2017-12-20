@@ -61,7 +61,6 @@ public class DeskActivity extends AppCompatActivity {
     private AreaAdapter areaAdapter;
     private RecyclerView listViewDesk;
     private LiveTableRecyclerAdapter tableadapter;
-
     private int flag = 0;
 
 
@@ -246,11 +245,26 @@ public class DeskActivity extends AppCompatActivity {
 
 
                 }else {
-                    myapp.setTable_sel_obj(tableC);
-                    //使用状态下跳到查看订单界面
-                    Intent mainIntent = new Intent();
-                    mainIntent.setClass(DeskActivity.this, ShowParticularsActivity.class);
-                    startActivity(mainIntent);
+                    List<OrderC> orderCList= CDBHelper.getObjByWhere(getApplicationContext(),
+                            Expression.property("className").equalTo("OrderC")
+                                    .and(Expression.property("tableNo").equalTo(tableC.getTableNum()))
+                                    .and(Expression.property("orderState").equalTo(1))
+                            ,null
+                            ,OrderC.class);
+
+                    Log.e("orderCList","orderCList.size()"+orderCList.size()+"-----"+tableC.getTableNum());
+                    if (orderCList.size() >0 ){
+                        myapp.setTable_sel_obj(tableC);
+                        //使用状态下跳到查看订单界面
+                        Intent mainIntent = new Intent();
+                        mainIntent.setClass(DeskActivity.this, ShowParticularsActivity.class);
+                        startActivity(mainIntent);
+                    }else {
+                        //转跳点餐界面
+                        turnMainActivity();
+
+                    }
+
                 }
 
             }
