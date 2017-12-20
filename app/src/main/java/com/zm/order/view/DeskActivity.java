@@ -305,6 +305,7 @@ public class DeskActivity extends AppCompatActivity {
                                    CheckOrderC checkOrderC = null;
 
 
+                                   //老数据没有字段遍历查询
                                    if(tableC.getLastCheckOrderId() == null || tableC.getLastCheckOrderId().isEmpty()){
 
                                        long startTime=System.currentTimeMillis();//记录开始时间
@@ -380,6 +381,7 @@ public class DeskActivity extends AppCompatActivity {
 
                                    }else {
 
+                                       //新数据查询
 
 
                                        checkOrderC = CDBHelper.getObjById(getApplicationContext(),tableC.getLastCheckOrderId(),CheckOrderC.class);
