@@ -942,7 +942,7 @@ public class PayActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
-                        setPayDetail(3, total);
+                        setPayDetail(4, total);
 
                         try {
                             submitCheckOrder();
@@ -982,7 +982,7 @@ public class PayActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialogInterface, int i) {
 
 
-                        setPayDetail(4, total);
+                        setPayDetail(3, total);
 
                         try {
                             submitCheckOrder();
