@@ -384,6 +384,7 @@ public class SeekT9Fragment extends Fragment {
                             if (!jg.getText().toString().equals("")&&jg.getText() != null){
                                 goods.setAllPrice(Float.parseFloat(jg.getText().toString()));
                                 goods.setDishesCount(1);
+                                goods.setDishesKindName("自点菜");
                                 //sgoods.setDishesId();
                                 ((MainActivity)getActivity()).getGoodsList().add(goods);
                                 //购物车计数器数据更新

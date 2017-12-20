@@ -29,6 +29,9 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    //打印机权限
+    <uses-permission android:name="android.hardware.usb.accessory" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:name="application.MyApplication"
@@ -86,6 +89,17 @@
             android:configChanges="keyboard|keyboardHidden|orientation"
             android:theme="@style/AppTheme.NoActionBar"
             ></activity>
+        <service
+            android:name="com.gprinter.service.GpPrintService"
+            android:enabled="true"
+            android:exported="true"
+            android:label="GpPrintService" >
+            <intent-filter>
+                <action android:name="com.gprinter.aidl.GpPrintService" />
+            </intent-filter>
+        </service>
+        <service android:name="com.gprinter.service.AllService" >
+        </service>
     </application>
 
 </manifest>
