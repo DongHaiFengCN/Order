@@ -100,8 +100,14 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
 
         if(true){ //支付成功
 
+            String waiter = "默认";
             MyApplication m = (MyApplication) payActivity.getApplicationContext();
-            String waiter =m.getUsersC().getEmployeeName();
+
+            if(m.getUsersC().getEmployeeName() != null && !m.getUsersC().getEmployeeName().isEmpty()){
+
+                waiter =m.getUsersC().getEmployeeName();
+            }
+
 
             String tableNumber = checkOrderC.getTableNo();
 
