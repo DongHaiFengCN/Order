@@ -42,6 +42,8 @@ public class ResetBillActivity extends AppCompatActivity {
 
     private List<GoodsC> goodsCList;
 
+    private CheckOrderC checkOrderC;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +70,8 @@ public class ResetBillActivity extends AppCompatActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     public void setMessage(CheckOrderC checkOrderC) {
+
+        this.checkOrderC = checkOrderC;
 
         tableNumberTv.setText(" 桌号：" + checkOrderC.getTableNo());
 
@@ -118,6 +122,9 @@ public class ResetBillActivity extends AppCompatActivity {
             orderC.setOrderState(1);
             CDBHelper.createAndUpdate(getApplicationContext(), orderC);
         }
+
+        //删除之前的checkorder记录
+        CDBHelper.deleDocumentById(getApplicationContext(),checkOrderC.get_id());
 
         startActivity(new Intent(ResetBillActivity.this, PayActivity.class));
     }
