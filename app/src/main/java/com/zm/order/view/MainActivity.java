@@ -626,6 +626,7 @@ public class MainActivity extends AppCompatActivity {
                         orderC.setAllPrice(total);
                         orderC.setOrderState(1);
                         orderC.setOrderType(1);
+                        orderC.setCreatedTime(getFormatDate());
                         orderC.setTableNo(myApp.getTable_sel_obj().getTableNum());
                         orderC.setTableName(myApp.getTable_sel_obj().getTableName());
                         AreaC areaC = CDBHelper.getObjById(getApplicationContext(),myApp.getTable_sel_obj().getAreaId(), AreaC.class);
@@ -644,6 +645,7 @@ public class MainActivity extends AppCompatActivity {
                                 obj.setOrder(orderC.get_id());
                                 CDBHelper.createAndUpdate(getApplicationContext(),obj);
                             }
+                            orderC.setCreatedTime(getFormatDate());
                             orderC.setGoodsList(goodsList);
                             orderC.setAllPrice(total);
                             CDBHelper.createAndUpdate(getApplicationContext(),orderC);

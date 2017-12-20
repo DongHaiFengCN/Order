@@ -64,17 +64,23 @@ public class ShowParticularsAdapter extends BaseAdapter {
         viewHolder.dj = convertView.findViewById(R.id.item_show_dj);
         viewHolder.mc = convertView.findViewById(R.id.item_show_mc);
         viewHolder.sl = convertView.findViewById(R.id.item_show_sl);
+        viewHolder.kw = convertView.findViewById(R.id.item_show_kw);
         viewHolder.item_show_lin = convertView.findViewById(R.id.item_show_lin);
 
         viewHolder.dj.setText(goodsCs.get(position).getAllPrice()+"");
         viewHolder.mc.setText(goodsCs.get(position).getDishesName());
         viewHolder.sl.setText(goodsCs.get(position).getDishesCount()+"");
+        if(goodsCs.get(position).getDishesTaste() != null){
+            viewHolder.kw.setText(goodsCs.get(position).getDishesTaste());
+        }else{
+            viewHolder.kw.setText("");
+        }
 
         return convertView;
     }
 
     class ViewHolder{
-        private TextView mc,dj,sl;
+        private TextView mc,dj,sl,kw;
         private LinearLayout item_show_lin;
 
     }
