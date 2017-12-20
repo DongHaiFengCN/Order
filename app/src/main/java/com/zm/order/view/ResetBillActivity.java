@@ -37,7 +37,6 @@ public class ResetBillActivity extends AppCompatActivity {
     @BindView(R.id.needpay_tv)
     TextView needpayTv;
 
-
     private List<OrderC> orderCList;
 
     private List<GoodsC> goodsCList;
@@ -47,6 +46,7 @@ public class ResetBillActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_reset_bill);
         ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -59,6 +59,7 @@ public class ResetBillActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
+
         EventBus.getDefault().unregister(this);
     }
 
