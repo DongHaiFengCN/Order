@@ -29,6 +29,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import untils.MyLog;
+import untils.Tool;
 
 
 public class DiscountActivity extends AppCompatActivity {
@@ -115,7 +116,10 @@ public class DiscountActivity extends AppCompatActivity {
 
                        if(stashTotal >= Float.valueOf(discountEt.getText().toString())){
 
-                           totalTv.setText((stashTotal-Float.valueOf(discountEt.getText().toString()))+"");
+                           totalTv.setText(Tool.substrct(stashTotal,Float.valueOf(discountEt.getText().toString()))+"");
+
+
+                          // totalTv.setText((stashTotal-Float.valueOf(discountEt.getText().toString()))+"");
 
                        }
                    }
@@ -209,11 +213,13 @@ public class DiscountActivity extends AppCompatActivity {
 
 
             if(inputMethodManager.isActive()){
+
                 inputMethodManager.hideSoftInputFromWindow(DiscountActivity.this.getCurrentFocus().getWindowToken(), 0);
             }
         }
 
         switch (view.getId()) {
+
             case R.id.unit_ten:
 
                 compareTotal(100f);
@@ -233,8 +239,8 @@ public class DiscountActivity extends AppCompatActivity {
 
                 Intent intent = new Intent();
                 intent.putExtra("Total", getTextTotal());
-                intent.putExtra("Margin",stashTotal-getTextTotal());
-                MyLog.e(getTextTotal()+"");
+                intent.putExtra("Margin", Tool.substrct(stashTotal,getTextTotal()));
+               // MyLog.e(getTextTotal()+"");
                 setResult(RESULT_OK, intent);
                 finish();
 
