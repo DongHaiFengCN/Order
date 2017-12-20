@@ -18,6 +18,7 @@ import application.MyApplication;
 import bean.kitchenmanage.order.CheckOrderC;
 import bean.kitchenmanage.order.GoodsC;
 import bean.kitchenmanage.order.OrderC;
+import bean.kitchenmanage.order.PayDetailC;
 import untils.BluetoothUtil;
 import untils.MyLog;
 import untils.PrintUtils;
@@ -151,9 +152,55 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
             PrintUtils.printText("--------------------------------\n");
             PrintUtils.printText(PrintUtils.printTwoData("实收", checkOrderC.getNeedPay()+"\n"));
             PrintUtils.printText("--------------------------------\n");
-          /*  PrintUtils.selectCommand(PrintUtils.ALIGN_LEFT);
-            PrintUtils.printText("备注：");
-            PrintUtils.printText("\n\n\n\n\n");*/
+            PrintUtils.selectCommand(PrintUtils.ALIGN_LEFT);
+
+            List<PayDetailC> payDetailCList = checkOrderC.getPromotionDetail().getPayDetailList();
+            StringBuffer stringBuffer = new StringBuffer("");
+
+            if(payDetailCList != null && !payDetailCList.isEmpty()){
+
+
+                for (int i = 0; i < payDetailCList.size(); i++) {
+
+                    PayDetailC p = payDetailCList.get(i);
+
+                    switch (p.getPayTypes()){
+
+                        case 1:
+                            stringBuffer.append("现金 ");
+                            break;
+                        case 2:
+                            stringBuffer.append("银行卡 ");
+                            break;
+                        case 3:
+                            stringBuffer.append("微信 ");
+                            break;
+                        case 4:
+                            stringBuffer.append("支付宝 ");
+                            break;
+                        case 5:
+                            stringBuffer.append("美团 ");
+                            break;
+                        case 6:
+                            stringBuffer.append("会员卡 ");
+                            break;
+                        case 7:
+                            stringBuffer.append("抹零 ");
+                            break;
+                        case 8:
+                            stringBuffer.append("赠卷 ");
+                            break;
+
+                        default:
+                            break;
+
+                    }
+
+                }
+
+            }
+            PrintUtils.printText("支付方式："+stringBuffer.toString());
+            PrintUtils.printText("\n\n\n\n\n");
             PrintUtils.printText("\n\n\n\n");
             PrintUtils.closeOutputStream();
 
