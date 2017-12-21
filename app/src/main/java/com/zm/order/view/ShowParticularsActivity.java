@@ -267,10 +267,12 @@ public class ShowParticularsActivity extends Activity {
                                 //2\
                                 OrderC orderC = CDBHelper.getObjById(getApplicationContext(),goodsC.getOrder(),OrderC.class);
                                 float allP = 0;
-                                for (int i = 0;i< orderC.getGoodsList().size();i++){
-                                    if (orderC.getGoodsList().get(i).getDishesName().equals(goodsC.getDishesName())){
-                                        DishesC dishesC = CDBHelper.getObjById(getApplicationContext(),orderC.getGoodsList().get(i).getDishesId(),DishesC.class);
-                                        float je = MyBigDecimal.mul(Float.parseFloat(editText.getText().toString()),dishesC.getPrice(),1);
+                                for (int i = 0;i< orderC.getGoodsList().size();i++)
+                                {
+                                    if (orderC.getGoodsList().get(i).getDishesName().equals(goodsC.getDishesName()))
+                                    {
+                                        //DishesC dishesC = CDBHelper.getObjById(getApplicationContext(),orderC.getGoodsList().get(i).getDishesId(),DishesC.class);
+                                        float je = MyBigDecimal.mul(Float.parseFloat(editText.getText().toString()),MyBigDecimal.div(goodsC.getAllPrice(),goodsC.getDishesCount(),2),1);
                                         orderC.getGoodsList().get(i).setAllPrice(je);
 
                                         GoodsC goodsC1 = new GoodsC(myapp.getCompany_ID());
