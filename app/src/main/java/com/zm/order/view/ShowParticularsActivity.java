@@ -73,7 +73,16 @@ public class ShowParticularsActivity extends Activity {
     private BluetoothDevice device;
     private BluetoothSocket socket;
 
+    /**
+     *
+     * @param obj
+     * @param type 1、退菜  2、加菜
+     * @param TableNum
+     * @param TableName
+     * @return
+     */
     private  boolean printerToKitchen(GoodsC obj, int type , String TableNum,String TableName){
+
         return false;
     }
 

@@ -57,13 +57,15 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
     private static final String TAG = Application.class.getSimpleName();
 
     private final static boolean SYNC_ENABLED = true;
-    private final static String DATABASE_NAME = "gyszdb";
 
+//    private String Company_ID="gysz";
+//    private final static String DATABASE_NAME = "gyszdb";
+//    private final static String SYNCGATEWAY_URL = "blip://123.207.174.171:4984/kitchendb/";
 
-    //private final static String SYNCGATEWAY_URL = "blip://60.217.194.246:4984/kitchenGYSZ/";
-   // private final static String SYNCGATEWAY_URL = "blip://123.207.174.171:4984/kitchendb/";
+    private String Company_ID="gysz";
+    private final static String DATABASE_NAME = "gyszdbD";
     private final static String SYNCGATEWAY_URL = "blip://192.168.2.174:4984/kitchendb/";
-    public static String Company_ID="gysz";
+
 
     private Database database = null;
     private Replicator replicator;
@@ -89,10 +91,11 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
         super.onCreate();
 
 
-       // Bugly.init(getApplicationContext(), "c11c0d8e58", true);
-        CrashReport.initCrashReport(getApplicationContext(), "c11c0d8e58", true);
-
-        startSession(DATABASE_NAME, null);
+        CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(this);
+        strategy.setAppChannel("商米");
+       Bugly.init(getApplicationContext(), "c11c0d8e58", true,strategy);
+       CrashReport.setUserId("1001");
+       startSession(DATABASE_NAME, null);
         mExecutor =  Executors.newCachedThreadPool();
 
     }
@@ -119,7 +122,7 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
     private void openDatabase(String dbname) {
         DatabaseConfiguration config = new DatabaseConfiguration(getApplicationContext());
         //File folder = new File(String.format("%s/SmartKitchenPad", Environment.getExternalStorageDirectory()));
-        //config.setDirectory(folder);
+       // config.setDirectory(folder);
        config.setConflictResolver(getConflictResolver());
         try {
             database = new Database(dbname, config);

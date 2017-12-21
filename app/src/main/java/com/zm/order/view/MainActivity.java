@@ -52,6 +52,8 @@ import com.gprinter.io.GpDevice;
 import com.gprinter.io.PortParameters;
 import com.gprinter.save.PortParamDataBase;
 import com.gprinter.service.GpPrintService;
+import com.tencent.bugly.crashreport.BuglyLog;
+import com.tencent.bugly.crashreport.CrashReport;
 import com.zm.order.R;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -119,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
     private GpService mGpService = null;
     private Map<String,ArrayList<GoodsC>> allKitchenClientGoods=new HashMap<String,ArrayList<GoodsC>>();
     private Map<String, String> allKitchenClientPrintNames=new HashMap<String, String>();
-    private static String pIp = "192.168.2.101";
+    private static String pIp = "192.168.1.249";
     private static int pPortNum = 9100;
     private String tableName,areaName,currentPersions,serNum;
     private static final int MAIN_QUERY_PRINTER_STATUS = 0xfe;
@@ -739,7 +741,7 @@ public class MainActivity extends AppCompatActivity {
             // 打印文字
             esc.addSelectPrintModes(EscCommand.FONT.FONTA, EscCommand.ENABLE.OFF, EscCommand.ENABLE.OFF, EscCommand.ENABLE.OFF, EscCommand.ENABLE.OFF);// 取消倍高倍宽
             esc.addSelectJustification(EscCommand.JUSTIFICATION.LEFT);// 设置打印左对齐
-            esc.addSetLeftMargin((short)10);
+           // esc.addSetLeftMargin((short)10);
             esc.addText("流水号:" + serNum + "\n");//流水号生成机制开发
             esc.addText("房间:" + areaName + "   " + "桌位：" + tableName + "\n");// 打印文字
             esc.addText("人数:" + currentPersions + "\n");//流水号生成机制开发
@@ -797,23 +799,21 @@ public class MainActivity extends AppCompatActivity {
 
         }
         esc.addText("--------------------------------------------\n");
-        byte lines = 0x02;
-        esc.addPrintAndFeedLines(lines);
-//        esc.addCutPaper();
-        byte len = 0x05;
+        esc.addPrintAndLineFeed();
+
+        byte len = 0x01;
         esc.addCutAndFeedPaper(len);
 
-
-
-
+/*
         for (int i = 0; i < myshangpinlist.size(); i++)
         {
+            esc.addSelectPrintModes(EscCommand.FONT.FONTA, EscCommand.ENABLE.OFF, EscCommand.ENABLE.ON, EscCommand.ENABLE.ON, EscCommand.ENABLE.OFF); // 设置为倍高倍宽
 
-
-            esc.addText("房间:" + areaName + "   " + "桌位：" + tableName + "\n");// 打印文字
-            lines = 0x02;
-            esc.addPrintAndFeedLines(lines);
-            esc.addText("菜品名称         单价     数量    金额 \n"); // 菜品名称(14) 单价(6) 数量(5) 金额(7)
+            esc.addText("--------------------\n");
+            esc.addText("房间:" + areaName + "\n");// 打印文字
+            esc.addText("桌位："+ tableName +"\n");
+            esc.addText("--------------------\n");
+            esc.addPrintAndLineFeed();
 
             float num = 1; // 数量 默认为1
             num = myshangpinlist.get(i).getDishesCount();
@@ -821,47 +821,24 @@ public class MainActivity extends AppCompatActivity {
             String temp = myshangpinlist.get(i).getDishesTaste();
             if (temp == null || "".equals(temp))
             {
-                try
-                {
-                    for (int j = 0; j < (18 - myshangpinlist.get(i).getDishesName().toString().getBytes("gbk").length); j++)
-                        esc.addText(" ");
-                } catch (UnsupportedEncodingException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+                esc.addPrintAndLineFeed();
             }
             else
             {
                 esc.addText("(" + temp + ")");
-                try {
-                    for (int j = 0; j < (18 - myshangpinlist.get(i).getDishesName().toString().getBytes("gbk").length
-                            - temp.getBytes("gbk").length - 2); j++)
-                        esc.addText(" ");
-                } catch (UnsupportedEncodingException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+                esc.addPrintAndLineFeed();
             }
-            // 查找菜品的单价
 
-            String  strprice= ""+ MyBigDecimal.div(myshangpinlist.get(i).getAllPrice(),myshangpinlist.get(i).getDishesCount(),2);//myshangpinlist.get(i).getSinglePrice;
-            esc.addText(strprice);
-            for (int j = 0; j < 9 - strprice.length(); j++)
-                esc.addText(" ");
 
-            esc.addText("" + num);
-            for (int j = 0; j <7  - ("" + num).length(); j++)
-                esc.addText(" ");
-            esc.addText("" + (myshangpinlist.get(i).getAllPrice()) + "\n");
-
-            lines = 0x05;
-            esc.addPrintAndFeedLines(lines);
-            // esc.addCutPaper();
-            byte len1 = 0x05;
+            esc.addText("数量： " + num);
+            esc.addPrintAndLineFeed();
+            byte len1 = 0x01;
+            esc.addPrintAndFeedLines(len1);
             esc.addCutAndFeedPaper(len1);
 
-        }
 
+        }
+*/
 
         Vector<Byte> datas = esc.getCommand();
         // 发送数据
@@ -897,7 +874,6 @@ public class MainActivity extends AppCompatActivity {
             try {
               //  PortParamDataBase database = new PortParamDataBase(this);
                 PortParameters mPortParam = new PortParameters();
-
                 mPortParam.setPortType(PortParameters.ETHERNET);
                 mPortParam.setIpAddr(pIp);
                 mPortParam.setPortNumber(pPortNum);
@@ -938,10 +914,7 @@ public class MainActivity extends AppCompatActivity {
 
                             break;
                     }
-
                 }
-
-
 
                 //database.close();
                 GpCom.ERROR_CODE r = GpCom.ERROR_CODE.values()[rel];
@@ -1218,7 +1191,8 @@ public class MainActivity extends AppCompatActivity {
                             orderC.setSerialNum(getOrderSerialNum());
                         }
 
-                        Log.e("goodsList","goodsList---"+goodsList.size());
+
+                        BuglyLog.e("saveOrder", "goodsListSize="+goodsList.size());
 
                         for(GoodsC obj:goodsList)
                         {
@@ -1256,8 +1230,12 @@ public class MainActivity extends AppCompatActivity {
 
 
             });
-        } catch (CouchbaseLiteException e) {
+        } catch (CouchbaseLiteException e)
+        {
+
             e.printStackTrace();
+            CrashReport.postCatchedException(e);
+
         }
 
         printOrderToKitchen();
