@@ -47,6 +47,7 @@
             android:layout_marginRight="50sp"
             android:background="@drawable/animselect"
             android:ems="10"
+            android:gravity="center"
             android:imeOptions="flagNoExtractUi"
             android:inputType="text"
             android:textColor="@color/md_black_1000" />
@@ -79,6 +80,7 @@
             android:layout_marginRight="50sp"
             android:background="@drawable/animselect"
             android:ems="10"
+            android:gravity="center"
             android:textColor="@color/md_black_1000"
             android:imeOptions="flagNoExtractUi"
             android:inputType="number|numberDecimal" />

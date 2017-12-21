@@ -27,6 +27,8 @@
         android:focusable="false"
         android:gravity="center"
         android:textSize="22sp"
+        android:inputType="number"
+        android:digits="@string/zm"
         android:layout_marginRight="10dp"
         android:layout_marginLeft="10dp"
         />
@@ -284,5 +286,271 @@
 
         </TableRow>
     </TableLayout>
+
+    <LinearLayout
+        android:id="@+id/activity_seek_lin_26"
+        android:layout_weight="1.1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:layout_below="@+id/activity_seek_edit"
+        android:layout_marginTop="10dp">
+        <LinearLayout
+            android:layout_weight="1.2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_weight="1"
+            android:layout_marginTop="10dp"
+            >
+
+            <Button
+                android:id="@+id/seek_26_q"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="Q"
+                />
+            <Button
+                android:id="@+id/seek_26_w"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="W"
+                />
+            <Button
+                android:id="@+id/seek_26_e"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="e"
+                />
+            <Button
+                android:id="@+id/seek_26_r"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="R"
+                />
+            <Button
+                android:id="@+id/seek_26_t"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="t"
+                />
+            <Button
+                android:id="@+id/seek_26_y"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="y"
+                />
+            <Button
+                android:id="@+id/seek_26_u"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="u"
+                />
+            <Button
+                android:id="@+id/seek_26_i"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="i"
+                />
+            <Button
+                android:id="@+id/seek_26_o"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="o"
+                />
+            <Button
+                android:id="@+id/seek_26_p"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="p"
+                />
+
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1.2"
+                android:background="@null"
+                />
+            <Button
+                android:id="@+id/seek_26_a"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1.1"
+                android:text="a"
+                />
+            <Button
+                android:id="@+id/seek_26_s"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1.1"
+                android:text="s"
+                />
+            <Button
+                android:id="@+id/seek_26_d"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1.1"
+                android:text="d"
+                />
+            <Button
+                android:id="@+id/seek_26_f"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1.1"
+                android:text="f"
+                />
+            <Button
+                android:id="@+id/seek_26_g"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1.1"
+                android:text="g"
+                />
+            <Button
+                android:id="@+id/seek_26_h"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1.1"
+                android:text="h"
+                />
+            <Button
+                android:id="@+id/seek_26_j"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1.1"
+                android:text="j"
+                />
+            <Button
+                android:id="@+id/seek_26_k"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1.1"
+                android:text="k"
+                />
+            <Button
+                android:id="@+id/seek_26_l"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1.1"
+                android:text="l"
+                />
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1.2"
+                android:background="@null"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/seek_26_qh"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1.14"
+                android:text="切换"
+                />
+
+            <Button
+                android:id="@+id/seek_26_z"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1.2"
+                android:text="z"
+                />
+            <Button
+                android:id="@+id/seek_26_x"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1.2"
+                android:text="x"
+                />
+            <Button
+                android:id="@+id/seek_26_c"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1.2"
+                android:text="c"
+                />
+            <Button
+                android:id="@+id/seek_26_v"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1.2"
+                android:text="v"
+                />
+            <Button
+                android:id="@+id/seek_26_b"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1.2"
+                android:text="b"
+                />
+            <Button
+                android:id="@+id/seek_26_n"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1.2"
+                android:text="n"
+                />
+            <Button
+                android:id="@+id/seek_26_m"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1.2"
+                android:text="m"
+                />
+            <Button
+                android:id="@+id/seek_26_sc"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1.14"
+                android:text="删除"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_weight="1.2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+        </LinearLayout>
+
+
+    </LinearLayout>
 
 </LinearLayout>

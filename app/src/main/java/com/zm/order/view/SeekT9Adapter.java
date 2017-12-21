@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -50,9 +51,11 @@ public class SeekT9Adapter extends BaseAdapter {
     private int pos,p ;
     private DishesC dishesC;
     private MyApplication myapp ;
+    private EditText editText;
 
-    public SeekT9Adapter(MainActivity context) {
+    public SeekT9Adapter(MainActivity context, EditText editText) {
         this.activity = context;
+        this.editText = editText;
         myapp = (MyApplication) activity.getApplication();
     }
 
@@ -259,7 +262,7 @@ public class SeekT9Adapter extends BaseAdapter {
 
 
     private void setTJ(int position , SparseArray<Object> s,ViewHolder viewHolder){
-
+        editText.setText("");
         mData.get(position).setDishesCount(mData.get(position).getDishesCount()+1);
         GoodsC goodsC = new GoodsC(myapp.getCompany_ID());
         String gID = CDBHelper.createAndUpdate(activity.getApplicationContext(),goodsC);

@@ -187,6 +187,7 @@ public class OrderFragment extends Fragment implements IMainView {
         final TextView price_tv = view.findViewById(R.id.price);
 
         final AmountView amountView = view.findViewById(R.id.amount_view);
+        amountView.setNumber("1.0");
         getDishesIdList.clear();
         tasteList.clear();
         String all = MyBigDecimal.mul(amountView.getAmount()+"",price+"",2);
@@ -234,7 +235,6 @@ public class OrderFragment extends Fragment implements IMainView {
             }
         });
         recyclerView.setAdapter(myGridAdapter);
-
         AlertDialog.Builder builder = new AlertDialog
                 .Builder(getActivity());
         builder.setTitle(name);

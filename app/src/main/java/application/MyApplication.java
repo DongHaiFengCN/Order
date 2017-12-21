@@ -63,7 +63,7 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
     //private final static String SYNCGATEWAY_URL = "blip://60.217.194.246:4984/kitchenGYSZ/";
    // private final static String SYNCGATEWAY_URL = "blip://123.207.174.171:4984/kitchendb/";
     private final static String SYNCGATEWAY_URL = "blip://192.168.2.174:4984/kitchendb/";
-    private String Company_ID="gyszD";
+    public static String Company_ID="gysz";
 
     private Database database = null;
     private Replicator replicator;

@@ -7,6 +7,7 @@
     <string name="title_activity_pay">账单结算</string>
     <string name="title_activity_discount">账单优惠</string>
     <string name="title_activity_sale">会员特惠</string>
+    <string name="zm">0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
     <!--    &lt;!&ndash; Strings related to Settings &ndash;&gt;
 
     &lt;!&ndash; Example General settings &ndash;&gt;

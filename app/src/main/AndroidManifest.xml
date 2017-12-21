@@ -51,7 +51,8 @@
         <activity
             android:name=".view.MainActivity"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            />
         <activity
             android:name=".view.DeskActivity"
             android:launchMode="singleTask" />
@@ -69,7 +70,7 @@
         <activity
             android:name=".view.ShowParticularsActivity"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateVisible|adjustResize" />
+            android:windowSoftInputMode="stateAlwaysVisible|adjustPan"/>
         <activity
             android:name=".view.ScanActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar" />

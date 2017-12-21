@@ -69,7 +69,8 @@ public class AmountView extends LinearLayout implements View.OnClickListener {
         btnIncrease =  findViewById(R.id.btnIncrease);
         btnDecrease.setOnClickListener(this);
         btnIncrease.setOnClickListener(this);
-
+        etAmount.clearFocus();
+        etAmount.setFocusableInTouchMode(false);
         etAmount.setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -80,6 +81,12 @@ public class AmountView extends LinearLayout implements View.OnClickListener {
 
                     aBoolean = false;
 
+                }
+                if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    etAmount.setFocusableInTouchMode(true);
+                    etAmount.requestFocus();
+                    etAmount.setText(getAmount()+"");
+                    etAmount.selectAll();
                 }
 
                 return false;
