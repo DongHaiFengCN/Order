@@ -696,7 +696,7 @@ public class MainActivity extends AppCompatActivity {
     private void setOrderPrintState(String orderId)
     {
 
-        OrderC obj= CDBHelper.getObjById(getApplicationContext(),orderId,OrderC.class);
+        OrderC obj = CDBHelper.getObjById(getApplicationContext(),orderId,OrderC.class);
         obj.setPrintFlag(1);
         CDBHelper.createAndUpdate(getApplicationContext(),obj);
     }
@@ -1247,14 +1247,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                     }
-
-
-
-
-
                 }
-
-
             });
         } catch (CouchbaseLiteException e) {
             e.printStackTrace();
