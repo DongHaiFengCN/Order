@@ -72,10 +72,9 @@ public class ShowParticularsActivity extends Activity {
     private BluetoothAdapter btAdapter;
     private BluetoothDevice device;
     private BluetoothSocket socket;
-    private GetPrinterToKitchen printer;
 
-    private void setPrinterToKitchen(GetPrinterToKitchen printerToKitchen){
-        this.printer = printerToKitchen;
+    private  boolean printerToKitchen(GoodsC obj, int type , String TableNum,String TableName){
+        return false;
     }
 
 
@@ -146,7 +145,7 @@ public class ShowParticularsActivity extends Activity {
                                                 float all = MyBigDecimal.sub(orderC.getAllPrice(),orderC.getGoodsList().get(i).getAllPrice(),1);
                                                 orderC.setAllPrice(all);
                                                 orderC.addOtherGoods(orderC.getGoodsList().get(i));
-                                                printer.printerToKitchen(orderC.getGoodsList().get(i),1,myapp.getTable_sel_obj().getTableNum(),myapp.getTable_sel_obj().getTableName());
+                                                printerToKitchen(orderC.getGoodsList().get(i),1,myapp.getTable_sel_obj().getTableNum(),myapp.getTable_sel_obj().getTableName());
 
                                             }else{
                                                 GoodsC goodsC1 = new GoodsC(myapp.getCompany_ID());
@@ -159,7 +158,7 @@ public class ShowParticularsActivity extends Activity {
                                                 goodsC1.setGoodsType(1);
                                                 goodsC1.setDishesName(orderC.getGoodsList().get(i).getDishesName()+"(退)");
                                                 orderC.addOtherGoods(goodsC1);
-                                                printer.printerToKitchen(goodsC1,1,myapp.getTable_sel_obj().getTableNum(),myapp.getTable_sel_obj().getTableName());
+                                                printerToKitchen(goodsC1,1,myapp.getTable_sel_obj().getTableNum(),myapp.getTable_sel_obj().getTableName());
                                             }
 
 
@@ -243,7 +242,7 @@ public class ShowParticularsActivity extends Activity {
                                     goodsC1.setDishesName(orderC.getGoodsList().get(i).getDishesName());
                                     goodsC1.setAllPrice(orderC.getGoodsList().get(i).getAllPrice());
                                     goodsC1.setDishesCount(MyBigDecimal.sub(Float.parseFloat(editText.getText().toString()),orderC.getOtherGoodsList().get(i).getDishesCount(),1));
-                                    printer.printerToKitchen(orderC.getGoodsList().get(i),2,myapp.getTable_sel_obj().getTableNum(),myapp.getTable_sel_obj().getTableName());
+                                    printerToKitchen(orderC.getGoodsList().get(i),2,myapp.getTable_sel_obj().getTableNum(),myapp.getTable_sel_obj().getTableName());
 
                                     orderC.getGoodsList().get(i).setDishesCount(Float.parseFloat(editText.getText().toString()));
 
@@ -481,10 +480,6 @@ public class ShowParticularsActivity extends Activity {
     }
 
 
-    interface GetPrinterToKitchen{
 
-         boolean printerToKitchen(GoodsC obj, int type , String TableNum,String TableName);
-
-    }
 
 }
