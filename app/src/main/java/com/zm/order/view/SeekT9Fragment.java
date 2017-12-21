@@ -291,29 +291,31 @@ public class SeekT9Fragment extends Fragment {
 
     // 查询方法
     public void search(final String search) {
+        if (search.length() < 2)
+            return;
 
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (search.length() < 2)
-                            return;
+        myGoodsList.clear();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
 
-                        myGoodsList.clear();
 
-                        List<DishesC> dishesCs = CDBHelper.getObjByWhere(getActivity().getApplicationContext()
-                                , Expression.property("className").equalTo("DishesC")
-                                        .and(Expression.property("dishesNameCode9").like("%" + search + "%"))
-                                , null, DishesC.class);
-                        for (DishesC obj : dishesCs) {
-                            GoodsC goodsObj = new GoodsC(myapp.getCompany_ID());
-                            goodsObj.setDishesCount(0);
-                            goodsObj.setDishesId(obj.get_id());
-                            myGoodsList.add(goodsObj);
-                        }
-                        seekT9Adapter.setmData(myGoodsList);
-                        seekT9Adapter.notifyDataSetChanged();
-                    }
-                }).start();
+                List<DishesC> dishesCs = CDBHelper.getObjByWhere(getActivity().getApplicationContext()
+                        , Expression.property("className").equalTo("DishesC")
+                                .and(Expression.property("dishesNameCode9").like("%" + search + "%"))
+                        , null, DishesC.class);
+                for (DishesC obj : dishesCs) {
+                    GoodsC goodsObj = new GoodsC(myapp.getCompany_ID());
+                    goodsObj.setDishesCount(0);
+                    goodsObj.setDishesId(obj.get_id());
+                    myGoodsList.add(goodsObj);
+                }
+            }
+        }).start();
+
+
+        seekT9Adapter.setmData(myGoodsList);
+        seekT9Adapter.notifyDataSetChanged();
 
         //        List<Document> documentList=CDBHelper.getDocmentsByWhere((getActivity().getApplicationContext(), Expression.property("className").equalTo("DishesC")
 //                .and(Expression.property("dishesNameCode9").like(search+"%")),null,DishesC.class);
