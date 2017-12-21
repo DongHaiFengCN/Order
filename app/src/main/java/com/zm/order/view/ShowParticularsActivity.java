@@ -128,83 +128,89 @@ public class ShowParticularsActivity extends Activity {
                     tc.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            if (goodsCList.get(position).getDishesCount() > 0.0){
-                                //1\
-                                GoodsC goodsC = goodsCList.get(position);
-                                //2\
-                                OrderC orderC = CDBHelper.getObjById(getApplicationContext(),goodsC.getOrder(),OrderC.class);
-                                //3\
-                                //打印goodslist
-                                {
-                                    Log.e("orderC.getGoodsList()",orderC.getGoodsList().size()+"");
-                                }
-                                float allP = 0;
-                                for (int i = 0;i < orderC.getGoodsList().size(); i++){
-                                    if (orderC.getGoodsList().get(i).getDishesName().equals(goodsC.getDishesName())){
-                                        float sl = MyBigDecimal.sub(goodsC.getDishesCount(),Float.parseFloat(editText.getText().toString()),1);
-                                        if (sl > -1){
+                            if (editText.getText().toString().equals("")){
 
-                                            if (sl == 0.0){
+                                Toast.makeText(ShowParticularsActivity.this,"输入不得为空",Toast.LENGTH_LONG).show();
 
-                                                orderC.getGoodsList().get(i).setGoodsType(1);
-                                                orderC.getGoodsList().get(i).setDishesName(orderC.getGoodsList().get(i).getDishesName()+"(退)");
-                                                orderC.setAllPrice(MyBigDecimal.sub(orderC.getAllPrice(),orderC.getGoodsList().get(i).getAllPrice(),1));
-                                                orderC.getGoodsList().get(i).setAllPrice(0);
-                                                orderC.getGoodsList().get(i).setDishesCount(Float.parseFloat(editText.getText().toString()));
-                                                orderC.addOtherGoods(orderC.getGoodsList().get(i));
-                                                AreaC areaCs = CDBHelper.getObjById(getApplicationContext(),myapp.getTable_sel_obj().getAreaId(), AreaC.class);
-                                                printerToKitchen(orderC.getGoodsList().get(i),1,areaCs.getAreaName(),myapp.getTable_sel_obj().getTableName());
-                                                Log.e("areaCs",areaCs.getAreaName());
-                                                orderC.getGoodsList().remove(i);
+                            }else {
+
+                                if (goodsCList.get(position).getDishesCount() > 0.0) {
+                                    //1\
+                                    GoodsC goodsC = goodsCList.get(position);
+                                    //2\
+                                    OrderC orderC = CDBHelper.getObjById(getApplicationContext(), goodsC.getOrder(), OrderC.class);
+                                    //3\
+                                    //打印goodslist
+                                    {
+                                        Log.e("orderC.getGoodsList()", orderC.getGoodsList().size() + "");
+                                    }
+                                    float allP = 0;
+                                    for (int i = 0; i < orderC.getGoodsList().size(); i++) {
+                                        if (orderC.getGoodsList().get(i).getDishesName().equals(goodsC.getDishesName())) {
+                                            float sl = MyBigDecimal.sub(goodsC.getDishesCount(), Float.parseFloat(editText.getText().toString()), 1);
+                                            if (sl > -1) {
+
+                                                if (sl == 0.0) {
+
+                                                    orderC.getGoodsList().get(i).setGoodsType(1);
+                                                    orderC.getGoodsList().get(i).setDishesName(orderC.getGoodsList().get(i).getDishesName() + "(退)");
+                                                    orderC.setAllPrice(MyBigDecimal.sub(orderC.getAllPrice(), orderC.getGoodsList().get(i).getAllPrice(), 1));
+                                                    orderC.getGoodsList().get(i).setAllPrice(0);
+                                                    orderC.getGoodsList().get(i).setDishesCount(Float.parseFloat(editText.getText().toString()));
+                                                    orderC.addOtherGoods(orderC.getGoodsList().get(i));
+                                                    AreaC areaCs = CDBHelper.getObjById(getApplicationContext(), myapp.getTable_sel_obj().getAreaId(), AreaC.class);
+                                                    printerToKitchen(orderC.getGoodsList().get(i), 1, areaCs.getAreaName(), myapp.getTable_sel_obj().getTableName());
+                                                    Log.e("areaCs", areaCs.getAreaName());
+                                                    orderC.getGoodsList().remove(i);
 
 
-                                            }else{
-                                                GoodsC goodsC1 = new GoodsC(myapp.getCompany_ID());
-                                                DishesC dishesC = CDBHelper.getObjById(getApplicationContext(),orderC.getGoodsList().get(i).getDishesId(),DishesC.class);
-                                                float allPrice = MyBigDecimal.mul(dishesC.getPrice(),sl,1);
-                                                orderC.getGoodsList().get(i).setAllPrice(allPrice);
-                                                orderC.getGoodsList().get(i).setDishesCount(sl);
-                                                orderC.setAllPrice(MyBigDecimal.sub(orderC.getAllPrice(),MyBigDecimal.mul(dishesC.getPrice(),Float.parseFloat(editText.getText().toString()),1),1));
-                                                goodsC1.setDishesCount(Float.parseFloat(editText.getText().toString()));
-                                                goodsC1.setAllPrice(0);
-                                                goodsC1.setGoodsType(1);
-                                                goodsC1.setDishesName(orderC.getGoodsList().get(i).getDishesName()+"(退)");
-                                                orderC.addOtherGoods(goodsC1);
-                                                AreaC areaCs = CDBHelper.getObjById(getApplicationContext(),myapp.getTable_sel_obj().getAreaId(), AreaC.class);
-                                                printerToKitchen(goodsC1,1,areaCs.getAreaName(),myapp.getTable_sel_obj().getTableName());
-                                                Log.e("areaCs",areaCs.getAreaName());
+                                                } else {
+                                                    GoodsC goodsC1 = new GoodsC(myapp.getCompany_ID());
+                                                    DishesC dishesC = CDBHelper.getObjById(getApplicationContext(), orderC.getGoodsList().get(i).getDishesId(), DishesC.class);
+                                                    float allPrice = MyBigDecimal.mul(dishesC.getPrice(), sl, 1);
+                                                    orderC.getGoodsList().get(i).setAllPrice(allPrice);
+                                                    orderC.getGoodsList().get(i).setDishesCount(sl);
+                                                    orderC.setAllPrice(MyBigDecimal.sub(orderC.getAllPrice(), MyBigDecimal.mul(dishesC.getPrice(), Float.parseFloat(editText.getText().toString()), 1), 1));
+                                                    goodsC1.setDishesCount(Float.parseFloat(editText.getText().toString()));
+                                                    goodsC1.setAllPrice(0);
+                                                    goodsC1.setGoodsType(1);
+                                                    goodsC1.setDishesName(orderC.getGoodsList().get(i).getDishesName() + "(退)");
+                                                    orderC.addOtherGoods(goodsC1);
+                                                    AreaC areaCs = CDBHelper.getObjById(getApplicationContext(), myapp.getTable_sel_obj().getAreaId(), AreaC.class);
+                                                    printerToKitchen(goodsC1, 1, areaCs.getAreaName(), myapp.getTable_sel_obj().getTableName());
+                                                    Log.e("areaCs", areaCs.getAreaName());
+                                                }
+
+
+                                            } else {
+                                                Toast.makeText(ShowParticularsActivity.this, "你输入的数量大于你点的数量，请重新输入！", Toast.LENGTH_LONG).show();
                                             }
 
-
-
-                                        }else{
-                                            Toast.makeText(ShowParticularsActivity.this,"你输入的数量大于你点的数量，请重新输入！",Toast.LENGTH_LONG).show();
                                         }
+
 
                                     }
 
 
+                                    //打印goodslist
+                                    {
+                                        Log.e("orderC.getGoodsList()", orderC.getGoodsList().size() + "");
+                                    }
+                                    //4\保存orderC
+
+                                    CDBHelper.createAndUpdate(getApplicationContext(), orderC);
+                                    //5\ 创建退菜记录
+                                    RetreatOrderC retreatOrderC = new RetreatOrderC(myapp.getCompany_ID());
+                                    retreatOrderC.setState(0);
+                                    retreatOrderC.setOrderCId(orderC.get_id());
+                                    //6
+                                    //goodsCList.remove(position);
+                                    setAll();
+                                    adatper.notifyDataSetChanged();
+                                    builder.dismiss();
+                                } else {
+                                    Toast.makeText(ShowParticularsActivity.this, "菜品数量为0，不可以退菜！", Toast.LENGTH_LONG).show();
                                 }
-
-
-                                //打印goodslist
-                                {
-                                    Log.e("orderC.getGoodsList()",orderC.getGoodsList().size()+"");
-                                }
-                                //4\保存orderC
-
-                                CDBHelper.createAndUpdate(getApplicationContext(),orderC);
-                                //5\ 创建退菜记录
-                                RetreatOrderC retreatOrderC = new RetreatOrderC(myapp.getCompany_ID());
-                                retreatOrderC.setState(0);
-                                retreatOrderC.setOrderCId(orderC.get_id());
-                                //6
-                                //goodsCList.remove(position);
-                                setAll();
-                                adatper.notifyDataSetChanged();
-                                builder.dismiss();
-                            }else{
-                                Toast.makeText(ShowParticularsActivity.this,"菜品数量为0，不可以退菜！",Toast.LENGTH_LONG).show();
                             }
                         }
                     });
@@ -214,25 +220,33 @@ public class ShowParticularsActivity extends Activity {
                     zc.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            //1\
-                            GoodsC goodsC = goodsCList.get(position);
-                            //2\
-                            OrderC orderC = CDBHelper.getObjById(getApplicationContext(),goodsC.getOrder(),OrderC.class);
-                            float allP =0;
-                            for (int i = 0; i < orderC.getGoodsList().size(); i++){
-                                if (orderC.getGoodsList().get(i).getDishesName().equals(goodsC.getDishesName())){
-                                    orderC.getGoodsList().get(i).setGoodsType(2);
-                                    orderC.getGoodsList().get(i).setDishesName(goodsC.getDishesName()+"(赠)");
-                                    orderC.getGoodsList().get(i).setAllPrice(0);
 
+                            if (editText.getText().toString().equals("")){
+
+                                Toast.makeText(ShowParticularsActivity.this,"输入不得为空",Toast.LENGTH_LONG).show();
+
+                            }else {
+
+                                //1\
+                                GoodsC goodsC = goodsCList.get(position);
+                                //2\
+                                OrderC orderC = CDBHelper.getObjById(getApplicationContext(), goodsC.getOrder(), OrderC.class);
+                                float allP = 0;
+                                for (int i = 0; i < orderC.getGoodsList().size(); i++) {
+                                    if (orderC.getGoodsList().get(i).getDishesName().equals(goodsC.getDishesName())) {
+                                        orderC.getGoodsList().get(i).setGoodsType(2);
+                                        orderC.getGoodsList().get(i).setDishesName(goodsC.getDishesName() + "(赠)");
+                                        orderC.getGoodsList().get(i).setAllPrice(0);
+
+                                    }
+                                    allP += orderC.getGoodsList().get(i).getAllPrice();
                                 }
-                                allP+=orderC.getGoodsList().get(i).getAllPrice();
+                                orderC.setAllPrice(allP);
+                                CDBHelper.createAndUpdate(getApplicationContext(), orderC);
+                                setAll();
+                                adatper.notifyDataSetChanged();
+                                builder.dismiss();
                             }
-                            orderC.setAllPrice(allP);
-                            CDBHelper.createAndUpdate(getApplicationContext(),orderC);
-                            setAll();
-                            adatper.notifyDataSetChanged();
-                            builder.dismiss();
                         }
                     });
 
@@ -240,36 +254,43 @@ public class ShowParticularsActivity extends Activity {
                     shi.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            //1\
-                            GoodsC goodsC = goodsCList.get(position);
+                            if (editText.getText().toString().equals("")){
 
-                            //2\
-                            OrderC orderC = CDBHelper.getObjById(getApplicationContext(),goodsC.getOrder(),OrderC.class);
-                            float allP = 0;
-                            for (int i = 0;i< orderC.getGoodsList().size();i++){
-                                if (orderC.getGoodsList().get(i).getDishesName().equals(goodsC.getDishesName())){
-                                    DishesC dishesC = CDBHelper.getObjById(getApplicationContext(),orderC.getGoodsList().get(i).getDishesId(),DishesC.class);
-                                    float je = MyBigDecimal.mul(Float.parseFloat(editText.getText().toString()),dishesC.getPrice(),1);
-                                    orderC.getGoodsList().get(i).setAllPrice(je);
+                                Toast.makeText(ShowParticularsActivity.this,"输入不得为空",Toast.LENGTH_LONG).show();
 
-                                    GoodsC goodsC1 = new GoodsC(myapp.getCompany_ID());
-                                    goodsC1.setDishesName(orderC.getGoodsList().get(i).getDishesName());
-                                    goodsC1.setAllPrice(orderC.getGoodsList().get(i).getAllPrice());
-                                    goodsC1.setDishesCount(MyBigDecimal.sub(Float.parseFloat(editText.getText().toString()),goodsC.getDishesCount(),1));
-                                    AreaC areaCs = CDBHelper.getObjById(getApplicationContext(),myapp.getTable_sel_obj().getAreaId(), AreaC.class);
-                                    printerToKitchen(orderC.getGoodsList().get(i),2,areaCs.getAreaName(),myapp.getTable_sel_obj().getTableName());
-                                    Log.e("areaCs",areaCs.getAreaName());
-                                    orderC.getGoodsList().get(i).setDishesCount(Float.parseFloat(editText.getText().toString()));
+                            }else{
 
+
+                                //1\
+                                GoodsC goodsC = goodsCList.get(position);
+
+                                //2\
+                                OrderC orderC = CDBHelper.getObjById(getApplicationContext(),goodsC.getOrder(),OrderC.class);
+                                float allP = 0;
+                                for (int i = 0;i< orderC.getGoodsList().size();i++){
+                                    if (orderC.getGoodsList().get(i).getDishesName().equals(goodsC.getDishesName())){
+                                        DishesC dishesC = CDBHelper.getObjById(getApplicationContext(),orderC.getGoodsList().get(i).getDishesId(),DishesC.class);
+                                        float je = MyBigDecimal.mul(Float.parseFloat(editText.getText().toString()),dishesC.getPrice(),1);
+                                        orderC.getGoodsList().get(i).setAllPrice(je);
+
+                                        GoodsC goodsC1 = new GoodsC(myapp.getCompany_ID());
+                                        goodsC1.setDishesName(orderC.getGoodsList().get(i).getDishesName());
+                                        goodsC1.setAllPrice(orderC.getGoodsList().get(i).getAllPrice());
+                                        goodsC1.setDishesCount(MyBigDecimal.sub(Float.parseFloat(editText.getText().toString()),goodsC.getDishesCount(),1));
+                                        AreaC areaCs = CDBHelper.getObjById(getApplicationContext(),myapp.getTable_sel_obj().getAreaId(), AreaC.class);
+                                        printerToKitchen(orderC.getGoodsList().get(i),2,areaCs.getAreaName(),myapp.getTable_sel_obj().getTableName());
+                                        Log.e("areaCs",areaCs.getAreaName());
+                                        orderC.getGoodsList().get(i).setDishesCount(Float.parseFloat(editText.getText().toString()));
+
+                                    }
+                                    allP+=orderC.getGoodsList().get(i).getAllPrice();
                                 }
-                                allP+=orderC.getGoodsList().get(i).getAllPrice();
+                                orderC.setAllPrice(allP);
+                                CDBHelper.createAndUpdate(getApplicationContext(),orderC);
+                                setAll();
+                                adatper.notifyDataSetChanged();
+                                builder.dismiss();
                             }
-                            orderC.setAllPrice(allP);
-                            CDBHelper.createAndUpdate(getApplicationContext(),orderC);
-                            setAll();
-                            adatper.notifyDataSetChanged();
-                            builder.dismiss();
-
                         }
                     });
                     Button fou = view1.findViewById(R.id.dialog_tuicai_qx);

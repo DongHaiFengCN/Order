@@ -12,11 +12,11 @@
         android:id="@+id/appBarLayout">
         <ImageView
             android:id="@+id/show_img"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
             android:layout_centerVertical="true"
-            android:background="@drawable/animback"
-            android:layout_marginLeft="20dp"
+            android:src="@drawable/animback"
+            android:padding="12dp"
             />
 
             <TextView
