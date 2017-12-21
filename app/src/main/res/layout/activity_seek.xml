@@ -483,6 +483,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1.14"
                 android:text="切换"
+                android:textSize="12sp"
                 />
 
             <Button
@@ -540,6 +541,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1.14"
                 android:text="删除"
+                android:textSize="12sp"
                 />
         </LinearLayout>
         <LinearLayout
