@@ -121,7 +121,8 @@ public class MainActivity extends AppCompatActivity {
     private GpService mGpService = null;
     private Map<String,ArrayList<GoodsC>> allKitchenClientGoods=new HashMap<String,ArrayList<GoodsC>>();
     private Map<String, String> allKitchenClientPrintNames=new HashMap<String, String>();
-    private static String pIp = "192.168.1.249";
+  //  private static String pIp = "192.168.1.249";
+    private static String pIp = "192.168.2.101";
     private static int pPortNum = 9100;
     private String tableName,areaName,currentPersions,serNum;
     private static final int MAIN_QUERY_PRINTER_STATUS = 0xfe;
@@ -163,7 +164,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
     }
 
     @Override
@@ -405,12 +405,11 @@ public class MainActivity extends AppCompatActivity {
 
                         while (iterator.hasNext()){
                             GoodsC goodsC = iterator.next();
-                            if (goodsC.getDishesCount() == 0){
+                            if (goodsC.getDishesCount() == 0)
+                            {
                                 iterator.remove();
                                 break;
                             }
-
-
                         }
                         for (int i = 0; 0 < getGoodsList().size();i++){
                             if (getGoodsList().get(i).getDishesCount() == 0 ){
@@ -796,6 +795,7 @@ public class MainActivity extends AppCompatActivity {
                 esc.addText(" ");
 
             esc.addText("" + (myshangpinlist.get(i).getAllPrice()) + "\n");
+            esc.addPrintAndLineFeed();
 
         }
         esc.addText("--------------------------------------------\n");

@@ -92,9 +92,9 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 
 
         CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(this);
-        strategy.setAppChannel("商米");
+        strategy.setAppChannel("开发部");
        Bugly.init(getApplicationContext(), "c11c0d8e58", true,strategy);
-       CrashReport.setUserId("1001");
+       CrashReport.setUserId("1002");
        startSession(DATABASE_NAME, null);
         mExecutor =  Executors.newCachedThreadPool();
 
