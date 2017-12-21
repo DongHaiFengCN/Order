@@ -295,11 +295,10 @@ public class SeekT9Fragment extends Fragment {
             return;
 
         myGoodsList.clear();
-        new Thread(new Runnable() {
+        Log.e("myGoodsList",myGoodsList.size()+"");
+        mHandler.post(new Runnable() {
             @Override
             public void run() {
-
-
                 List<DishesC> dishesCs = CDBHelper.getObjByWhere(getActivity().getApplicationContext()
                         , Expression.property("className").equalTo("DishesC")
                                 .and(Expression.property("dishesNameCode9").like("%" + search + "%"))
@@ -309,17 +308,16 @@ public class SeekT9Fragment extends Fragment {
                     goodsObj.setDishesCount(0);
                     goodsObj.setDishesId(obj.get_id());
                     myGoodsList.add(goodsObj);
+                    Log.e("myGoodsList",myGoodsList.size()+"");
                 }
+                seekT9Adapter.setmData(myGoodsList);
+                seekT9Adapter.notifyDataSetChanged();
             }
-        }).start();
 
-
-        seekT9Adapter.setmData(myGoodsList);
-        seekT9Adapter.notifyDataSetChanged();
+        });
 
         //        List<Document> documentList=CDBHelper.getDocmentsByWhere((getActivity().getApplicationContext(), Expression.property("className").equalTo("DishesC")
 //                .and(Expression.property("dishesNameCode9").like(search+"%")),null,DishesC.class);
-
 
     }
 
