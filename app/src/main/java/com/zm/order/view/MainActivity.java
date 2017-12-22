@@ -1167,60 +1167,52 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run()
                 {
-
-                    List<OrderC> orderCList=CDBHelper.getObjByWhere(getApplicationContext(),
+                    List<OrderC> orderCList = CDBHelper.getObjByWhere(getApplicationContext(),
                             Expression.property("className").equalTo("OrderC")
                                     .and(Expression.property("orderState").equalTo(1))
                                     .and(Expression.property("tableNo").equalTo(myApp.getTable_sel_obj().getTableNum()))
                             , Ordering.property("createdTime").descending()
                             ,OrderC.class);
 
-
-
-                    if (document == null)
+                    if(orderCList.size()>0)
                     {
-
-                        if(orderCList.size()>0)
-                        {
-                            orderC.setOrderNum(orderCList.get(0).getOrderNum()+1);
-                            orderC.setSerialNum(orderCList.get(0).getSerialNum());
-                        }
-                        else
-                        {
-                            orderC.setOrderNum(1);
-                            orderC.setSerialNum(getOrderSerialNum());
-                        }
-
-
-                        BuglyLog.e("saveOrder", "goodsListSize="+goodsList.size());
-
-                        for(GoodsC obj:goodsList)
-                        {
-                            obj.setOrder(orderC.get_id());
-                            CDBHelper.createAndUpdate(getApplicationContext(),obj);
-                        }
-                        orderC.setGoodsList(goodsList);
-                        orderC.setAllPrice(total);
-                        orderC.setOrderState(1);
-                        orderC.setOrderType(1);
-                        orderC.setCreatedTime(getFormatDate());
-                        orderC.setTableNo(myApp.getTable_sel_obj().getTableNum());
-                        orderC.setTableName(myApp.getTable_sel_obj().getTableName());
-                        AreaC areaC = CDBHelper.getObjById(getApplicationContext(),myApp.getTable_sel_obj().getAreaId(), AreaC.class);
-                        orderC.setAreaName(areaC.getAreaName());
-                        gOrderId = CDBHelper.createAndUpdate(getApplicationContext(),orderC);
-                        Log.e("id",gOrderId);
-
-                        areaName = orderC.getAreaName();
-                        tableName = orderC.getTableName();
-                        currentPersions = ""+myApp.getTable_sel_obj().getCurrentPersions();
-                        if(orderC.getOrderNum()==1)//第一次下单
-                            serNum = orderC.getSerialNum();//流水号
-                        else //多次下单
-                            serNum = orderC.getSerialNum()+"_"+orderC.getOrderNum();
-
-
+                        orderC.setOrderNum(orderCList.get(0).getOrderNum()+1);
+                        orderC.setSerialNum(orderCList.get(0).getSerialNum());
                     }
+                    else
+                    {
+                        orderC.setOrderNum(1);
+                        orderC.setSerialNum(getOrderSerialNum());
+                    }
+
+
+                    BuglyLog.e("saveOrder", "goodsListSize="+goodsList.size());
+
+                    for(GoodsC obj:goodsList)
+                    {
+                        obj.setOrder(orderC.get_id());
+                        CDBHelper.createAndUpdate(getApplicationContext(),obj);
+                    }
+                    orderC.setGoodsList(goodsList);
+                    orderC.setAllPrice(total);
+                    orderC.setOrderState(1);
+                    orderC.setOrderType(1);
+                    orderC.setCreatedTime(getFormatDate());
+                    orderC.setTableNo(myApp.getTable_sel_obj().getTableNum());
+                    orderC.setTableName(myApp.getTable_sel_obj().getTableName());
+                    AreaC areaC = CDBHelper.getObjById(getApplicationContext(),myApp.getTable_sel_obj().getAreaId(), AreaC.class);
+                    orderC.setAreaName(areaC.getAreaName());
+                    gOrderId = CDBHelper.createAndUpdate(getApplicationContext(),orderC);
+                    Log.e("id",gOrderId);
+
+                    areaName = orderC.getAreaName();
+                    tableName = orderC.getTableName();
+                    currentPersions = ""+myApp.getTable_sel_obj().getCurrentPersions();
+                    if(orderC.getOrderNum()==1)//第一次下单
+                        serNum = orderC.getSerialNum();//流水号
+                    else //多次下单
+                        serNum = orderC.getSerialNum()+"_"+orderC.getOrderNum();
+
                 }
             });
         } catch (CouchbaseLiteException e)

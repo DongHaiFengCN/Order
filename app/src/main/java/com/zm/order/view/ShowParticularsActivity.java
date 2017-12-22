@@ -20,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -58,9 +59,9 @@ public class ShowParticularsActivity extends Activity {
     @BindView(R.id.show_listView)
     ListView showListView;
     @BindView(R.id.show_but_dc)
-    Button showButDc;
+    LinearLayout showButDc;
     @BindView(R.id.show_but_md)
-    Button showButMd;
+    LinearLayout showButMd;
     @BindView(R.id.show_tv_sl)
     TextView showTvSl;
     @BindView(R.id.show_img)
@@ -335,9 +336,9 @@ public class ShowParticularsActivity extends Activity {
         for (OrderC orderC : orderCList) {
             for (GoodsC goodsb : orderC.getGoodsList()) {
 
-                flag = false;
-
-                for (GoodsC goodsC : goodsCList){
+                //flag = false;
+                goodsCList.add(goodsb);
+                /*for (GoodsC goodsC : goodsCList){
 
                     if (goodsC.getDishesName().equals(goodsb.getDishesName()) ){
 
@@ -367,7 +368,7 @@ public class ShowParticularsActivity extends Activity {
                 if (!flag) {
 
                     goodsCList.add(goodsb);
-                }
+                }*/
 
             }
 
@@ -404,7 +405,7 @@ public class ShowParticularsActivity extends Activity {
         }
 
 
-        showTvSl.setText("共：" + goodsCList.size() + "道菜，共："+all+"元");
+        showTvSl.setText(goodsCList.size() + "道菜，总计："+all+"元");
     }
 
 

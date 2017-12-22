@@ -11,41 +11,38 @@
         android:layout_weight="1"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:text="菜品名称"
-        android:gravity="center"
+        android:text="名称"
+        android:gravity="center_vertical"
         android:textSize="15dp"
+        android:paddingLeft="20dp"
         />
 
     <TextView
         android:id="@+id/item_show_kw"
-        android:layout_weight="1"
+        android:layout_weight="1.2"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:text="菜品口味"
+        android:text="口味"
         android:gravity="center"
         android:textSize="15dp"
         />
     <TextView
         android:id="@+id/item_show_dj"
-        android:layout_weight="1"
+        android:layout_weight="1.4"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:text="菜品单价"
+        android:text="单价"
         android:gravity="center"
         android:textSize="15dp"
         />
     <TextView
         android:id="@+id/item_show_sl"
-        android:layout_weight="1"
+        android:layout_weight="1.4"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:text="菜品数量"
+        android:text="数量"
         android:gravity="center"
         android:textSize="15dp"
         />
-
-
-
-
 
 </LinearLayout>

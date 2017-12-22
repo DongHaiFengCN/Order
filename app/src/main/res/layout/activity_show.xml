@@ -7,7 +7,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="8"
+        android:layout_weight="8.3"
         android:background="@color/colorPrimaryDark"
         android:id="@+id/appBarLayout">
         <ImageView
@@ -16,7 +16,7 @@
             android:layout_height="match_parent"
             android:layout_centerVertical="true"
             android:src="@drawable/animback"
-            android:padding="12dp"
+            android:padding="15dp"
             />
 
             <TextView
@@ -28,7 +28,7 @@
                 android:text="菜品详情"
                 android:gravity="center"
                 android:layout_centerInParent="true"
-                android:textSize="26sp" />
+                android:textSize="23sp" />
 
     </RelativeLayout>
 
@@ -36,15 +36,17 @@
         android:layout_weight="8"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="@color/colorPrimaryDark">
 
         <TextView
             android:id="@+id/show_tv_sl"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center"
+            android:gravity="center_vertical"
+            android:paddingLeft="20dp"
             android:textSize="22sp"
-            android:textColor="@color/colorPrimary"
+            android:textColor="@color/md_white_1000"
             />
 
 
@@ -56,44 +58,46 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <LinearLayout
-            android:layout_weight="9"
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="50dp">
 
             <TextView
                 android:layout_weight="1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="菜品名称"
+                android:text="名称"
+                android:gravity="center_vertical"
+                android:paddingLeft="20dp"
+                android:textSize="18dp"
+                android:textColor="@color/md_black_1000"
+                />
+
+            <TextView
+                android:layout_weight="1.2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="口味"
                 android:gravity="center"
                 android:textSize="18dp"
                 android:textColor="@color/md_black_1000"
                 />
 
             <TextView
-                android:layout_weight="1"
+                android:id="@+id/textView3"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="菜品口味"
+                android:layout_weight="1.4"
                 android:gravity="center"
-                android:textSize="18dp"
+                android:text="价格"
                 android:textColor="@color/md_black_1000"
-                />
+                android:textSize="18dp" />
+
             <TextView
-                android:layout_weight="1"
+                android:layout_weight="1.4"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="菜品总价"
-                android:gravity="center"
-                android:textSize="18dp"
-                android:textColor="@color/md_black_1000"
-                />
-            <TextView
-                android:layout_weight="1"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="菜品数量"
+                android:text="数量"
                 android:gravity="center"
                 android:textSize="18dp"
                 android:textColor="@color/md_black_1000"
@@ -103,17 +107,52 @@
         </LinearLayout>
 
         <ListView
-            android:layout_weight="1"
             android:layout_marginTop="10dp"
             android:id="@+id/show_listView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             >
 
         </ListView>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_toRightOf="@+id/show_jieshu"
+                android:background="@color/md_grey_500"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                />
+
+            <TextView
+                android:id="@+id/show_jieshu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="结束"
+                android:layout_centerInParent="true"
+                android:textSize="15sp"
+                android:textColor="@color/md_grey_500"
+                />
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_toLeftOf="@+id/show_jieshu"
+                android:background="@color/md_grey_500"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="10dp"/>
+
+        </RelativeLayout>
+
     </LinearLayout>
 
-
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/md_grey_500"
+        />
 
     <LinearLayout
         android:layout_weight="8"
@@ -121,29 +160,74 @@
         android:layout_height="match_parent"
         android:orientation="horizontal">
 
-        <Button
+        <LinearLayout
             android:id="@+id/show_but_dy"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="打印"
-            />
+            android:orientation="vertical"
+            >
+            <ImageView
+                android:layout_marginTop="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:src="@drawable/animdy"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="打印"
+                android:gravity="center"
+                />
 
-        <Button
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/show_but_dc"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="继续点餐"
-            />
+            android:orientation="vertical"
+            >
+            <ImageView
+                android:layout_marginTop="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:src="@drawable/animdc"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="点餐"
+                android:gravity="center"
+                />
 
-        <Button
+        </LinearLayout>
+
+
+        <LinearLayout
             android:id="@+id/show_but_md"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="买单"
-            />
+            android:orientation="vertical"
+            >
+            <ImageView
+                android:layout_marginTop="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:src="@drawable/animmd"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="买单"
+                android:gravity="center"
+                />
+
+        </LinearLayout>
+
+
 
     </LinearLayout>
 
