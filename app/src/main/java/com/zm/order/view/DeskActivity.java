@@ -158,8 +158,6 @@ public class DeskActivity extends AppCompatActivity {
                 if(tableC.getState()!=2)
                 {
 
-
-
                     final EditText  editText = new EditText(DeskActivity.this);
 
                     LinearLayout linearLayout =new LinearLayout(DeskActivity.this);
@@ -224,8 +222,6 @@ public class DeskActivity extends AppCompatActivity {
                                 //设置就餐人数，转跳
 
                                 tableC.setState(2);
-                                CDBHelper.createAndUpdate(getApplicationContext(),tableC);
-
                                 tableC.setCurrentPersions(Integer.valueOf(editText.getText().toString()));
                                 //设置全局Table
                                 myapp.setTable_sel_obj(tableC);
@@ -253,7 +249,8 @@ public class DeskActivity extends AppCompatActivity {
                             ,OrderC.class);
 
                     Log.e("orderCList","orderCList.size()"+orderCList.size()+"-----"+tableC.getTableNum());
-                    if (orderCList.size() >0 ){
+                    if (orderCList.size() >0 )
+                    {
                         myapp.setTable_sel_obj(tableC);
                         //使用状态下跳到查看订单界面
                         Intent mainIntent = new Intent();
