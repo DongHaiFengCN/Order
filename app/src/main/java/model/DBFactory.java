@@ -31,7 +31,6 @@ public class DBFactory {
                 break;
             case CouchBase:
 
-
                 //i = new CouchBaseManger(context);
 
                i = CouchBaseManger.getInstance();

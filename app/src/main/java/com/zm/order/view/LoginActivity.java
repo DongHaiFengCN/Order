@@ -68,28 +68,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
         usersC.setUserName("001");
         usersC.setPasswd("123456");
         CDBHelper.createAndUpdate(getApplicationContext(),usersC);*/
-/*
-        idbManager = DBFactory.get(DatabaseSource.CouchBase, this);
-        List<Document> list = idbManager.getByClassName("qrcodeC");
 
-        Iterator<Document> i = list.iterator();
-
-        while(i.hasNext()){
-
-            Document d = i.next();
-
-            if(d.getString("wxUrl") == null){
-
-
-                CDBHelper.deleDocument(getApplicationContext(),d);
-
-            }
-
-
-        }
-
-        List<Document> list1 = idbManager.getByClassName("qrcodeC");
-        MyLog.e("删除后长度 "+list1.size());*/
 
 
         inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -97,6 +76,8 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
         usersCList = CDBHelper.getObjByWhere(getApplicationContext(),
                 Expression.property("className")
                         .equalTo("UsersC"),null, UsersC.class);
+
+
 
         for (int i = 0; i<usersCList.size();i++)
         {

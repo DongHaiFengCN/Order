@@ -302,6 +302,7 @@ public class CDBHelper
       {
         String id=row.getString(0);
         documentList.add(id);
+        Log.e("getid","id---->"+id);
       }
     }
     catch ( CouchbaseLiteException e)

@@ -54,12 +54,7 @@ public class CouchBaseManger<T> implements IDBManager {
         private static final  CouchBaseManger c = new CouchBaseManger();
     }
 
-    @Override
-    public void Testshow() {
 
-        MyLog.e(getDishesKindsByClassName("DishesKind").size()+"~~~~~~");
-
-    }
 
     @Override
     public boolean isLogin(String name, String pass) {
@@ -91,65 +86,6 @@ public class CouchBaseManger<T> implements IDBManager {
         return false;
     }
 
-    @Override
-    public List<Document> getDishesKindsByClassName(String name) {
-
-        List<Document> documentList = new ArrayList<>();
-        Query query= Query.select(SelectResult.expression(Expression.meta().getId()))
-                .from(DataSource.database(database))
-                .where(Expression.property("className").equalTo(name));
-        try {
-            ResultSet resultSet= query.run();
-            Result result;
-
-            while ((result=resultSet.next())!=null){
-
-                String id = result.getString(0);
-                Document doc=database.getDocument(id);
-                documentList.add(doc);
-              // MyLog.e("数据库查询结果 Name "+doc.getString("name"));
-                //MyLog.e("数据库查询结果 mPassword "+doc.getString("mPassword"));
-
-
-            }
-            //
-
-        } catch (CouchbaseLiteException e) {
-            e.printStackTrace();
-        }
-
-        return documentList;
-    }
-
-    @Override
-    public List<T> search(Object object) throws IllegalAccessException {
-
-        List<T> list = new ArrayList<>();
-
-        Map<String, Object> map = new HashMap<>();
-
-        Class<?> clazz = object.getClass();
-
-        for (Field field : clazz.getDeclaredFields()) {
-
-            field.setAccessible(true);
-
-            //获取变量名
-
-            String fieldName = field.getName();
-
-            //获取变量值
-
-            Object value = field.get(object);
-
-            map.put(fieldName, value);
-        }
-
-
-
-
-        return list;
-    }
 
     @Override
     public void save(Document document) throws CouchbaseLiteException {
@@ -222,35 +158,6 @@ public class CouchBaseManger<T> implements IDBManager {
         return doc;
     }
 
-    @Override
-    public List<Document> getByClassName(String name) {
-
-        List<Document> documentList = new ArrayList<>();
-        Query query= Query.select(SelectResult.expression(Expression.meta().getId()))
-                .from(DataSource.database(database))
-                .where(Expression.property("className").equalTo(name));
-        try {
-            ResultSet resultSet= query.run();
-            Result result;
-
-            while ((result=resultSet.next())!=null){
-
-                String id = result.getString(0);
-                Document doc=database.getDocument(id);
-                documentList.add(doc);
-                // MyLog.e("数据库查询结果 Name "+doc.getString("name"));
-                //MyLog.e("数据库查询结果 mPassword "+doc.getString("mPassword"));
-
-
-            }
-            //
-
-        } catch (CouchbaseLiteException e) {
-            e.printStackTrace();
-        }
-
-        return documentList;
-    }
 
     @Override
     public void setContext(Context context) {
@@ -262,31 +169,6 @@ public class CouchBaseManger<T> implements IDBManager {
 
     }
 
-    @Override
-    public List<Document> getOrderListBelongToTable(String key, String values,int status) {
-        List<Document> documentList = new ArrayList<>();
-        Query query= Query.select(SelectResult.expression(Expression.meta().getId()))
-                .from(DataSource.database(database))
-                .where(Expression.property("className").equalTo("OrderC").and(Expression.property(key).equalTo(values)).and(Expression.property("orderState").equalTo(status)));
-
-        try {
-            ResultSet resultSet= query.run();
-            Result result;
-
-            while ((result=resultSet.next())!=null){
-
-                String cardId = result.getString(0);
-                documentList.add(database.getDocument(cardId));
-
-            }
-
-
-        } catch (CouchbaseLiteException e) {
-            e.printStackTrace();
-        }
-
-        return documentList;
-    }
 
 
     @Override

@@ -155,6 +155,8 @@ public class DeskActivity extends AppCompatActivity {
             {
                 String tableId= (String)data;
                 final TableC  tableC =  CDBHelper.getObjById(getApplicationContext(),tableId,TableC.class);
+
+                myapp.setTable_sel_obj(tableC);
                 if(tableC.getState()!=2)
                 {
 
@@ -182,7 +184,6 @@ public class DeskActivity extends AppCompatActivity {
 
                     //添加控件到布局
                     linearLayout.addView(editText);
-
 
 
                     editText.setHint("最多人数："+tableC.getMaxPersons()+"最小人数 : "+tableC.getMinConsum());
@@ -223,9 +224,12 @@ public class DeskActivity extends AppCompatActivity {
 
                                 tableC.setState(2);
                                 tableC.setCurrentPersions(Integer.valueOf(editText.getText().toString()));
-                                //设置全局Table
+
                                 myapp.setTable_sel_obj(tableC);
+                                //设置全局Table
                                 CDBHelper.createAndUpdate(getApplicationContext(),tableC);
+
+
 
                                 alertDialog.dismiss();
 
@@ -303,7 +307,8 @@ public class DeskActivity extends AppCompatActivity {
 
 
                                    //老数据没有字段遍历查询
-                                   if(tableC.getLastCheckOrderId() == null || tableC.getLastCheckOrderId().isEmpty()){
+                                   if(tableC.getLastCheckOrderId() == null || tableC.getLastCheckOrderId().isEmpty())
+                                   {
 
                                        long startTime=System.currentTimeMillis();//记录开始时间
 
@@ -451,6 +456,7 @@ public class DeskActivity extends AppCompatActivity {
                                     public void onClick(DialogInterface dialog, int which)
                                     {
                                         tableC.setState(0);
+
                                         CDBHelper.createAndUpdate(getApplicationContext(),tableC);
                                         myapp.setTable_sel_obj(tableC);
                                     }
