@@ -111,7 +111,6 @@ public class MainActivity extends AppCompatActivity {
     private FragmentManager fm;//获得Fragment管理器
     private FragmentTransaction ft; //开启一个事务
     private boolean isFlag = true;
-    private OrderC orderC ;
     private List<GoodsC> goodsList = new ArrayList<>();
     private String gOrderId;
     private Document document;
@@ -149,9 +148,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         myApp = (MyApplication) getApplication();
-        orderC = new OrderC(myApp.getCompany_ID());
-        String oId = CDBHelper.createAndUpdate(getApplicationContext(),orderC);
-        orderC.set_id(oId);
         mHandler = new Handler();
         initView();
         //连接打印机服务
@@ -620,17 +616,22 @@ public class MainActivity extends AppCompatActivity {
 
                 Document dishKindDoc= CDBHelper.getDocByID(getApplicationContext(),dishKindId);
                 String dishesKindName=dishKindDoc.getString("kindName");
-
-                for(GoodsC goodsC:goodsList)//3 for 该厨房下所应得商品
-                {
-                    if(dishesKindName.equals(goodsC.getDishesKindName()))
+                if (dishesKindName != null){
+                    for(GoodsC goodsC:goodsList)//3 for 该厨房下所应得商品
                     {
-                        findflag = true;
-                        // g_printGoodsList.remove(goodsC);//为了降低循环次数，因为菜品只可能在一个厨房打印分发，故分发完后移除掉。
-                        oneKitchenClientGoods.add(goodsC);
-                    }
+                        if (goodsC.getDishesKindName() != null){
+                            if(dishesKindName.equals(goodsC.getDishesKindName()))
+                            {
+                                findflag = true;
+                                // g_printGoodsList.remove(goodsC);//为了降低循环次数，因为菜品只可能在一个厨房打印分发，故分发完后移除掉。
+                                oneKitchenClientGoods.add(goodsC);
+                            }
 
-                }//end for 3
+                        }
+
+                    }//end for 3
+                }
+
             }//end for 2
 
 
@@ -1094,7 +1095,7 @@ public class MainActivity extends AppCompatActivity {
 
             String waiter = myApp.getUsersC().getEmployeeName();
 
-            String tableNumber = orderC.getTableNo();
+            String tableNumber = myApp.getTable_sel_obj().getTableNum();
             PrintUtils.selectCommand(PrintUtils.RESET);
             PrintUtils.selectCommand(PrintUtils.LINE_SPACING_DEFAULT);
             PrintUtils.selectCommand(PrintUtils.ALIGN_CENTER);
@@ -1112,7 +1113,7 @@ public class MainActivity extends AppCompatActivity {
             PrintUtils.printText("--------------------------------\n");
             PrintUtils.selectCommand(PrintUtils.BOLD_CANCEL);
 
-            List<GoodsC> goodsCList = orderC.getGoodsList();
+            List<GoodsC> goodsCList = getGoodsList();
 
             for (int j = 0; j < goodsCList.size(); j++) {
 
@@ -1162,6 +1163,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void saveOrder()
     {
+
+        final OrderC orderC = new OrderC(myApp.getCompany_ID());
+        String oId = CDBHelper.createAndUpdate(getApplicationContext(),orderC);
+        orderC.set_id(oId);
         try {
             CDBHelper.db.inBatch(new TimerTask() {
                 @Override
@@ -1197,6 +1202,7 @@ public class MainActivity extends AppCompatActivity {
                     orderC.setAllPrice(total);
                     orderC.setOrderState(1);
                     orderC.setOrderType(1);
+                    orderC.setOrderCType(0);
                     orderC.setCreatedTime(getFormatDate());
                     orderC.setTableNo(myApp.getTable_sel_obj().getTableNum());
                     orderC.setTableName(myApp.getTable_sel_obj().getTableName());

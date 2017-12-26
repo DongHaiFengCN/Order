@@ -7,11 +7,15 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.couchbase.lite.Expression;
+import com.zm.order.view.MyBigDecimal;
 import com.zm.order.view.PayActivity;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import application.MyApplication;
@@ -45,6 +49,7 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
     private CheckOrderC checkOrderC;
     private String str; //临时变量
     private float total;
+    private List<GoodsC> goodsCList = new ArrayList<>();
 
     public ProgressBarasyncTask(PayActivity payActivity) {
 
@@ -113,8 +118,8 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
             String tableNumber = checkOrderC.getTableNo();
 
 
-
-            List<OrderC> list = checkOrderC.getOrderList();
+            setAll();
+            //List<OrderC> list = checkOrderC.getOrderList();
 
             PrintUtils.selectCommand(PrintUtils.RESET);
             PrintUtils.selectCommand(PrintUtils.LINE_SPACING_DEFAULT);
@@ -133,9 +138,8 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
             PrintUtils.printText("--------------------------------\n");
             PrintUtils.selectCommand(PrintUtils.BOLD_CANCEL);
 
-            for (int i = 0; i < list.size(); i++) {
+            //for (int i = 0; i < list.size(); i++) {
 
-                List<GoodsC> goodsCList = list.get(i).getGoodsList();
 
                 for (int j = 0; j < goodsCList.size(); j++) {
 
@@ -146,7 +150,7 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
 
                 }
 
-            }
+            //}
             PrintUtils.printText("--------------------------------\n");
             PrintUtils.printText(PrintUtils.printTwoData("合计", total+"\n"));
             PrintUtils.printText("--------------------------------\n");
@@ -266,5 +270,108 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
         this.checkOrderC = checkOrderC;
     }
 
+    private void setAll()
+    {
+
+        boolean flag = false;
+        for (OrderC orderC : checkOrderC.getOrderList()) {
+
+            for (GoodsC goodsb : orderC.getGoodsList()) {
+
+                flag = false;
+
+                for (GoodsC goodsC : goodsCList) {
+
+                    if (goodsC.getDishesName().equals(goodsb.getDishesName())) {
+
+                        if (goodsb.getDishesTaste() != null) {
+
+                            if (goodsb.getDishesTaste().equals(goodsC.getDishesTaste())) {
+
+                                float add = MyBigDecimal.add(goodsC.getAllPrice(), goodsb.getAllPrice(), 1);
+                                goodsC.setAllPrice(add);
+                                float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
+                                goodsC.setDishesCount(count);
+                                flag = true;
+                            }
+
+                        } else {
+
+                            float add = MyBigDecimal.add(goodsC.getAllPrice(), goodsb.getAllPrice(), 1);
+                            goodsC.setAllPrice(add);
+                            float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
+                            goodsC.setDishesCount(count);
+                            flag = true;
+                        }
+
+                        break;
+                    }
+                }
+                if (!flag) {
+                    goodsCList.add(goodsb);
+                }
+            }
+            if (orderC.getOrderCType() == 1){
+                for (GoodsC goodsB : orderC.getGoodsList()){
+                    flag = false;
+                    goodsB.setDishesName(goodsB.getDishesName()+"(退)");
+                    for (GoodsC goodsC : goodsCList){
+                        if(goodsB.getDishesCount() == -1.0){
+                            goodsB.setDishesCount(1);
+                            goodsB.setAllPrice(-goodsB.getAllPrice());
+                        }
+                        if (goodsC.getDishesName().equals(goodsB.getDishesName()) ){
+
+                            if (goodsB.getDishesTaste() != null){
+
+                                if (goodsB.getDishesTaste().equals(goodsC.getDishesTaste())){
+
+                                    float add = MyBigDecimal.add(Math.abs(goodsC.getAllPrice()),Math.abs(goodsB.getAllPrice()),1);
+                                    goodsC.setAllPrice(add);
+                                    float count = MyBigDecimal.add(Math.abs(goodsC.getDishesCount()),Math.abs(goodsB.getDishesCount()),1);
+                                    if (count == -1.0){
+                                        goodsC.setDishesCount(1);
+                                    }
+                                    goodsC.setDishesCount(count);
+                                    flag = true;
+                                }
+
+                            }else{
+
+                                float add = MyBigDecimal.add(Math.abs(goodsC.getAllPrice()),Math.abs(goodsB.getAllPrice()),1);
+                                goodsC.setAllPrice(add);
+                                float count = MyBigDecimal.add(Math.abs(goodsC.getDishesCount()),Math.abs(goodsB.getDishesCount()),1);
+                                if (count == -1.0){
+                                    goodsC.setDishesCount(1);
+                                }
+                                goodsC.setDishesCount(count);
+                                flag = true;
+                            }
+
+                            break;
+                        }
+                    }
+                    if (!flag) {
+                        goodsCList.add(goodsB);
+                    }
+                }
+            }
+            total += orderC.getAllPrice();
+        }
+
+        Iterator<GoodsC> goodsCIterator = goodsCList.iterator();
+        while (goodsCIterator.hasNext()){
+            if (goodsCIterator.next().getDishesCount() == 0.0){
+                goodsCIterator.remove();
+            }
+        }
+        for (int i = 0 ; i< goodsCList.size();i++){
+            if (goodsCList.get(i).getDishesCount()==0.0){
+                goodsCList.remove(i);
+            }
+        }
+
+
+    }
 
 }

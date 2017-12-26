@@ -315,26 +315,28 @@ public class SeekT9Adapter extends BaseAdapter {
 
             for (int i = 0; i< activity.getGoodsList().size();i++) {
                 if (activity.getGoodsList().get(i).getDishesName().toString().equals(dishesC.getDishesName())){
-                    activity.getGoodsList().get(i).setDishesCount(number++);
-                    number = activity.getGoodsList().get(i).getDishesCount();
-                    String all = MyBigDecimal.mul(number+"",dishesC.getPrice()+"",2);
 
-                    activity.getGoodsList().get(i).setAllPrice(Float.parseFloat(all));
-                    total = activity.getTotal();
-                    String all1 = MyBigDecimal.mul(1+"",dishesC.getPrice()+"",2);
-                    total += Float.parseFloat(all1);
-                    activity.setTotal(total);
-                    isName = true;
-                    //购物车计数器数据更新
-                    point =  activity.getPoint();
-                    if (point==0){
-                        point++;
-                        activity.setPoint(point);
-                    }else{
-                        point = activity.getGoodsList().size();
-                        activity.setPoint(point);
-                    }
-                    break;
+                        activity.getGoodsList().get(i).setDishesCount(number++);
+                        number = activity.getGoodsList().get(i).getDishesCount();
+                        String all = MyBigDecimal.mul(number+"",dishesC.getPrice()+"",2);
+
+                        activity.getGoodsList().get(i).setAllPrice(Float.parseFloat(all));
+                        total = activity.getTotal();
+                        String all1 = MyBigDecimal.mul(1+"",dishesC.getPrice()+"",2);
+                        total += Float.parseFloat(all1);
+                        activity.setTotal(total);
+                        isName = true;
+                        //购物车计数器数据更新
+                        point =  activity.getPoint();
+                        if (point==0){
+                            point++;
+                            activity.setPoint(point);
+                        }else{
+                            point = activity.getGoodsList().size();
+                            activity.setPoint(point);
+                        }
+                        break;
+
                 }else{
                     isName = false;
                 }

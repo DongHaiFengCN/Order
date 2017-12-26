@@ -155,6 +155,7 @@ public class DeskActivity extends AppCompatActivity {
             {
                 String tableId= (String)data;
                 final TableC  tableC =  CDBHelper.getObjById(getApplicationContext(),tableId,TableC.class);
+                myapp.setTable_sel_obj(tableC);
                 if(tableC.getState()!=2)
                 {
 
@@ -238,8 +239,6 @@ public class DeskActivity extends AppCompatActivity {
                         }
                     });
 
-
-
                 }else {
                     List<OrderC> orderCList= CDBHelper.getObjByWhere(getApplicationContext(),
                             Expression.property("className").equalTo("OrderC")
@@ -249,9 +248,8 @@ public class DeskActivity extends AppCompatActivity {
                             ,OrderC.class);
 
                     Log.e("orderCList","orderCList.size()"+orderCList.size()+"-----"+tableC.getTableNum());
-                    if (orderCList.size() >0 )
+                    if (orderCList.size() > 0 )
                     {
-                        myapp.setTable_sel_obj(tableC);
                         //使用状态下跳到查看订单界面
                         Intent mainIntent = new Intent();
                         mainIntent.setClass(DeskActivity.this, ShowParticularsActivity.class);

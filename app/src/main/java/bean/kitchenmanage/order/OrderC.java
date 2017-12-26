@@ -116,6 +116,12 @@ public class OrderC implements Serializable{
 	 */
 	private int orderType;
 
+	/**
+	 *退菜标识 0.正常  1.退菜 2.赠菜 3.自定义菜
+	 */
+	private int orderCType;
+
+
 
 	public OrderC()
 	{
@@ -332,5 +338,13 @@ public class OrderC implements Serializable{
 		if(otherGoodsList==null)
 			otherGoodsList = new ArrayList<>();
 		otherGoodsList.add(obj);
+	}
+
+	public int getOrderCType() {
+		return orderCType;
+	}
+
+	public void setOrderCType(int orderCType) {
+		this.orderCType = orderCType;
 	}
 }

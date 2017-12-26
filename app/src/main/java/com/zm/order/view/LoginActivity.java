@@ -30,6 +30,9 @@ import java.util.List;
 
 import application.ISharedPreferences;
 import application.MyApplication;
+import bean.kitchenmanage.dishes.DishesC;
+import bean.kitchenmanage.dishes.DishesKindC;
+import bean.kitchenmanage.dishes.DishesTasteC;
 import bean.kitchenmanage.user.UsersC;
 import model.CDBHelper;
 import model.DBFactory;
@@ -97,7 +100,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
         usersCList = CDBHelper.getObjByWhere(getApplicationContext(),
                 Expression.property("className")
                         .equalTo("UsersC"),null, UsersC.class);
-
+        Log.e("Login",usersCList.size()+"null");
         for (int i = 0; i<usersCList.size();i++)
         {
             Log.e("Login",usersCList.get(i).getUserName().toString()+"null");

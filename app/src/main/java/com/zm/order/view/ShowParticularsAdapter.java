@@ -1,6 +1,7 @@
 package com.zm.order.view;
 
 import android.app.Activity;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 
 import com.zm.order.R;
 
+import java.util.Iterator;
 import java.util.List;
 
 import bean.kitchenmanage.order.GoodsC;
@@ -31,13 +33,16 @@ public class ShowParticularsAdapter extends BaseAdapter {
 
     public ShowParticularsAdapter(Activity activity){
         this.activity = activity;
+
     }
 
-    public void setGoodsCs(List<GoodsC> goodsCs){
+    public void setGoodsCs(final List<GoodsC> goodsCs){
         this.goodsCs = goodsCs;
+
     }
     @Override
     public int getCount() {
+
         return goodsCs == null ? 0 : goodsCs.size();
     }
 
@@ -75,6 +80,8 @@ public class ShowParticularsAdapter extends BaseAdapter {
         }else{
             viewHolder.kw.setText("");
         }
+
+
 
         return convertView;
     }
