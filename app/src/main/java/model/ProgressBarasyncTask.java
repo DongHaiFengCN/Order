@@ -23,6 +23,8 @@ import bean.kitchenmanage.order.CheckOrderC;
 import bean.kitchenmanage.order.GoodsC;
 import bean.kitchenmanage.order.OrderC;
 import bean.kitchenmanage.order.PayDetailC;
+import bean.kitchenmanage.table.AreaC;
+import bean.kitchenmanage.user.CompanyC;
 import untils.BluetoothUtil;
 import untils.MyLog;
 import untils.PrintUtils;
@@ -120,13 +122,16 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
 
             setAll();
             //List<OrderC> list = checkOrderC.getOrderList();
-
+            List<CompanyC> companyCs = CDBHelper.getObjByClass(payActivity.getApplicationContext(),CompanyC.class);
+            AreaC areaCs = CDBHelper.getObjById(payActivity.getApplicationContext(),m.getTable_sel_obj().getAreaId(),AreaC.class);
             PrintUtils.selectCommand(PrintUtils.RESET);
             PrintUtils.selectCommand(PrintUtils.LINE_SPACING_DEFAULT);
             PrintUtils.selectCommand(PrintUtils.ALIGN_CENTER);
-            PrintUtils.printText("肴点点\n\n");
+            if (companyCs.size() != 0){
+                PrintUtils.printText(companyCs.get(0).getPointName()+"\n\n");
+            }
             PrintUtils.selectCommand(PrintUtils.DOUBLE_HEIGHT_WIDTH);
-            PrintUtils.printText(tableNumber+"号桌\n\n");
+            PrintUtils.printText(areaCs.getAreaName()+"/"+m.getTable_sel_obj().getTableName()+"桌\n\n");
             PrintUtils.selectCommand(PrintUtils.NORMAL);
             PrintUtils.selectCommand(PrintUtils.ALIGN_LEFT);
             PrintUtils.printText(PrintUtils.printTwoData("订单编号", OrderId()+"\n"));

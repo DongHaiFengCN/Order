@@ -78,6 +78,7 @@ import bean.kitchenmanage.order.OrderC;
 import bean.kitchenmanage.order.OrderNum;
 import bean.kitchenmanage.table.AreaC;
 import bean.kitchenmanage.table.TableC;
+import bean.kitchenmanage.user.CompanyC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import model.CDBHelper;
@@ -113,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
     private FragmentManager fm;//获得Fragment管理器
     private FragmentTransaction ft; //开启一个事务
     private boolean isFlag = true;
-    private OrderC newOrderObj;
+
     private List<GoodsC> goodsList = new ArrayList<>();
     private String gOrderId;
     private Document document;
@@ -1088,13 +1089,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void onPrint()
     {
-
+        List<CompanyC> companyCs = CDBHelper.getObjByClass(getApplicationContext(),CompanyC.class);
             String waiter = myApp.getUsersC().getEmployeeName();
 
             PrintUtils.selectCommand(PrintUtils.RESET);
             PrintUtils.selectCommand(PrintUtils.LINE_SPACING_DEFAULT);
             PrintUtils.selectCommand(PrintUtils.ALIGN_CENTER);
-            PrintUtils.printText("肴点点\n\n");
+            if (companyCs.size() != 0){
+                PrintUtils.printText(companyCs.get(0).getPointName()+"\n\n");
+            }
             PrintUtils.selectCommand(PrintUtils.DOUBLE_HEIGHT_WIDTH);
             PrintUtils.printText(areaName+"/"+tableName+"\n\n");
             PrintUtils.selectCommand(PrintUtils.NORMAL);
@@ -1108,7 +1111,7 @@ public class MainActivity extends AppCompatActivity {
             PrintUtils.printText("--------------------------------\n");
             PrintUtils.selectCommand(PrintUtils.BOLD_CANCEL);
 
-            List<GoodsC> goodsCList = newOrderObj.getGoodsList();
+            List<GoodsC> goodsCList = getGoodsList();
 
             for (int j = 0; j < goodsCList.size(); j++) {
 
@@ -1163,8 +1166,10 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run()
                 {
-                    newOrderObj = new OrderC(myApp.getCompany_ID());
 
+                    OrderC newOrderObj = new OrderC(myApp.getCompany_ID());
+                    gOrderId = CDBHelper.createAndUpdate(getApplicationContext(),newOrderObj);
+                    newOrderObj.set_id(gOrderId);
                     List<OrderC> orderCList = CDBHelper.getObjByWhere(getApplicationContext(),
                             Expression.property("className").equalTo("OrderC")
                                     .and(Expression.property("orderState").equalTo(1))
@@ -1186,7 +1191,11 @@ public class MainActivity extends AppCompatActivity {
 
                     BuglyLog.e("saveOrder", "goodsListSize="+goodsList.size());
 
-
+                    for(GoodsC obj:goodsList)
+                    {
+                        obj.setOrder(gOrderId);
+                        CDBHelper.createAndUpdate(getApplicationContext(),obj);
+                    }
                     newOrderObj.setGoodsList(goodsList);
                     newOrderObj.setAllPrice(total);
                     newOrderObj.setOrderState(1);
@@ -1196,18 +1205,15 @@ public class MainActivity extends AppCompatActivity {
                     newOrderObj.setTableName(myApp.getTable_sel_obj().getTableName());
                     AreaC areaC = CDBHelper.getObjById(getApplicationContext(),myApp.getTable_sel_obj().getAreaId(), AreaC.class);
                     newOrderObj.setAreaName(areaC.getAreaName());
-                    gOrderId = CDBHelper.createAndUpdate(getApplicationContext(),newOrderObj);
-                    newOrderObj.set_id(gOrderId);
 
-                    for(GoodsC obj:goodsList)
-                    {
-                        obj.setOrder(gOrderId);
-                        CDBHelper.createAndUpdate(getApplicationContext(),obj);
-                    }
+                    CDBHelper.createAndUpdate(getApplicationContext(),newOrderObj);
 
-                    TableC tableC = myApp.getTable_sel_obj();
-                    tableC.setTotalCount(MyBigDecimal.add(tableC.getTotalCount(),total,1));
-                    CDBHelper.createAndUpdate(getApplicationContext(),tableC);
+
+
+//
+//                    TableC tableC = myApp.getTable_sel_obj();
+//                    tableC.setTotalCount(MyBigDecimal.add(tableC.getTotalCount(),total,1));
+//                    CDBHelper.createAndUpdate(getApplicationContext(),tableC);
 
 
                     Log.e("id",gOrderId);

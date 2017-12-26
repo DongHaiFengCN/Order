@@ -43,6 +43,7 @@ import bean.kitchenmanage.order.GoodsC;
 import bean.kitchenmanage.order.OrderC;
 import bean.kitchenmanage.order.RetreatOrderC;
 import bean.kitchenmanage.table.AreaC;
+import bean.kitchenmanage.user.CompanyC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -663,14 +664,17 @@ public class ShowParticularsActivity extends Activity {
 
 
         String waiter = myapp.getUsersC().getEmployeeName();
-
+        List<CompanyC> companyCs = CDBHelper.getObjByClass(getApplicationContext(),CompanyC.class);
+        AreaC areaCs = CDBHelper.getObjById(getApplicationContext(),myapp.getTable_sel_obj().getAreaId(),AreaC.class);
         String tableNumber = myapp.getTable_sel_obj().getTableNum();
         PrintUtils.selectCommand(PrintUtils.RESET);
         PrintUtils.selectCommand(PrintUtils.LINE_SPACING_DEFAULT);
         PrintUtils.selectCommand(PrintUtils.ALIGN_CENTER);
-        PrintUtils.printText("肴点点\n\n");
+        if (companyCs.size() != 0){
+            PrintUtils.printText(companyCs.get(0).getPointName()+"\n\n");
+        }
         PrintUtils.selectCommand(PrintUtils.DOUBLE_HEIGHT_WIDTH);
-        PrintUtils.printText(tableNumber+"号桌\n\n");
+        PrintUtils.printText(areaCs.getAreaName()+"/"+myapp.getTable_sel_obj().getTableName()+"桌\n\n");
         PrintUtils.selectCommand(PrintUtils.NORMAL);
         PrintUtils.selectCommand(PrintUtils.ALIGN_LEFT);
         PrintUtils.printText(PrintUtils.printTwoData("订单编号", OrderId()+"\n"));

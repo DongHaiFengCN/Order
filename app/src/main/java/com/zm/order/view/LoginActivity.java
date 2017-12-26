@@ -64,11 +64,6 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         myapp = (MyApplication) getApplication();
-        /*UsersC usersC = new UsersC(myapp.getCompany_ID());
-        usersC.setUserName("001");
-        usersC.setPasswd("123456");
-        CDBHelper.createAndUpdate(getApplicationContext(),usersC);*/
-
 
 
         inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -81,7 +76,8 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
 
         for (int i = 0; i<usersCList.size();i++)
         {
-            Log.e("Login",usersCList.get(i).getUserName().toString()+"null");
+            Log.e("Login",usersCList.get(i).getUserName().toString()+"_"+usersCList.get(i).getEmployeeName());
+
         }
          myApplication = (MyApplication) getApplication();
       //  myApplication.cancleSharePreferences();
