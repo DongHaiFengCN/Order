@@ -23,6 +23,7 @@ import android.os.RemoteException;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
@@ -76,6 +77,7 @@ import bean.kitchenmanage.order.GoodsC;
 import bean.kitchenmanage.order.OrderC;
 import bean.kitchenmanage.order.OrderNum;
 import bean.kitchenmanage.table.AreaC;
+import bean.kitchenmanage.table.TableC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import model.CDBHelper;
@@ -111,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
     private FragmentManager fm;//获得Fragment管理器
     private FragmentTransaction ft; //开启一个事务
     private boolean isFlag = true;
+    private OrderC newOrderObj;
     private List<GoodsC> goodsList = new ArrayList<>();
     private String gOrderId;
     private Document document;
@@ -147,7 +150,9 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         });
-        myApp = (MyApplication) getApplication();
+        myApp = (MyApplication) getApplicationContext();
+
+
         mHandler = new Handler();
         initView();
         //连接打印机服务
@@ -171,8 +176,6 @@ public class MainActivity extends AppCompatActivity {
         if (conn != null) {
             unbindService(conn); // unBindService
         }
-
-
     }
 
     private void registerPrinterBroadcast()
@@ -214,11 +217,7 @@ public class MainActivity extends AppCompatActivity {
                     //1、程序连接上厨房端打印机后要进行分厨房打印
                     if(goodsList==null||goodsList.size()<=0)
                         return ;
-
-
                     printGoodsAtRomoteByIndex(id);
-
-
                 }
                 else if (type == GpDevice.STATE_INVALID_PRINTER)
                 {
@@ -616,22 +615,19 @@ public class MainActivity extends AppCompatActivity {
 
                 Document dishKindDoc= CDBHelper.getDocByID(getApplicationContext(),dishKindId);
                 String dishesKindName=dishKindDoc.getString("kindName");
-                if (dishesKindName != null){
-                    for(GoodsC goodsC:goodsList)//3 for 该厨房下所应得商品
+                if(TextUtils.isEmpty(dishesKindName))
+                    continue;
+
+                for(GoodsC goodsC:goodsList)//3 for 该厨房下所应得商品
+                {
+                    if(dishesKindName.equals(goodsC.getDishesKindName()))
                     {
-                        if (goodsC.getDishesKindName() != null){
-                            if(dishesKindName.equals(goodsC.getDishesKindName()))
-                            {
-                                findflag = true;
-                                // g_printGoodsList.remove(goodsC);//为了降低循环次数，因为菜品只可能在一个厨房打印分发，故分发完后移除掉。
-                                oneKitchenClientGoods.add(goodsC);
-                            }
+                        findflag = true;
+                        // g_printGoodsList.remove(goodsC);//为了降低循环次数，因为菜品只可能在一个厨房打印分发，故分发完后移除掉。
+                        oneKitchenClientGoods.add(goodsC);
+                    }
 
-                        }
-
-                    }//end for 3
-                }
-
+                }//end for 3
             }//end for 2
 
 
@@ -1090,18 +1086,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void onPrint() {
-
+    private void onPrint()
+    {
 
             String waiter = myApp.getUsersC().getEmployeeName();
 
-            String tableNumber = myApp.getTable_sel_obj().getTableNum();
             PrintUtils.selectCommand(PrintUtils.RESET);
             PrintUtils.selectCommand(PrintUtils.LINE_SPACING_DEFAULT);
             PrintUtils.selectCommand(PrintUtils.ALIGN_CENTER);
             PrintUtils.printText("肴点点\n\n");
             PrintUtils.selectCommand(PrintUtils.DOUBLE_HEIGHT_WIDTH);
-            PrintUtils.printText(tableNumber+"号桌\n\n");
+            PrintUtils.printText(areaName+"/"+tableName+"\n\n");
             PrintUtils.selectCommand(PrintUtils.NORMAL);
             PrintUtils.selectCommand(PrintUtils.ALIGN_LEFT);
             PrintUtils.printText(PrintUtils.printTwoData("订单编号", OrderId()+"\n"));
@@ -1113,7 +1108,7 @@ public class MainActivity extends AppCompatActivity {
             PrintUtils.printText("--------------------------------\n");
             PrintUtils.selectCommand(PrintUtils.BOLD_CANCEL);
 
-            List<GoodsC> goodsCList = getGoodsList();
+            List<GoodsC> goodsCList = newOrderObj.getGoodsList();
 
             for (int j = 0; j < goodsCList.size(); j++) {
 
@@ -1163,15 +1158,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void saveOrder()
     {
-
-        final OrderC orderC = new OrderC(myApp.getCompany_ID());
-        String oId = CDBHelper.createAndUpdate(getApplicationContext(),orderC);
-        orderC.set_id(oId);
         try {
             CDBHelper.db.inBatch(new TimerTask() {
                 @Override
                 public void run()
                 {
+                    newOrderObj = new OrderC(myApp.getCompany_ID());
+
                     List<OrderC> orderCList = CDBHelper.getObjByWhere(getApplicationContext(),
                             Expression.property("className").equalTo("OrderC")
                                     .and(Expression.property("orderState").equalTo(1))
@@ -1181,43 +1174,51 @@ public class MainActivity extends AppCompatActivity {
 
                     if(orderCList.size()>0)
                     {
-                        orderC.setOrderNum(orderCList.get(0).getOrderNum()+1);
-                        orderC.setSerialNum(orderCList.get(0).getSerialNum());
+                        newOrderObj.setOrderNum(orderCList.get(0).getOrderNum()+1);
+                        newOrderObj.setSerialNum(orderCList.get(0).getSerialNum());
                     }
                     else
                     {
-                        orderC.setOrderNum(1);
-                        orderC.setSerialNum(getOrderSerialNum());
+                        newOrderObj.setOrderNum(1);
+                        newOrderObj.setSerialNum(getOrderSerialNum());
                     }
 
 
                     BuglyLog.e("saveOrder", "goodsListSize="+goodsList.size());
 
+
+                    newOrderObj.setGoodsList(goodsList);
+                    newOrderObj.setAllPrice(total);
+                    newOrderObj.setOrderState(1);
+                    newOrderObj.setOrderType(1);
+                    newOrderObj.setCreatedTime(getFormatDate());
+                    newOrderObj.setTableNo(myApp.getTable_sel_obj().getTableNum());
+                    newOrderObj.setTableName(myApp.getTable_sel_obj().getTableName());
+                    AreaC areaC = CDBHelper.getObjById(getApplicationContext(),myApp.getTable_sel_obj().getAreaId(), AreaC.class);
+                    newOrderObj.setAreaName(areaC.getAreaName());
+                    gOrderId = CDBHelper.createAndUpdate(getApplicationContext(),newOrderObj);
+                    newOrderObj.set_id(gOrderId);
+
                     for(GoodsC obj:goodsList)
                     {
-                        obj.setOrder(orderC.get_id());
+                        obj.setOrder(gOrderId);
                         CDBHelper.createAndUpdate(getApplicationContext(),obj);
                     }
-                    orderC.setGoodsList(goodsList);
-                    orderC.setAllPrice(total);
-                    orderC.setOrderState(1);
-                    orderC.setOrderType(1);
-                    orderC.setOrderCType(0);
-                    orderC.setCreatedTime(getFormatDate());
-                    orderC.setTableNo(myApp.getTable_sel_obj().getTableNum());
-                    orderC.setTableName(myApp.getTable_sel_obj().getTableName());
-                    AreaC areaC = CDBHelper.getObjById(getApplicationContext(),myApp.getTable_sel_obj().getAreaId(), AreaC.class);
-                    orderC.setAreaName(areaC.getAreaName());
-                    gOrderId = CDBHelper.createAndUpdate(getApplicationContext(),orderC);
+
+                    TableC tableC = myApp.getTable_sel_obj();
+                    tableC.setTotalCount(MyBigDecimal.add(tableC.getTotalCount(),total,1));
+                    CDBHelper.createAndUpdate(getApplicationContext(),tableC);
+
+
                     Log.e("id",gOrderId);
 
-                    areaName = orderC.getAreaName();
-                    tableName = orderC.getTableName();
+                    areaName = newOrderObj.getAreaName();
+                    tableName = newOrderObj.getTableName();
                     currentPersions = ""+myApp.getTable_sel_obj().getCurrentPersions();
-                    if(orderC.getOrderNum()==1)//第一次下单
-                        serNum = orderC.getSerialNum();//流水号
+                    if(newOrderObj.getOrderNum()==1)//第一次下单
+                        serNum = newOrderObj.getSerialNum();//流水号
                     else //多次下单
-                        serNum = orderC.getSerialNum()+"_"+orderC.getOrderNum();
+                        serNum = newOrderObj.getSerialNum()+"_"+newOrderObj.getOrderNum();
 
                 }
             });

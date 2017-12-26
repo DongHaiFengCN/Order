@@ -23,7 +23,6 @@ public class LoginModelImpl implements ILoginModel{
     {
 
     }
-
     /**
      * 网络访问检测
      *
@@ -44,7 +43,6 @@ public class LoginModelImpl implements ILoginModel{
          IDBManager idbManager = DBFactory.get(DatabaseSource.CouchBase,context);//返回当前数据库
 
         return idbManager.isLogin(info[0],info[1]);
-
     }
 
     @Override

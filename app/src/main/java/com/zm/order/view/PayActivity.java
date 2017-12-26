@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
+import com.couchbase.lite.Ordering;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
@@ -857,13 +858,24 @@ public class PayActivity extends AppCompatActivity {
     }
 
     //跳转主界面
-    public void turnDesk(){
+    public void turnDesk()
+    {
 
-       TableC obj = myApplication.getTable_sel_obj();
+        if(ifChangeTable())
+        {
+            TableC obj = myApplication.getTable_sel_obj();
+            obj.setLastCheckOrderId(id);
+            obj.setState(0);
+            obj.setTotalCount(0);
+            CDBHelper.createAndUpdate(getApplicationContext(),tableC);
+        }
+        else
+        {
+            Toast.makeText(getApplicationContext(),"有未买单信息，不能改变桌位状态",Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-       obj.setLastCheckOrderId(id);
-       obj.setState(0);
-       CDBHelper.createAndUpdate(getApplicationContext(),tableC);
+
         Intent intent = new Intent(PayActivity.this,DeskActivity.class);
         startActivity(intent);
         finish();
@@ -1364,12 +1376,12 @@ public class PayActivity extends AppCompatActivity {
 
     }
 
-    private void changeTableState()
-    {
-        tableC.setState(0);
-        CDBHelper.createAndUpdate(getApplicationContext(),tableC);
-        myApplication.setTable_sel_obj(tableC);
-    }
+//    private void changeTableState()
+//    {
+//        tableC.setState(0);
+//        CDBHelper.createAndUpdate(getApplicationContext(),tableC);
+//        myApplication.setTable_sel_obj(tableC);
+//    }
     /**
      * 提交结账信息
      * <p>
@@ -1503,6 +1515,23 @@ public class PayActivity extends AppCompatActivity {
             return null;
         }
         return bitmap;
+    }
+
+
+    private boolean ifChangeTable()
+    {
+        List<OrderC> orderCList = CDBHelper.getObjByWhere(getApplicationContext(),
+                Expression.property("className").equalTo("OrderC")
+                        .and(Expression.property("orderState").equalTo(1))
+                        .and(Expression.property("tableNo").equalTo(myApplication.getTable_sel_obj().getTableNum()))
+                , Ordering.property("createdTime").descending()
+                ,OrderC.class);
+
+        if(orderCList.size()>0)
+        {
+            return false;
+        }
+        return true;
     }
 }
 

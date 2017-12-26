@@ -28,6 +28,7 @@ import com.couchbase.lite.ResultSet;
 import com.couchbase.lite.SelectResult;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tencent.bugly.crashreport.CrashReport;
 import com.zm.order.R;
 
 import java.util.ArrayList;
@@ -136,9 +137,20 @@ public class LiveTableRecyclerAdapter extends RecyclerView.Adapter<LiveTableRecy
         TableC tableobj=CDBHelper.getObjById(context.getApplicationContext(),docId, TableC.class);
 
         int state=tableobj.getState();
+
+
         switch (state)
         {
             case 0:
+                if(tableobj.getTotalCount()>0)
+                {
+                    tableobj.setState(2);
+                    CDBHelper.createAndUpdate(context.getApplicationContext(),tableobj);
+                   // CrashReport.putUserData(context.getApplicationContext(),"mykey","tablechange");
+                    //CrashReport.testJavaCrash();
+                    Log.e("&&&&&&&&&&&&&&&","*************");
+                    break;
+                }
                 holder.cardView.setCardBackgroundColor(Color.rgb(86,209,109));
                 break;
             case 1:

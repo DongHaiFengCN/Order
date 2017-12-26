@@ -23,13 +23,11 @@ import bean.kitchenmanage.order.OrderC;
 
 public interface IDBManager<T> {
 
-    void Testshow();
+
 
     boolean isLogin(String name, String pass);
 
-    List<Document> getDishesKindsByClassName(String name);
 
-    List<T> search(T t) throws IllegalAccessException;
 
     void save(Document document) throws CouchbaseLiteException;
 
@@ -38,11 +36,10 @@ public interface IDBManager<T> {
     Document getMembers(String tel);
     Document getCard(String id);
 
-    List<Document> getByClassName(String name);
 
     void setContext(Context context);
 
-    List<Document> getOrderListBelongToTable(String key,String values,int status);
+
 
 
 

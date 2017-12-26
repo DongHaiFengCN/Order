@@ -36,14 +36,12 @@ import bean.kitchenmanage.order.GoodsC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import model.CDBHelper;
-import presenter.IMainPresenter;
-import presenter.MainPresenterImpl;
 
 /**
  * Created by lenovo on 2017/10/26.
  */
 
-public class OrderFragment extends Fragment implements IMainView {
+public class OrderFragment extends Fragment  {
 
     @BindView(R.id.dishes_rv)
     ListView dishesRv;
@@ -70,30 +68,17 @@ public class OrderFragment extends Fragment implements IMainView {
         //initData();
         myapp = (MyApplication) getActivity().getApplication();
         initView();
-        IMainPresenter iMainView = new MainPresenterImpl(this);
-        iMainView.init();
-
-
         return view;
-
     }
-
     @Override
     public void onCreate( Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
     }
-
-    @Override
     public void initView() {
-
-
        // final GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);//设置每行展示3个
         //dishesAdapter = new DishesAdapter(getActivity());
 
         tasteList = new ArrayList<>();
-
         leftAdapter = new DishesKindAdapter();
         titleList = CDBHelper.getIdsByWhere(getActivity(),
                 Expression.property("className").equalTo("DishesKindC")
@@ -164,13 +149,6 @@ public class OrderFragment extends Fragment implements IMainView {
 
     }
 
-    @Override
-    public void showDishes(List<String> data, List<Integer> headPosition) {
-//        dishesAdapter.setmData(data);
-//        dishesAdapter.setHeadPosition(headPosition);
-//        dishesAdapter.notifyDataSetChanged();
-
-    }
 
     /**
      * 菜品选择弹出框编辑模块
@@ -289,16 +267,9 @@ public class OrderFragment extends Fragment implements IMainView {
         builder.show();
     }
 
-    @Override
-    public void showKindName(List<String> data) {
 
 
-    }
 
-    @Override
-    public Context getIMainViewActivity() {
-        return getActivity();
-    }
 
     public class DishesKindAdapter extends BaseAdapter {
 

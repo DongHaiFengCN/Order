@@ -202,4 +202,11 @@ public class Tool {
         return flag;
     }
 
+    public static String getNewFormatDate(){
+        Date date = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return formatter.format(date);
+
+    }
+
 }
