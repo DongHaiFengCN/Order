@@ -58,6 +58,9 @@ import com.tencent.bugly.crashreport.CrashReport;
 import com.zm.order.R;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -172,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         MyLog.d("onDestroy");
+        EventBus.getDefault().unregister(this);
         unregisterReceiver(PrinterStatusBroadcastReceiver);
         // 2、注销打印消息
         if (conn != null) {
@@ -1332,6 +1336,147 @@ public class MainActivity extends AppCompatActivity {
         }*/
 
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * @param dishesMessage
+     * @author 董海峰
+     * @date 2017/12/22 14:58
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
+    public void setMessage(DishesMessage dishesMessage) {
+
+
+
+        boolean isDishes = true;
+
+        // TODO 处理数据
+
+        //没有菜默认添加
+        if (goodsList.size() == 0) {
+
+            isDishes = false;
+
+            if (o == null) {
+
+                o = new OrderAdapter(goodsList, MainActivity.this);
+
+                order_lv.setAdapter(o);
+            }
+
+
+        } else {
+
+            for (int i = 0; i < goodsList.size(); i++) {
+
+                if (goodsList.get(i).getDishesName().equals(dishesMessage.getName())) {
+
+                    if (goodsList.get(i).getDishesTaste() == null &&
+                            dishesMessage.getDishesTaste() == null) {
+
+                        upOrderData(dishesMessage, i);
+
+                        isDishes = true;
+                        break;
+
+                    } else if (goodsList.get(i).getDishesTaste().equals(dishesMessage.getDishesTaste())) {
+
+
+                        upOrderData(dishesMessage, i);
+                        isDishes = true;
+                        break;
+
+                    } else {
+
+
+                        isDishes = false;
+
+                    }
+
+                } else {
+
+                    isDishes = false;
+                }
+
+            }
+
+        }
+
+        //没找到菜品，添加菜品
+        if (!isDishes && dishesMessage.isOperation()) {
+            //更新数量指示器
+            GoodsC goodsC = new GoodsC();
+            goodsC.setChannelId(myApp.getCompany_ID());
+            goodsC.setDishesTaste(dishesMessage.getDishesTaste());
+            goodsC.setDishesName(dishesMessage.getName());
+            goodsC.setDishesCount(dishesMessage.getCount());
+            goodsC.setDishesId(dishesMessage.getDishesC().get_id());
+            goodsC.setGoodsType(0);
+            goodsC.setAllPrice(dishesMessage.getTotal());
+
+            Log.e("总价是：", dishesMessage.getTotal() + "");
+            goodsList.add(goodsC);
+
+        }
+
+
+        updataTotal();
+        updataPoint();
+
+        o.notifyDataSetChanged();
+    }
+
+    private void updataPoint() {
+
+        setPoint(o.getCount());
+    }
+
+    private void updataTotal() {
+
+        if (goodsList.size() == 0) {
+
+            setTotal(0.00f);
+
+        } else {
+
+            float t = 0f;
+
+            for (int i = 0; i < goodsList.size(); i++) {
+
+                t += goodsList.get(i).getAllPrice();
+
+
+            }
+            setTotal(t);
+
+        }
+    }
+
+    //更新订单goodsList数据
+    private void upOrderData(DishesMessage dishesMessage, int i) {
+
+
+        if (dishesMessage.isOperation()) {
+
+            goodsList.get(i).setDishesCount(goodsList.get(i).getDishesCount() + dishesMessage.getCount());
+            goodsList.get(i).setAllPrice(goodsList.get(i).getAllPrice() + dishesMessage.getTotal());
+
+        } else {
+
+            if ((goodsList.get(i).getDishesCount() - dishesMessage.getCount()) == 0) {
+
+                goodsList.remove(i);
+
+            } else {
+                goodsList.get(i).setDishesCount(goodsList.get(i).getDishesCount() - dishesMessage.getCount());
+                goodsList.get(i).setAllPrice(goodsList.get(i).getAllPrice() - dishesMessage
+                        .getDishesC().getPrice());
+            }
+
+
+
+        }
+
     }
 
 
