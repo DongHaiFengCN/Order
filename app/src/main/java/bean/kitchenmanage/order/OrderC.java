@@ -30,11 +30,7 @@ public class OrderC implements Serializable{
 	 */
 	private String _id;
 
-	//2、
-	/**
-	 * 订单号，生成规则 datetime+桌位号  //
-	 */
-	private String orderID;
+
 	/**
 	 * 订单序号，只做同桌多次点餐时使用,第一次下单为序号为1，第二次下单序号为2
 	 */
@@ -75,13 +71,6 @@ public class OrderC implements Serializable{
 
 	//3、
 	private List<GoodsC> goodsList;
-
-	/**
-	 *  退菜
-	 */
-
-	private List<GoodsC> otherGoodsList;
-
 	/**
 	 *点餐员姓名
 	 */
@@ -117,7 +106,7 @@ public class OrderC implements Serializable{
 	private int orderType;
 
 	/**
-	 *退菜标识 0.正常  1.退菜 2.赠菜 3.自定义菜
+	 *退菜标识 0.正常  1.退菜
 	 */
 	private int orderCType;
 
@@ -175,13 +164,6 @@ public class OrderC implements Serializable{
 
 
 
-	public String getOrderID() {
-		return orderID;
-	}
-
-	public void setOrderID(String orderID) {
-		this.orderID = orderID;
-	}
 
 	public int getOrderNum() {
 		return orderNum;
@@ -326,19 +308,7 @@ public class OrderC implements Serializable{
 		this.orderType = orderType;
 	}
 
-	public List<GoodsC> getOtherGoodsList() {
-		return otherGoodsList;
-	}
 
-	public void setOtherGoodsList(List<GoodsC> otherGoodsList) {
-		this.otherGoodsList = otherGoodsList;
-	}
-	public void addOtherGoods(GoodsC obj)
-	{
-		if(otherGoodsList==null)
-			otherGoodsList = new ArrayList<>();
-		otherGoodsList.add(obj);
-	}
 
 	public int getOrderCType() {
 		return orderCType;

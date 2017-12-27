@@ -28,6 +28,9 @@ import com.couchbase.lite.Database;
 import com.couchbase.lite.Expression;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import com.tencent.bugly.crashreport.BuglyLog;
+import com.tencent.bugly.crashreport.CrashReport;
+import com.zm.order.BuildConfig;
 import com.zm.order.R;
 
 
@@ -101,9 +104,15 @@ public class DeskActivity extends AppCompatActivity {
         myapp= (MyApplication) getApplicationContext();
 
         initWidget();
-    }
+
+
+}
+
     private void initWidget()
     {
+        BuglyLog.e("DeskActivity", "initWidget");
+       // CrashReport.setIsDevelopmentDevice(getApplicationContext(), BuildConfig.DEBUG);
+
         db = myapp.getDatabase();
 
         List<AreaC> list = CDBHelper.getObjByClass(getApplicationContext(),AreaC.class);
@@ -125,7 +134,6 @@ public class DeskActivity extends AppCompatActivity {
 
                 areaAdapter.setSelectItem(i);
                 final String id = areaAdapter.getItem(i);
-
                 Message msg = Message.obtain();
                 msg.obj = id;
                 msg.what = 1;
@@ -467,15 +475,13 @@ public class DeskActivity extends AppCompatActivity {
 
             }
         });
-        long endTime1 = System.currentTimeMillis();
-        MyLog.e("time1="+(endTime1- starttime));
+
         //3,recyclerview created
         listViewDesk = (RecyclerView)findViewById(R.id.lv_desk);
         listViewDesk.setItemAnimator(new DefaultItemAnimator());
         listViewDesk.setLayoutManager(new GridLayoutManager(this,3));
         listViewDesk.setAdapter(tableadapter);
-        long endTime2 = System.currentTimeMillis();
-        MyLog.e("time2="+(endTime2- endTime1));
+
     }
 
     private void turnMainActivity() {

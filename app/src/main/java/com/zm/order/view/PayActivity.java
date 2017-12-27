@@ -505,7 +505,7 @@ public class PayActivity extends AppCompatActivity {
             GoodsC h = orderDishesList.get(j);
 
             String name = h.getDishesName();
-            float sum = Float.valueOf(String.valueOf(h.getAllPrice()));
+            float sum = MyBigDecimal.mul(h.getPrice(),h.getDishesCount(),2);
             //1 设置菜品的名称
 
             s.put(1, name);
@@ -1235,7 +1235,8 @@ public class PayActivity extends AppCompatActivity {
                                     if (h.getDishesId().equals(allDishes.get(i).getDishesId())) {
                                         MyLog.e("打折的菜"+name);
 
-                                        copy += h.getAllPrice();
+                                        copy = MyBigDecimal.add(copy,MyBigDecimal.mul(h.getPrice(),h.getDishesCount(),2),2);// h.getAllPrice();
+
 
                                         break;
                                     }
