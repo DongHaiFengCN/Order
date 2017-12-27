@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_PRINT_RECEIPT = 0xfc;
     private boolean  printerSat = false;
 
-
+    private Map<Integer,float[]> stringHashMap = new HashMap<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

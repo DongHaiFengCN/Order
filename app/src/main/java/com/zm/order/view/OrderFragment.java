@@ -2,11 +2,8 @@ package com.zm.order.view;
 
 import android.app.Fragment;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -24,15 +21,17 @@ import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
 import com.couchbase.lite.Ordering;
 import com.zm.order.R;
-import com.zm.order.view.adapter.MyGridAdapter;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TimerTask;
 
 import application.MyApplication;
-import bean.kitchenmanage.dishes.DishesKindC;
-import bean.kitchenmanage.order.GoodsC;
+import bean.kitchenmanage.dishes.DishesC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import model.CDBHelper;
@@ -49,7 +48,7 @@ public class OrderFragment extends Fragment  {
     ListView orderList;
     private DishesKindAdapter leftAdapter;
     private OrderDragAdapter orderDragAdapter;
-    private List<Object> getDishesIdList;
+    private List<String> getDishesIdList;
     private List<String> tasteList;
     private View view;
     private String taste = "默认";
@@ -61,9 +60,12 @@ public class OrderFragment extends Fragment  {
     private List<String> dishesIdList;
     private MyApplication myapp;
     private int pos;
+
+    private Map<Integer,float[]> stringHashMap = new HashMap<>();
+
     @Override
-    public View onCreateView(LayoutInflater inflater,  ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.frame_order,null);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.frame_order, null);
         ButterKnife.bind(this, view);
         //initData();
         myapp = (MyApplication) getActivity().getApplication();
@@ -71,13 +73,10 @@ public class OrderFragment extends Fragment  {
         return view;
     }
     @Override
-    public void onCreate( Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
     public void initView() {
-       // final GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);//设置每行展示3个
-        //dishesAdapter = new DishesAdapter(getActivity());
-
         tasteList = new ArrayList<>();
         leftAdapter = new DishesKindAdapter();
         titleList = CDBHelper.getIdsByWhere(getActivity(),
@@ -85,12 +84,13 @@ public class OrderFragment extends Fragment  {
                         .and(Expression.property("isSetMenu").equalTo(false)),
                 Ordering.property("kindName").ascending());
         leftAdapter.setNames(titleList);
+
         orderList.setAdapter(leftAdapter);
         //左侧点击事件监听
         orderList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                if(DishesIdList!=null){
+                if (DishesIdList != null) {
                     DishesIdList.clear();
                 }
 
@@ -100,34 +100,62 @@ public class OrderFragment extends Fragment  {
                     CDBHelper.db.inBatch(new TimerTask() {
                         @Override
                         public void run() {
-                            dishesIdList=new ArrayList<>();
+                            dishesIdList = new ArrayList<>();
                             //获取点击的菜品类别的Document
-                            Document KindDocument= CDBHelper.getDocByID(getActivity(),titleList.get(position));
+                            Document KindDocument = CDBHelper.getDocByID(getActivity(), titleList.get(position));
                             //获取此Document下的菜品Id号
-                            if(KindDocument.getArray("dishesListId")!=null)
-                            {
-                                DishesIdList= KindDocument.getArray("dishesListId").toList();
+                            if (KindDocument.getArray("dishesListId") != null) {
+                                DishesIdList = KindDocument.getArray("dishesListId").toList();
                                 //增强for循环读取id
-                                for(Object DishesId:DishesIdList)
-                                {
-                                    if(DishesId==null){
+                                for (Object DishesId : DishesIdList) {
+                                    if (DishesId == null) {
                                         continue;
                                     }
 
                                     dishesIdList.add(DishesId.toString());
                                 }
                             }
-                            orderDragAdapter = new OrderDragAdapter(getActivity(),KindDocument);
+                            if(orderDragAdapter == null){
+                                orderDragAdapter = new OrderDragAdapter(getActivity());
+                            }
 
                             orderDragAdapter.setMlistDishesId(dishesIdList);
 
-                            dishesRv.setAdapter(orderDragAdapter);
-                            orderDragAdapter.setOnItemClickListener(new OrderDragAdapter.OnItemClickListener() {
+                            if (stringHashMap.get(position) != null) {
+
+                                orderDragAdapter.setNumbers(stringHashMap.get(position));
+
+
+                            }
+
+
+                            orderDragAdapter.setChangerNumbersListener(new OrderDragAdapter.ChangerNumbersListener() {
                                 @Override
-                                public void onItemClick(String name, float price,int position) {
-                                    showDialog(name,price,position);
+                                public void getNumber(float[] numbers) {
+
+                                    stringHashMap.put(position,numbers);
+
+
+                                    //如果有被选择的菜品
+                                    leftAdapter.getaBoolean()[position] = isKindNameClick(numbers);
+                                    leftAdapter.notifyDataSetChanged();
+
+
                                 }
                             });
+
+                            dishesRv.setAdapter(orderDragAdapter);
+
+                            dishesRv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                                    DishesC dishesC = CDBHelper.getObjById(getActivity().getApplication(), dishesIdList.get(i), DishesC.class);
+                                    showDialog(dishesC.getDishesName(), dishesC.getPrice(), i);
+
+                                }
+                            });
+
                         }
                     });
                 } catch (CouchbaseLiteException e) {
@@ -137,16 +165,23 @@ public class OrderFragment extends Fragment  {
             }
 
 
-
         });
 
         orderList.performItemClick(orderList.getChildAt(0), 0, orderList
                 .getItemIdAtPosition(0));
 
 
+    }
 
+    private boolean isKindNameClick(float[] numbers) {
+        for (int i = 0; i < numbers.length; i++) {
 
+            if(numbers[i] != 0.0f){
 
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -156,115 +191,85 @@ public class OrderFragment extends Fragment  {
      * @param name  传入的菜品的名称
      * @param price 传入的菜品的价格
      */
-    private void showDialog(final String name, final float price,int position) {
+    private void showDialog(final String name, final float price, final int position) {
 
-        final float[] l = {0.0f};
-        getDishesIdList = new ArrayList<>();
         view = LayoutInflater.from(getActivity()).inflate(R.layout.view_item_dialog, null);
 
         final TextView price_tv = view.findViewById(R.id.price);
 
         final AmountView amountView = view.findViewById(R.id.amount_view);
-        amountView.setNumber("1.0");
-        getDishesIdList.clear();
-        tasteList.clear();
-        String all = MyBigDecimal.mul(amountView.getAmount()+"",price+"",2);
 
-        price_tv.setText("总计 " +Float.parseFloat(all)+" 元");
-        amountView.getAmount();
+        String all = MyBigDecimal.mul(amountView.getAmount() + "", price + "", 2);
+
+        price_tv.setText("总计 " + Float.parseFloat(all) + " 元");
+
+
+        final DishesMessage dishesMessage = new DishesMessage();
+
+        dishesMessage.setOperation(true);
+        dishesMessage.setSingle(false);
+        final float[] l = new float[1];
+
+
         l[0] = Float.parseFloat(all);
+
+        dishesMessage.setTotal(l[0]);
+
+
         //增删选择器的数据改变的监听方法
 
         amountView.setChangeListener(new AmountView.ChangeListener() {
             @Override
             public void OnChange(float ls, boolean flag) {
 
-                String all = MyBigDecimal.mul(ls+"",price+"",2);
+                String all = MyBigDecimal.mul(ls + "", price + "", 2);
                 l[0] = Float.parseFloat(all);//实时计算当前菜品选择不同数量后的单品总价
+
+                dishesMessage.setTotal(l[0]);
 
                 price_tv.setText("总计 " + l[0] + " 元");
 
             }
         });
 
-        Document document = CDBHelper.getDocByID(getActivity().getApplicationContext(), dishesIdList.get(position).toString());
-        if (document.getArray("tasteList") != null){
-            getDishesIdList = document.getArray("tasteList").toList();
-        }else{
-            getDishesIdList = null;
-        }
+        DishesC dishesC = CDBHelper.getObjById(getActivity().getApplicationContext(), dishesIdList.get(position).toString(), DishesC.class);
 
-        if (getDishesIdList != null) {
-            for (int a = 0; a < getDishesIdList.size(); a++) {
-                Document document1 = CDBHelper.getDocByID(getActivity().getApplicationContext(), getDishesIdList.get(a).toString());
-                tasteList.add(document1.getString("tasteName"));
-            }
+        dishesMessage.setName(dishesC.getDishesName());
 
-        }
-        final GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);//设置每行展示3个
-        final Document doc = CDBHelper.getDocByID(getActivity(),dishesIdList.get(position));
-        RecyclerView recyclerView = view.findViewById(R.id.view_dialog_recycler);
-        recyclerView.setLayoutManager(manager);
-        MyGridAdapter myGridAdapter = new MyGridAdapter(getActivity(),tasteList);
-        myGridAdapter.setmOnItemOlickListener(new MyGridAdapter.OnItemOlickListener() {
-            @Override
-            public void onItemClick(int position) {
-                pos = position;
-            }
-        });
-        recyclerView.setAdapter(myGridAdapter);
+        dishesMessage.setDishesC(dishesC);
+
+
         AlertDialog.Builder builder = new AlertDialog
                 .Builder(getActivity());
         builder.setTitle(name);
         builder.setView(view);
         builder.setNegativeButton("取消", null);
-        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("确定", null);
+
+        final AlertDialog alertDialog = builder.show();
+
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
+            public void onClick(View view) {
 
-                float sum = amountView.getAmount();
+                if (amountView.getAmount() > 0f) {
 
-                if (sum != 0) {//如果选择器的数量不为零，当前的选择的菜品加入订单列表
-                    GoodsC goodsC = new GoodsC(myapp.getCompany_ID());
-                    String gID = CDBHelper.createAndUpdate(getActivity().getApplicationContext(),goodsC);
-                    goodsC.set_id(gID);
-                    goodsC.setDishesName(name);
-                    if (tasteList.size() == 0){
-                        goodsC.setDishesTaste(null);
-                    }else{
-                        goodsC.setDishesTaste(tasteList.get(pos));
-                    }
-                    goodsC.setDishesCount(sum);
-                    String all = MyBigDecimal.mul(sum+"",price+"",2);
-                    goodsC.setAllPrice(Float.parseFloat(all));
-                    goodsC.setGoodsType(0);
-                    goodsC.setDishesId(doc.getId());
-                    if ( doc.getString("dishesKindId") != null) {
-                        DishesKindC dishesKind = CDBHelper.getObjById(getActivity().getApplicationContext(), doc.getString("dishesKindId"), DishesKindC.class);
-                        goodsC.setDishesKindName(dishesKind.getKindName());
-                        Log.e("dishesKindName", dishesKind.getKindName());
-                    }
-                    ((MainActivity)getActivity()).getGoodsList().add(goodsC);
-                    //购物车计数器数据更新
-                    point =  (((MainActivity) getActivity()).getPoint());
-                    point++;
-                    ((MainActivity) getActivity()).setPoint(point);
+                    orderDragAdapter.updata(position, amountView.getAmount());
 
-                    //计算总价
-                    total = ((MainActivity) getActivity()).getTotal();
-                    total += l[0];
-                    ((MainActivity) getActivity()).setTotal(total);
+                    dishesMessage.setCount(amountView.getAmount());
 
-                    //刷新订单数据源
-                    //o.notifyDataSetChanged();
+                    EventBus.getDefault().postSticky(dishesMessage);
+
+                    alertDialog.dismiss();
 
                 } else {
 
-                    Toast.makeText(getActivity(), "没有选择商品数量！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "数量必须大于0！", Toast.LENGTH_SHORT).show();
                 }
+
+
             }
         });
-        builder.show();
     }
 
 
@@ -275,9 +280,26 @@ public class OrderFragment extends Fragment  {
 
         private LayoutInflater listContainerLeft;
         private int mSelect = 0; //选中项
+
+        public LayoutInflater getListContainerLeft() {
+            return listContainerLeft;
+        }
+
+        public void setaBoolean(boolean[] aBoolean) {
+            this.aBoolean = aBoolean;
+        }
+
+        public boolean[] getaBoolean() {
+            return aBoolean;
+        }
+
+        boolean aBoolean[];
+
         public void setNames(List<String> names) {
             this.names = names;
+            aBoolean = new boolean[names.size()];
         }
+
 
         private List<String> names;
 
@@ -309,6 +331,7 @@ public class OrderFragment extends Fragment  {
                 view = listContainerLeft.inflate(R.layout.view_kindname_lv, null);
                 listItemView.tv_title = view.findViewById(R.id.title);
                 listItemView.imageView = view.findViewById(R.id.imageView);
+                listItemView.imagePoint = view.findViewById(R.id.imagePoint);
                 view.setTag(listItemView);
             } else {
                 listItemView = (ListItemView) view.getTag();
@@ -320,7 +343,16 @@ public class OrderFragment extends Fragment  {
                 view.setBackgroundResource(R.color.md_grey_100);  //其他项背景
                 listItemView.imageView.setVisibility(View.INVISIBLE);
             }
-            listItemView.tv_title.setText(CDBHelper.getDocByID(getActivity(),names.get(i)).getString("kindName"));
+
+            if (aBoolean[i]){
+
+                listItemView.imagePoint.setVisibility(View.VISIBLE);
+            }
+            else {
+
+                listItemView.imagePoint.setVisibility(View.INVISIBLE);
+            }
+            listItemView.tv_title.setText(CDBHelper.getDocByID(getActivity(), names.get(i)).getString("kindName"));
 
             return view;
 
@@ -336,6 +368,7 @@ public class OrderFragment extends Fragment  {
 
             TextView tv_title;
             ImageView imageView;
+            ImageView imagePoint;
         }
 
     }
