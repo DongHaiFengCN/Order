@@ -26,6 +26,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -425,7 +426,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 //初始化订单的数据，绑定数据源的信息。
                 //o.notifyDataSetChanged();
-                setOrderDialog();
+                if (getGoodsList().size()>0){
+                    setOrderDialog();
+                }
                 /*if (flag) {
                     orderAdapter.notifyDataSetChanged();
 
@@ -609,14 +612,12 @@ public class MainActivity extends AppCompatActivity {
         dialog.setContentView(orderDialog);
         Window windowDialog = dialog.getWindow();
         windowDialog.setGravity(Gravity.BOTTOM);
+        WindowManager m = getWindowManager();
+        Display d = m.getDefaultDisplay();//为获取屏幕宽、高
         // 获取对话框当前的参数值
         WindowManager.LayoutParams lp = windowDialog.getAttributes();
-        // 新位置Y坐标
-        lp.y = 100;
-        // 宽度
-        lp.width = (int) getResources().getDisplayMetrics().widthPixels;
-        orderDialog.measure(0, 0);
-        lp.height = orderDialog.getMeasuredHeight();
+        lp.y = 80;
+        lp.height = (int)(d.getHeight()*0.6);
         windowDialog.setAttributes(lp);
         dialog.show();
     }
