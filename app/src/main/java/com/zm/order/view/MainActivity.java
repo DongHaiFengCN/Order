@@ -86,6 +86,7 @@ import untils.AnimationUtil;
 import untils.BluetoothUtil;
 import untils.MyLog;
 import untils.PrintUtils;
+import untils.Tool;
 
 import static com.gprinter.service.GpPrintService.ACTION_CONNECT_STATUS;
 
@@ -506,85 +507,88 @@ public class MainActivity extends AppCompatActivity {
         //提交按钮
         ok_tv.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view)
-            {
-                saveOrder();
-                if (total == 0 || getGoodsList().size() > 0) {
-                    //如果order列表开启状态就关闭
-                    if (!flag) {
-                        linearLayout.setAnimation(AnimationUtil.moveToViewBottom());
-                        linearLayout.setVisibility(View.GONE);
-                        imageView.animate()
-                                .alpha(0f)
-                                .setDuration(400)
-                                .setListener(new AnimatorListenerAdapter() {
-                                    @Override
-                                    public void onAnimationEnd(Animator animation) {
-                                        imageView.setVisibility(View.GONE);
-                                    }
-                                });
+            public void onClick(View view) {
+                if (Tool.isFastDoubleClick()) {
+                    return;
+                } else {
 
-                        flag = true;
-                    }
+                    if (total > 0.0 || getGoodsList().size() > 0) {
+                        //如果order列表开启状态就关闭
+                        if (!flag) {
+                            linearLayout.setAnimation(AnimationUtil.moveToViewBottom());
+                            linearLayout.setVisibility(View.GONE);
+                            imageView.animate()
+                                    .alpha(0f)
+                                    .setDuration(400)
+                                    .setListener(new AnimatorListenerAdapter() {
+                                        @Override
+                                        public void onAnimationEnd(Animator animation) {
+                                            imageView.setVisibility(View.GONE);
+                                        }
+                                    });
 
-
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                    View view1 = getLayoutInflater().inflate(R.layout.view_pay_dialog,null);
-                    builder.setView(view1);
-                    builder.setCancelable(true);
-                    final AlertDialog dialog = builder.create();
-                    Button shi = view1.findViewById(R.id.view_pay_shi);
-                    Button fou = view1.findViewById(R.id.view_pay_fou);
-                    shi.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-
-                            Intent intent = new Intent(MainActivity.this, PayActivity.class);
-                            startActivityForResult(intent,1);
-                            finish();
-                            dialog.dismiss();
+                            flag = true;
                         }
-                    });
-                    fou.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
 
-                            Intent intent = new Intent(MainActivity.this, DeskActivity.class);
-                            startActivity(intent);
-                            dialog.dismiss();
-                            finish();
-                        }
-                    });
 
-                    Button dy = view1.findViewById(R.id.view_pay_dy);
-                    dy.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (setPrintOrder().equals("")){
-                                Toast.makeText(MainActivity.this,"没有链接蓝牙打印机",Toast.LENGTH_LONG).show();
-                            }else {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                        View view1 = getLayoutInflater().inflate(R.layout.view_pay_dialog, null);
+                        builder.setView(view1);
+                        builder.setCancelable(true);
+                        final AlertDialog dialog = builder.create();
+                        Button shi = view1.findViewById(R.id.view_pay_shi);
+                        Button fou = view1.findViewById(R.id.view_pay_fou);
+                        shi.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+
+                                saveOrder();
+                                Intent intent = new Intent(MainActivity.this, PayActivity.class);
+                                startActivityForResult(intent, 1);
+                                finish();
+                                dialog.dismiss();
+                            }
+                        });
+                        fou.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                saveOrder();
                                 Intent intent = new Intent(MainActivity.this, DeskActivity.class);
                                 startActivity(intent);
                                 dialog.dismiss();
                                 finish();
                             }
+                        });
+
+                        Button dy = view1.findViewById(R.id.view_pay_dy);
+                        dy.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (setPrintOrder().equals("")) {
+                                    Toast.makeText(MainActivity.this, "没有链接蓝牙打印机", Toast.LENGTH_LONG).show();
+                                } else {
+                                    saveOrder();
+                                    Intent intent = new Intent(MainActivity.this, DeskActivity.class);
+                                    startActivity(intent);
+                                    dialog.dismiss();
+                                    finish();
+                                }
 
 
-                        }
-                    });
+                            }
+                        });
 
-                    dialog.show();
+                        dialog.show();
 
-                } else {
+                    } else {
 
-                    Toast.makeText(MainActivity.this, "订单为空！", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "订单为空！", Toast.LENGTH_SHORT).show();
+                    }
+
+
                 }
 
-
             }
-
-
         });
     }
 

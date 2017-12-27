@@ -361,7 +361,6 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
                     }
                 }
             }
-            total += orderC.getAllPrice();
         }
 
         Iterator<GoodsC> goodsCIterator = goodsCList.iterator();

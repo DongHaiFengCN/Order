@@ -47,9 +47,11 @@ import bean.kitchenmanage.user.CompanyC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.internal.Utils;
 import model.CDBHelper;
 import untils.BluetoothUtil;
 import untils.PrintUtils;
+import untils.Tool;
 
 import static com.gprinter.service.AllService.TAG;
 
@@ -171,7 +173,10 @@ public class ShowParticularsActivity extends Activity {
                                                                 if (goodsC1.getDishesTaste().equals(goodsC.getDishesTaste())) {
 
                                                                     if (goodsC1.getDishesCount() == count) {
+
                                                                         goodsC1.setGoodsType(1);
+                                                                        goodsC1.setDishesCount(MyBigDecimal.sub(goodsC1.getDishesCount(),Float.parseFloat(editText.getText().toString()),2));
+
 
                                                                         goods.setGoodsType(1);
                                                                         goods.setDishesName(goodsC1.getDishesName());
@@ -356,6 +361,7 @@ public class ShowParticularsActivity extends Activity {
                                         if (Float.parseFloat(editText.getText().toString()) > goodsCList.get(position).getDishesCount()){
                                             GoodsC goodsC = goodsCList.get(position);
                                             float count = Float.parseFloat(editText.getText().toString());
+                                            Log.e(TAG,"orderCList---"+orderCList.size());
                                             for (int i = orderCList.size()-1; i >= 0 ; i--){
 
                                                 Iterator<GoodsC> goodsCIterator = orderCList.get(i).getGoodsList().iterator();
@@ -364,12 +370,12 @@ public class ShowParticularsActivity extends Activity {
                                                     if (goodsC1.getDishesName().equals(goodsC.getDishesName())){
                                                         if (goodsC1.getDishesTaste() != null){
                                                             if (goodsC1.getDishesTaste().equals(goodsC.getDishesTaste())){
-                                                                count -= goodsC1.getDishesCount();
+                                                                count = MyBigDecimal.sub(count,goodsC1.getDishesCount(),1);
                                                                 Log.e(TAG,"count"+count);
                                                             }
 
                                                         }else {
-                                                            count -= goodsC1.getDishesCount();
+                                                            count =  MyBigDecimal.sub(count,goodsC1.getDishesCount(),1);
                                                             Log.e(TAG,"count"+count);
                                                         }
                                                     }
@@ -523,7 +529,7 @@ public class ShowParticularsActivity extends Activity {
                     }
                 }
             }
-            all += orderC.getAllPrice();
+            all = MyBigDecimal.add(all,orderC.getAllPrice(),1);
         }
 
         Iterator<GoodsC> goodsCIterator = goodsCList.iterator();
@@ -626,7 +632,13 @@ public class ShowParticularsActivity extends Activity {
 
             case R.id.show_but_dy:
 
-                setPrintOrder();
+                if (Tool.isFastDoubleClick()) {
+                    Toast.makeText(ShowParticularsActivity.this,"点的太快",Toast.LENGTH_LONG).show();
+                    return;
+                }else{
+                    setPrintOrder();
+                }
+
 
                 break;
 
@@ -635,6 +647,7 @@ public class ShowParticularsActivity extends Activity {
                 break;
         }
     }
+
 
     private String setPrintOrder(){
 
