@@ -55,55 +55,52 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 public class MyApplication extends MobApplication implements ISharedPreferences, ReplicatorChangeListener {
 
     private static final String TAG = Application.class.getSimpleName();
-
     private final static boolean SYNC_ENABLED = true;
-
 //    private String Company_ID="gysz";
 //    private final static String DATABASE_NAME = "gyszdb";
 //    private final static String SYNCGATEWAY_URL = "blip://123.207.174.171:4984/kitchendb/";
 
-    private String Company_ID="gysz";
-    //private final static String DATABASE_NAME = "gyszdbD";
+    private String Company_ID = "gysz";
     private final static String DATABASE_NAME = "GYSZDB";
-   // private final static String SYNCGATEWAY_URL = "blip://192.168.2.174:4984/kitchendb/";
     private final static String SYNCGATEWAY_URL = "blip://192.168.2.166:4984/kitchendb/";
-
-
     private Database database = null;
     private Replicator replicator;
 
-
     private TableC table_sel_obj;
 
+    private UsersC usersC;
     public UsersC getUsersC() {
         return usersC;
     }
+
+    public ExecutorService mExecutor;
 
     public void setUsersC(UsersC usersC) {
         this.usersC = usersC;
     }
 
-    private UsersC usersC;
 
-    public ExecutorService mExecutor;
     OkHttpClient okHttpClient;
+
     @Override
-    public void onCreate()
-    {
+    public void onCreate() {
         super.onCreate();
 
 
         CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(this);
         strategy.setAppChannel("开发部");
-       Bugly.init(getApplicationContext(), "c11c0d8e58", true,strategy);
-       CrashReport.setUserId("1002");
-       startSession(DATABASE_NAME);
-        mExecutor =  Executors.newCachedThreadPool();
+        strategy.setAppVersion("1.0.0.1");
+        Bugly.init(getApplicationContext(), "c11c0d8e58", true, strategy);
+        CrashReport.setUserId("1002");
+
+       // CrashReport.setUserSceneTag(getApplicationContext(),64667);
+        startSession(DATABASE_NAME);
+        mExecutor = Executors.newCachedThreadPool();
 
     }
+
     @Override
-    public void onTerminate()
-    {
+    public void onTerminate() {
 
         if (mExecutor != null && !mExecutor.isShutdown()) {
             mExecutor.shutdown();
@@ -112,8 +109,7 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
         super.onTerminate();
     }
 
-    private void startSession(String dbName)
-    {
+    private void startSession(String dbName) {
         openDatabase(dbName);
         startReplication(getCompany_ID(), "123456");
     }
@@ -126,7 +122,7 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
         DatabaseConfiguration config = new DatabaseConfiguration(getApplicationContext());
         File folder = new File(String.format("%s/SmartKitchenPad", Environment.getExternalStorageDirectory()));
         config.setDirectory(folder);
-       config.setConflictResolver(getConflictResolver());
+        config.setConflictResolver(getConflictResolver());
         try {
             database = new Database(dbname, config);
         } catch (CouchbaseLiteException e) {
@@ -134,9 +130,9 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
             // TODO: error handling
         }
     }
+
     private void closeDatabase() {
-        if (database != null)
-        {
+        if (database != null) {
             try {
                 database.close();
             } catch (CouchbaseLiteException e) {
@@ -145,10 +141,12 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
         }
 
     }
+
     public Database getDatabase() {
         return database;
     }
-    private ConflictResolver getConflictResolver(){
+
+    private ConflictResolver getConflictResolver() {
         /**
          * Example: Conflict resolver that merges Mine and Their document.
          */
@@ -162,27 +160,26 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
                 Set<String> changed = new HashSet<>();
 
                 // copy all data from theirs document
-                for (String key : theirs)
-                {
-                    Log.e("ConflictResolvertheir","key="+key+"value="+theirs.getObject(key));
+                for (String key : theirs) {
+                    Log.e("ConflictResolvertheir", "key=" + key + "value=" + theirs.getObject(key));
                     resolved.setObject(key, theirs.getObject(key));
                     changed.add(key);
                 }
 
                 // copy all data from mine which are not in mine document
-                for (String key : mine)
-                {
-                    Log.e("ConflictResolvermine","key="+key+"value="+mine.getObject(key));
+                for (String key : mine) {
+                    Log.e("ConflictResolvermine", "key=" + key + "value=" + mine.getObject(key));
                     if (!changed.contains(key))
                         resolved.setObject(key, mine.getObject(key));
                 }
 
-               // Log.e(TAG, "ConflictResolver.resolve() resolved -> %s", resolved.toMap());
+                // Log.e(TAG, "ConflictResolver.resolve() resolved -> %s", resolved.toMap());
 
                 return resolved;
             }
         };
     }
+
     // -------------------------
     // Replicator operation
     // -------------------------
@@ -198,7 +195,7 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
         }
 
         ReplicatorConfiguration config = new ReplicatorConfiguration(database, uri);
-        List<String> channels =new ArrayList<>();
+        List<String> channels = new ArrayList<>();
 
 //        MyLog.d("companyid="+getCompany_ID());
 //        channels.add(getCompany_ID());
@@ -221,6 +218,7 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 
         replicator.stop();
     }
+
     @Override
     public SharedPreferences getSharePreferences() {
 
@@ -232,6 +230,7 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 
         return getSharePreferences().edit().clear().commit();
     }
+
     // --------------------------------------------------
     // ReplicatorChangeListener implementation
     // --------------------------------------------------
@@ -242,8 +241,7 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 //
 //    }
     @Override
-    public void changed(ReplicatorChange change)
-    {
+    public void changed(ReplicatorChange change) {
         // Log.e(TAG, "[Todo] Replicator: status -> %s, error -> %s", status, error);
 
     }
@@ -256,11 +254,16 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
         Company_ID = company_ID;
     }
 
-    public TableC getTable_sel_obj() {
+    public TableC getTable_sel_obj()
+    {
+        if(table_sel_obj==null)
+        {}
         return table_sel_obj;
     }
 
-    public void setTable_sel_obj(TableC table_sel_obj) {
+    public void setTable_sel_obj(TableC table_sel_obj)
+    {
         this.table_sel_obj = table_sel_obj;
+        {}
     }
 }

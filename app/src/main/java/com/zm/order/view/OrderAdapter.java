@@ -1,6 +1,7 @@
 package com.zm.order.view;
 
 import android.os.Handler;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -19,6 +20,7 @@ import java.util.TimerTask;
 import bean.kitchenmanage.dishes.DishesC;
 import bean.kitchenmanage.order.GoodsC;
 import model.CDBHelper;
+import untils.MyLog;
 
 /**
  * 项目名称：Order
@@ -36,7 +38,7 @@ public class OrderAdapter extends BaseAdapter {
      * SparseArray<Object> 中 0位置是菜品名字;1位置是菜品口味;2位置是菜品选择的数量;3单价}
      *
      */
-    private List<SparseArray<Object>> orderItem;
+
     private List<GoodsC> goodsCs;
     private MainActivity context;
     private int Price = 0;
@@ -47,11 +49,7 @@ public class OrderAdapter extends BaseAdapter {
         this.onchangeListener = onchangeListener;
     }
 
-    public void setOrderItem(SparseArray<Object> sparseArray){
-        orderItem.add(sparseArray);
-        notifyDataSetChanged();
 
-    }
     public void setListener(setOnItemListener listener){
         this.listener = listener;
     }
@@ -64,11 +62,6 @@ public class OrderAdapter extends BaseAdapter {
         this.goodsCs = goodsCs;
         this.context = mainActivity;
     }
-   /* public OrderAdapter(List<SparseArray<Object>> orderItem, MainActivity mainActivity) {
-        this.orderItem = orderItem;
-        this.context = mainActivity;
-    }*/
-
 
     @Override
     public int getCount() {
@@ -112,12 +105,11 @@ public class OrderAdapter extends BaseAdapter {
         }
 
         viewHold.name.setText(goodsCs.get(i).getDishesName());
-        if (goodsCs.get(i).getDishesTaste() == null){
+        if (TextUtils.isEmpty(goodsCs.get(i).getDishesTaste())){
             viewHold.taste.setText("");
         }else{
             viewHold.taste.setText(goodsCs.get(i).getDishesTaste());
         }
-        context.setOrderAdapter(this);
 
         viewHold.number.setNumber(goodsCs.get(i).getDishesCount()+"");
 
@@ -128,26 +120,14 @@ public class OrderAdapter extends BaseAdapter {
             }
         });
 
-
-        if (goodsCs.get(i).getDishesId() != null){
-            DishesC dishesC = null;
-            dishesC =  CDBHelper.getObjById(context.getApplicationContext(),goodsCs.get(i).getDishesId(), DishesC.class);
-
-
             //设置item的点击事件
-                final DishesC finalDishesC = dishesC;
                 viewHold.number.setChangeListener(new AmountView.ChangeListener() {
                 @Override
-                public void OnChange(float ls,boolean flag) {
-
-
+                public void OnChange(float ls,boolean flag)
+                {
+                    MyLog.e("OnChange    数量="+ls);
                     goodsCs.get(i).setDishesCount(ls);
-
-                    goodsCs.get(i).setAllPrice(MyBigDecimal.mul(ls,finalDishesC.getPrice(),2));
-
-                    onchangeListener.onchangeListener(flag, finalDishesC.getPrice() ,ls);
-
-                    context.getSeekT9Adapter().notifyDataSetChanged();
+                    onchangeListener.onchangeListener(flag, goodsCs.get(i).getPrice(),ls);
 
                   if(ls <= 0){
 
@@ -155,40 +135,36 @@ public class OrderAdapter extends BaseAdapter {
                       context.getSeekT9Adapter().notifyDataSetChanged();
                       goodsCs.remove(i);
                       notifyDataSetChanged();
-
                   }
-
-
-
                 }
             });
-        }else{
-            final float price = goodsCs.get(i).getAllPrice();
-            //设置item的点击事件
-            viewHold.number.setChangeListener(new AmountView.ChangeListener() {
-                @Override
-                public void OnChange(float ls,boolean flag) {
-
-                    goodsCs.get(i).setDishesCount(ls);
-                    goodsCs.get(i).setAllPrice(MyBigDecimal.mul(ls,price,2));
-
-                    onchangeListener.onchangeListener(flag, price ,ls);
-
-
-                    if(ls <= 0){
-
-                        goodsCs.get(i).setDishesCount(0);
-                        goodsCs.remove(i);
-                        notifyDataSetChanged();
-
-                    }
-
-
-
-                }
-            });
-
-        }
+//        }else{
+//           // final float price = goodsCs.get(i).getAllPrice();
+//            //设置item的点击事件
+//            viewHold.number.setChangeListener(new AmountView.ChangeListener() {
+//                @Override
+//                public void OnChange(float ls,boolean flag) {
+//
+//                    goodsCs.get(i).setDishesCount(ls);
+//                   // goodsCs.get(i).setAllPrice(MyBigDecimal.mul(ls,price,2));
+//
+//                    onchangeListener.onchangeListener(flag, goodsCs.get(i).getPrice() ,ls);
+//
+//
+//                    if(ls <= 0){
+//
+//                        goodsCs.get(i).setDishesCount(0);
+//                        goodsCs.remove(i);
+//                        notifyDataSetChanged();
+//
+//                    }
+//
+//
+//
+//                }
+//            });
+//
+//        }
         return view;
     }
 

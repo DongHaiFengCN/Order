@@ -41,7 +41,6 @@ import bean.kitchenmanage.dishes.DishesC;
 import bean.kitchenmanage.dishes.DishesKindC;
 import bean.kitchenmanage.order.GoodsC;
 import bean.kitchenmanage.order.OrderC;
-import bean.kitchenmanage.order.RetreatOrderC;
 import bean.kitchenmanage.table.AreaC;
 import bean.kitchenmanage.user.CompanyC;
 import butterknife.BindView;
@@ -49,6 +48,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import model.CDBHelper;
 import untils.BluetoothUtil;
+import untils.MyLog;
 import untils.PrintUtils;
 
 import static com.gprinter.service.AllService.TAG;
@@ -95,6 +95,7 @@ public class ShowParticularsActivity extends Activity {
         ButterKnife.bind(this);
         myapp = (MyApplication) getApplication();
         goodsCList = new ArrayList<>();
+        goodsCListT = new ArrayList<>();
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         setAll();
         adatper = new ShowParticularsAdapter(this);
@@ -106,7 +107,9 @@ public class ShowParticularsActivity extends Activity {
 
                         //点击订单OrderC
                         OrderC order = CDBHelper.getObjById(getApplicationContext(), goodsCList.get(position).getOrder(), OrderC.class);
-                        if (order.getOrderCType() == 0 && goodsCList.get(position).getGoodsType() != 2){
+                   if (order.getOrderCType() == 0 && goodsCList.get(position).getGoodsType() != 2)//非退订单+非赠菜
+                    // if (order.getOrderCType() == 0 )//非退订单+非赠菜
+                        {
                             final AlertDialog.Builder alertDialog = new AlertDialog.Builder(ShowParticularsActivity.this);
                             View view1 = LayoutInflater.from(ShowParticularsActivity.this).inflate(R.layout.activity_tv_dialog,null);
                             alertDialog.setView(view1);
@@ -148,7 +151,6 @@ public class ShowParticularsActivity extends Activity {
                                             GoodsC goodsC = goodsCList.get(position);
                                             float count = Float.parseFloat(editText.getText().toString());
                                             boolean f = false;
-                                            RetreatOrderC retreatOrderC = new RetreatOrderC(myapp.getCompany_ID());
                                             GoodsC goods = new GoodsC(myapp.getCompany_ID());
                                             String goodsID = CDBHelper.createAndUpdate(getApplicationContext(),goods);
                                             goods.set_id(goodsID);
@@ -430,6 +432,8 @@ public class ShowParticularsActivity extends Activity {
     private void setAll()
     {
         goodsCList.clear();
+        goodsCListT.clear();
+
         all = 0f;
         orderCList = CDBHelper.getObjByWhere(getApplicationContext(),
                 Expression.property("className").equalTo("OrderC")
@@ -442,6 +446,7 @@ public class ShowParticularsActivity extends Activity {
         for (OrderC orderC : orderCList)
         {
 
+
                 for (GoodsC goodsb : orderC.getGoodsList())
                 {
 
@@ -450,31 +455,30 @@ public class ShowParticularsActivity extends Activity {
                     for (GoodsC goodsC : goodsCList)
                     {
 
-                        if (goodsC.getDishesName().equals(goodsb.getDishesName())) {
+                        if (goodsC.getDishesName().equals(goodsb.getDishesName())) {//+名称相同
 
-                            if (goodsb.getDishesTaste() != null) {
+                            if (goodsb.getDishesTaste() != null) {//*前提有口味的菜品，必须有默认口味
 
-                                if (goodsb.getDishesTaste().equals(goodsC.getDishesTaste())) {
+                                if (goodsb.getDishesTaste().equals(goodsC.getDishesTaste())) {//口味相同合并
 
-                                    float add = MyBigDecimal.add(goodsC.getAllPrice(), goodsb.getAllPrice(), 1);
+                                    float add = MyBigDecimal.add(goodsC.getAllPrice(), goodsb.getAllPrice(), 2);
                                     goodsC.setAllPrice(add);
-                                    float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
+                                    float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 2);
                                     goodsC.setDishesCount(count);
                                     flag = true;
                                 }
 
-                            } else {
+                            } else {//都无口味合并
 
-                                float add = MyBigDecimal.add(goodsC.getAllPrice(), goodsb.getAllPrice(), 1);
+                                float add = MyBigDecimal.add(goodsC.getAllPrice(), goodsb.getAllPrice(), 2);
                                 goodsC.setAllPrice(add);
-                                float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
+                                float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 2);
                                 goodsC.setDishesCount(count);
-
                                 flag = true;
                             }
 
                             break;
-                        }
+                        }//-名称相同
                     }
                     if (!flag) {
 
@@ -482,12 +486,12 @@ public class ShowParticularsActivity extends Activity {
 
                     }
                 }
-            if (orderC.getOrderCType() == 1){
+
+            if (orderC.getOrderCType() == 1){ //+退菜合并
                 for (GoodsC goodsB : orderC.getGoodsList()){
                     flag = false;
-                    goodsB.setDishesName(goodsB.getDishesName()+"(退)");
-
-                    for (GoodsC goodsC : goodsCList){
+                    for (GoodsC goodsC : goodsCListT)
+                    {
 
 
                         if (goodsC.getDishesName().equals(goodsB.getDishesName()) ){
@@ -496,18 +500,18 @@ public class ShowParticularsActivity extends Activity {
 
                                 if (goodsB.getDishesTaste().equals(goodsC.getDishesTaste())){
 
-                                    float add = MyBigDecimal.add(Math.abs(goodsC.getAllPrice()),Math.abs(goodsB.getAllPrice()),1);
+                                    float add = MyBigDecimal.add(Math.abs(goodsC.getAllPrice()),Math.abs(goodsB.getAllPrice()),2);
                                     goodsC.setAllPrice(add);
-                                    float count = MyBigDecimal.add(Math.abs(goodsC.getDishesCount()),Math.abs(goodsB.getDishesCount()),1);
+                                    float count = MyBigDecimal.add(Math.abs(goodsC.getDishesCount()),Math.abs(goodsB.getDishesCount()),2);
                                     goodsC.setDishesCount(count);
                                     flag = true;
                                 }
 
                             }else{
 
-                                float add = MyBigDecimal.add(Math.abs(goodsC.getAllPrice()),Math.abs(goodsB.getAllPrice()),1);
+                                float add = MyBigDecimal.add(Math.abs(goodsC.getAllPrice()),Math.abs(goodsB.getAllPrice()),2);
                                 goodsC.setAllPrice(add);
-                                float count = MyBigDecimal.add(Math.abs(goodsC.getDishesCount()),Math.abs(goodsB.getDishesCount()),1);
+                                float count = MyBigDecimal.add(Math.abs(goodsC.getDishesCount()),Math.abs(goodsB.getDishesCount()),2);
                                 goodsC.setDishesCount(count);
                                 flag = true;
                             }
@@ -519,23 +523,25 @@ public class ShowParticularsActivity extends Activity {
                     {
                         goodsB.setDishesCount(Math.abs(goodsB.getDishesCount()));
                         goodsB.setAllPrice(Math.abs(goodsB.getAllPrice()));
-                        goodsCList.add(goodsB);
+                        goodsCListT.add(goodsB);
                     }
                 }
-            }
-            all += orderC.getAllPrice();
+            }  //-退菜合并
+            all = MyBigDecimal.add(all,orderC.getAllPrice(),2);
         }
 
-        Iterator<GoodsC> goodsCIterator = goodsCList.iterator();
-        while (goodsCIterator.hasNext()){
-            if (goodsCIterator.next().getDishesCount() == 0.0){
-                goodsCIterator.remove();
-            }
+        for(GoodsC obj:goodsCListT)
+        {
+            obj.setDishesName(obj.getDishesName()+"(退)");
+            goodsCList.add(obj);
         }
-        for (int i = 0 ; i< goodsCList.size();i++){
-            if (goodsCList.get(i).getDishesCount()==0.0){
-                Log.e(TAG,"i==="+i);
+
+        for (int i = 0 ; i< goodsCList.size();i++)
+        {
+            if (goodsCList.get(i).getDishesCount()==0.0)
+            {
                 goodsCList.remove(i);
+                i--;
             }
         }
 

@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean flag = true;
     private ImageButton delet_bt;
     public  List<SparseArray<Object>> orderItem = new ArrayList<>();
-    public  OrderAdapter o;
+    public  OrderAdapter orderAdapter;
     private BluetoothAdapter btAdapter;
     private BluetoothDevice device;
     private BluetoothSocket socket;
@@ -291,12 +291,12 @@ public class MainActivity extends AppCompatActivity {
         return seekT9Adapter;
     }
 
-    public void setOrderAdapter(OrderAdapter o) {
-        this.o = o;
-
-    }
+//    public void setOrderAdapter(OrderAdapter o) {
+//        this.orderAdapter = o;
+//
+//    }
     public OrderAdapter getOrderAdapter(){
-        return o;
+        return orderAdapter;
     }
 
     public List<SparseArray<Object>> getOrderItem(){
@@ -304,6 +304,33 @@ public class MainActivity extends AppCompatActivity {
     }
     public List<GoodsC> getGoodsList(){
         return goodsList;
+    }
+    public void changeOrderGoodsByT9(GoodsC goodsObj)
+    {
+        for (int i = 0; i<goodsList.size();i++)//+for
+        {
+            if (goodsList.get(i).getDishesName().toString().equals(goodsObj.getDishesName()))//名称相等
+            {
+                if(goodsList.get(i).getDishesTaste()!=null)//口味不为空
+                {
+                    if(goodsList.get(i).getDishesTaste().equals(goodsObj.getDishesTaste()))//口味相等
+                    {
+                        goodsList.get(i).setDishesCount(goodsObj.getDishesCount());
+                        break;
+                    }
+
+                }//口味为空
+                else
+                {
+                    goodsList.get(i).setDishesCount(goodsObj.getDishesCount());
+                    break;
+
+                }
+
+            }
+        }//-for
+
+
     }
     public void setTotal(float total){
         this.total = total;
@@ -354,9 +381,9 @@ public class MainActivity extends AppCompatActivity {
         layoutParams.width = w;
         layoutParams.height = h / 2;
         linearLayout.setLayoutParams(layoutParams);
-        o = new OrderAdapter( getGoodsList(), MainActivity.this);
-        order_lv.setAdapter(o);
-        o.setListener(new OrderAdapter.setOnItemListener() {
+        orderAdapter = new OrderAdapter( getGoodsList(), MainActivity.this);
+        order_lv.setAdapter(orderAdapter);
+        orderAdapter.setListener(new OrderAdapter.setOnItemListener() {
             @Override
             public void setListener(final int position) {
 
@@ -372,10 +399,11 @@ public class MainActivity extends AppCompatActivity {
                                 //OrderC orderC = CDBHelper.getObjById(getApplicationContext(),goodsC.getOrder(),OrderC.class);
                                 goodsC.setGoodsType(2);
                                 goodsC.setDishesName(goodsC.getDishesName()+"(赠)");
-                                total -= goodsC.getAllPrice();
+
+                                total = MyBigDecimal.sub(total,MyBigDecimal.mul(goodsC.getPrice(),goodsC.getDishesCount(),2),2);
                                 setTotal(total);
-                                goodsC.setAllPrice(0);
-                                o.notifyDataSetChanged();
+
+                                orderAdapter.notifyDataSetChanged();
                                 dialog.dismiss();
                             }
                         });
@@ -393,31 +421,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 //初始化订单的数据，绑定数据源的信息。
                 //o.notifyDataSetChanged();
-
-                mHandler.post(new TimerTask() {
-                    @Override
-                    public void run() {
-                        Iterator<GoodsC> iterator = getGoodsList().iterator();
-
-                        while (iterator.hasNext()){
-                            GoodsC goodsC = iterator.next();
-                            if (goodsC.getDishesCount() == 0)
-                            {
-                                iterator.remove();
-                                break;
-                            }
-                        }
-                        for (int i = 0; 0 < getGoodsList().size();i++){
-                            if (getGoodsList().get(i).getDishesCount() == 0 ){
-                                getGoodsList().remove(i);
-                            }
-                            break;
-                        }
-
-                    }
-                });
-
                 if (flag) {
+                    orderAdapter.notifyDataSetChanged();
 
                     linearLayout.setAnimation(AnimationUtil.moveToViewLocation());
                     linearLayout.setVisibility(View.VISIBLE);
@@ -449,34 +454,26 @@ public class MainActivity extends AppCompatActivity {
 
                 //监听orderItem的增加删除，设置总价以及总数量, flag ？+ ：-,price 单价 ,sum 当前item的个数。
 
-                o.setOnchangeListener(new OrderAdapter.OnchangeListener() {
+                orderAdapter.setOnchangeListener(new OrderAdapter.OnchangeListener() {
                     @Override
-                    public void onchangeListener(boolean flag, float price, float sum) {
+                    public void onchangeListener(boolean flag, float allPrice, float sum) {
 
-                        if (flag) {
-
-                            total += price;
-                            String to = MyBigDecimal.round(total+"",2);
-                            total_tv.setText(to + "元");
-
+                        if (flag) {//点加号
+                            total = MyBigDecimal.add(total,allPrice,2);
+                            total_tv.setText(total + "元");
 
                         } else {
 
-                            total -= price;
-                            String to = MyBigDecimal.round(total+"",2);
-                            total_tv.setText(to + "元");
+                            total = MyBigDecimal.sub(total,allPrice,2);
+                            total_tv.setText(total + "元");
 
-                            if (sum == 0) {
-
+                            if (sum == 0)
+                            {
                                 point--;
-
                                 point_tv.setText(point + "");
-
                                 if (point == 0) {
-
                                     point_tv.setVisibility(View.INVISIBLE);
                                 }
-
 
                             }
 
@@ -614,14 +611,11 @@ public class MainActivity extends AppCompatActivity {
             for(String dishKindId:kitchenClientObj.getDishesKindIDList())//2 for 遍历厨房下所含菜系
             {
 
-                Document dishKindDoc= CDBHelper.getDocByID(getApplicationContext(),dishKindId);
-                String dishesKindName=dishKindDoc.getString("kindName");
-                if(TextUtils.isEmpty(dishesKindName))
-                    continue;
+
 
                 for(GoodsC goodsC:goodsList)//3 for 该厨房下所应得商品
                 {
-                    if(dishesKindName.equals(goodsC.getDishesKindName()))
+                    if(dishKindId.equals(goodsC.getDishesKindId()))
                     {
                         findflag = true;
                         // g_printGoodsList.remove(goodsC);//为了降低循环次数，因为菜品只可能在一个厨房打印分发，故分发完后移除掉。
@@ -783,7 +777,7 @@ public class MainActivity extends AppCompatActivity {
             }
             // 查找菜品的单价
 
-            String  strprice= ""+ MyBigDecimal.div(myshangpinlist.get(i).getAllPrice(),myshangpinlist.get(i).getDishesCount(),2);//myshangpinlist.get(i).getSinglePrice;
+            String  strprice= ""+myshangpinlist.get(i).getPrice();//""+ MyBigDecimal.div(myshangpinlist.get(i).getAllPrice(),myshangpinlist.get(i).getDishesCount(),2);//myshangpinlist.get(i).getSinglePrice;
             esc.addText(strprice);
             for (int j = 0; j < 9 - strprice.length(); j++)
                 esc.addText(" ");
@@ -792,7 +786,7 @@ public class MainActivity extends AppCompatActivity {
             for (int j = 0; j < 7 - ("" + num).length(); j++)
                 esc.addText(" ");
 
-            esc.addText("" + (myshangpinlist.get(i).getAllPrice()) + "\n");
+            esc.addText("" + (MyBigDecimal.mul(myshangpinlist.get(i).getPrice(),myshangpinlist.get(i).getDishesCount(),2)) + "\n");
             esc.addPrintAndLineFeed();
 
         }
@@ -1015,7 +1009,7 @@ public class MainActivity extends AppCompatActivity {
         total = 0;
 
         getGoodsList().clear();
-        o.notifyDataSetChanged();
+        orderAdapter.notifyDataSetChanged();
         seekT9Adapter.notifyDataSetChanged();
     }
 
@@ -1116,8 +1110,9 @@ public class MainActivity extends AppCompatActivity {
             for (int j = 0; j < goodsCList.size(); j++) {
 
                 GoodsC goodsC = goodsCList.get(j);
+                String allPrice = ""+MyBigDecimal.mul(goodsC.getPrice(),goodsC.getDishesCount(),2);
 
-                PrintUtils.printText(PrintUtils.printThreeData(goodsC.getDishesName(),goodsC.getDishesCount()+"", goodsC.getAllPrice()+"\n"));
+                PrintUtils.printText(PrintUtils.printThreeData(goodsC.getDishesName(),goodsC.getDishesCount()+"", allPrice+"\n"));
 
 
             }
@@ -1194,7 +1189,7 @@ public class MainActivity extends AppCompatActivity {
                     for(GoodsC obj:goodsList)
                     {
                         obj.setOrder(gOrderId);
-                        CDBHelper.createAndUpdate(getApplicationContext(),obj);
+                       // CDBHelper.createAndUpdate(getApplicationContext(),obj);
                     }
                     newOrderObj.setGoodsList(goodsList);
                     newOrderObj.setAllPrice(total);

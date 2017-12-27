@@ -10,6 +10,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -44,6 +45,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import model.CDBHelper;
+import untils.MyLog;
 
 /**
  * Created by lenovo on 2017/10/26.
@@ -92,11 +94,14 @@ public class SeekT9Fragment extends Fragment {
     public static String[][] pinyin2sz = new String[][]{{"a", "b", "c", ""}, {"d", "e", "f", ""}, {"g", "h", "i", ""}, {"j", "k", "l", ""}, {"m", "n", "o", ""}, {"p", "q", "r", "s"}, {"t", "u", "v", ""}, {"w", "x", "y", "z"}};
     private String taste = "默认";
     private float total = 0.0f;
-    public int point = 1, pos;
-    private List<DishesC> mlistSearchDishesObj;
-    private List<GoodsC> myGoodsList;
-    private List<String> tasteList;
+    public int point = 1, tastePos;
+    private float tmpAllPrice;
+
     private SeekT9Adapter seekT9Adapter;
+    private List<GoodsC> t9GoodsList;
+
+    private List<String> tasteList;
+
     View view;
     private MainActivity mainActivity;
     private Handler mHandler = null;
@@ -106,6 +111,8 @@ public class SeekT9Fragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+
+        MyLog.d( "onCreateView");
         View view = inflater.inflate(R.layout.activity_seek, container, false);
 
         unbinder = ButterKnife.bind(this, view);
@@ -117,13 +124,34 @@ public class SeekT9Fragment extends Fragment {
 
     }
 
-    public void initView() {
-        seekT9Adapter = new SeekT9Adapter((MainActivity) getActivity(), activitySeekEdit);
+    @Override
+    public void onHiddenChanged(boolean hidden)
+    {
+        super.onHiddenChanged(hidden);
+        MyLog.d( "onHiddenChanged");
+        if(!hidden)
+        {
+            MyLog.d( "hidden="+hidden);
 
-        mlistSearchDishesObj = new ArrayList<>();
-        myGoodsList = new ArrayList<>();
-        ((MainActivity) getActivity()).setT9Adapter(seekT9Adapter);
-        activitySeekList.setAdapter(seekT9Adapter);
+            t9GoodsList.clear();
+            seekT9Adapter.notifyDataSetChanged();
+            activitySeekEdit.setText("");
+
+
+        }
+
+    }
+
+    public void initView()
+    {
+
+
+       if(t9GoodsList==null)
+           t9GoodsList = new ArrayList<>();
+       else
+           t9GoodsList.clear();
+
+        seekT9Adapter = new SeekT9Adapter((MainActivity) getActivity(), activitySeekEdit,t9GoodsList);
 
         seekT9Adapter.setListener(new SeekT9Adapter.SeekT9OnClickListener() {
             @Override
@@ -133,8 +161,11 @@ public class SeekT9Fragment extends Fragment {
             }
 
         });
-        setSeetSearch();
+        activitySeekList.setAdapter(seekT9Adapter);
+        ((MainActivity) getActivity()).setT9Adapter(seekT9Adapter);
 
+
+        setSeetSearch();
 
     }
 
@@ -145,23 +176,31 @@ public class SeekT9Fragment extends Fragment {
      * @param name  传入的菜品的名称
      * @param price 传入的菜品的价格
      */
-    private void showDialog(final String name, final float price, int p) {
-        final float[] l = {0.0f};
+    private void showDialog(final String name, final float price, final int selGoodsPos)
+    {
+
+        tastePos = 0;
+        if(tasteList==null)
         tasteList = new ArrayList<>();
+        else
+            tasteList.clear();
+
         view = LayoutInflater.from(getActivity()).inflate(R.layout.view_item_dialog, null);
 
         final TextView price_tv = view.findViewById(R.id.price);
 
-        final DishesC dishesC = CDBHelper.getObjById(getActivity().getApplicationContext(), myGoodsList.get(p).getDishesId(), DishesC.class);
+        final DishesC dishesC = CDBHelper.getObjById(getActivity().getApplicationContext(), t9GoodsList.get(selGoodsPos).getDishesId(), DishesC.class);
         final AmountView amountView = view.findViewById(R.id.amount_view);
-        if (myGoodsList.get(p).getDishesCount() == 0.0) {
+        final  float  sourceCount = t9GoodsList.get(selGoodsPos).getDishesCount();
+        if (sourceCount == 0.0)
+        {
             amountView.setNumber("1.0");
         } else {
-            amountView.setNumber(myGoodsList.get(p).getDishesCount() + "");
+            amountView.setNumber(sourceCount + "");
         }
         String all = MyBigDecimal.mul(amountView.getAmount() + "", price + "", 2);
-        price_tv.setText("总计 " + Float.parseFloat(all) + " 元");
-        l[0] = Float.parseFloat(all);
+        price_tv.setText("总计 " + all + " 元");
+        tmpAllPrice = Float.parseFloat(all);
         //增删选择器的数据改变的监听方法
 
         amountView.setChangeListener(new AmountView.ChangeListener() {
@@ -170,13 +209,14 @@ public class SeekT9Fragment extends Fragment {
 
                 //实时计算当前菜品选择不同数量后的单品总价
                 String all = MyBigDecimal.mul(ls + "", price + "", 2);
-                l[0] = Float.parseFloat(all);
+                tmpAllPrice = Float.parseFloat(all);
 
-                price_tv.setText("总计 " + l[0] + " 元");
+                price_tv.setText("总计 " + tmpAllPrice + " 元");
 
             }
         });
-        if (dishesC.getTasteList() != null) {
+        if (dishesC.getTasteList() != null)
+        {
             for (int i = 0; i < dishesC.getTasteList().size(); i++) {
                 Document document = CDBHelper.getDocByID(getActivity().getApplicationContext(), dishesC.getTasteList().get(i).toString());
                 tasteList.add(document.getString("tasteName"));
@@ -191,58 +231,70 @@ public class SeekT9Fragment extends Fragment {
         myGridAdapter.setmOnItemOlickListener(new MyGridAdapter.OnItemOlickListener() {
             @Override
             public void onItemClick(int position) {
-                pos = position;
+                tastePos = position;
             }
         });
         recyclerView.setAdapter(myGridAdapter);
         AlertDialog.Builder builder = new AlertDialog
                 .Builder(getActivity());
+
+
         builder.setTitle(name);
         builder.setView(view);
         builder.setNegativeButton("取消", null);
         builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
+            public void onClick(DialogInterface dialogInterface, int i)
+            {
                 mainActivity = (MainActivity) getActivity();
-                float sum = amountView.getAmount();
+                float destCount = amountView.getAmount();
+                if(destCount<=0)
+                {
+                    Toast.makeText(getActivity(), "没有选择商品数量！", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
-                if (sum != 0) {//如果选择器的数量不为零，当前的选择的菜品加入订单列表
-                    GoodsC goodsC = new GoodsC(myapp.getCompany_ID());
-                    String gID = CDBHelper.createAndUpdate(getActivity().getApplicationContext(), goodsC);
-                    goodsC.set_id(gID);
-                    goodsC.setDishesName(name);
-                    if (tasteList.size() == 0) {
-                        goodsC.setDishesTaste(null);
-                    } else {
-                        goodsC.setDishesTaste(tasteList.get(pos));
-                    }
-                    goodsC.setDishesCount(sum);
-                    String all = MyBigDecimal.mul(sum + "", price + "", 2);
-                    goodsC.setAllPrice(Float.parseFloat(all));
-                    goodsC.setGoodsType(0);
-                    goodsC.setDishesId(dishesC.get_id());
-                    if (dishesC.getDishesKindId() != null) {
-                        DishesKindC dishesKind = CDBHelper.getObjById(getActivity().getApplicationContext(), dishesC.getDishesKindId(), DishesKindC.class);
-                        goodsC.setDishesKindName(dishesKind.getKindName());
-                    }
-                    ((MainActivity) getActivity()).getGoodsList().add(goodsC);
-                    //购物车计数器数据更新
-                    point = (((MainActivity) getActivity()).getPoint());
-                    point++;
-                    ((MainActivity) getActivity()).setPoint(point);
+                t9GoodsList.get(selGoodsPos).setDishesCount(destCount);
+                seekT9Adapter.notifyDataSetChanged();
+                GoodsC goodsC = new GoodsC(myapp.getCompany_ID());
+                goodsC.setDishesName(name);
+                if (tasteList.size() == 0) {
+                    goodsC.setDishesTaste(null);
+                } else {
+                    goodsC.setDishesTaste(tasteList.get(tastePos));
+                }
+                goodsC.setDishesCount(destCount);
+                goodsC.setPrice(price);
+                goodsC.setGoodsType(0);
+                goodsC.setDishesId(dishesC.get_id());
+                goodsC.setDishesKindId(dishesC.getDishesKindId());
+                //1、还未点此菜弹出
+                if(sourceCount==0.0)
+                {
+                        ((MainActivity) getActivity()).getGoodsList().add(goodsC);
 
-                    //计算总价
-                    total = ((MainActivity) getActivity()).getTotal();
-                    total += l[0];
+                        //购物车计数器数据更新
+                        point = (((MainActivity) getActivity()).getPoint());
+                        point++;
+                        ((MainActivity) getActivity()).setPoint(point);
+
+                        //计算总价
+                        total = ((MainActivity) getActivity()).getTotal();
+                        total = MyBigDecimal.add(total,tmpAllPrice,2);
+                        ((MainActivity) getActivity()).setTotal(total);
+
+                }//
+                else//原来点有此菜
+                {
+                    ((MainActivity) getActivity()).changeOrderGoodsByT9(goodsC);
+                    float tmp = MyBigDecimal.mul(goodsC.getPrice(),MyBigDecimal.sub(destCount,sourceCount,2),2);
+                    total = MyBigDecimal.add(total,tmp,2);
                     ((MainActivity) getActivity()).setTotal(total);
 
-                    //刷新订单数据源
-                    //o.notifyDataSetChanged();
-
-                } else {
-
-                    Toast.makeText(getActivity(), "没有选择商品数量！", Toast.LENGTH_SHORT).show();
                 }
+
+
+
 
             }
         });
@@ -294,8 +346,8 @@ public class SeekT9Fragment extends Fragment {
         if (search.length() < 2)
             return;
 
-        myGoodsList.clear();
-        Log.e("myGoodsList",myGoodsList.size()+"");
+        t9GoodsList.clear();
+
         mHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -305,12 +357,14 @@ public class SeekT9Fragment extends Fragment {
                         , null, DishesC.class);
                 for (DishesC obj : dishesCs) {
                     GoodsC goodsObj = new GoodsC(myapp.getCompany_ID());
+                    goodsObj.setDishesName(obj.getDishesName());
                     goodsObj.setDishesCount(0);
+                    goodsObj.setPrice(obj.getPrice());
                     goodsObj.setDishesId(obj.get_id());
-                    myGoodsList.add(goodsObj);
-                    Log.e("myGoodsList",myGoodsList.size()+"");
+                    goodsObj.setDishesKindId(obj.getDishesKindId());
+                    t9GoodsList.add(goodsObj);
+
                 }
-                seekT9Adapter.setmData(myGoodsList);
                 seekT9Adapter.notifyDataSetChanged();
             }
 
@@ -325,6 +379,16 @@ public class SeekT9Fragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+    private  String findZDCKindId()
+    {
+        List<String> zdcIdList = CDBHelper.getIdsByWhere(getActivity().getApplicationContext()
+                ,Expression.property("className").equalTo("DishesKindC")
+                 .and(Expression.property("kindName").equalTo("自点菜"))
+                ,null);
+        if(zdcIdList.size()>0)
+            return  zdcIdList.get(0);
+        else return "";
     }
 
     @OnClick({R.id.activity_seek_edit, R.id.ibtn_key_1, R.id.ibtn_key_2, R.id.ibtn_key_3, R.id.ibtn_key_4, R.id.ibtn_key_5, R.id.ibtn_key_6, R.id.ibtn_key_7, R.id.ibtn_key_8, R.id.ibtn_key_9, R.id.ibtn_key_l, R.id.ibtn_key_0, R.id.ibtn_key_r, R.id.ibtn_key_del,R.id.seek_26_q, R.id.seek_26_w, R.id.seek_26_e, R.id.seek_26_r, R.id.seek_26_t, R.id.seek_26_y, R.id.seek_26_u, R.id.seek_26_i, R.id.seek_26_o, R.id.seek_26_p, R.id.seek_26_a, R.id.seek_26_s, R.id.seek_26_d, R.id.seek_26_f, R.id.seek_26_g, R.id.seek_26_h, R.id.seek_26_j, R.id.seek_26_k, R.id.seek_26_l, R.id.seek_26_z, R.id.seek_26_x, R.id.seek_26_c, R.id.seek_26_v, R.id.seek_26_b, R.id.seek_26_n, R.id.seek_26_m,R.id.seek_26_sc,R.id.seek_26_qh})
@@ -400,6 +464,7 @@ public class SeekT9Fragment extends Fragment {
                 alert.setCancelable(true);
                 final EditText cm = view1.findViewById(R.id.custom_dc_c);//菜名
                 final EditText jg = view1.findViewById(R.id.custom_dc_t);//价格
+                final EditText f_count = view1.findViewById(R.id.custom_dc_count);
                 //取消或确定按钮监听事件处理
                 final AlertDialog dialog = alert.create();
                 Button btn_cancel = view1
@@ -419,15 +484,23 @@ public class SeekT9Fragment extends Fragment {
                 btn_comfirm.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        GoodsC goods = new GoodsC(myapp.getCompany_ID());
+                        GoodsC obj = new GoodsC(myapp.getCompany_ID());
+                        if(TextUtils.isEmpty(f_count.getText().toString()))
+                        {
+                            Toast.makeText(getActivity(), "数量不能为空", Toast.LENGTH_LONG).show();
+                            return;
+                        }
                         if (!cm.getText().toString().equals("") && cm.getText() != null) {
-                            goods.setDishesName(cm.getText().toString());
-                            if (!jg.getText().toString().equals("") && jg.getText() != null) {
-                                goods.setAllPrice(Float.parseFloat(jg.getText().toString()));
-                                goods.setDishesCount(1);
-                                goods.setDishesKindName("自点菜");
-                                //sgoods.setDishesId();
-                                ((MainActivity) getActivity()).getGoodsList().add(goods);
+                            obj.setDishesName(cm.getText().toString());
+                            if (!jg.getText().toString().equals("") && jg.getText() != null)
+                            {
+                                obj.setPrice(Float.parseFloat(jg.getText().toString()));
+                                obj.setDishesCount(Float.parseFloat(f_count.getText().toString()));
+                                String zdcDishedKindId = findZDCKindId();
+                                obj.setDishesKindId(zdcDishedKindId);
+                                obj.setGoodsType(3);
+
+                                ((MainActivity) getActivity()).getGoodsList().add(obj);
                                 //购物车计数器数据更新
                                 point = (((MainActivity) getActivity()).getPoint());
                                 point++;

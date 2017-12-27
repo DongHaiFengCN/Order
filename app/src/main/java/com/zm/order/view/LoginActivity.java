@@ -72,8 +72,6 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
                 Expression.property("className")
                         .equalTo("UsersC"),null, UsersC.class);
 
-
-
         for (int i = 0; i<usersCList.size();i++)
         {
             Log.e("Login",usersCList.get(i).getUserName().toString()+"_"+usersCList.get(i).getEmployeeName());
