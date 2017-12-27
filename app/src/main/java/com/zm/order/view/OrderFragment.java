@@ -236,12 +236,12 @@ public class OrderFragment extends Fragment  {
                     }
                     goodsC.setDishesCount(sum);
                     String all = MyBigDecimal.mul(sum+"",price+"",2);
-                    goodsC.setAllPrice(Float.parseFloat(all));
+                    goodsC.setPrice(Float.parseFloat(all));
                     goodsC.setGoodsType(0);
                     goodsC.setDishesId(doc.getId());
                     if ( doc.getString("dishesKindId") != null) {
                         DishesKindC dishesKind = CDBHelper.getObjById(getActivity().getApplicationContext(), doc.getString("dishesKindId"), DishesKindC.class);
-                        goodsC.setDishesKindName(dishesKind.getKindName());
+                        goodsC.setDishesKindId(doc.getString("dishesKindId"));
                         Log.e("dishesKindName", dishesKind.getKindName());
                     }
                     ((MainActivity)getActivity()).getGoodsList().add(goodsC);

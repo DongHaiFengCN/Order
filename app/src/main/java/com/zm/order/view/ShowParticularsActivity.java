@@ -41,7 +41,6 @@ import bean.kitchenmanage.dishes.DishesC;
 import bean.kitchenmanage.dishes.DishesKindC;
 import bean.kitchenmanage.order.GoodsC;
 import bean.kitchenmanage.order.OrderC;
-import bean.kitchenmanage.order.RetreatOrderC;
 import bean.kitchenmanage.table.AreaC;
 import bean.kitchenmanage.user.CompanyC;
 import butterknife.BindView;
@@ -150,7 +149,6 @@ public class ShowParticularsActivity extends Activity {
                                             GoodsC goodsC = goodsCList.get(position);
                                             float count = Float.parseFloat(editText.getText().toString());
                                             boolean f = false;
-                                            RetreatOrderC retreatOrderC = new RetreatOrderC(myapp.getCompany_ID());
                                             GoodsC goods = new GoodsC(myapp.getCompany_ID());
                                             String goodsID = CDBHelper.createAndUpdate(getApplicationContext(),goods);
                                             goods.set_id(goodsID);
@@ -180,7 +178,7 @@ public class ShowParticularsActivity extends Activity {
 
                                                                         goods.setGoodsType(1);
                                                                         goods.setDishesName(goodsC1.getDishesName());
-                                                                        goods.setAllPrice(-goodsC1.getAllPrice());
+                                                                        goods.setPrice(goodsC1.getPrice());
                                                                         goods.setDishesCount(-goodsC1.getDishesCount());
 
                                                                         Log.e(TAG, "aA");
@@ -190,11 +188,11 @@ public class ShowParticularsActivity extends Activity {
                                                                     } else if (goodsC1.getDishesCount() > count) {
 
 
-                                                                        float singlePrice = MyBigDecimal.div(goodsC.getAllPrice(), goodsC.getDishesCount(), 2);
+                                                                        float singlePrice = MyBigDecimal.div(goodsC.getPrice(), goodsC.getDishesCount(), 2);
                                                                         goods.setDishesCount(-count);
                                                                         goods.setDishesName(goodsC1.getDishesName());
                                                                         goods.setGoodsType(1);
-                                                                        goods.setAllPrice(-MyBigDecimal.mul(singlePrice, count, 1));
+                                                                        goods.setPrice(-MyBigDecimal.mul(singlePrice, count, 1));
 
                                                                         Log.e(TAG, "B" + orderC.getGoodsList().size());
                                                                         f = true;
@@ -206,10 +204,10 @@ public class ShowParticularsActivity extends Activity {
 
                                                                         goods.setDishesCount(-goodsC1.getDishesCount());
                                                                         goods.setDishesName(goodsC1.getDishesName());
-                                                                        goods.setAllPrice(-goodsC1.getAllPrice());
+                                                                        goods.setPrice(-goodsC1.getPrice());
                                                                         goods.setGoodsType(1);
 
-                                                                        order.setAllPrice(goodsC.getAllPrice());
+                                                                        order.setAllPrice(goodsC.getPrice());
                                                                         order.setOrderState(1);
                                                                         order.setOrderType(1);
                                                                         order.setOrderCType(1);
@@ -231,7 +229,7 @@ public class ShowParticularsActivity extends Activity {
 
                                                                     goods.setGoodsType(1);
                                                                     goods.setDishesName(goodsC1.getDishesName());
-                                                                    goods.setAllPrice(-goodsC1.getAllPrice());
+                                                                    goods.setPrice(-goodsC1.getPrice());
                                                                     goods.setDishesCount(-goodsC1.getDishesCount());
 
                                                                     Log.e(TAG, "aA");
@@ -241,12 +239,12 @@ public class ShowParticularsActivity extends Activity {
                                                                 } else if (goodsC1.getDishesCount() > count) {
 
 
-                                                                    float singlePrice = MyBigDecimal.div(goodsC.getAllPrice(), goodsC.getDishesCount(), 2);
+                                                                    float singlePrice = MyBigDecimal.div(goodsC.getPrice(), goodsC.getDishesCount(), 2);
                                                                     //生成一个新goods
                                                                     goods.setDishesCount(-count);
                                                                     goods.setDishesName(goodsC1.getDishesName());
                                                                     goods.setGoodsType(1);
-                                                                    goods.setAllPrice(-MyBigDecimal.mul(singlePrice, count, 1));
+                                                                    goods.setPrice(-MyBigDecimal.mul(singlePrice, count, 1));
 
                                                                     Log.e(TAG, "B" + orderC.getGoodsList().size());
                                                                     f = true;
@@ -258,10 +256,10 @@ public class ShowParticularsActivity extends Activity {
                                                                     goodsC1.setGoodsType(1);
                                                                     goods.setDishesCount(-goodsC1.getDishesCount());
                                                                     goods.setDishesName(goodsC1.getDishesName());
-                                                                    goods.setAllPrice(-goodsC1.getAllPrice());
+                                                                    goods.setPrice(-goodsC1.getPrice());
                                                                     goods.setGoodsType(1);
 
-                                                                    order.setAllPrice(goods.getAllPrice());
+                                                                    order.setAllPrice(goods.getPrice());
                                                                     order.setOrderState(1);
                                                                     order.setOrderType(1);
                                                                     order.setOrderCType(1);
@@ -287,7 +285,7 @@ public class ShowParticularsActivity extends Activity {
                                                     order.setOrderType(1);
                                                     order.setOrderCType(1);
                                                     order.addGoods(goods);
-                                                    order.setAllPrice(goods.getAllPrice());
+                                                    order.setAllPrice(goods.getPrice());
                                                     order.setCreatedTime(getFormatDate());
                                                     order.setTableNo(myapp.getTable_sel_obj().getTableNum());
                                                     order.setTableName(myapp.getTable_sel_obj().getTableName());
@@ -335,10 +333,10 @@ public class ShowParticularsActivity extends Activity {
                                             {
                                                 orderC.getGoodsList().get(i).setGoodsType(2);
                                                 orderC.getGoodsList().get(i).setDishesName(goodsC.getDishesName() + "(赠)");
-                                                orderC.getGoodsList().get(i).setAllPrice(0);
+                                                orderC.getGoodsList().get(i).setPrice(0);
 
                                             }
-                                            allP += orderC.getGoodsList().get(i).getAllPrice();
+                                            allP += orderC.getGoodsList().get(i).getPrice();
                                         }
                                         orderC.setAllPrice(allP);
                                         CDBHelper.createAndUpdate(getApplicationContext(), orderC);
@@ -390,13 +388,13 @@ public class ShowParticularsActivity extends Activity {
                                             String goodsID = CDBHelper.createAndUpdate(getApplicationContext(),goodsC2);
                                             goodsC2.set_id(goodsID);
                                             goodsC2.setDishesCount(count);
-                                            goodsC2.setAllPrice(MyBigDecimal.mul(count,MyBigDecimal.div(goodsC.getAllPrice(),goodsC.getDishesCount(),2),1));
+                                            goodsC2.setPrice(MyBigDecimal.mul(count,MyBigDecimal.div(goodsC.getPrice(),goodsC.getDishesCount(),2),1));
                                             goodsC2.setDishesName(goodsC.getDishesName());
                                             goodsC2.setOrder(order.get_id());
                                             order.setOrderState(1);
                                             order.setOrderType(1);
                                             order.setOrderCType(0);
-                                            order.setAllPrice(goodsC2.getAllPrice());
+                                            order.setAllPrice(goodsC2.getPrice());
                                             order.addGoods(goodsC2);
                                             order.setCreatedTime(getFormatDate());
                                             order.setTableNo(myapp.getTable_sel_obj().getTableNum());
@@ -462,8 +460,8 @@ public class ShowParticularsActivity extends Activity {
 
                                 if (goodsb.getDishesTaste().equals(goodsC.getDishesTaste())) {
 
-                                    float add = MyBigDecimal.add(goodsC.getAllPrice(), goodsb.getAllPrice(), 1);
-                                    goodsC.setAllPrice(add);
+                                    float add = MyBigDecimal.add(goodsC.getPrice(), goodsb.getPrice(), 1);
+                                    goodsC.setPrice(add);
                                     float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
                                     goodsC.setDishesCount(count);
                                     flag = true;
@@ -471,8 +469,8 @@ public class ShowParticularsActivity extends Activity {
 
                             } else {
 
-                                float add = MyBigDecimal.add(goodsC.getAllPrice(), goodsb.getAllPrice(), 1);
-                                goodsC.setAllPrice(add);
+                                float add = MyBigDecimal.add(goodsC.getPrice(), goodsb.getPrice(), 1);
+                                goodsC.setPrice(add);
                                 float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
                                 goodsC.setDishesCount(count);
 
@@ -502,8 +500,8 @@ public class ShowParticularsActivity extends Activity {
 
                                 if (goodsB.getDishesTaste().equals(goodsC.getDishesTaste())){
 
-                                    float add = MyBigDecimal.add(Math.abs(goodsC.getAllPrice()),Math.abs(goodsB.getAllPrice()),1);
-                                    goodsC.setAllPrice(add);
+                                    float add = MyBigDecimal.add(Math.abs(goodsC.getPrice()),Math.abs(goodsB.getPrice()),1);
+                                    goodsC.setPrice(add);
                                     float count = MyBigDecimal.add(Math.abs(goodsC.getDishesCount()),Math.abs(goodsB.getDishesCount()),1);
                                     goodsC.setDishesCount(count);
                                     flag = true;
@@ -511,8 +509,8 @@ public class ShowParticularsActivity extends Activity {
 
                             }else{
 
-                                float add = MyBigDecimal.add(Math.abs(goodsC.getAllPrice()),Math.abs(goodsB.getAllPrice()),1);
-                                goodsC.setAllPrice(add);
+                                float add = MyBigDecimal.add(Math.abs(goodsC.getPrice()),Math.abs(goodsB.getPrice()),1);
+                                goodsC.setPrice(add);
                                 float count = MyBigDecimal.add(Math.abs(goodsC.getDishesCount()),Math.abs(goodsB.getDishesCount()),1);
                                 goodsC.setDishesCount(count);
                                 flag = true;
@@ -524,7 +522,7 @@ public class ShowParticularsActivity extends Activity {
                     if (!flag)
                     {
                         goodsB.setDishesCount(Math.abs(goodsB.getDishesCount()));
-                        goodsB.setAllPrice(Math.abs(goodsB.getAllPrice()));
+                        goodsB.setPrice(Math.abs(goodsB.getPrice()));
                         goodsCList.add(goodsB);
                     }
                 }
@@ -707,7 +705,7 @@ public class ShowParticularsActivity extends Activity {
                 taste = "("+goodsC.getDishesTaste()+")";
             }
 
-            PrintUtils.printText(PrintUtils.printThreeData(goodsC.getDishesName()+taste,goodsC.getDishesCount()+"", goodsC.getAllPrice()+"\n"));
+            PrintUtils.printText(PrintUtils.printThreeData(goodsC.getDishesName()+taste,goodsC.getDishesCount()+"", goodsC.getPrice()+"\n"));
 
 
         }

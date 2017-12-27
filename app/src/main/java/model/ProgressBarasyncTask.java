@@ -150,7 +150,7 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
 
                     GoodsC goodsC = goodsCList.get(j);
 
-                    PrintUtils.printText(PrintUtils.printThreeData(goodsC.getDishesName(),goodsC.getDishesCount()+"", goodsC.getAllPrice()+"\n"));
+                    PrintUtils.printText(PrintUtils.printThreeData(goodsC.getDishesName(),goodsC.getDishesCount()+"", goodsC.getPrice()+"\n"));
 
 
                 }
@@ -293,8 +293,8 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
 
                             if (goodsb.getDishesTaste().equals(goodsC.getDishesTaste())) {
 
-                                float add = MyBigDecimal.add(goodsC.getAllPrice(), goodsb.getAllPrice(), 1);
-                                goodsC.setAllPrice(add);
+                                float add = MyBigDecimal.add(goodsC.getPrice(), goodsb.getPrice(), 1);
+                                goodsC.setPrice(add);
                                 float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
                                 goodsC.setDishesCount(count);
                                 flag = true;
@@ -302,8 +302,8 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
 
                         } else {
 
-                            float add = MyBigDecimal.add(goodsC.getAllPrice(), goodsb.getAllPrice(), 1);
-                            goodsC.setAllPrice(add);
+                            float add = MyBigDecimal.add(goodsC.getPrice(), goodsb.getPrice(), 1);
+                            goodsC.setPrice(add);
                             float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
                             goodsC.setDishesCount(count);
                             flag = true;
@@ -323,7 +323,7 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
                     for (GoodsC goodsC : goodsCList){
                         if(goodsB.getDishesCount() == -1.0){
                             goodsB.setDishesCount(1);
-                            goodsB.setAllPrice(-goodsB.getAllPrice());
+                            goodsB.setPrice(-goodsB.getPrice());
                         }
                         if (goodsC.getDishesName().equals(goodsB.getDishesName()) ){
 
@@ -331,8 +331,8 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
 
                                 if (goodsB.getDishesTaste().equals(goodsC.getDishesTaste())){
 
-                                    float add = MyBigDecimal.add(Math.abs(goodsC.getAllPrice()),Math.abs(goodsB.getAllPrice()),1);
-                                    goodsC.setAllPrice(add);
+                                    float add = MyBigDecimal.add(Math.abs(goodsC.getPrice()),Math.abs(goodsB.getPrice()),1);
+                                    goodsC.setPrice(add);
                                     float count = MyBigDecimal.add(Math.abs(goodsC.getDishesCount()),Math.abs(goodsB.getDishesCount()),1);
                                     if (count == -1.0){
                                         goodsC.setDishesCount(1);
@@ -343,8 +343,8 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
 
                             }else{
 
-                                float add = MyBigDecimal.add(Math.abs(goodsC.getAllPrice()),Math.abs(goodsB.getAllPrice()),1);
-                                goodsC.setAllPrice(add);
+                                float add = MyBigDecimal.add(Math.abs(goodsC.getPrice()),Math.abs(goodsB.getPrice()),1);
+                                goodsC.setPrice(add);
                                 float count = MyBigDecimal.add(Math.abs(goodsC.getDishesCount()),Math.abs(goodsB.getDishesCount()),1);
                                 if (count == -1.0){
                                     goodsC.setDishesCount(1);

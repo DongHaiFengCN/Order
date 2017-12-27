@@ -72,7 +72,7 @@ public class ShowParticularsAdapter extends BaseAdapter {
         viewHolder.kw = convertView.findViewById(R.id.item_show_kw);
         viewHolder.item_show_lin = convertView.findViewById(R.id.item_show_lin);
 
-        viewHolder.dj.setText(goodsCs.get(position).getAllPrice()+"");
+        viewHolder.dj.setText(goodsCs.get(position).getPrice()+"");
         viewHolder.mc.setText(goodsCs.get(position).getDishesName());
         viewHolder.sl.setText(goodsCs.get(position).getDishesCount()+"");
         if(goodsCs.get(position).getDishesTaste() != null){
