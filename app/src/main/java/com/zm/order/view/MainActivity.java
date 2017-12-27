@@ -2,6 +2,7 @@ package com.zm.order.view;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -15,7 +16,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -23,14 +23,16 @@ import android.os.RemoteException;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -51,7 +53,6 @@ import com.gprinter.command.EscCommand;
 import com.gprinter.command.GpCom;
 import com.gprinter.io.GpDevice;
 import com.gprinter.io.PortParameters;
-import com.gprinter.save.PortParamDataBase;
 import com.gprinter.service.GpPrintService;
 import com.tencent.bugly.crashreport.BuglyLog;
 import com.tencent.bugly.crashreport.CrashReport;
@@ -68,7 +69,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TimerTask;
@@ -80,7 +80,6 @@ import bean.kitchenmanage.order.GoodsC;
 import bean.kitchenmanage.order.OrderC;
 import bean.kitchenmanage.order.OrderNum;
 import bean.kitchenmanage.table.AreaC;
-import bean.kitchenmanage.table.TableC;
 import bean.kitchenmanage.user.CompanyC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -426,7 +425,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 //初始化订单的数据，绑定数据源的信息。
                 //o.notifyDataSetChanged();
-                if (flag) {
+                setOrderDialog();
+                /*if (flag) {
                     orderAdapter.notifyDataSetChanged();
 
                     linearLayout.setAnimation(AnimationUtil.moveToViewLocation());
@@ -455,7 +455,7 @@ public class MainActivity extends AppCompatActivity {
 
                     flag = true;
 
-                }
+                }*/
 
                 //监听orderItem的增加删除，设置总价以及总数量, flag ？+ ：-,price 单价 ,sum 当前item的个数。
 
@@ -591,6 +591,34 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+
+    private void setOrderDialog(){
+        Dialog dialog = new Dialog(MainActivity.this,R.style.ActionSheetDialogStyle);
+        View orderDialog = LayoutInflater.from(MainActivity.this).inflate(R.layout.activity_dialog_order,null);
+        ListView listView = orderDialog.findViewById(R.id.order_lv);
+        ImageView delet = orderDialog.findViewById(R.id.delet);
+        listView.setAdapter(orderAdapter);
+        delet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clearOrder();
+            }
+        });
+        dialog.setContentView(orderDialog);
+        Window windowDialog = dialog.getWindow();
+        windowDialog.setGravity(Gravity.BOTTOM);
+        // 获取对话框当前的参数值
+        WindowManager.LayoutParams lp = windowDialog.getAttributes();
+        // 新位置Y坐标
+        lp.y = 100;
+        // 宽度
+        lp.width = (int) getResources().getDisplayMetrics().widthPixels;
+        orderDialog.measure(0, 0);
+        lp.height = orderDialog.getMeasuredHeight();
+        windowDialog.setAttributes(lp);
+        dialog.show();
     }
 
     /**
@@ -1356,11 +1384,11 @@ public class MainActivity extends AppCompatActivity {
 
             isDishes = false;
 
-            if (o == null) {
+            if (orderAdapter == null) {
 
-                o = new OrderAdapter(goodsList, MainActivity.this);
+                orderAdapter = new OrderAdapter(goodsList, MainActivity.this);
 
-                order_lv.setAdapter(o);
+                order_lv.setAdapter(orderAdapter);
             }
 
 
@@ -1411,7 +1439,7 @@ public class MainActivity extends AppCompatActivity {
             goodsC.setDishesCount(dishesMessage.getCount());
             goodsC.setDishesId(dishesMessage.getDishesC().get_id());
             goodsC.setGoodsType(0);
-            goodsC.setAllPrice(dishesMessage.getTotal());
+            goodsC.setPrice(dishesMessage.getTotal());
 
             Log.e("总价是：", dishesMessage.getTotal() + "");
             goodsList.add(goodsC);
@@ -1422,12 +1450,12 @@ public class MainActivity extends AppCompatActivity {
         updataTotal();
         updataPoint();
 
-        o.notifyDataSetChanged();
+        orderAdapter.notifyDataSetChanged();
     }
 
     private void updataPoint() {
 
-        setPoint(o.getCount());
+        setPoint(orderAdapter.getCount());
     }
 
     private void updataTotal() {
@@ -1442,7 +1470,7 @@ public class MainActivity extends AppCompatActivity {
 
             for (int i = 0; i < goodsList.size(); i++) {
 
-                t += goodsList.get(i).getAllPrice();
+                t += goodsList.get(i).getPrice();
 
 
             }
@@ -1458,7 +1486,7 @@ public class MainActivity extends AppCompatActivity {
         if (dishesMessage.isOperation()) {
 
             goodsList.get(i).setDishesCount(goodsList.get(i).getDishesCount() + dishesMessage.getCount());
-            goodsList.get(i).setAllPrice(goodsList.get(i).getAllPrice() + dishesMessage.getTotal());
+            goodsList.get(i).setPrice(goodsList.get(i).getPrice() + dishesMessage.getTotal());
 
         } else {
 
@@ -1468,7 +1496,7 @@ public class MainActivity extends AppCompatActivity {
 
             } else {
                 goodsList.get(i).setDishesCount(goodsList.get(i).getDishesCount() - dishesMessage.getCount());
-                goodsList.get(i).setAllPrice(goodsList.get(i).getAllPrice() - dishesMessage
+                goodsList.get(i).setPrice(goodsList.get(i).getPrice() - dishesMessage
                         .getDishesC().getPrice());
             }
 
