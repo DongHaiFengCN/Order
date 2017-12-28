@@ -226,6 +226,26 @@ public class SeekT9Adapter extends BaseAdapter {
                         activity.setTotal(total);
                         break;
                     }
+                    else
+                    {
+                        if(goodsObj.getDishesTaste().equals(activity.getGoodsList().get(i).getDishesTaste()))
+                        {
+                            activity.getGoodsList().get(i).setDishesCount(activity.getGoodsList().get(i).getDishesCount()-1);
+                            float tmpCount = activity.getGoodsList().get(i).getDishesCount();
+                            if (tmpCount== 0.0)
+                            {
+                                activity.getGoodsList().remove(i);
+                                i--;
+                                point = activity.getPoint();
+                                point--;
+                                activity.setPoint(point);
+                            }
+                            total = activity.getTotal();
+                            total = MyBigDecimal.sub(total,goodsObj.getPrice(),2);
+                            activity.setTotal(total);
+                            break;
+                        }
+                    }
 
                 }
 

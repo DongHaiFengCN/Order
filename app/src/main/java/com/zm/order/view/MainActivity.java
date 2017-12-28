@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView ok_tv;
     private TextView total_tv;
     private ImageView car_iv;
-    private boolean flag = true;
+
     private ImageButton delet_bt;
     public  List<SparseArray<Object>> orderItem = new ArrayList<>();
     public  OrderAdapter orderAdapter;
@@ -120,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isFlag = true;
 
     private List<GoodsC> goodsList = new ArrayList<>();
+    private List<GoodsC> zcGoodsList = new ArrayList<>();
     private String gOrderId;
     private Document document;
     private Handler mHandler;
@@ -401,7 +402,6 @@ public class MainActivity extends AppCompatActivity {
                                 //1\
                                 GoodsC goodsC = goodsList.get(position);
                                 //2\
-                                //OrderC orderC = CDBHelper.getObjById(getApplicationContext(),goodsC.getOrder(),OrderC.class);
                                 goodsC.setGoodsType(2);
                                 goodsC.setDishesName(goodsC.getDishesName()+"(赠)");
 
@@ -516,24 +516,8 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 } else {
 
-                    if (total > 0.0 || getGoodsList().size() > 0) {
-                        //如果order列表开启状态就关闭
-                        if (!flag) {
-                            linearLayout.setAnimation(AnimationUtil.moveToViewBottom());
-                            linearLayout.setVisibility(View.GONE);
-                            imageView.animate()
-                                    .alpha(0f)
-                                    .setDuration(400)
-                                    .setListener(new AnimatorListenerAdapter() {
-                                        @Override
-                                        public void onAnimationEnd(Animator animation) {
-                                            imageView.setVisibility(View.GONE);
-                                        }
-                                    });
-
-                            flag = true;
-                        }
-
+                    if (getGoodsList().size() > 0)
+                    {
 
                         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                         View view1 = getLayoutInflater().inflate(R.layout.view_pay_dialog, null);
@@ -567,16 +551,20 @@ public class MainActivity extends AppCompatActivity {
                         Button dy = view1.findViewById(R.id.view_pay_dy);
                         dy.setOnClickListener(new View.OnClickListener() {
                             @Override
-                            public void onClick(View v) {
-                                if (setPrintOrder().equals("")) {
+                            public void onClick(View v)
+                            {
+                                saveOrder();
+
+                                if (setPrintOrder().equals(""))
+                                {
                                     Toast.makeText(MainActivity.this, "没有链接蓝牙打印机", Toast.LENGTH_LONG).show();
-                                } else {
-                                    saveOrder();
-                                    Intent intent = new Intent(MainActivity.this, DeskActivity.class);
-                                    startActivity(intent);
-                                    dialog.dismiss();
-                                    finish();
                                 }
+
+                                Intent intent = new Intent(MainActivity.this, DeskActivity.class);
+                                startActivity(intent);
+                                dialog.dismiss();
+                                finish();
+
 
 
                             }
@@ -627,8 +615,6 @@ public class MainActivity extends AppCompatActivity {
      */
     private void printOrderToKitchen()
     {
-
-
         //1\ 查询出所有厨房,并分配菜品
         List<KitchenClientC> kitchenClientList= CDBHelper.getObjByClass(getApplicationContext(), KitchenClientC.class);
         if(kitchenClientList.size()<=0)
@@ -648,8 +634,6 @@ public class MainActivity extends AppCompatActivity {
             for(String dishKindId:kitchenClientObj.getDishesKindIDList())//2 for 遍历厨房下所含菜系
             {
 
-
-
                 for(GoodsC goodsC:goodsList)//3 for 该厨房下所应得商品
                 {
                     if(dishKindId.equals(goodsC.getDishesKindId()))
@@ -660,6 +644,18 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                 }//end for 3
+
+                if(zcGoodsList.size()>0)
+                {
+                    for(GoodsC obj:zcGoodsList)
+                    {
+                        if(dishKindId.equals(obj.getDishesKindId()))
+                        {
+                            findflag = true;
+                            oneKitchenClientGoods.add(obj);
+                        }
+                    }
+                }
             }//end for 2
 
 
@@ -667,8 +663,6 @@ public class MainActivity extends AppCompatActivity {
             {
                 String clientKtname=""+kitchenClientObj.getName();//厨房名称
                 String printname=""+kitchenClientObj.getKitchenAdress();//打印机名称
-
-                //String printId=printname.substring(printname.length()-1,printname.length());
 
                 int printerId=0;//Integer.parseInt(printId)-1;
 
@@ -1133,12 +1127,12 @@ public class MainActivity extends AppCompatActivity {
             PrintUtils.printText(areaName+"/"+tableName+"\n\n");
             PrintUtils.selectCommand(PrintUtils.NORMAL);
             PrintUtils.selectCommand(PrintUtils.ALIGN_LEFT);
-            PrintUtils.printText(PrintUtils.printTwoData("订单编号", OrderId()+"\n"));
+            PrintUtils.printText(PrintUtils.printTwoData("订单编号", serNum+"\n"));
             PrintUtils.printText(PrintUtils.printTwoData("下单时间", getFormatDate()+"\n"));
             PrintUtils.printText(PrintUtils.printTwoData("人数："+myApp.getTable_sel_obj().getCurrentPersions(), "收银员："+waiter+"\n"));
             PrintUtils.printText("--------------------------------\n");
             PrintUtils.selectCommand(PrintUtils.BOLD);
-            PrintUtils.printText(PrintUtils.printThreeData("项目", "数量", "金额\n"));
+            PrintUtils.printText(PrintUtils.printThreeData("菜品", "数量", "金额\n"));
             PrintUtils.printText("--------------------------------\n");
             PrintUtils.selectCommand(PrintUtils.BOLD_CANCEL);
 
@@ -1151,7 +1145,11 @@ public class MainActivity extends AppCompatActivity {
 
                 PrintUtils.printText(PrintUtils.printThreeData(goodsC.getDishesName(),goodsC.getDishesCount()+"", allPrice+"\n"));
 
-
+            }
+            if(zcGoodsList.size()>0)
+            {
+                for(GoodsC obj:zcGoodsList)
+                    PrintUtils.printText(PrintUtils.printThreeData(obj.getDishesName(),obj.getDishesCount()+"", 0+"\n"));
             }
 
             PrintUtils.printText("--------------------------------\n");
@@ -1160,11 +1158,6 @@ public class MainActivity extends AppCompatActivity {
             PrintUtils.printText("\n\n\n\n");
             PrintUtils.closeOutputStream();
 
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
     }
 
     /**
@@ -1198,8 +1191,11 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run()
                 {
+                   zcGoodsList.clear();
 
                     OrderC newOrderObj = new OrderC(myApp.getCompany_ID());
+                    OrderC zcOrderObj = new OrderC(myApp.getCompany_ID());
+
                     gOrderId = CDBHelper.createAndUpdate(getApplicationContext(),newOrderObj);
                     newOrderObj.set_id(gOrderId);
                     List<OrderC> orderCList = CDBHelper.getObjByWhere(getApplicationContext(),
@@ -1220,18 +1216,25 @@ public class MainActivity extends AppCompatActivity {
                         newOrderObj.setSerialNum(getOrderSerialNum());
                     }
 
-
-                    BuglyLog.e("saveOrder", "goodsListSize="+goodsList.size());
-
-                    for(GoodsC obj:goodsList)
+                    for(int i=0;i<goodsList.size();i++)
                     {
+                        GoodsC obj = goodsList.get(i);
+                        if(obj.getGoodsType()==2)
+                        {
+                            zcGoodsList.add(obj);
+                            goodsList.remove(i);
+                            i--;
+                            continue;
+                        }
                         obj.setOrder(gOrderId);
-                       // CDBHelper.createAndUpdate(getApplicationContext(),obj);
+
                     }
+
                     newOrderObj.setGoodsList(goodsList);
                     newOrderObj.setAllPrice(total);
-                    newOrderObj.setOrderState(1);
-                    newOrderObj.setOrderType(1);
+                    newOrderObj.setOrderState(1);//未买单
+                    newOrderObj.setOrderCType(0);//正常
+                    newOrderObj.setDeviceType(1);//点餐宝
                     newOrderObj.setCreatedTime(getFormatDate());
                     newOrderObj.setTableNo(myApp.getTable_sel_obj().getTableNum());
                     newOrderObj.setTableName(myApp.getTable_sel_obj().getTableName());
@@ -1241,11 +1244,26 @@ public class MainActivity extends AppCompatActivity {
                     CDBHelper.createAndUpdate(getApplicationContext(),newOrderObj);
 
 
+                    if(zcGoodsList.size()>0)
+                    {
+                        zcOrderObj.setSerialNum(newOrderObj.getSerialNum());
+                        zcOrderObj.setOrderState(1);//未买单
+                        zcOrderObj.setOrderCType(2);//赠菜
+                        zcOrderObj.setDeviceType(1);//点餐宝
+                        zcOrderObj.setCreatedTime(newOrderObj.getCreatedTime());
+                        zcOrderObj.setTableNo(newOrderObj.getTableNo());
+                        zcOrderObj.setTableName(newOrderObj.getTableName());
+                        zcOrderObj.setAreaName(newOrderObj.getAreaName());
+                        String id = CDBHelper.createAndUpdate(getApplicationContext(),zcOrderObj);
+                        for(GoodsC obj:zcGoodsList)
+                        {
+                            obj.setOrder(id);
+                        }
+                        zcOrderObj.setGoodsList(zcGoodsList);
+                        zcOrderObj.set_id(id);
 
-//
-//                    TableC tableC = myApp.getTable_sel_obj();
-//                    tableC.setTotalCount(MyBigDecimal.add(tableC.getTotalCount(),total,1));
-//                    CDBHelper.createAndUpdate(getApplicationContext(),tableC);
+                        CDBHelper.createAndUpdate(getApplicationContext(),zcOrderObj);
+                    }
 
 
                     Log.e("id",gOrderId);

@@ -27,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.couchbase.lite.Expression;
+import com.couchbase.lite.Ordering;
 import com.zm.order.R;
 
 import java.io.IOException;
@@ -209,7 +210,7 @@ public class ShowParticularsActivity extends Activity {
 
                                                                         order.setAllPrice(goodsC.getPrice());
                                                                         order.setOrderState(1);
-                                                                        order.setOrderType(1);
+                                                                        order.setDeviceType(1);
                                                                         order.setOrderCType(1);
                                                                         order.addGoods(goods);
 
@@ -261,7 +262,7 @@ public class ShowParticularsActivity extends Activity {
 
                                                                     order.setAllPrice(goods.getPrice());
                                                                     order.setOrderState(1);
-                                                                    order.setOrderType(1);
+                                                                    order.setDeviceType(1);
                                                                     order.setOrderCType(1);
                                                                     order.addGoods(goods);
 
@@ -282,7 +283,7 @@ public class ShowParticularsActivity extends Activity {
                                                     Log.e(TAG,"D");
                                                     goods.setOrder(order.get_id());
                                                     order.setOrderState(1);
-                                                    order.setOrderType(1);
+                                                    order.setDeviceType(1);
                                                     order.setOrderCType(1);
                                                     order.addGoods(goods);
                                                     order.setAllPrice(goods.getPrice());
@@ -392,7 +393,7 @@ public class ShowParticularsActivity extends Activity {
                                             goodsC2.setDishesName(goodsC.getDishesName());
                                             goodsC2.setOrder(order.get_id());
                                             order.setOrderState(1);
-                                            order.setOrderType(1);
+                                            order.setDeviceType(1);
                                             order.setOrderCType(0);
                                             order.setAllPrice(goodsC2.getPrice());
                                             order.addGoods(goodsC2);
@@ -439,29 +440,28 @@ public class ShowParticularsActivity extends Activity {
                 Expression.property("className").equalTo("OrderC")
                         .and(Expression.property("tableNo").equalTo(myapp.getTable_sel_obj().getTableNum()))
                         .and(Expression.property("orderState").equalTo(1))
-                , null
+                , Ordering.property("createdTime").descending()
                 , OrderC.class);
         boolean flag = false;
 
         for (OrderC orderC : orderCList)
         {
-
                 for (GoodsC goodsb : orderC.getGoodsList())
                 {
-
                     flag = false;
-
+                    if(orderC.getOrderCType()==0)//正常菜订单
+                    {
+                        all = MyBigDecimal.add(all,orderC.getAllPrice(),1);
+                    }
                     for (GoodsC goodsC : goodsCList)
                     {
-
-                        if (goodsC.getDishesName().equals(goodsb.getDishesName())) {
+                        if (goodsC.getDishesName().equals(goodsb.getDishesName()))
+                        {
 
                             if (goodsb.getDishesTaste() != null) {
 
                                 if (goodsb.getDishesTaste().equals(goodsC.getDishesTaste())) {
 
-                                    float add = MyBigDecimal.add(goodsC.getPrice(), goodsb.getPrice(), 1);
-                                    goodsC.setPrice(add);
                                     float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
                                     goodsC.setDishesCount(count);
                                     flag = true;
@@ -469,8 +469,6 @@ public class ShowParticularsActivity extends Activity {
 
                             } else {
 
-                                float add = MyBigDecimal.add(goodsC.getPrice(), goodsb.getPrice(), 1);
-                                goodsC.setPrice(add);
                                 float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
                                 goodsC.setDishesCount(count);
 
@@ -486,63 +484,7 @@ public class ShowParticularsActivity extends Activity {
 
                     }
                 }
-            if (orderC.getOrderCType() == 1){
-                for (GoodsC goodsB : orderC.getGoodsList()){
-                    flag = false;
-                    goodsB.setDishesName(goodsB.getDishesName()+"(退)");
-
-                    for (GoodsC goodsC : goodsCList){
-
-
-                        if (goodsC.getDishesName().equals(goodsB.getDishesName()) ){
-
-                            if (goodsB.getDishesTaste() != null){
-
-                                if (goodsB.getDishesTaste().equals(goodsC.getDishesTaste())){
-
-                                    float add = MyBigDecimal.add(Math.abs(goodsC.getPrice()),Math.abs(goodsB.getPrice()),1);
-                                    goodsC.setPrice(add);
-                                    float count = MyBigDecimal.add(Math.abs(goodsC.getDishesCount()),Math.abs(goodsB.getDishesCount()),1);
-                                    goodsC.setDishesCount(count);
-                                    flag = true;
-                                }
-
-                            }else{
-
-                                float add = MyBigDecimal.add(Math.abs(goodsC.getPrice()),Math.abs(goodsB.getPrice()),1);
-                                goodsC.setPrice(add);
-                                float count = MyBigDecimal.add(Math.abs(goodsC.getDishesCount()),Math.abs(goodsB.getDishesCount()),1);
-                                goodsC.setDishesCount(count);
-                                flag = true;
-                            }
-
-                            break;
-                        }
-                    }
-                    if (!flag)
-                    {
-                        goodsB.setDishesCount(Math.abs(goodsB.getDishesCount()));
-                        goodsB.setPrice(Math.abs(goodsB.getPrice()));
-                        goodsCList.add(goodsB);
-                    }
-                }
-            }
-            all = MyBigDecimal.add(all,orderC.getAllPrice(),1);
         }
-
-        Iterator<GoodsC> goodsCIterator = goodsCList.iterator();
-        while (goodsCIterator.hasNext()){
-            if (goodsCIterator.next().getDishesCount() == 0.0){
-                goodsCIterator.remove();
-            }
-        }
-        for (int i = 0 ; i< goodsCList.size();i++){
-            if (goodsCList.get(i).getDishesCount()==0.0){
-                Log.e(TAG,"i==="+i);
-                goodsCList.remove(i);
-            }
-        }
-
         showTvSl.setText(goodsCList.size() + "道菜，总计："+all+"元");
 
     }

@@ -252,6 +252,7 @@ public class DeskActivity extends AppCompatActivity {
                             Expression.property("className").equalTo("OrderC")
                                     .and(Expression.property("tableNo").equalTo(tableC.getTableNum()))
                                     .and(Expression.property("orderState").equalTo(1))
+                                    .and(Expression.property("orderCType").notEqualTo(1))//非退菜
                             ,null
                             ,OrderC.class);
 
