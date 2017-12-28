@@ -1,7 +1,7 @@
 package bean.kitchenmanage.order;
 
 /**
- * Class description goes here.
+ * 流水号
  * <p>
  * Created by loongsun on 2017/11/28.
  * <p>

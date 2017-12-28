@@ -3,6 +3,7 @@ package com.zm.order.view;
 import android.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -38,55 +39,39 @@ import model.CDBHelper;
 
 public class SeekT9Adapter extends BaseAdapter {
 
-    private List<GoodsC> mData;
+    private List<GoodsC> mGoodsList;
     private MainActivity activity;
     private SeekT9OnClickListener listener;
-    private float number=1;
+    //private float number=1;
     private int point = 1;
     private float total;
-    private String taste ;
+
     private List<String> tasteList;
-    private SeekT9OrderItem orderItem;
-    private boolean isName = false,isTaste = false;
-    private int pos,p ;
-    private DishesC dishesC;
-    private MyApplication myapp ;
+    private String m_taste;
+
+    private MyApplication myapp;
     private EditText editText;
 
-    public SeekT9Adapter(MainActivity context, EditText editText) {
+    public SeekT9Adapter(MainActivity context, EditText editText, List<GoodsC> mData) {
         this.activity = context;
         this.editText = editText;
         myapp = (MyApplication) activity.getApplication();
+        this.mGoodsList = mData;
     }
 
     public void setListener(SeekT9OnClickListener listener) {
         this.listener = listener;
     }
 
-    public void setOrderItem(SeekT9OrderItem orderItem){
-        this.orderItem = orderItem;
-    }
 
-    public void setmData(List<GoodsC> mData) {
-
-        this.mData = mData;
-    }
-
-    private int getPosition(){
-        return p;
-    }
-
-    public List<GoodsC> getmData(){
-        return mData;
-    }
     @Override
     public int getCount() {
-        return mData == null ? 0 : mData.size();
+        return mGoodsList == null ? 0 : mGoodsList.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return mData.get(position);
+        return mGoodsList.get(position);
     }
 
     @Override
@@ -108,74 +93,77 @@ public class SeekT9Adapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        dishesC =  CDBHelper.getObjById(activity.getApplicationContext(),mData.get(position).getDishesId(),DishesC.class);
-        viewHolder.itemSeekInfo.setText(dishesC.getDishesName());
-        viewHolder.itemSeekTv.setText(dishesC.getPrice() + "");
-        viewHolder.viewShu.setText(""+mData.get(position).getDishesCount());
+
+        viewHolder.itemSeekInfo.setText(mGoodsList.get(position).getDishesName());
+        viewHolder.itemSeekTv.setText(mGoodsList.get(position).getPrice() + "");
+        viewHolder.viewShu.setText("" + mGoodsList.get(position).getDishesCount());
 
         viewHolder.itemSeekLn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dishesC =  CDBHelper.getObjById(activity.getApplicationContext(),mData.get(position).getDishesId(),DishesC.class);
+                Log.e("item click", "position = " + position);
                 v.setBackgroundResource(R.color.lucency);
                 if (listener != null) {
-                    listener.OnClickListener(v,dishesC.getDishesName(), dishesC.getPrice(),position);
+                    listener.OnClickListener(v, mGoodsList.get(position).getDishesName(), mGoodsList.get(position).getPrice(), position);
                 }
             }
         });
-
-        activity.setT9Adapter(this);
-
-        if (activity.getGoodsList().size() != 0 ){
-            for (int i = 0 ;i< activity.getGoodsList().size() ;i++){
-                if (activity.getGoodsList().get(i).getDishesName().toString().equals(dishesC.getDishesName())) {
-                    viewHolder.viewShu.setText(activity.getGoodsList().get(i).getDishesCount()+"");
-                    mData.get(position).setDishesCount(Float.parseFloat(viewHolder.viewShu.getText().toString()));
-                    break;
-                }else {
-                    mData.get(position).setDishesCount(0);
-                    viewHolder.viewShu.setText(mData.get(position).getDishesCount()+"");
-                }
-            }
-            number = Float.parseFloat(viewHolder.viewShu.getText().toString());
-        }else{
-            mData.get(position).setDishesCount(0);
-            viewHolder.viewShu.setText(mData.get(position).getDishesCount()+"");
-        }
+//        if (activity.getGoodsList().size() != 0 )
+//        {
+//            for (int i = 0 ;i< activity.getGoodsList().size() ;i++){
+//                if (activity.getGoodsList().get(i).getDishesName().toString().equals(dishesC.getDishesName())) {
+//                    viewHolder.viewShu.setText(activity.getGoodsList().get(i).getDishesCount()+"");
+//                    mData.get(position).setDishesCount(Float.parseFloat(viewHolder.viewShu.getText().toString()));
+//                    break;
+//                }else {
+//                    mData.get(position).setDishesCount(0);
+//                    viewHolder.viewShu.setText(mData.get(position).getDishesCount()+"");
+//                }
+//            }
+//            number = Float.parseFloat(viewHolder.viewShu.getText().toString());
+//        }else{
+//            mData.get(position).setDishesCount(0);
+//            viewHolder.viewShu.setText(mData.get(position).getDishesCount()+"");
+//        }
 
         final String str = viewHolder.viewShu.getText().toString();
-        Log.e("viewShu",str);
-        if (str.equals("0.0")){
+        Log.e("viewShu", str);
+        if (str.equals("0.0")) {
             viewHolder.viewShu.setVisibility(View.INVISIBLE);
             viewHolder.viewJian.setVisibility(View.INVISIBLE);
-        }else {
+        } else {
             viewHolder.viewShu.setVisibility(View.VISIBLE);
             viewHolder.viewJian.setVisibility(View.VISIBLE);
         }
 
-        final SparseArray<Object> s = new SparseArray<>();
         viewHolder.viewTj.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 try {
                     CDBHelper.db.inBatch(new TimerTask() {
                         @Override
                         public void run() {
-                            dishesC =  CDBHelper.getObjById(activity.getApplicationContext(), mData.get(position).getDishesId(),DishesC.class);
 
-                            tasteList = new ArrayList<String>();
-                            if (dishesC.getTasteList() != null){
-                                for (int i = 0; i <  dishesC.getTasteList().size(); i++){
-                                    Document document = CDBHelper.getDocByID(activity.getApplicationContext(),dishesC.getTasteList().get(i).toString());
+                            m_taste = null;
+                            if (tasteList == null)
+                                tasteList = new ArrayList<String>();
+                            else
+                                tasteList.clear();
+
+                            DishesC dishesC = CDBHelper.getObjById(activity.getApplicationContext(), mGoodsList.get(position).getDishesId(), DishesC.class);
+
+                            if (dishesC.getTasteList() != null) {
+                                for (int i = 0; i < dishesC.getTasteList().size(); i++) {
+                                    Document document = CDBHelper.getDocByID(activity.getApplicationContext(), dishesC.getTasteList().get(i).toString());
                                     tasteList.add(document.getString("tasteName"));
                                 }
 
-                                dialog(tasteList,position,s,viewHolder);
+                                selTasteDialog(tasteList, position, viewHolder);
                                 activity.getOrderAdapter().notifyDataSetChanged();
 
-                            }else{
-                                setTJ(position,s,viewHolder);
+                            } else {
+
+                                setAdd(position, viewHolder);
                                 activity.getOrderAdapter().notifyDataSetChanged();
                             }
                         }
@@ -192,196 +180,165 @@ public class SeekT9Adapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
 
-
-                try {
-                    CDBHelper.db.inBatch(new TimerTask() {
-                        @Override
-                        public void run() {
-                            dishesC = CDBHelper.getObjById(activity.getApplicationContext(), mData.get(position).getDishesId(), DishesC.class);
-                            if (mData.get(position).getDishesCount() > 0) {
-                                mData.get(position).setDishesCount(mData.get(position).getDishesCount() - 1);
-                            }
-
-                            if (mData.get(position).getDishesCount() <= 0) {
-                                viewHolder.viewShu.setVisibility(View.INVISIBLE);
-                                viewHolder.viewJian.setVisibility(View.INVISIBLE);
-                            }
-                            viewHolder.viewShu.setText(mData.get(position).getDishesCount() + "");
-                            if (activity.getGoodsList().size() != 0) {
-                                for (int i = 0; i < activity.getGoodsList().size(); i++) {
-                                    if (activity.getGoodsList().get(i).getDishesName().toString().equals(dishesC.getDishesName())) {
-                                        number = activity.getGoodsList().get(i).getDishesCount();
-                                        break;
-                                    }
-                                }
-                            }
-
-                            number = Float.parseFloat(viewHolder.viewShu.getText().toString());
-                            if (activity.getGoodsList().size() != 0) {
-                                for (int i = 0; i < activity.getGoodsList().size(); i++) {
-                                    if (activity.getGoodsList().get(i).getDishesName().toString().equals(dishesC.getDishesName())) {
-                                        activity.getGoodsList().get(i).setDishesCount(number);
-                                        number = activity.getGoodsList().get(i).getDishesCount();
-                                        activity.getGoodsList().get(i).setAllPrice(number * dishesC.getPrice());
-                                        if (activity.getGoodsList().get(i).getDishesCount() == 0.0){
-                                            activity.getGoodsList().remove(i);
-                                        }
-                                        total = activity.getTotal();
-                                        total -= 1 * dishesC.getPrice();
-                                        activity.setTotal(total);
-                                        point = activity.getPoint();
-                                        if (number == 0) {
-                                            point--;
-                                            number = 1;
-                                        }
-                                        activity.setPoint(point);
-                                        break;
-                                    }
-                                }
-
-                            }
-                            activity.getOrderAdapter().notifyDataSetChanged();
-                        }
-                    });
-                } catch (CouchbaseLiteException e) {
-                    e.printStackTrace();
+                  if (mGoodsList.get(position).getDishesCount() > 0) {
+                    mGoodsList.get(position).setDishesCount(mGoodsList.get(position).getDishesCount() - 1);
                 }
 
-
-
-
+                if (mGoodsList.get(position).getDishesCount() <= 0) {
+                    viewHolder.viewShu.setVisibility(View.INVISIBLE);
+                    viewHolder.viewJian.setVisibility(View.INVISIBLE);
                 }
+                viewHolder.viewShu.setText(mGoodsList.get(position).getDishesCount() + "");
+
+                GoodsC obj = mGoodsList.get(position);
+                setSub(obj);
+
+            }
 
         });
-
 
 
         return convertView;
     }
 
+    private void setSub(GoodsC goodsObj)
+    {
+        if (activity.getGoodsList().size() != 0)
+        {
+            for (int i = 0; i < activity.getGoodsList().size(); i++)
+            {
+                if (activity.getGoodsList().get(i).getDishesName().toString().equals(goodsObj.getDishesName()))//名称相同
+                {
+                    if(TextUtils.isEmpty(goodsObj.getDishesTaste()))
+                    {
+                        activity.getGoodsList().get(i).setDishesCount(activity.getGoodsList().get(i).getDishesCount()-1);
+                        float tmpCount = activity.getGoodsList().get(i).getDishesCount();
+                        if (tmpCount== 0.0)
+                        {
+                            activity.getGoodsList().remove(i);
+                            i--;
+                            point = activity.getPoint();
+                            point--;
+                            activity.setPoint(point);
+                        }
+                        total = activity.getTotal();
+                        total = MyBigDecimal.sub(total,goodsObj.getPrice(),2);
+                        activity.setTotal(total);
+                        break;
+                    }
 
-
-    private void setTJ(int position , SparseArray<Object> s,ViewHolder viewHolder){
-        editText.setText("");
-        mData.get(position).setDishesCount(mData.get(position).getDishesCount()+1);
-        GoodsC goodsC = new GoodsC(myapp.getCompany_ID());
-        String gID = CDBHelper.createAndUpdate(activity.getApplicationContext(),goodsC);
-        goodsC.set_id(gID);
-        viewHolder.viewShu.setText(mData.get(position).getDishesCount()+"");
-        if (!viewHolder.viewShu.getText().toString().equals("0")){
-            viewHolder.viewShu.setVisibility(View.VISIBLE);
-            viewHolder.viewJian.setVisibility(View.VISIBLE);
-        }
-        if (activity.getGoodsList().size() == 0 ){
-
-            //如果选择器的数量不为零，当前的选择的菜品加入订单列表
-            if (mData.get(position).getDishesCount() > 0) {
-
-
-                goodsC.setDishesName(dishesC.getDishesName());
-                if (tasteList.size() == 0){
-                    goodsC.setDishesTaste(null);
-                }else{
-                    goodsC.setDishesTaste(tasteList.get(pos));
                 }
-                goodsC.setDishesCount(1);
-                String all = MyBigDecimal.mul(mData.get(position).getDishesCount()+"",dishesC.getPrice()+"",2);
-                goodsC.setGoodsType(0);
-                goodsC.setAllPrice(Float.parseFloat(all));
-                goodsC.setDishesId(dishesC.get_id());
-                if (dishesC.getDishesKindId()!=null){
-                    DishesKindC dishesKind  = CDBHelper.getObjById(activity.getApplicationContext(),dishesC.getDishesKindId(), DishesKindC.class);
-                    goodsC.setDishesKindName(dishesKind.getKindName());
-                    Log.e("dishesKindName",dishesKind.getKindName());
-                }
-                activity.getGoodsList().add(goodsC);
-                //购物车计数器数据更新
-                point =  activity.getPoint();
-                point++;
-                activity.setPoint(point);
-                //计算总价
-                total = activity.getTotal();
-                String all1 = MyBigDecimal.mul(1+"",dishesC.getPrice()+"",2);
-                total += Float.parseFloat(all1);
-                activity.setTotal(total);
+
 
             }
 
-        }else {
+        }
+        activity.getOrderAdapter().notifyDataSetChanged();
+    }
+    private void setAdd(int position, ViewHolder viewHolder) {
+        boolean isInsert = true;
+        editText.setText("");
+        mGoodsList.get(position).setDishesCount(mGoodsList.get(position).getDishesCount() + 1);
+        viewHolder.viewShu.setText(mGoodsList.get(position).getDishesCount() + "");
 
-            mData.get(position).setDishesCount(Float.parseFloat(viewHolder.viewShu.getText().toString()));
+        GoodsC goodsObj = new GoodsC(myapp.getCompany_ID());
+        goodsObj.setDishesName(mGoodsList.get(position).getDishesName());
+        goodsObj.setDishesTaste(m_taste);
+        goodsObj.setDishesCount(1);
+        goodsObj.setPrice(mGoodsList.get(position).getPrice());
+        goodsObj.setGoodsType(0);
+        goodsObj.setDishesId(mGoodsList.get(position).get_id());
+        goodsObj.setDishesKindId(mGoodsList.get(position).getDishesKindId());
 
-            number = mData.get(position).getDishesCount();
 
-            for (int i = 0; i< activity.getGoodsList().size();i++) {
-                if (activity.getGoodsList().get(i).getDishesName().toString().equals(dishesC.getDishesName())){
+        if (!viewHolder.viewShu.getText().toString().equals("0")) {
+            viewHolder.viewShu.setVisibility(View.VISIBLE);
+            viewHolder.viewJian.setVisibility(View.VISIBLE);
+        }
+        if (activity.getGoodsList().size() == 0)//购物车为空
+        {
 
-                        activity.getGoodsList().get(i).setDishesCount(number++);
-                        number = activity.getGoodsList().get(i).getDishesCount();
-                        String all = MyBigDecimal.mul(number+"",dishesC.getPrice()+"",2);
+            //当前的选择的菜品加入订单列表
+            activity.getGoodsList().add(goodsObj);
+            //购物车计数器数据更新
+            point = activity.getPoint();
+            point++;
+            activity.setPoint(point);
+            //计算总价
+            total = activity.getTotal();
+            total = MyBigDecimal.add(total, goodsObj.getPrice(), 2);
+            activity.setTotal(total);
 
-                        activity.getGoodsList().get(i).setAllPrice(Float.parseFloat(all));
+
+        } else {//购物车不为空，合并或者直插入，要看名称与口味是否一致
+
+            for (int i = 0; i < activity.getGoodsList().size(); i++)//+for
+            {
+                if (activity.getGoodsList().get(i).getDishesName().toString().equals(goodsObj.getDishesName()))//名称相等
+                {
+                    if (activity.getGoodsList().get(i).getDishesTaste() != null)//口味不为空
+                    {
+                        if (activity.getGoodsList().get(i).getDishesTaste().equals(goodsObj.getDishesTaste()))//口味相等
+                        {
+                            activity.getGoodsList().get(i).setDishesCount(activity.getGoodsList().get(i).getDishesCount() + 1);
+
+                            total = activity.getTotal();
+                            total = MyBigDecimal.add(total, goodsObj.getPrice(), 2);
+                            activity.setTotal(total);
+                            isInsert = false;
+                            //购物车计数器数据更新
+                            point = activity.getPoint();
+                            if (point == 0) {
+                                point++;
+                                activity.setPoint(point);
+                            } else {
+                                point = activity.getGoodsList().size();
+                                activity.setPoint(point);
+                            }
+                            break;
+                        }
+
+                    }//口味为空
+                    else {
+                        activity.getGoodsList().get(i).setDishesCount(activity.getGoodsList().get(i).getDishesCount() + 1);
                         total = activity.getTotal();
-                        String all1 = MyBigDecimal.mul(1+"",dishesC.getPrice()+"",2);
-                        total += Float.parseFloat(all1);
+                        total = MyBigDecimal.add(total, goodsObj.getPrice(), 2);
                         activity.setTotal(total);
-                        isName = true;
+                        isInsert = false;
                         //购物车计数器数据更新
-                        point =  activity.getPoint();
-                        if (point==0){
+                        point = activity.getPoint();
+                        if (point == 0) {
                             point++;
                             activity.setPoint(point);
-                        }else{
+                        } else {
                             point = activity.getGoodsList().size();
                             activity.setPoint(point);
                         }
                         break;
-
-                }else{
-                    isName = false;
-                }
-            }
-
-            if (isName == false){
-
-                number = mData.get(position).getDishesCount();
-
-                if (number != -1) {//如果选择器的数量不为零，当前的选择的菜品加入订单列表
-
-                    goodsC.setDishesName(dishesC.getDishesName());
-                    if (tasteList.size() == 0){
-                        goodsC.setDishesTaste(null);
-                    }else{
-                        goodsC.setDishesTaste(tasteList.get(pos));
                     }
-                    goodsC.setDishesCount(1);
-                    String all = MyBigDecimal.mul(mData.get(position).getDishesCount()+"",dishesC.getPrice()+"",2);
 
-                    goodsC.setAllPrice(Float.parseFloat(all));
-                    goodsC.setDishesId(dishesC.get_id());
-                    DishesKindC dishesKind  = CDBHelper.getObjById(activity.getApplicationContext(),dishesC.getDishesKindId(), DishesKindC.class);
-                    goodsC.setDishesKindName(dishesKind.getKindName());
-                    Log.e("dishesKindName",dishesKind.getKindName());
-                    activity.getGoodsList().add(goodsC);
-                    //购物车计数器数据更新
-                    point =  activity.getPoint();
-                    point++;
-                    activity.setPoint(point);
-                    //计算总价
-                    total = activity.getTotal();
-                    String all1 = MyBigDecimal.mul(1+"",dishesC.getPrice()+"",2);
-                    total += Float.parseFloat(all1);
-                    activity.setTotal(total);
                 }
+            }//-for
 
+            if (isInsert == true) {
 
+                activity.getGoodsList().add(goodsObj);
+                //购物车计数器数据更新
+                point = activity.getPoint();
+                point++;
+                activity.setPoint(point);
+                //计算总价
+                total = activity.getTotal();
+                total = MyBigDecimal.add(total, goodsObj.getPrice(), 2);
+                activity.setTotal(total);
             }
         }
     }
 
     //自定义弹窗
-    public void dialog(final List<String> mData, final int position , final SparseArray<Object> s, final ViewHolder viewHolder) {
+    public void selTasteDialog(final List<String> mData, final int position, final ViewHolder viewHolder) {
 
+        m_taste = tasteList.get(0);
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         View view = View
                 .inflate(activity, R.layout.view_t9_dialog, null);//设置弹窗布局
@@ -389,12 +346,13 @@ public class SeekT9Adapter extends BaseAdapter {
         builder.setCancelable(true);
         RecyclerView rlv_caipin = view.findViewById(R.id.rlv_caipin);
         rlv_caipin.setLayoutManager(new LinearLayoutManager(activity));
-        SeekT9DialogAdapter seekT9DialogAdapter = new SeekT9DialogAdapter(activity,mData);
+        SeekT9DialogAdapter seekT9DialogAdapter = new SeekT9DialogAdapter(activity, mData);
 
         seekT9DialogAdapter.setmOnItemOlickListener(new SeekT9DialogAdapter.OnItemOlickListener() {
             @Override
             public void onItemClick(int position) {
-                pos = position;
+
+                m_taste = tasteList.get(position);
             }
         });
         rlv_caipin.setAdapter(seekT9DialogAdapter);
@@ -416,23 +374,21 @@ public class SeekT9Adapter extends BaseAdapter {
 
         btn_comfirm.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
-                taste = mData.get(pos);
-                isTaste = true;
+            public void onClick(View v) {
+
                 dialog.dismiss();
-                setTJ(position,s,viewHolder);
+                setAdd(position, viewHolder);
             }
         });
         dialog.show();
     }
 
     interface SeekT9OnClickListener {
-        void OnClickListener(View view,String name, float price,int pos);
+        void OnClickListener(View view, String name, float price, int pos);
     }
 
-    interface SeekT9OrderItem{
-        void seekT9OrderItem(SparseArray<Object> list,int point,float total);
+    interface SeekT9OrderItem {
+        void seekT9OrderItem(SparseArray<Object> list, int point, float total);
     }
 
     public class ViewHolder {

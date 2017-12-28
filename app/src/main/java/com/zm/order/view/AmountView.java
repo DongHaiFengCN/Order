@@ -85,7 +85,7 @@ public class AmountView extends LinearLayout implements View.OnClickListener {
                 if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                     etAmount.setFocusableInTouchMode(true);
                     etAmount.requestFocus();
-                    etAmount.setText(getAmount()+"");
+                    etAmount.setText(etAmount.getText());
                     etAmount.selectAll();
                 }
 

@@ -41,33 +41,28 @@ public class GoodsC {
 	 */
 	private float DishesCount;
 	/**
-	 * 所选菜品个数总价
+	 * 所选菜品个数
 	 */
-	private float allPrice;
+	private float price;
 	/**
 	 * 所选菜品名称
 	 */
 	private String dishesName;
 	/**
-	 * 所选菜品名称
+	 * 所选菜类Id
 	 */
-	private String dishesKindName;
+	private String dishesKindId;
 	/**
 	 * 是否是待叫商品,0，代表正常上菜；1代表待叫菜品，打印时加备注
 	 */
     private int isWaitCall;
 
-	/**
-	 * 点餐时间
-	 */
-	private String createdTime;
+
 
 	/**
 	 *退菜标识 0.正常  1.退菜 2.赠菜 3.自定义菜
 	 */
 	private int goodsType;
-
-
 
 	public GoodsC() {
 	}
@@ -75,22 +70,6 @@ public class GoodsC {
 	public GoodsC(String company_id) {
 		this.channelId = company_id;
 		this.className="GoodsC";
-	}
-
-	public String getCreatedTime() {
-		return createdTime;
-	}
-
-	public void setCreatedTime(String createdTime) {
-		this.createdTime = createdTime;
-	}
-
-	public String getDishesKindName() {
-		return dishesKindName;
-	}
-
-	public void setDishesKindName(String dishesKindName) {
-		this.dishesKindName = dishesKindName;
 	}
 
 	public String get_id() {
@@ -125,14 +104,14 @@ public class GoodsC {
 		this.order = order;
 	}
 
-//	public DishesC getDishes() {
-//		return dishes;
-//	}
-//
-//	public void setDishes(DishesC dishes) {
-//		this.dishes = dishes;
-//	}
 
+	public String getDishesKindId() {
+		return dishesKindId;
+	}
+
+	public void setDishesKindId(String dishesKindId) {
+		this.dishesKindId = dishesKindId;
+	}
 
 	public String getDishesId() {
 		return dishesId;
@@ -158,12 +137,12 @@ public class GoodsC {
 		DishesCount = dishesCount;
 	}
 
-	public float getAllPrice() {
-		return allPrice;
+	public float getPrice() {
+		return price;
 	}
 
-	public void setAllPrice(float allPrice) {
-		this.allPrice = allPrice;
+	public void setPrice(float price) {
+		this.price = price;
 	}
 
 	public String getDishesName() {

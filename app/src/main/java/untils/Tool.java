@@ -1,6 +1,7 @@
 package untils;
 
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -30,7 +31,7 @@ import model.CDBHelper;
  */
 
 public class Tool {
-
+    private static long lastClickTime;
     public static boolean isNotEmpty(Object c){
 
         if(c == null){
@@ -207,6 +208,17 @@ public class Tool {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return formatter.format(date);
 
+    }
+
+
+    public static boolean isFastDoubleClick() {
+        long time = System.currentTimeMillis();
+        Log.e("TOol","time---"+time+"----lastClickTime-----"+lastClickTime);
+        if ( (time - lastClickTime) < 10000) {
+            return true;
+        }
+        lastClickTime = time;
+        return false;
     }
 
 }
