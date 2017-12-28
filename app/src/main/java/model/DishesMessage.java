@@ -1,4 +1,4 @@
-package com.zm.order.view;
+package model;
 
 import bean.kitchenmanage.dishes.DishesC;
 

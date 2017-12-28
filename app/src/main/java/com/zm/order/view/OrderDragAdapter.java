@@ -15,12 +15,15 @@ import com.zm.order.R;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import bean.kitchenmanage.dishes.DishesC;
 import bean.kitchenmanage.dishes.DishesTasteC;
 import bean.kitchenmanage.order.GoodsC;
 import model.CDBHelper;
+import model.DishesMessage;
 
 /**
  * Created by lenovo on 2017/10/30.
@@ -28,16 +31,28 @@ import model.CDBHelper;
 
 public class OrderDragAdapter extends BaseAdapter {
 
-    private List<String> mlistDishesId;
+    private List<DishesC>   mlistDishes;
     private Context context;
-    private DishesC doc;
 
 
 
     //维护数量数组
     private float[] numbers;
+
+
+    Map<String, Float> floatMap = new HashMap<>();
+
     ListView listview;
-    List<GoodsC> goodsCList;
+
+    public void setMessage( List<DishesC> mlistDishes,float[] numbers){
+
+        this.mlistDishes = mlistDishes;
+
+        this.numbers = numbers;
+
+        notifyDataSetChanged();
+
+    }
 
     ChangerNumbersListener changerNumbersListener;
 
@@ -45,36 +60,27 @@ public class OrderDragAdapter extends BaseAdapter {
         this.changerNumbersListener = changerNumbersListener;
     }
 
-    public void setNumbers(float[] numbers) {
-        this.numbers = numbers;
-        notifyDataSetChanged();
-    }
+
     public void setListview(ListView listview) {
         this.listview = listview;
     }
 
 
-
-
     public OrderDragAdapter(Context context) {
         this.context = context;
-        goodsCList = ((MainActivity) context).getGoodsList();
+
     }
 
-    public void setMlistDishesId(List<String> mlistDishesId) {
-        this.mlistDishesId = mlistDishesId;
-        numbers = new float[mlistDishesId.size()];
-    }
 
 
     @Override
     public int getCount() {
-        return mlistDishesId == null ? 0 : mlistDishesId.size();
+        return mlistDishes == null ? 0 : mlistDishes.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return mlistDishesId.get(position);
+        return mlistDishes.get(position);
     }
 
     @Override
@@ -99,9 +105,6 @@ public class OrderDragAdapter extends BaseAdapter {
             view = (HolderView) convertView.getTag();
         }
 
-        //获取菜品实体类信息
-        doc = CDBHelper.getObjById(context, mlistDishesId.get(position), DishesC.class);
-
         // 当数量不为零，且关闭状态，打开减号与数量；当数量为零，处于开启状态则关闭。
         if (numbers[position] != 0.0f && view.substruct.getVisibility() == View.INVISIBLE
                 && view.number.getVisibility() == View.INVISIBLE) {
@@ -119,16 +122,18 @@ public class OrderDragAdapter extends BaseAdapter {
 
         }
 
+
         //设置数量
-        view.number.setText(numbers[position] + "");
+      //  view.number.setText(floatMap.get(mlistDishesId.get(position)) + "");
 
 
+        view.number.setText(numbers[position]+"");
         //加法指示器
         view.addtion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                setMessage(CDBHelper.getObjById(context, mlistDishesId.get(position), DishesC.class), true, position);
+                setMessage(mlistDishes.get(position), true, position);
                 changerNumbersListener.getNumber(numbers);
 
             }
@@ -139,19 +144,17 @@ public class OrderDragAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
 
-                setMessage(CDBHelper.getObjById(context, mlistDishesId.get(position), DishesC.class), false, position);
+                setMessage(mlistDishes.get(position), false, position);
                 changerNumbersListener.getNumber(numbers);
 
             }
         });
 
 
-        if (doc != null) {
+            view.name.setText(mlistDishes.get(position).getDishesName());
 
-            view.name.setText(doc.getDishesName());
+            view.price.setText(mlistDishes.get(position).getPrice() + " 元/份");
 
-            view.price.setText(doc.getPrice() + " 元/份");
-        }
 
         return convertView;
     }
@@ -248,13 +251,6 @@ public class OrderDragAdapter extends BaseAdapter {
         EventBus.getDefault().postSticky(dishesMessage);
     }
 
-    public void insert(int dragSrcPosition, int dragPosition) {
-
-        String id = mlistDishesId.get(dragPosition);
-        mlistDishesId.set(dragPosition, mlistDishesId.get(dragSrcPosition));
-        mlistDishesId.set(dragSrcPosition, id);
-        notifyDataSetChanged();
-    }
 
 
     void updata(int position, float count) {
@@ -276,9 +272,9 @@ public class OrderDragAdapter extends BaseAdapter {
 
     }
 
-    interface ChangerNumbersListener{
+    interface ChangerNumbersListener {
 
-        void getNumber(float [] numbers);
+        void getNumber(float[] numbers);
 
     }
 

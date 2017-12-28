@@ -15,7 +15,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -30,7 +29,6 @@ import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -51,7 +49,6 @@ import com.gprinter.command.EscCommand;
 import com.gprinter.command.GpCom;
 import com.gprinter.io.GpDevice;
 import com.gprinter.io.PortParameters;
-import com.gprinter.save.PortParamDataBase;
 import com.gprinter.service.GpPrintService;
 import com.tencent.bugly.crashreport.BuglyLog;
 import com.tencent.bugly.crashreport.CrashReport;
@@ -80,11 +77,12 @@ import bean.kitchenmanage.order.GoodsC;
 import bean.kitchenmanage.order.OrderC;
 import bean.kitchenmanage.order.OrderNum;
 import bean.kitchenmanage.table.AreaC;
-import bean.kitchenmanage.table.TableC;
 import bean.kitchenmanage.user.CompanyC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import model.CDBHelper;
+import model.DishesMessage;
+import model.FragmentFlag;
 import untils.AnimationUtil;
 import untils.BluetoothUtil;
 import untils.MyLog;
@@ -142,6 +140,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+
+        EventBus.getDefault().register(this);
         ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
@@ -1287,6 +1287,7 @@ public class MainActivity extends AppCompatActivity {
             }else{
                 ft.show(seekT9Fragment);;
             }
+
             isFlag = false;
         }else if (isTrue == false){
             if (orderFragment == null){
@@ -1295,6 +1296,8 @@ public class MainActivity extends AppCompatActivity {
             }else{
                 ft.show(orderFragment);
             }
+
+
             isFlag = true;
         }
         ft.commit();

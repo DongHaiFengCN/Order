@@ -66,6 +66,9 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
         myapp = (MyApplication) getApplication();
 
 
+        //Document document = CDBHelper.getDocByID(getApplicationContext()," DishesC.975c2506-e2ea-477c-8d08-dd6778625240");
+
+       // this.success();
         inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         intent = new Intent(this,DeskActivity.class);
         usersCList = CDBHelper.getObjByWhere(getApplicationContext(),

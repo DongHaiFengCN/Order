@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -26,21 +27,31 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TimerTask;
 
-import application.MyApplication;
+
 import bean.kitchenmanage.dishes.DishesC;
+import bean.kitchenmanage.dishes.DishesKindC;
+import bean.kitchenmanage.order.GoodsC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import model.CDBHelper;
+import model.DishesMessage;
+import rx.Observable;
+import rx.Scheduler;
+import rx.Subscriber;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by lenovo on 2017/10/26.
  */
 
-public class OrderFragment extends Fragment  {
+public class OrderFragment extends Fragment {
 
     @BindView(R.id.dishes_rv)
     ListView dishesRv;
@@ -48,45 +59,208 @@ public class OrderFragment extends Fragment  {
     ListView orderList;
     private DishesKindAdapter leftAdapter;
     private OrderDragAdapter orderDragAdapter;
-    private List<String> getDishesIdList;
-    private List<String> tasteList;
     private View view;
-    private String taste = "默认";
-    private List<SparseArray<Object>> orderItem = new ArrayList<>();
-    private int point = 0;
-    private float total = 0.0f;
+
     private List<String> titleList = new ArrayList<>();
     List<Object> DishesIdList;
     private List<String> dishesIdList;
-    private MyApplication myapp;
-    private int pos;
 
-    private Map<Integer,float[]> stringHashMap = new HashMap<>();
+
+    //缓存disheskind 与 对应菜品数量的number集合
+
+    private Map<String, float[]> dishesCollection = new HashMap<>();
+
+    private Map<String, List<DishesC>> dishesObjectCollection = new HashMap<>();
+
+    //*************************
+    List<DishesKindC> dishesKindCList;
+
+    String kindId;
+
+    List<GoodsC> goodsCList;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.frame_order, null);
         ButterKnife.bind(this, view);
+        intiData1();
         //initData();
-        myapp = (MyApplication) getActivity().getApplication();
-        initView();
         return view;
     }
+
+    private void intiData1() {
+
+        dishesKindCList = CDBHelper.getObjByWhere(getActivity().getApplication()
+                , Expression.property("className").equalTo("DishesKindC")
+                        .and(Expression.property("isSetMenu").equalTo(false)), Ordering.property("kindName")
+                        .ascending(), DishesKindC.class);
+
+
+        //初始化菜品数量维护映射表
+        for (DishesKindC dishesKindC : dishesKindCList) {
+
+            int count = dishesKindC.getDishesListId().size();
+
+            List<String> disheList = dishesKindC.getDishesListId();
+
+            List<DishesC> dishesCS = new ArrayList<>();
+
+            for (int i = 0; i < count; i++) {
+
+
+                DishesC dishesC = CDBHelper.getObjById(getActivity().getApplication(), disheList.get(i), DishesC.class);
+                if (dishesC != null) {
+
+                    dishesCS.add(dishesC);
+                }
+
+
+            }
+
+            //初始化disheKind对应的dishes实体类映射
+            dishesObjectCollection.put(dishesKindC.get_id(), dishesCS);
+
+            //初始化dishekind对应的dishes的数量映射
+            dishesCollection.put(dishesKindC.get_id(), new float[dishesCS.size()]);
+
+            //获取order数据
+            goodsCList = ((MainActivity) getActivity()).getGoodsList();
+
+            //如果有数据，数值复制给dishesCollection
+            if (!goodsCList.isEmpty()) {
+
+
+                for (GoodsC goodsC : goodsCList) {
+
+
+
+
+                }
+
+            }
+
+
+        }
+
+        leftAdapter = new DishesKindAdapter();
+
+        leftAdapter.setNames(dishesKindCList);
+
+        orderList.setAdapter(leftAdapter);
+
+        orderDragAdapter = new OrderDragAdapter(getActivity());
+
+
+        orderList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                leftAdapter.changeSelected(position);
+
+                kindId = dishesKindCList.get(position).get_id();
+
+                orderDragAdapter.setMessage(dishesObjectCollection.get(kindId)
+                        , dishesCollection.get(kindId));
+                dishesRv.setAdapter(orderDragAdapter);
+            }
+        });
+
+        orderList.performItemClick(orderList.getChildAt(0), 0, orderList
+                .getItemIdAtPosition(0));
+
+        orderDragAdapter.setChangerNumbersListener(new OrderDragAdapter.ChangerNumbersListener() {
+            @Override
+            public void getNumber(float[] numbers) {
+
+                //更新缓存数据
+                dishesCollection.put(kindId, numbers);
+
+
+            }
+        });
+
+
+
+
+
+     /*   Observable.create(new Observable.OnSubscribe<DishesKindC>() {
+
+
+            @Override
+            public void call(Subscriber<? super DishesKindC> subscriber) {
+
+                dishesKindCList = CDBHelper.getObjByWhere(getActivity().getApplication()
+                        , Expression.property("className").equalTo("DishesKindC")
+                                .and(Expression.property("isSetMenu").equalTo(false)), Ordering.property("kindName")
+                                .ascending(), DishesKindC.class);
+
+
+                for (int i = 0; i < dishesKindCList.size(); i++) {
+
+                    subscriber.onNext(dishesKindCList.get(i));
+                    titleList.add(dishesKindCList.get(i).getKindName());
+
+                }
+                subscriber.onCompleted();
+
+            }
+        }).observeOn(Schedulers.newThread()).toMap(new Func1<DishesKindC, String>() {
+
+            @Override
+            public String call(DishesKindC dishesKindC) {
+
+                return dishesKindC.getKindName();
+            }
+        }).subscribe(new Action1<Map<String, DishesKindC>>() {
+
+            @Override
+            public void call(Map<String, DishesKindC> stringDishesKindCMap) {
+
+              //  stringDishesKindCMap1 = stringDishesKindCMap;
+
+                ArrayAdapter<String> adapter = new ArrayAdapter(getActivity().getApplication(),android.R.layout.simple_expandable_list_item_1,titleList);
+
+                LayoutInflater inflater = (LayoutInflater) getActivity().getApplication().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View v1 = inflater.inflate(android.R.layout.simple_expandable_list_item_1, null);
+
+
+                Iterator<Map.Entry<String, DishesKindC>> entries = stringDishesKindCMap.entrySet().iterator();
+
+                orderList.setAdapter(adapter);
+
+          *//*      while (entries.hasNext()) {
+
+                    Map.Entry<String, DishesKindC> entry = entries.next();
+
+                    Log.e("测试一下：","Key = " + entry.getKey() + ", Value = " +entry.getValue().get_id());
+
+                }*//*
+
+            }
+        });*/
+
+
+    }
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
-    public void initView() {
-        tasteList = new ArrayList<>();
+
+    public void initData() {
+
         leftAdapter = new DishesKindAdapter();
-        titleList = CDBHelper.getIdsByWhere(getActivity(),
+       /* titleList = CDBHelper.getIdsByWhere(getActivity(),
                 Expression.property("className").equalTo("DishesKindC")
                         .and(Expression.property("isSetMenu").equalTo(false)),
-                Ordering.property("kindName").ascending());
-        leftAdapter.setNames(titleList);
+                Ordering.property("kindName").ascending());*/
+
+
+        // leftAdapter.setNames(titleList);
 
         orderList.setAdapter(leftAdapter);
-        //左侧点击事件监听
+      /*  //左侧点击事件监听
         orderList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
@@ -115,7 +289,7 @@ public class OrderFragment extends Fragment  {
                                     dishesIdList.add(DishesId.toString());
                                 }
                             }
-                            if(orderDragAdapter == null){
+                            if (orderDragAdapter == null) {
                                 orderDragAdapter = new OrderDragAdapter(getActivity());
                             }
 
@@ -133,7 +307,7 @@ public class OrderFragment extends Fragment  {
                                 @Override
                                 public void getNumber(float[] numbers) {
 
-                                    stringHashMap.put(position,numbers);
+                                    stringHashMap.put(position, numbers);
 
 
                                     //如果有被选择的菜品
@@ -165,7 +339,7 @@ public class OrderFragment extends Fragment  {
             }
 
 
-        });
+        });*/
 
         orderList.performItemClick(orderList.getChildAt(0), 0, orderList
                 .getItemIdAtPosition(0));
@@ -176,7 +350,7 @@ public class OrderFragment extends Fragment  {
     private boolean isKindNameClick(float[] numbers) {
         for (int i = 0; i < numbers.length; i++) {
 
-            if(numbers[i] != 0.0f){
+            if (numbers[i] != 0.0f) {
 
                 return true;
             }
@@ -273,17 +447,20 @@ public class OrderFragment extends Fragment  {
     }
 
 
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+
+        if (!hidden) {
 
 
+        }
+    }
 
     public class DishesKindAdapter extends BaseAdapter {
 
-        private LayoutInflater listContainerLeft;
-        private int mSelect = 0; //选中项
 
-        public LayoutInflater getListContainerLeft() {
-            return listContainerLeft;
-        }
+        private int mSelect = 0; //选中项
 
         public void setaBoolean(boolean[] aBoolean) {
             this.aBoolean = aBoolean;
@@ -295,13 +472,13 @@ public class OrderFragment extends Fragment  {
 
         boolean aBoolean[];
 
-        public void setNames(List<String> names) {
+        public void setNames(List<DishesKindC> names) {
             this.names = names;
             aBoolean = new boolean[names.size()];
         }
 
 
-        private List<String> names;
+        private List<DishesKindC> names;
 
         public DishesKindAdapter() {
         }
@@ -324,6 +501,8 @@ public class OrderFragment extends Fragment  {
 
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
+
+            LayoutInflater listContainerLeft;
             listContainerLeft = LayoutInflater.from(getActivity());
             ListItemView listItemView = null;
             if (view == null) {
@@ -344,15 +523,14 @@ public class OrderFragment extends Fragment  {
                 listItemView.imageView.setVisibility(View.INVISIBLE);
             }
 
-            if (aBoolean[i]){
+            if (aBoolean[i]) {
 
                 listItemView.imagePoint.setVisibility(View.VISIBLE);
-            }
-            else {
+            } else {
 
                 listItemView.imagePoint.setVisibility(View.INVISIBLE);
             }
-            listItemView.tv_title.setText(CDBHelper.getDocByID(getActivity(), names.get(i)).getString("kindName"));
+            listItemView.tv_title.setText(names.get(i).getKindName());
 
             return view;
 
