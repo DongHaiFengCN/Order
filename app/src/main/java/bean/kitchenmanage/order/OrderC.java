@@ -67,7 +67,15 @@ public class OrderC implements Serializable{
 	 *订单状态 0：已买单；1:刚下单未买单；2：消台订单；
 	 */
 	private int orderState;
+	/**
+	 *0,前台主程序所下订单;1、点餐宝所下订单;2、手机所下订单
+	 */
+	private int deviceType;
 
+	/**
+	 *退菜标识 0.正常  1.退菜，2 赠菜
+	 */
+	private int orderCType;
 
 	//3、
 	private List<GoodsC> goodsList;
@@ -100,15 +108,7 @@ public class OrderC implements Serializable{
 	 */
 	private String reserverId;
 
-	/**
-	 *0,前台主程序所下订单;1、点餐宝所下订单;2、手机所下订单
-	 */
-	private int orderType;
 
-	/**
-	 *退菜标识 0.正常  1.退菜
-	 */
-	private int orderCType;
 
 
 
@@ -300,15 +300,13 @@ public class OrderC implements Serializable{
 		this.reserverId = reserverId;
 	}
 
-	public int getOrderType() {
-		return orderType;
+	public int getDeviceType() {
+		return deviceType;
 	}
 
-	public void setOrderType(int orderType) {
-		this.orderType = orderType;
+	public void setDeviceType(int deviceType) {
+		this.deviceType = deviceType;
 	}
-
-
 
 	public int getOrderCType() {
 		return orderCType;
