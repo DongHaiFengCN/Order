@@ -2,6 +2,7 @@ package com.zm.order.view;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -15,7 +16,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -23,14 +23,17 @@ import android.os.RemoteException;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
+import android.view.Display;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -51,7 +54,6 @@ import com.gprinter.command.EscCommand;
 import com.gprinter.command.GpCom;
 import com.gprinter.io.GpDevice;
 import com.gprinter.io.PortParameters;
-import com.gprinter.save.PortParamDataBase;
 import com.gprinter.service.GpPrintService;
 import com.tencent.bugly.crashreport.BuglyLog;
 import com.tencent.bugly.crashreport.CrashReport;
@@ -68,7 +70,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TimerTask;
@@ -80,16 +81,15 @@ import bean.kitchenmanage.order.GoodsC;
 import bean.kitchenmanage.order.OrderC;
 import bean.kitchenmanage.order.OrderNum;
 import bean.kitchenmanage.table.AreaC;
-import bean.kitchenmanage.table.TableC;
 import bean.kitchenmanage.user.CompanyC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import model.CDBHelper;
-import model.DishesMessage;
 import untils.AnimationUtil;
 import untils.BluetoothUtil;
 import untils.MyLog;
 import untils.PrintUtils;
+import untils.Tool;
 
 import static com.gprinter.service.GpPrintService.ACTION_CONNECT_STATUS;
 
@@ -102,10 +102,10 @@ public class MainActivity extends AppCompatActivity {
     private TextView ok_tv;
     private TextView total_tv;
     private ImageView car_iv;
-    private boolean flag = true;
+
     private ImageButton delet_bt;
     public  List<SparseArray<Object>> orderItem = new ArrayList<>();
-    public  OrderAdapter o;
+    public  OrderAdapter orderAdapter;
     private BluetoothAdapter btAdapter;
     private BluetoothDevice device;
     private BluetoothSocket socket;
@@ -120,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isFlag = true;
 
     private List<GoodsC> goodsList = new ArrayList<>();
+    private List<GoodsC> zcGoodsList = new ArrayList<>();
     private String gOrderId;
     private Document document;
     private Handler mHandler;
@@ -296,12 +297,12 @@ public class MainActivity extends AppCompatActivity {
         return seekT9Adapter;
     }
 
-    public void setOrderAdapter(OrderAdapter o) {
-        this.o = o;
-
-    }
+//    public void setOrderAdapter(OrderAdapter o) {
+//        this.orderAdapter = o;
+//
+//    }
     public OrderAdapter getOrderAdapter(){
-        return o;
+        return orderAdapter;
     }
 
     public List<SparseArray<Object>> getOrderItem(){
@@ -309,6 +310,33 @@ public class MainActivity extends AppCompatActivity {
     }
     public List<GoodsC> getGoodsList(){
         return goodsList;
+    }
+    public void changeOrderGoodsByT9(GoodsC goodsObj)
+    {
+        for (int i = 0; i<goodsList.size();i++)//+for
+        {
+            if (goodsList.get(i).getDishesName().toString().equals(goodsObj.getDishesName()))//名称相等
+            {
+                if(goodsList.get(i).getDishesTaste()!=null)//口味不为空
+                {
+                    if(goodsList.get(i).getDishesTaste().equals(goodsObj.getDishesTaste()))//口味相等
+                    {
+                        goodsList.get(i).setDishesCount(goodsObj.getDishesCount());
+                        break;
+                    }
+
+                }//口味为空
+                else
+                {
+                    goodsList.get(i).setDishesCount(goodsObj.getDishesCount());
+                    break;
+
+                }
+
+            }
+        }//-for
+
+
     }
     public void setTotal(float total){
         this.total = total;
@@ -359,9 +387,9 @@ public class MainActivity extends AppCompatActivity {
         layoutParams.width = w;
         layoutParams.height = h / 2;
         linearLayout.setLayoutParams(layoutParams);
-        o = new OrderAdapter( getGoodsList(), MainActivity.this);
-        order_lv.setAdapter(o);
-        o.setListener(new OrderAdapter.setOnItemListener() {
+        orderAdapter = new OrderAdapter( getGoodsList(), MainActivity.this);
+        order_lv.setAdapter(orderAdapter);
+        orderAdapter.setListener(new OrderAdapter.setOnItemListener() {
             @Override
             public void setListener(final int position) {
 
@@ -374,13 +402,13 @@ public class MainActivity extends AppCompatActivity {
                                 //1\
                                 GoodsC goodsC = goodsList.get(position);
                                 //2\
-                                //OrderC orderC = CDBHelper.getObjById(getApplicationContext(),goodsC.getOrder(),OrderC.class);
                                 goodsC.setGoodsType(2);
                                 goodsC.setDishesName(goodsC.getDishesName()+"(赠)");
-                                total -= goodsC.getAllPrice();
+
+                                total = MyBigDecimal.sub(total,MyBigDecimal.mul(goodsC.getPrice(),goodsC.getDishesCount(),2),2);
                                 setTotal(total);
-                                goodsC.setAllPrice(0);
-                                o.notifyDataSetChanged();
+
+                                orderAdapter.notifyDataSetChanged();
                                 dialog.dismiss();
                             }
                         });
@@ -398,31 +426,11 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 //初始化订单的数据，绑定数据源的信息。
                 //o.notifyDataSetChanged();
-
-                mHandler.post(new TimerTask() {
-                    @Override
-                    public void run() {
-                        Iterator<GoodsC> iterator = getGoodsList().iterator();
-
-                        while (iterator.hasNext()){
-                            GoodsC goodsC = iterator.next();
-                            if (goodsC.getDishesCount() == 0)
-                            {
-                                iterator.remove();
-                                break;
-                            }
-                        }
-                        for (int i = 0; 0 < getGoodsList().size();i++){
-                            if (getGoodsList().get(i).getDishesCount() == 0 ){
-                                getGoodsList().remove(i);
-                            }
-                            break;
-                        }
-
-                    }
-                });
-
-                if (flag) {
+                if (getGoodsList().size()>0){
+                    setOrderDialog();
+                }
+                /*if (flag) {
+                    orderAdapter.notifyDataSetChanged();
 
                     linearLayout.setAnimation(AnimationUtil.moveToViewLocation());
                     linearLayout.setVisibility(View.VISIBLE);
@@ -450,38 +458,30 @@ public class MainActivity extends AppCompatActivity {
 
                     flag = true;
 
-                }
+                }*/
 
                 //监听orderItem的增加删除，设置总价以及总数量, flag ？+ ：-,price 单价 ,sum 当前item的个数。
 
-                o.setOnchangeListener(new OrderAdapter.OnchangeListener() {
+                orderAdapter.setOnchangeListener(new OrderAdapter.OnchangeListener() {
                     @Override
-                    public void onchangeListener(boolean flag, float price, float sum) {
+                    public void onchangeListener(boolean flag, float allPrice, float sum) {
 
-                        if (flag) {
-
-                            total += price;
-                            String to = MyBigDecimal.round(total+"",2);
-                            total_tv.setText(to + "元");
-
+                        if (flag) {//点加号
+                            total = MyBigDecimal.add(total,allPrice,2);
+                            total_tv.setText(total + "元");
 
                         } else {
 
-                            total -= price;
-                            String to = MyBigDecimal.round(total+"",2);
-                            total_tv.setText(to + "元");
+                            total = MyBigDecimal.sub(total,allPrice,2);
+                            total_tv.setText(total + "元");
 
-                            if (sum == 0) {
-
+                            if (sum == 0)
+                            {
                                 point--;
-
                                 point_tv.setText(point + "");
-
                                 if (point == 0) {
-
                                     point_tv.setVisibility(View.INVISIBLE);
                                 }
-
 
                             }
 
@@ -511,86 +511,103 @@ public class MainActivity extends AppCompatActivity {
         //提交按钮
         ok_tv.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view)
-            {
-                saveOrder();
-                if (total == 0 || getGoodsList().size() > 0) {
-                    //如果order列表开启状态就关闭
-                    if (!flag) {
-                        linearLayout.setAnimation(AnimationUtil.moveToViewBottom());
-                        linearLayout.setVisibility(View.GONE);
-                        imageView.animate()
-                                .alpha(0f)
-                                .setDuration(400)
-                                .setListener(new AnimatorListenerAdapter() {
-                                    @Override
-                                    public void onAnimationEnd(Animator animation) {
-                                        imageView.setVisibility(View.GONE);
-                                    }
-                                });
+            public void onClick(View view) {
+                if (Tool.isFastDoubleClick()) {
+                    return;
+                } else {
 
-                        flag = true;
-                    }
+                    if (getGoodsList().size() > 0)
+                    {
 
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                        View view1 = getLayoutInflater().inflate(R.layout.view_pay_dialog, null);
+                        builder.setView(view1);
+                        builder.setCancelable(true);
+                        final AlertDialog dialog = builder.create();
+                        Button shi = view1.findViewById(R.id.view_pay_shi);
+                        Button fou = view1.findViewById(R.id.view_pay_fou);
+                        shi.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                    View view1 = getLayoutInflater().inflate(R.layout.view_pay_dialog,null);
-                    builder.setView(view1);
-                    builder.setCancelable(true);
-                    final AlertDialog dialog = builder.create();
-                    Button shi = view1.findViewById(R.id.view_pay_shi);
-                    Button fou = view1.findViewById(R.id.view_pay_fou);
-                    shi.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-
-                            Intent intent = new Intent(MainActivity.this, PayActivity.class);
-                            startActivityForResult(intent,1);
-                            finish();
-                            dialog.dismiss();
-                        }
-                    });
-                    fou.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                            Intent intent = new Intent(MainActivity.this, DeskActivity.class);
-                            startActivity(intent);
-                            dialog.dismiss();
-                            finish();
-                        }
-                    });
-
-                    Button dy = view1.findViewById(R.id.view_pay_dy);
-                    dy.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (setPrintOrder().equals("")){
-                                Toast.makeText(MainActivity.this,"没有链接蓝牙打印机",Toast.LENGTH_LONG).show();
-                            }else {
+                                saveOrder();
+                                Intent intent = new Intent(MainActivity.this, PayActivity.class);
+                                startActivityForResult(intent, 1);
+                                finish();
+                                dialog.dismiss();
+                            }
+                        });
+                        fou.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                saveOrder();
                                 Intent intent = new Intent(MainActivity.this, DeskActivity.class);
                                 startActivity(intent);
                                 dialog.dismiss();
                                 finish();
                             }
+                        });
+
+                        Button dy = view1.findViewById(R.id.view_pay_dy);
+                        dy.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v)
+                            {
+                                saveOrder();
+
+                                if (setPrintOrder().equals(""))
+                                {
+                                    Toast.makeText(MainActivity.this, "没有链接蓝牙打印机", Toast.LENGTH_LONG).show();
+                                }
+
+                                Intent intent = new Intent(MainActivity.this, DeskActivity.class);
+                                startActivity(intent);
+                                dialog.dismiss();
+                                finish();
 
 
-                        }
-                    });
 
-                    dialog.show();
+                            }
+                        });
 
-                } else {
+                        dialog.show();
 
-                    Toast.makeText(MainActivity.this, "订单为空！", Toast.LENGTH_SHORT).show();
+                    } else {
+
+                        Toast.makeText(MainActivity.this, "订单为空！", Toast.LENGTH_SHORT).show();
+                    }
+
+
                 }
 
-
             }
-
-
         });
+    }
+
+
+    private void setOrderDialog(){
+        Dialog dialog = new Dialog(MainActivity.this,R.style.ActionSheetDialogStyle);
+        View orderDialog = LayoutInflater.from(MainActivity.this).inflate(R.layout.activity_dialog_order,null);
+        ListView listView = orderDialog.findViewById(R.id.order_lv);
+        ImageView delet = orderDialog.findViewById(R.id.delet);
+        listView.setAdapter(orderAdapter);
+        delet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clearOrder();
+            }
+        });
+        dialog.setContentView(orderDialog);
+        Window windowDialog = dialog.getWindow();
+        windowDialog.setGravity(Gravity.BOTTOM);
+        WindowManager m = getWindowManager();
+        Display d = m.getDefaultDisplay();//为获取屏幕宽、高
+        // 获取对话框当前的参数值
+        WindowManager.LayoutParams lp = windowDialog.getAttributes();
+        lp.y = 80;
+        lp.height = (int)(d.getHeight()*0.6);
+        windowDialog.setAttributes(lp);
+        dialog.show();
     }
 
     /**
@@ -598,8 +615,6 @@ public class MainActivity extends AppCompatActivity {
      */
     private void printOrderToKitchen()
     {
-
-
         //1\ 查询出所有厨房,并分配菜品
         List<KitchenClientC> kitchenClientList= CDBHelper.getObjByClass(getApplicationContext(), KitchenClientC.class);
         if(kitchenClientList.size()<=0)
@@ -619,14 +634,9 @@ public class MainActivity extends AppCompatActivity {
             for(String dishKindId:kitchenClientObj.getDishesKindIDList())//2 for 遍历厨房下所含菜系
             {
 
-                Document dishKindDoc= CDBHelper.getDocByID(getApplicationContext(),dishKindId);
-                String dishesKindName=dishKindDoc.getString("kindName");
-                if(TextUtils.isEmpty(dishesKindName))
-                    continue;
-
                 for(GoodsC goodsC:goodsList)//3 for 该厨房下所应得商品
                 {
-                    if(dishesKindName.equals(goodsC.getDishesKindName()))
+                    if(dishKindId.equals(goodsC.getDishesKindId()))
                     {
                         findflag = true;
                         // g_printGoodsList.remove(goodsC);//为了降低循环次数，因为菜品只可能在一个厨房打印分发，故分发完后移除掉。
@@ -634,6 +644,18 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                 }//end for 3
+
+                if(zcGoodsList.size()>0)
+                {
+                    for(GoodsC obj:zcGoodsList)
+                    {
+                        if(dishKindId.equals(obj.getDishesKindId()))
+                        {
+                            findflag = true;
+                            oneKitchenClientGoods.add(obj);
+                        }
+                    }
+                }
             }//end for 2
 
 
@@ -641,8 +663,6 @@ public class MainActivity extends AppCompatActivity {
             {
                 String clientKtname=""+kitchenClientObj.getName();//厨房名称
                 String printname=""+kitchenClientObj.getKitchenAdress();//打印机名称
-
-                //String printId=printname.substring(printname.length()-1,printname.length());
 
                 int printerId=0;//Integer.parseInt(printId)-1;
 
@@ -788,7 +808,7 @@ public class MainActivity extends AppCompatActivity {
             }
             // 查找菜品的单价
 
-            String  strprice= ""+ MyBigDecimal.div(myshangpinlist.get(i).getAllPrice(),myshangpinlist.get(i).getDishesCount(),2);//myshangpinlist.get(i).getSinglePrice;
+            String  strprice= ""+myshangpinlist.get(i).getPrice();//""+ MyBigDecimal.div(myshangpinlist.get(i).getAllPrice(),myshangpinlist.get(i).getDishesCount(),2);//myshangpinlist.get(i).getSinglePrice;
             esc.addText(strprice);
             for (int j = 0; j < 9 - strprice.length(); j++)
                 esc.addText(" ");
@@ -797,7 +817,7 @@ public class MainActivity extends AppCompatActivity {
             for (int j = 0; j < 7 - ("" + num).length(); j++)
                 esc.addText(" ");
 
-            esc.addText("" + (myshangpinlist.get(i).getAllPrice()) + "\n");
+            esc.addText("" + (MyBigDecimal.mul(myshangpinlist.get(i).getPrice(),myshangpinlist.get(i).getDishesCount(),2)) + "\n");
             esc.addPrintAndLineFeed();
 
         }
@@ -1020,7 +1040,7 @@ public class MainActivity extends AppCompatActivity {
         total = 0;
 
         getGoodsList().clear();
-        o.notifyDataSetChanged();
+        orderAdapter.notifyDataSetChanged();
         seekT9Adapter.notifyDataSetChanged();
     }
 
@@ -1107,12 +1127,12 @@ public class MainActivity extends AppCompatActivity {
             PrintUtils.printText(areaName+"/"+tableName+"\n\n");
             PrintUtils.selectCommand(PrintUtils.NORMAL);
             PrintUtils.selectCommand(PrintUtils.ALIGN_LEFT);
-            PrintUtils.printText(PrintUtils.printTwoData("订单编号", OrderId()+"\n"));
+            PrintUtils.printText(PrintUtils.printTwoData("订单编号", serNum+"\n"));
             PrintUtils.printText(PrintUtils.printTwoData("下单时间", getFormatDate()+"\n"));
             PrintUtils.printText(PrintUtils.printTwoData("人数："+myApp.getTable_sel_obj().getCurrentPersions(), "收银员："+waiter+"\n"));
             PrintUtils.printText("--------------------------------\n");
             PrintUtils.selectCommand(PrintUtils.BOLD);
-            PrintUtils.printText(PrintUtils.printThreeData("项目", "数量", "金额\n"));
+            PrintUtils.printText(PrintUtils.printThreeData("菜品", "数量", "金额\n"));
             PrintUtils.printText("--------------------------------\n");
             PrintUtils.selectCommand(PrintUtils.BOLD_CANCEL);
 
@@ -1121,10 +1141,15 @@ public class MainActivity extends AppCompatActivity {
             for (int j = 0; j < goodsCList.size(); j++) {
 
                 GoodsC goodsC = goodsCList.get(j);
+                String allPrice = ""+MyBigDecimal.mul(goodsC.getPrice(),goodsC.getDishesCount(),2);
 
-                PrintUtils.printText(PrintUtils.printThreeData(goodsC.getDishesName(),goodsC.getDishesCount()+"", goodsC.getAllPrice()+"\n"));
+                PrintUtils.printText(PrintUtils.printThreeData(goodsC.getDishesName(),goodsC.getDishesCount()+"", allPrice+"\n"));
 
-
+            }
+            if(zcGoodsList.size()>0)
+            {
+                for(GoodsC obj:zcGoodsList)
+                    PrintUtils.printText(PrintUtils.printThreeData(obj.getDishesName(),obj.getDishesCount()+"", 0+"\n"));
             }
 
             PrintUtils.printText("--------------------------------\n");
@@ -1133,11 +1158,6 @@ public class MainActivity extends AppCompatActivity {
             PrintUtils.printText("\n\n\n\n");
             PrintUtils.closeOutputStream();
 
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
     }
 
     /**
@@ -1171,8 +1191,11 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run()
                 {
+                   zcGoodsList.clear();
 
                     OrderC newOrderObj = new OrderC(myApp.getCompany_ID());
+                    OrderC zcOrderObj = new OrderC(myApp.getCompany_ID());
+
                     gOrderId = CDBHelper.createAndUpdate(getApplicationContext(),newOrderObj);
                     newOrderObj.set_id(gOrderId);
                     List<OrderC> orderCList = CDBHelper.getObjByWhere(getApplicationContext(),
@@ -1193,18 +1216,25 @@ public class MainActivity extends AppCompatActivity {
                         newOrderObj.setSerialNum(getOrderSerialNum());
                     }
 
-
-                    BuglyLog.e("saveOrder", "goodsListSize="+goodsList.size());
-
-                    for(GoodsC obj:goodsList)
+                    for(int i=0;i<goodsList.size();i++)
                     {
+                        GoodsC obj = goodsList.get(i);
+                        if(obj.getGoodsType()==2)
+                        {
+                            zcGoodsList.add(obj);
+                            goodsList.remove(i);
+                            i--;
+                            continue;
+                        }
                         obj.setOrder(gOrderId);
-                        CDBHelper.createAndUpdate(getApplicationContext(),obj);
+
                     }
+
                     newOrderObj.setGoodsList(goodsList);
                     newOrderObj.setAllPrice(total);
-                    newOrderObj.setOrderState(1);
-                    newOrderObj.setOrderType(1);
+                    newOrderObj.setOrderState(1);//未买单
+                    newOrderObj.setOrderCType(0);//正常
+                    newOrderObj.setDeviceType(1);//点餐宝
                     newOrderObj.setCreatedTime(getFormatDate());
                     newOrderObj.setTableNo(myApp.getTable_sel_obj().getTableNum());
                     newOrderObj.setTableName(myApp.getTable_sel_obj().getTableName());
@@ -1214,11 +1244,26 @@ public class MainActivity extends AppCompatActivity {
                     CDBHelper.createAndUpdate(getApplicationContext(),newOrderObj);
 
 
+                    if(zcGoodsList.size()>0)
+                    {
+                        zcOrderObj.setSerialNum(newOrderObj.getSerialNum());
+                        zcOrderObj.setOrderState(1);//未买单
+                        zcOrderObj.setOrderCType(2);//赠菜
+                        zcOrderObj.setDeviceType(1);//点餐宝
+                        zcOrderObj.setCreatedTime(newOrderObj.getCreatedTime());
+                        zcOrderObj.setTableNo(newOrderObj.getTableNo());
+                        zcOrderObj.setTableName(newOrderObj.getTableName());
+                        zcOrderObj.setAreaName(newOrderObj.getAreaName());
+                        String id = CDBHelper.createAndUpdate(getApplicationContext(),zcOrderObj);
+                        for(GoodsC obj:zcGoodsList)
+                        {
+                            obj.setOrder(id);
+                        }
+                        zcOrderObj.setGoodsList(zcGoodsList);
+                        zcOrderObj.set_id(id);
 
-//
-//                    TableC tableC = myApp.getTable_sel_obj();
-//                    tableC.setTotalCount(MyBigDecimal.add(tableC.getTotalCount(),total,1));
-//                    CDBHelper.createAndUpdate(getApplicationContext(),tableC);
+                        CDBHelper.createAndUpdate(getApplicationContext(),zcOrderObj);
+                    }
 
 
                     Log.e("id",gOrderId);
@@ -1358,11 +1403,11 @@ public class MainActivity extends AppCompatActivity {
 
             isDishes = false;
 
-            if (o == null) {
+            if (orderAdapter == null) {
 
-                o = new OrderAdapter(goodsList, MainActivity.this);
+                orderAdapter = new OrderAdapter(goodsList, MainActivity.this);
 
-                order_lv.setAdapter(o);
+                order_lv.setAdapter(orderAdapter);
             }
 
 
@@ -1413,7 +1458,7 @@ public class MainActivity extends AppCompatActivity {
             goodsC.setDishesCount(dishesMessage.getCount());
             goodsC.setDishesId(dishesMessage.getDishesC().get_id());
             goodsC.setGoodsType(0);
-            goodsC.setAllPrice(dishesMessage.getTotal());
+            goodsC.setPrice(dishesMessage.getTotal());
 
             Log.e("总价是：", dishesMessage.getTotal() + "");
             goodsList.add(goodsC);
@@ -1424,12 +1469,12 @@ public class MainActivity extends AppCompatActivity {
         updataTotal();
         updataPoint();
 
-        o.notifyDataSetChanged();
+        orderAdapter.notifyDataSetChanged();
     }
 
     private void updataPoint() {
 
-        setPoint(o.getCount());
+        setPoint(orderAdapter.getCount());
     }
 
     private void updataTotal() {
@@ -1444,7 +1489,7 @@ public class MainActivity extends AppCompatActivity {
 
             for (int i = 0; i < goodsList.size(); i++) {
 
-                t += goodsList.get(i).getAllPrice();
+                t += goodsList.get(i).getPrice();
 
 
             }
@@ -1460,7 +1505,7 @@ public class MainActivity extends AppCompatActivity {
         if (dishesMessage.isOperation()) {
 
             goodsList.get(i).setDishesCount(goodsList.get(i).getDishesCount() + dishesMessage.getCount());
-            goodsList.get(i).setAllPrice(goodsList.get(i).getAllPrice() + dishesMessage.getTotal());
+            goodsList.get(i).setPrice(goodsList.get(i).getPrice() + dishesMessage.getTotal());
 
         } else {
 
@@ -1470,7 +1515,7 @@ public class MainActivity extends AppCompatActivity {
 
             } else {
                 goodsList.get(i).setDishesCount(goodsList.get(i).getDishesCount() - dishesMessage.getCount());
-                goodsList.get(i).setAllPrice(goodsList.get(i).getAllPrice() - dishesMessage
+                goodsList.get(i).setPrice(goodsList.get(i).getPrice() - dishesMessage
                         .getDishesC().getPrice());
             }
 
