@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.text.method.DigitsKeyListener;
 import android.util.Log;
@@ -23,6 +24,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -77,11 +80,13 @@ public class ShowParticularsActivity extends Activity {
     private MyApplication myapp;
     private float all = 0f;
     private ImageView getShowImg;
+    private int type = 0;
 
     private BluetoothAdapter btAdapter;
     private BluetoothDevice device;
     private BluetoothSocket socket;
     private List<OrderC> orderCList;
+    private String tableArea = "";
 
     public static final String TAG = "ShowParticularsActivity";
     private  boolean printerToKitchen(GoodsC obj, int type , String areaName ,String TableName){
@@ -104,15 +109,16 @@ public class ShowParticularsActivity extends Activity {
         showListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(final AdapterView<?> parent, View view, final int position, long id) {
-
+                type = 0;
                         //点击订单OrderC
                         OrderC order = CDBHelper.getObjById(getApplicationContext(), goodsCList.get(position).getOrder(), OrderC.class);
                         if (order.getOrderCType() == 0 && goodsCList.get(position).getGoodsType() != 2){
                             final AlertDialog.Builder alertDialog = new AlertDialog.Builder(ShowParticularsActivity.this);
                             View view1 = LayoutInflater.from(ShowParticularsActivity.this).inflate(R.layout.activity_tv_dialog,null);
                             alertDialog.setView(view1);
-                            TextView title = view1.findViewById(R.id.dialog_tuicai_title);
-                            title.setText(goodsCList.get(position).getDishesName());
+                            TextView title = view1.findViewById(R.id.dialog_dishesName);
+                            title.setText(goodsCList.get(position).getDishesName()+"(已点数量"+goodsCList.get(position).getDishesCount()+"份)");
+
                             final EditText editText = view1.findViewById(R.id.dialog_ed_sl);
                             editText.setText(goodsCList.get(position).getDishesCount()+"");
                             editText.clearFocus();
@@ -132,7 +138,7 @@ public class ShowParticularsActivity extends Activity {
 
 
                             final AlertDialog builder = alertDialog.create();
-                            Button tc = view1.findViewById(R.id.dialog_tuicai);
+                            /*Button tc = view1.findViewById(R.id.dialog_tuicai);
                             tc.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
@@ -345,13 +351,50 @@ public class ShowParticularsActivity extends Activity {
                                         builder.dismiss();
                                     }
                                 }
+                            });*/
+
+                            RadioGroup group = view1.findViewById(R.id.dialog_radio);
+                            group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                                @Override
+                                public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
+                                    if (checkedId == R.id.dialog_add_zc)//增加菜
+                                    {
+                                        type = 0;
+
+                                    }else if (checkedId == R.id.dialog_delete_tc)//退菜
+                                    {
+                                        type = 1;
+                                    }else if (checkedId == R.id.dialog_give_zc)//赠菜
+                                    {
+                                        type = 2;
+                                    }
+                                }
                             });
 
                             Button shi = view1.findViewById(R.id.dialog_tuicai_qd);
                             shi.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    if (editText.getText().toString().equals("")){
+
+                                    switch (type){
+
+                                        case 0:
+                                            Toast.makeText(ShowParticularsActivity.this,"0",Toast.LENGTH_LONG).show();
+                                            break;
+                                        case 1:
+                                            Toast.makeText(ShowParticularsActivity.this,"1",Toast.LENGTH_LONG).show();
+                                            break;
+                                        case 2:
+                                            Toast.makeText(ShowParticularsActivity.this,"2",Toast.LENGTH_LONG).show();
+                                            break;
+
+                                        default:
+                                            break;
+
+
+                                    }
+
+                                    /*if (editText.getText().toString().equals("")){
 
                                         Toast.makeText(ShowParticularsActivity.this,"输入不得为空",Toast.LENGTH_LONG).show();
 
@@ -413,7 +456,7 @@ public class ShowParticularsActivity extends Activity {
                                         }
 
 
-                                    }
+                                    }*/
                                 }
                             });
                             Button fou = view1.findViewById(R.id.dialog_tuicai_qx);
@@ -528,6 +571,8 @@ public class ShowParticularsActivity extends Activity {
                 }
             }
             all = MyBigDecimal.add(all,orderC.getAllPrice(),1);
+            tableArea = orderC.getAreaName();
+
         }
 
         Iterator<GoodsC> goodsCIterator = goodsCList.iterator();
@@ -543,7 +588,7 @@ public class ShowParticularsActivity extends Activity {
             }
         }
 
-        showTvSl.setText(goodsCList.size() + "道菜，总计："+all+"元");
+        showTvSl.setText(tableArea+","+myapp.getTable_sel_obj().getTableName()+"："+goodsCList.size() + "道菜，总计："+all+"元");
 
     }
 
