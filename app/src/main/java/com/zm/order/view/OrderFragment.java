@@ -50,8 +50,6 @@ public class OrderFragment extends Fragment {
     private List<String> titleList = new ArrayList<>();
     List<Object> DishesIdList;
     private List<String> dishesIdList;
-
-    int finalI;
     //缓存disheskind 与 对应菜品数量的number集合
 
     private Map<String, float[]> dishesCollection = new HashMap<>();
@@ -70,7 +68,6 @@ public class OrderFragment extends Fragment {
         EventBus.getDefault().register(this);
         ButterKnife.bind(this, view);
         intiData1();
-        //initData();
         return view;
     }
 
@@ -128,77 +125,11 @@ public class OrderFragment extends Fragment {
             @Override
             public void getNumber(float[] numbers) {
                 //更新缓存数据
-                //dishesCollection.put(kindId, numbers);
                 myNotifyDataSetChanged();
-
-                //默认滚动到第一个选中的菜品位置
-
-
-
 
 
             }
         });
-
-
-
-
-
-     /*   Observable.create(new Observable.OnSubscribe<DishesKindC>() {
-
-
-            @Override
-            public void call(Subscriber<? super DishesKindC> subscriber) {
-
-                dishesKindCList = CDBHelper.getObjByWhere(getActivity().getApplication()
-                        , Expression.property("className").equalTo("DishesKindC")
-                                .and(Expression.property("isSetMenu").equalTo(false)), Ordering.property("kindName")
-                                .ascending(), DishesKindC.class);
-
-
-                for (int i = 0; i < dishesKindCList.size(); i++) {
-
-                    subscriber.onNext(dishesKindCList.get(i));
-                    titleList.add(dishesKindCList.get(i).getKindName());
-
-                }
-                subscriber.onCompleted();
-
-            }
-        }).observeOn(Schedulers.newThread()).toMap(new Func1<DishesKindC, String>() {
-
-            @Override
-            public String call(DishesKindC dishesKindC) {
-
-                return dishesKindC.getKindName();
-            }
-        }).subscribe(new Action1<Map<String, DishesKindC>>() {
-
-            @Override
-            public void call(Map<String, DishesKindC> stringDishesKindCMap) {
-
-              //  stringDishesKindCMap1 = stringDishesKindCMap;
-
-                ArrayAdapter<String> adapter = new ArrayAdapter(getActivity().getApplication(),android.R.layout.simple_expandable_list_item_1,titleList);
-
-                LayoutInflater inflater = (LayoutInflater) getActivity().getApplication().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                View v1 = inflater.inflate(android.R.layout.simple_expandable_list_item_1, null);
-
-
-                Iterator<Map.Entry<String, DishesKindC>> entries = stringDishesKindCMap.entrySet().iterator();
-
-                orderList.setAdapter(adapter);
-
-          *//*      while (entries.hasNext()) {
-
-                    Map.Entry<String, DishesKindC> entry = entries.next();
-
-                    Log.e("测试一下：","Key = " + entry.getKey() + ", Value = " +entry.getValue().get_id());
-
-                }*//*
-
-            }
-        });*/
 
 
     }
@@ -307,121 +238,6 @@ public class OrderFragment extends Fragment {
         }
     }
 
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    public void initData() {
-
-        leftAdapter = new DishesKindAdapter();
-       /* titleList = CDBHelper.getIdsByWhere(getActivity(),
-                Expression.property("className").equalTo("DishesKindC")
-                        .and(Expression.property("isSetMenu").equalTo(false)),
-                Ordering.property("kindName").ascending());*/
-
-
-        // leftAdapter.setNames(titleList);
-
-        orderList.setAdapter(leftAdapter);
-      /*  //左侧点击事件监听
-        orderList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                if (DishesIdList != null) {
-                    DishesIdList.clear();
-                }
-
-                leftAdapter.changeSelected(position);
-
-                try {
-                    CDBHelper.db.inBatch(new TimerTask() {
-                        @Override
-                        public void run() {
-                            dishesIdList = new ArrayList<>();
-                            //获取点击的菜品类别的Document
-                            Document KindDocument = CDBHelper.getDocByID(getActivity(), titleList.get(position));
-                            //获取此Document下的菜品Id号
-                            if (KindDocument.getArray("dishesListId") != null) {
-                                DishesIdList = KindDocument.getArray("dishesListId").toList();
-                                //增强for循环读取id
-                                for (Object DishesId : DishesIdList) {
-                                    if (DishesId == null) {
-                                        continue;
-                                    }
-
-                                    dishesIdList.add(DishesId.toString());
-                                }
-                            }
-                            if (orderDragAdapter == null) {
-                                orderDragAdapter = new OrderDragAdapter(getActivity());
-                            }
-
-                            orderDragAdapter.setMlistDishesId(dishesIdList);
-
-                            if (stringHashMap.get(position) != null) {
-
-                                orderDragAdapter.setNumbers(stringHashMap.get(position));
-
-
-                            }
-
-
-                            orderDragAdapter.setChangerNumbersListener(new OrderDragAdapter.ChangerNumbersListener() {
-                                @Override
-                                public void getNumber(float[] numbers) {
-
-                                    stringHashMap.put(position, numbers);
-
-
-                                    //如果有被选择的菜品
-                                    leftAdapter.getaBoolean()[position] = isKindNameClick(numbers);
-                                    leftAdapter.notifyDataSetChanged();
-
-
-                                }
-                            });
-
-                            dishesRv.setAdapter(orderDragAdapter);
-
-                            dishesRv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                                @Override
-                                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-                                    DishesC dishesC = CDBHelper.getObjById(getActivity().getApplication(), dishesIdList.get(i), DishesC.class);
-                                    showDialog(dishesC.getDishesName(), dishesC.getPrice(), i);
-
-                                }
-                            });
-
-                        }
-                    });
-                } catch (CouchbaseLiteException e) {
-                    e.printStackTrace();
-                }
-
-            }
-
-
-        });*/
-
-        orderList.performItemClick(orderList.getChildAt(0), 0, orderList
-                .getItemIdAtPosition(0));
-
-
-    }
-
-    private boolean isKindNameClick(float[] numbers) {
-        for (int i = 0; i < numbers.length; i++) {
-
-            if (numbers[i] != 0.0f) {
-
-                return true;
-            }
-        }
-        return false;
-    }
 
 
     /**
