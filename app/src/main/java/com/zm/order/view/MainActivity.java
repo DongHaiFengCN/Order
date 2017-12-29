@@ -494,7 +494,13 @@ public class MainActivity extends AppCompatActivity {
 
 
                         }
+
+                        EventBus.getDefault().postSticky(new String());
                     }
+
+
+
+
                 });
 
             }
@@ -1467,7 +1473,6 @@ public class MainActivity extends AppCompatActivity {
             goodsC.setGoodsType(0);
             goodsC.setPrice(dishesMessage.getTotal());
 
-            Log.e("总价是：", dishesMessage.getTotal() + "");
             goodsList.add(goodsC);
 
         }

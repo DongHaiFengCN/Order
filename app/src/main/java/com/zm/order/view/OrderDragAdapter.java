@@ -41,8 +41,6 @@ public class OrderDragAdapter extends BaseAdapter {
     private float[] numbers;
 
 
-    Map<String, Float> floatMap = new HashMap<>();
-
     ListView listview;
 
     public void setMessage( List<DishesC> mlistDishes,float[] numbers){
@@ -51,7 +49,7 @@ public class OrderDragAdapter extends BaseAdapter {
 
         this.numbers = numbers;
 
-        notifyDataSetChanged();
+      //  notifyDataSetChanged();
 
     }
 
@@ -125,7 +123,6 @@ public class OrderDragAdapter extends BaseAdapter {
 
 
         //设置数量
-      //  view.number.setText(floatMap.get(mlistDishesId.get(position)) + "");
 
 
         view.number.setText(numbers[position]+"");
@@ -147,6 +144,7 @@ public class OrderDragAdapter extends BaseAdapter {
 
                 setMessage(mlistDishes.get(position), false, position);
                 changerNumbersListener.getNumber(numbers);
+
 
             }
         });
@@ -258,7 +256,7 @@ public class OrderDragAdapter extends BaseAdapter {
     void updata(int position, float count) {
 
         numbers[position] += count;
-        notifyDataSetChanged();
+      //  notifyDataSetChanged();
 
 
     }
