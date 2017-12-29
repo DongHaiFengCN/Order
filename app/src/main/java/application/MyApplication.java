@@ -119,6 +119,7 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
         startSession(DATABASE_NAME);
         mExecutor = Executors.newCachedThreadPool();
 
+
         mExecutor.execute(new Runnable() {
             @Override
             public void run() {
