@@ -351,10 +351,15 @@ public class ShowParticularsActivity extends Activity {
                         {
                             retreateGoodsObj.setDishesCount(retreateGoodsObj.getDishesCount()-oldGoods.getDishesCount());
                             orderObj.getGoodsList().remove(j);
+                            float tmpAllPrice = MyBigDecimal.mul(oldGoods.getPrice(),oldGoods.getDishesCount(),2);
+                            orderObj.setAllPrice(MyBigDecimal.sub(orderObj.getAllPrice(),tmpAllPrice,2));
                             CDBHelper.createAndUpdate(getApplicationContext(),orderObj);
                         }
                         else //数量上有剩余菜品
                         {
+                            float tmpAllPrice = MyBigDecimal.mul(retreateGoodsObj.getPrice(),retreateGoodsObj.getDishesCount(),2);
+                            orderObj.setAllPrice(MyBigDecimal.sub(orderObj.getAllPrice(),tmpAllPrice,2));
+
                             oldGoods.setDishesCount(oldGoods.getDishesCount() - retreateGoodsObj.getDishesCount());
                             CDBHelper.createAndUpdate(getApplicationContext(),orderObj);
 
@@ -657,19 +662,22 @@ private void giveDishesDialog(int pos)//对赠菜的处理窗口
                 Expression.property("className").equalTo("OrderC")
                         .and(Expression.property("tableNo").equalTo(myapp.getTable_sel_obj().getTableNum()))
                         .and(Expression.property("orderState").equalTo(1))
-                , Ordering.property("createdTime").descending()
+                , Ordering.property("createdTime").ascending()
                 , OrderC.class);
         boolean flag = false;
 
+
         for (OrderC orderC : orderCList)
         {
+            if(orderC.getOrderCType()==0)//0，正常菜订单
+            {
+                all = MyBigDecimal.add(all,orderC.getAllPrice(),1);
+            }
+
                 for (GoodsC goodsb : orderC.getGoodsList())
                 {
                     flag = false;
-                    if(orderC.getOrderCType()==0)//0，正常菜订单
-                    {
-                        all = MyBigDecimal.add(all,orderC.getAllPrice(),1);
-                    }
+
                     for (GoodsC goodsC : goodsCList)
                     {
                         if (goodsC.getDishesName().equals(goodsb.getDishesName()))

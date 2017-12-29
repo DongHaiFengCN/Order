@@ -538,7 +538,7 @@ public class CDBHelper
     {
       document.set(props);
       db.save(document);
-      Log.e("createOrUpdate--->","content----->"+document.toMap().toString());
+     // Log.e("createOrUpdate--->","content----->"+document.toMap().toString());
 
     } catch (CouchbaseLiteException e)
     {

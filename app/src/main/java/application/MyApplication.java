@@ -92,7 +92,6 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
         strategy.setAppVersion("1.0.0.1");
         Bugly.init(getApplicationContext(), "c11c0d8e58", true, strategy);
         CrashReport.setUserId("1002");
-
        // CrashReport.setUserSceneTag(getApplicationContext(),64667);
         startSession(DATABASE_NAME);
         mExecutor = Executors.newCachedThreadPool();
