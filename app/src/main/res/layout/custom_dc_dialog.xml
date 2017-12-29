@@ -14,12 +14,11 @@
             android:id="@+id/custom_dc_title"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="请输入您要编辑的菜名和价格"
-            android:textSize="22sp"
-            android:textColor="@color/md_white_1000"
             android:gravity="center_vertical"
             android:paddingLeft="20sp"
-            />
+            android:text="输入编辑的菜品信息"
+            android:textColor="@color/md_white_1000"
+            android:textSize="22sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -67,11 +66,11 @@
             android:layout_width="150dp"
             android:layout_height="40dp"
             android:background="@null"
-            android:text="价格："
-            android:textColor="@color/md_black_1000"
+            android:gravity="center_vertical"
             android:paddingLeft="20sp"
-            android:textSize="18sp"
-            android:gravity="center_vertical"/>
+            android:text="*单价："
+            android:textColor="@color/md_black_1000"
+            android:textSize="18sp" />
 
         <EditText
             android:id="@+id/custom_dc_t"
@@ -81,9 +80,10 @@
             android:background="@drawable/animselect"
             android:ems="10"
             android:gravity="center"
-            android:textColor="@color/md_black_1000"
+            android:hint="输入单价"
             android:imeOptions="flagNoExtractUi"
-            android:inputType="number|numberDecimal" />
+            android:inputType="number|numberDecimal"
+            android:textColor="@color/md_black_1000" />
 
     </LinearLayout>
 

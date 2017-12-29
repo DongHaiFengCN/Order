@@ -1044,7 +1044,7 @@ public class MainActivity extends AppCompatActivity {
         seekT9Adapter.notifyDataSetChanged();
     }
 
-    private   String getOrderSerialNum()
+    public    String getOrderSerialNum()
     {
         String orderNum=null;
         SimpleDateFormat formatter=new SimpleDateFormat("yyyy-MM-dd");

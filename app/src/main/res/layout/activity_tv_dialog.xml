@@ -41,6 +41,7 @@
             android:layout_marginBottom="20dp"
             android:layout_marginTop="20dp"
             android:paddingLeft="20dp"
+            android:text="菜品名称"
             android:textSize="16sp" />
 
 
@@ -51,68 +52,67 @@
         android:id="@+id/dialog_radio"
         android:layout_width="match_parent"
         android:layout_height="55dp"
-        android:orientation="horizontal"
         android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp">
+        android:layout_marginRight="20dp"
+        android:orientation="horizontal">
+
         <RadioButton
             android:id="@+id/dialog_add_zc"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:layout_marginTop="8dp"
             android:layout_weight="1"
-            android:text="追加菜品"
             android:background="@drawable/radio_checked"
-            android:textColor="@drawable/radio_checked_color"
-            android:textSize="16sp"
             android:button="@null"
             android:checked="true"
             android:gravity="center"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginRight="4dp"
-            android:layout_marginLeft="4dp"
-            />
+            android:text="追加菜品"
+            android:textColor="@drawable/radio_checked_color"
+            android:textSize="16sp" />
 
         <View
             android:layout_width="1sp"
-            android:layout_height="match_parent"
-            />
+            android:layout_height="match_parent" />
 
         <RadioButton
             android:id="@+id/dialog_delete_tc"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:layout_marginTop="8dp"
             android:layout_weight="1"
-            android:text="退菜处理"
+            android:background="@drawable/radio_checked"
             android:button="@null"
             android:gravity="center"
-            android:background="@drawable/radio_checked"
+            android:text="退菜处理"
             android:textColor="@drawable/radio_checked_color"
-            android:textSize="16sp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginRight="4dp"
-            android:layout_marginLeft="4dp"/>
+            android:textSize="16sp" />
 
 
         <View
             android:layout_width="1sp"
-            android:layout_height="match_parent"
-            />
+            android:layout_height="match_parent" />
+
         <RadioButton
             android:id="@+id/dialog_give_zc"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:layout_marginTop="8dp"
             android:layout_weight="1"
+            android:background="@drawable/radio_checked"
+            android:button="@null"
+            android:gravity="center"
             android:text="赠送菜品"
             android:textColor="@drawable/radio_checked_color"
             android:textSize="16sp"
-            android:button="@null"
-            android:gravity="center"
-            android:background="@drawable/radio_checked"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginRight="4dp"
-            android:layout_marginLeft="4dp"
 
             />
 
@@ -168,15 +168,14 @@
             android:id="@+id/dialog_tuicai_qx"
             android:layout_width="match_parent"
             android:layout_height="40dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp"
             android:layout_weight="1"
+            android:background="@drawable/button_frame_bk"
             android:text="取消"
             android:textColor="@color/md_black_1000"
-            android:textSize="18sp"
-            android:background="@drawable/button_frame_bk"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginRight="5dp"
-            />
+            android:textSize="18sp" />
         <View
             android:layout_width="1sp"
             android:layout_height="match_parent"
@@ -186,15 +185,15 @@
             android:id="@+id/dialog_tuicai_qd"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:layout_weight="1"
-            android:text="确定"
-            android:background="@drawable/button_circular_yj"
-            android:textColor="@color/md_white_1000"
-            android:textSize="18sp"
-
             android:layout_marginLeft="5dp"
+            android:layout_marginRight="24dp"
             android:layout_marginTop="5dp"
-            android:layout_marginRight="24dp"/>
+            android:layout_weight="1"
+            android:background="@drawable/button_circular_yj"
+
+            android:text="确定"
+            android:textColor="@color/md_white_1000"
+            android:textSize="18sp" />
 
 
     </LinearLayout>

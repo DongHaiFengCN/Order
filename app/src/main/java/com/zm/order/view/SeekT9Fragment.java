@@ -132,20 +132,14 @@ public class SeekT9Fragment extends Fragment {
         if(!hidden)
         {
             MyLog.d( "hidden="+hidden);
-
             t9GoodsList.clear();
             seekT9Adapter.notifyDataSetChanged();
             activitySeekEdit.setText("");
-
-
         }
-
     }
 
     public void initView()
     {
-
-
        if(t9GoodsList==null)
            t9GoodsList = new ArrayList<>();
        else
@@ -198,7 +192,7 @@ public class SeekT9Fragment extends Fragment {
         } else {
             amountView.setNumber(sourceCount + "");
         }
-        String all = MyBigDecimal.mul(amountView.getAmount() + "", price + "", 2);
+        String all = MyBigDecimal.mul(sourceCount+ "", price + "", 2);
         price_tv.setText("总计 " + all + " 元");
         tmpAllPrice = Float.parseFloat(all);
         //增删选择器的数据改变的监听方法
@@ -256,6 +250,7 @@ public class SeekT9Fragment extends Fragment {
 
                 t9GoodsList.get(selGoodsPos).setDishesCount(destCount);
                 seekT9Adapter.notifyDataSetChanged();
+
                 GoodsC goodsC = new GoodsC(myapp.getCompany_ID());
                 goodsC.setDishesName(name);
                 if (tasteList.size() == 0) {
@@ -287,7 +282,9 @@ public class SeekT9Fragment extends Fragment {
                 else//原来点有此菜
                 {
                     ((MainActivity) getActivity()).changeOrderGoodsByT9(goodsC);
+
                     float tmp = MyBigDecimal.mul(goodsC.getPrice(),MyBigDecimal.sub(destCount,sourceCount,2),2);
+                    total = ((MainActivity) getActivity()).getTotal();
                     total = MyBigDecimal.add(total,tmp,2);
                     ((MainActivity) getActivity()).setTotal(total);
 
@@ -494,8 +491,10 @@ public class SeekT9Fragment extends Fragment {
                             obj.setDishesName(cm.getText().toString());
                             if (!jg.getText().toString().equals("") && jg.getText() != null)
                             {
-                                obj.setPrice(Float.parseFloat(jg.getText().toString()));
-                                obj.setDishesCount(Float.parseFloat(f_count.getText().toString()));
+                                float singlePrice =  Float.parseFloat(jg.getText().toString());
+                                obj.setPrice(singlePrice);
+                                float counts = Float.parseFloat(f_count.getText().toString());
+                                obj.setDishesCount(counts);
                                 String zdcDishedKindId = findZDCKindId();
                                 obj.setDishesKindId(zdcDishedKindId);
                                 obj.setGoodsType(3);
@@ -508,7 +507,7 @@ public class SeekT9Fragment extends Fragment {
 
                                 //计算总价
                                 total = ((MainActivity) getActivity()).getTotal();
-                                total += Float.parseFloat(jg.getText().toString());
+                                total = MyBigDecimal.add(total,MyBigDecimal.mul(singlePrice,counts,2),2);
                                 ((MainActivity) getActivity()).setTotal(total);
 
 
