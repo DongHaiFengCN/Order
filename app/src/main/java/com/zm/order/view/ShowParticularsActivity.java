@@ -320,67 +320,86 @@ public class ShowParticularsActivity extends Activity {
         CDBHelper.createAndUpdate(getApplicationContext(), newOrderObj);
     }
 
-    private void removeGoodsFromOrder(GoodsC retreateGoodsObj, int type)//0,全退，1，部分退
+    private void removeGoodsFromOrder(GoodsC retreateObj, int type)//0,全退，1，部分退
     {
-        for (int i = 0; i < orderCList.size(); i++) {
+        float  retreateCounts = retreateObj.getDishesCount();
+        String retreateTaste  = retreateObj.getDishesTaste();
+        String retreateName =   retreateObj.getDishesName();
+
+        for (int i = 0; i < orderCList.size(); i++)
+        {
+            if(retreateCounts<=0)
+                break;
             OrderC orderObj = orderCList.get(i);
             if (orderObj.getOrderCType() != type)
                 continue;
-            for (int j = 0; j < orderObj.getGoodsList().size(); j++) {
 
-                GoodsC oldGoods = orderObj.getGoodsList().get(j);
-                if (retreateGoodsObj.getDishesName().equals(oldGoods.getDishesName()))//名称相同
+            List<GoodsC> oldGoodsList = orderObj.getGoodsList();
+            for (int j = 0; j < oldGoodsList.size(); j++)
+            {
+                if(retreateCounts<=0)
+                    break;
+
+                GoodsC oldGoods = oldGoodsList.get(j);
+
+                if (retreateName.equals(oldGoods.getDishesName()))//名称相同
                 {
-                    if (TextUtils.isEmpty(oldGoods.getDishesTaste())) {
-                        if (retreateGoodsObj.getDishesCount() >= oldGoods.getDishesCount())//退出菜品数量超出原有数量
+                    if (TextUtils.isEmpty(retreateTaste)&&TextUtils.isEmpty(oldGoods.getDishesTaste()))//口味都为空
+                    {
+                        if (retreateCounts >= oldGoods.getDishesCount())//退出菜品数量超出原有数量
                         {
-                            retreateGoodsObj.setDishesCount(retreateGoodsObj.getDishesCount() - oldGoods.getDishesCount());
+                            float retreatePrice = MyBigDecimal.mul(oldGoods.getPrice(), oldGoods.getDishesCount(), 2);
                             orderObj.getGoodsList().remove(oldGoods);
                             j--;
-                            if (orderObj.getGoodsList().size() == 0) {
+                            if (orderObj.getGoodsList().size() == 0)
+                            {
                                 CDBHelper.deleteObj(getApplicationContext(), orderObj);
                             } else {
-                                float retreatePrice = MyBigDecimal.mul(retreateGoodsObj.getPrice(), retreateGoodsObj.getDishesCount(), 2);
                                 float lastPrice = MyBigDecimal.sub(orderObj.getAllPrice(), retreatePrice, 2);
                                 orderObj.setAllPrice(lastPrice);
                                 CDBHelper.createAndUpdate(getApplicationContext(), orderObj);
                             }
+                            retreateCounts = MyBigDecimal.sub(retreateCounts,oldGoods.getDishesCount(),2);
                         } else //数量上有剩余菜品
                         {
-                            oldGoods.setDishesCount(oldGoods.getDishesCount() - retreateGoodsObj.getDishesCount());
-                            float retreatePrice = MyBigDecimal.mul(retreateGoodsObj.getPrice(), retreateGoodsObj.getDishesCount(), 2);
+                            float retreatePrice = MyBigDecimal.mul(retreateObj.getPrice(), retreateCounts, 2);
                             float lastPrice = MyBigDecimal.sub(orderObj.getAllPrice(), retreatePrice, 2);
                             orderObj.setAllPrice(lastPrice);
+
+                            float  lastCount = MyBigDecimal.sub(oldGoods.getDishesCount(),retreateCounts,2);
+                            oldGoods.setDishesCount(lastCount);
+
                             CDBHelper.createAndUpdate(getApplicationContext(), orderObj);
-
-
+                            retreateCounts = 0;
                         }
-                    } else {
-                        if (oldGoods.getDishesTaste().equals(retreateGoodsObj.getDishesTaste())) {
-                            if (retreateGoodsObj.getDishesCount() >= oldGoods.getDishesCount())//退出菜品数量超出原有数量
-                            {
-                                retreateGoodsObj.setDishesCount(retreateGoodsObj.getDishesCount() - oldGoods.getDishesCount());
-                                orderObj.getGoodsList().remove(oldGoods);
-                                j--;
-                                if (orderObj.getGoodsList().size() == 0) {
-                                    CDBHelper.deleteObj(getApplicationContext(), orderObj);
-                                } else {
-                                    float retreatePrice = MyBigDecimal.mul(retreateGoodsObj.getPrice(), retreateGoodsObj.getDishesCount(), 2);
-                                    float lastPrice = MyBigDecimal.sub(orderObj.getAllPrice(), retreatePrice, 2);
-                                    orderObj.setAllPrice(lastPrice);
-                                    CDBHelper.createAndUpdate(getApplicationContext(), orderObj);
-                                }
+                    } else  if (!TextUtils.isEmpty(retreateTaste)&&!TextUtils.isEmpty(oldGoods.getDishesTaste())&&retreateTaste.equals(oldGoods.getDishesTaste()))//口味都不为空且相等
+                    {
 
-                            } else //数量上有剩余菜品
+                        if (retreateCounts >= oldGoods.getDishesCount())//退出菜品数量超出原有数量
+                        {
+                            float retreatePrice = MyBigDecimal.mul(oldGoods.getPrice(), oldGoods.getDishesCount(), 2);
+                            orderObj.getGoodsList().remove(oldGoods);
+                            j--;
+                            if (orderObj.getGoodsList().size() == 0)
                             {
-                                oldGoods.setDishesCount(oldGoods.getDishesCount() - retreateGoodsObj.getDishesCount());
-                                float retreatePrice = MyBigDecimal.mul(retreateGoodsObj.getPrice(), retreateGoodsObj.getDishesCount(), 2);
+                                CDBHelper.deleteObj(getApplicationContext(), orderObj);
+                            } else {
                                 float lastPrice = MyBigDecimal.sub(orderObj.getAllPrice(), retreatePrice, 2);
                                 orderObj.setAllPrice(lastPrice);
                                 CDBHelper.createAndUpdate(getApplicationContext(), orderObj);
-
-
                             }
+                            retreateCounts = MyBigDecimal.sub(retreateCounts,oldGoods.getDishesCount(),2);
+                        }
+                        else //数量上有剩余菜品
+                        {
+                            float retreatePrice = MyBigDecimal.mul(retreateObj.getPrice(), retreateCounts, 2);
+                            float lastPrice = MyBigDecimal.sub(orderObj.getAllPrice(), retreatePrice, 2);
+                            orderObj.setAllPrice(lastPrice);
+
+                            float  lastCount = MyBigDecimal.sub(oldGoods.getDishesCount(),retreateCounts,2);
+                            oldGoods.setDishesCount(lastCount);
+                            CDBHelper.createAndUpdate(getApplicationContext(), orderObj);
+                            retreateCounts = 0;
                         }
                     }
                 }
@@ -662,28 +681,35 @@ public class ShowParticularsActivity extends Activity {
         boolean flag = false;
 
 
-        for (OrderC orderC : orderCList) {
+        for (OrderC orderC : orderCList)
+        {
             if (orderC.getOrderCType() == 0)//0，正常菜订单
             {
                 all = MyBigDecimal.add(all, orderC.getAllPrice(), 1);
             }
 
-            for (GoodsC goodsb : orderC.getGoodsList()) {
+            for (GoodsC goodsb : orderC.getGoodsList())
+            {
                 flag = false;
 
-                for (GoodsC goodsC : goodsCList) {
+                for (GoodsC goodsC : goodsCList)
+                {
                     if (goodsC.getDishesName().equals(goodsb.getDishesName())) {
 
-                        if (goodsb.getDishesTaste() != null) {
+                        if (goodsb.getDishesTaste() != null)
+                        {
 
-                            if (goodsb.getDishesTaste().equals(goodsC.getDishesTaste())) {
+                            if (goodsb.getDishesTaste().equals(goodsC.getDishesTaste()))
+                            {
 
                                 float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
                                 goodsC.setDishesCount(count);
                                 flag = true;
                             }
 
-                        } else {
+                        }
+                        else
+                        {
 
                             float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
                             goodsC.setDishesCount(count);
@@ -694,9 +720,16 @@ public class ShowParticularsActivity extends Activity {
                         break;
                     }
                 }
-                if (!flag) {
-
-                    goodsCList.add(goodsb);
+                if (!flag)
+                {
+                    GoodsC objClone = null;
+                    try {
+                          objClone = (GoodsC)goodsb.clone();
+                    } catch (CloneNotSupportedException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    goodsCList.add(objClone);
 
                 }
             }

@@ -179,9 +179,12 @@ public class PayActivity extends AppCompatActivity {
         //获取包含桌号xx的所有订单
         List<OrderC> orderCList = CDBHelper.getObjByWhere(getApplicationContext(),Expression.property("className")
                 .equalTo("OrderC").and(Expression.property("tableNo").equalTo(tableC.getTableNum()))
-                .and(Expression.property("orderState").equalTo(1)),null,OrderC.class);
+                .and(Expression.property("orderState").equalTo(1))
+                ,Ordering.property("createdTime").ascending()
+                ,OrderC.class);
 
-        for(OrderC orderC:orderCList){
+        for(OrderC orderC:orderCList)
+        {
 
             checkOrder.addOrder(orderC);
 
