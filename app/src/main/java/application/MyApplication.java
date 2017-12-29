@@ -138,7 +138,6 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 
                     for (int i = 0; i < count; i++) {
 
-
                         DishesC dishesC = CDBHelper.getObjById(getApplicationContext(), disheList.get(i), DishesC.class);
 
                         if (dishesC != null) {
