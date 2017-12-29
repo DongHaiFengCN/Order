@@ -90,9 +90,9 @@ public class ResetBillActivity extends AppCompatActivity {
             goodsCList.addAll(orderCList.get(i).getGoodsList());
         }
 
-        ShowParticularsAdapter showParticularsAdapter = new ShowParticularsAdapter(ResetBillActivity.this);
+        ShowParticularsAdapter showParticularsAdapter = new ShowParticularsAdapter(ResetBillActivity.this,goodsCList);
 
-        showParticularsAdapter.setGoodsCs(goodsCList);
+
 
         itemInfoLv.setAdapter(showParticularsAdapter);
 

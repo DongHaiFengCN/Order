@@ -527,7 +527,6 @@ public class CDBHelper
     if (id == null||"".equals(id))
     {
       String docId= props.get("className") +"."+java.util.UUID.randomUUID().toString();
-      ///props.put("_id",docId);
       document =new Document(docId);
     }
     else
@@ -539,6 +538,7 @@ public class CDBHelper
     {
       document.set(props);
       db.save(document);
+      Log.e("createOrUpdate--->","content----->"+document.toMap().toString());
 
     } catch (CouchbaseLiteException e)
     {
@@ -699,4 +699,5 @@ public class CDBHelper
 
     return m.convertValue(map, aClass);
   }
+
 }

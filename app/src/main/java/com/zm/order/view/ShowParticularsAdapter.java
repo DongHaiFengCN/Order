@@ -1,6 +1,7 @@
 package com.zm.order.view;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,15 +32,14 @@ public class ShowParticularsAdapter extends BaseAdapter {
         this.linClickListener = linClickListener;
     }
 
-    public ShowParticularsAdapter(Activity activity){
+    public ShowParticularsAdapter(Activity activity,List<GoodsC> goodsCs)
+    {
         this.activity = activity;
-
-    }
-
-    public void setGoodsCs(final List<GoodsC> goodsCs){
         this.goodsCs = goodsCs;
 
     }
+
+
     @Override
     public int getCount() {
 
@@ -62,25 +62,49 @@ public class ShowParticularsAdapter extends BaseAdapter {
         if (convertView == null){
             convertView = LayoutInflater.from(activity).inflate(R.layout.item_show_particulars,null);
             viewHolder = new ViewHolder();
+            viewHolder.dj = convertView.findViewById(R.id.item_show_dj);
+            viewHolder.mc = convertView.findViewById(R.id.item_show_mc);
+            viewHolder.sl = convertView.findViewById(R.id.item_show_sl);
+            viewHolder.kw = convertView.findViewById(R.id.item_show_kw);
+            viewHolder.item_show_lin = convertView.findViewById(R.id.item_show_lin);
+
+
             convertView.setTag(viewHolder);
         }else{
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        viewHolder.dj = convertView.findViewById(R.id.item_show_dj);
-        viewHolder.mc = convertView.findViewById(R.id.item_show_mc);
-        viewHolder.sl = convertView.findViewById(R.id.item_show_sl);
-        viewHolder.kw = convertView.findViewById(R.id.item_show_kw);
-        viewHolder.item_show_lin = convertView.findViewById(R.id.item_show_lin);
 
-        viewHolder.dj.setText(goodsCs.get(position).getPrice()+"");
+        if(goodsCs.get(position).getGoodsType()==1)//退菜
+        {
+
+            viewHolder.mc.setTextColor(Color.parseColor("#fd7550"));
+            viewHolder.kw.setTextColor(Color.parseColor("#fd7550"));
+            viewHolder.dj.setTextColor(Color.parseColor("#fd7550"));
+            viewHolder.sl.setTextColor(Color.parseColor("#fd7550"));
+        }
+        else if (goodsCs.get(position).getGoodsType()==2)//赠菜
+        {
+            viewHolder.mc.setTextColor(Color.parseColor("#56d16d"));
+            viewHolder.kw.setTextColor(Color.parseColor("#56d16d"));
+            viewHolder.dj.setTextColor(Color.parseColor("#56d16d"));
+            viewHolder.sl.setTextColor(Color.parseColor("#56d16d"));
+        }
+        else
+        {
+            viewHolder.mc.setTextColor(Color.parseColor("#3a3a3a"));
+            viewHolder.kw.setTextColor(Color.parseColor("#3a3a3a"));
+            viewHolder.dj.setTextColor(Color.parseColor("#3a3a3a"));
+            viewHolder.sl.setTextColor(Color.parseColor("#3a3a3a"));
+        }
         viewHolder.mc.setText(goodsCs.get(position).getDishesName());
-        viewHolder.sl.setText(goodsCs.get(position).getDishesCount()+"");
         if(goodsCs.get(position).getDishesTaste() != null){
             viewHolder.kw.setText(goodsCs.get(position).getDishesTaste());
         }else{
             viewHolder.kw.setText("");
         }
+        viewHolder.dj.setText(""+MyBigDecimal.mul(goodsCs.get(position).getPrice(),goodsCs.get(position).getDishesCount(),2));
 
+        viewHolder.sl.setText(goodsCs.get(position).getDishesCount()+"");
 
 
         return convertView;

@@ -8,7 +8,7 @@ package bean.kitchenmanage.order;
  * @date 2017-01-06
  *
  */
-public class GoodsC {
+public class GoodsC implements Cloneable {
 	/**
 	 * 公司唯一身份id,用于数据同步,做为唯一管道符
 	 */
@@ -21,7 +21,6 @@ public class GoodsC {
 	 * docId
 	 */
 	private String _id;
-
 
 	/**
 	 * 所属订单对象
@@ -168,4 +167,8 @@ public class GoodsC {
 	public void setGoodsType(int goodsType) {
 		this.goodsType = goodsType;
 	}
+	public Object clone() throws CloneNotSupportedException {
+		return super.clone(); // 具体的克隆操作由父类完成
+	}
+
 }

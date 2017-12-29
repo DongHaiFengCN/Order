@@ -36,8 +36,7 @@
         android:layout_weight="8"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="@color/colorPrimaryDark">
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/show_tv_sl"
@@ -45,12 +44,18 @@
             android:layout_height="match_parent"
             android:gravity="center_vertical"
             android:paddingLeft="20dp"
-            android:textSize="22sp"
-            android:textColor="@color/md_white_1000"
+            android:textSize="18sp"
+            android:textColor="@color/md_black_1000"
             />
 
 
     </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider_e9">
+
+    </View>
 
     <LinearLayout
         android:layout_weight="3"
@@ -105,44 +110,50 @@
 
 
         </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider_e9">
+
+        </View>
 
         <ListView
-            android:layout_marginTop="10dp"
             android:id="@+id/show_listView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            >
+            android:layout_marginTop="5dp">
 
         </ListView>
+
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:visibility="gone">
 
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_toRightOf="@+id/show_jieshu"
-                android:background="@color/md_grey_500"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="10dp"
-                />
+                android:layout_toRightOf="@+id/show_jieshu"
+                android:background="@color/md_grey_500" />
 
             <TextView
                 android:id="@+id/show_jieshu"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="结束"
                 android:layout_centerInParent="true"
-                android:textSize="15sp"
+                android:text="结束"
                 android:textColor="@color/md_grey_500"
-                />
+                android:textSize="15sp" />
+
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_toLeftOf="@+id/show_jieshu"
-                android:background="@color/md_grey_500"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="10dp"/>
+                android:layout_marginRight="10dp"
+                android:layout_toLeftOf="@+id/show_jieshu"
+                android:background="@color/md_grey_500" />
 
         </RelativeLayout>
 
@@ -173,12 +184,12 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/animdy"
                 />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="打印"
                 android:gravity="center"
-                />
+                android:text="打印" />
 
         </LinearLayout>
 
@@ -195,12 +206,12 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/animdc"
                 />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="点餐"
                 android:gravity="center"
-                />
+                android:text="点餐" />
 
         </LinearLayout>
 
@@ -218,12 +229,12 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/animmd"
                 />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="买单"
                 android:gravity="center"
-                />
+                android:text="买单" />
 
         </LinearLayout>
 

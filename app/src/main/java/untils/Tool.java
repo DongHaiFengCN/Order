@@ -1,5 +1,6 @@
 package untils;
 
+import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -16,6 +17,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import application.MyApplication;
 import bean.kitchenmanage.order.OrderNum;
 import bean.kitchenmanage.promotion.PromotionRuleC;
 import model.CDBHelper;
@@ -221,4 +223,47 @@ public class Tool {
         return false;
     }
 
+    public static    String getOrderSerialNum(Context  context)
+    {
+        MyApplication myApp = (MyApplication)context.getApplicationContext();
+        String orderNum=null;
+        SimpleDateFormat formatter=new SimpleDateFormat("yyyy-MM-dd");
+
+        List<OrderNum> orderNumList = CDBHelper.getObjByWhere(context.getApplicationContext(),Expression.property("className").equalTo("OrderNum")
+                ,null
+                ,OrderNum.class);
+        if(orderNumList.size()<=0)//第一次使用
+        {
+            OrderNum obj = new OrderNum(myApp.getCompany_ID());
+            String time=formatter.format(new Date());
+            obj.setDate(time);
+            obj.setNum(1);
+            CDBHelper.createAndUpdate(context.getApplicationContext(),obj);
+            orderNum =  "001";
+        }
+        else//有数据，判断是不是当天
+        {
+            OrderNum obj = orderNumList.get(0);
+            String olderDate = obj.getDate();
+            String newDate =  formatter.format(new Date());
+            int num = obj.getNum();
+            if(!newDate.equals(olderDate))//不是一天的，
+            {
+                obj.setNum(1);
+                obj.setDate(newDate);
+                CDBHelper.createAndUpdate(context.getApplicationContext(),obj);
+                orderNum =  "001";
+            }
+            else//同一天
+            {
+                int newNum = num+1;
+                obj.setNum(newNum);
+                CDBHelper.createAndUpdate(context.getApplicationContext(),obj);
+                orderNum = String.format("%3d", newNum).replace(" ", "0");
+            }
+        }
+
+        return orderNum;
+
+    }
 }

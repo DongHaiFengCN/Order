@@ -101,30 +101,15 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
                name.setText(userNumber);
                password.setText(userPsw);
                saveloginstatueChk.setChecked(true);
-               closeInputMethod();
+               password.clearFocus();
+               password.setFocusableInTouchMode(false);
 
-               Log.e("login","num="+userNumber+"_psw="+userPsw);
-
-              // this.success();
            }
 
 
 
 }
 
-    /**
-     *
-     */
-    private void closeInputMethod()
-    {
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        boolean isOpen = imm.isActive();
-        if (isOpen)
-        {
-
-         imm.hideSoftInputFromWindow(password.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-        }
-    }
 
     private void initView() {
 
