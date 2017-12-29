@@ -50,7 +50,7 @@ public class AreaAdapter extends ArrayAdapter<String> {
 				while ((result = rs.next()) != null)
 				{
 					add(result.getString(0));
-					Log.e("areaAdapter","liveQuery change getRows ="+result.getString(0));
+					//Log.e("areaAdapter","liveQuery change getRows ="+result.getString(0));
 				}
 				notifyDataSetChanged();
 			}

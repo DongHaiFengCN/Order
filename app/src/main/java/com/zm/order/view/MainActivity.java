@@ -1466,6 +1466,7 @@ public class MainActivity extends AppCompatActivity {
             //更新数量指示器
             GoodsC goodsC = new GoodsC();
             goodsC.setChannelId(myApp.getCompany_ID());
+            goodsC.setDishesKindId(dishesMessage.getDishKindId());
             goodsC.setDishesTaste(dishesMessage.getDishesTaste());
             goodsC.setDishesName(dishesMessage.getName());
             goodsC.setDishesCount(dishesMessage.getCount());

@@ -3,7 +3,6 @@ package com.zm.order.view;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +40,8 @@ public class OrderDragAdapter extends BaseAdapter {
     private float[] numbers;
 
 
+    Map<String, Float> floatMap = new HashMap<>();
+
     ListView listview;
 
     public void setMessage( List<DishesC> mlistDishes,float[] numbers){
@@ -49,7 +50,7 @@ public class OrderDragAdapter extends BaseAdapter {
 
         this.numbers = numbers;
 
-      //  notifyDataSetChanged();
+        notifyDataSetChanged();
 
     }
 
@@ -123,6 +124,7 @@ public class OrderDragAdapter extends BaseAdapter {
 
 
         //设置数量
+        //  view.number.setText(floatMap.get(mlistDishesId.get(position)) + "");
 
 
         view.number.setText(numbers[position]+"");
@@ -145,14 +147,13 @@ public class OrderDragAdapter extends BaseAdapter {
                 setMessage(mlistDishes.get(position), false, position);
                 changerNumbersListener.getNumber(numbers);
 
-
             }
         });
 
 
-            view.name.setText(mlistDishes.get(position).getDishesName());
+        view.name.setText(mlistDishes.get(position).getDishesName());
 
-            view.price.setText(mlistDishes.get(position).getPrice() + " 元/份");
+        view.price.setText(mlistDishes.get(position).getPrice() + " 元/份");
 
 
         return convertView;
@@ -238,12 +239,14 @@ public class OrderDragAdapter extends BaseAdapter {
 
             numbers[position] += 1f;
 
-
         } else {
 
             numbers[position] -= 1f;
 
         }
+
+         notifyDataSetChanged();
+
 
         dishesMessage.setOperation(flag);
         dishesMessage.setNumbers(numbers);
@@ -256,7 +259,7 @@ public class OrderDragAdapter extends BaseAdapter {
     void updata(int position, float count) {
 
         numbers[position] += count;
-      //  notifyDataSetChanged();
+        notifyDataSetChanged();
 
 
     }
