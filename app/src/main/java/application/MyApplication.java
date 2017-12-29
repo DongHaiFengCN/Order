@@ -14,7 +14,9 @@ import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.DatabaseConfiguration;
 import com.couchbase.lite.Document;
+import com.couchbase.lite.Expression;
 import com.couchbase.lite.Log;
+import com.couchbase.lite.Ordering;
 import com.couchbase.lite.ReadOnlyDocument;
 import com.couchbase.lite.Replicator;
 import com.couchbase.lite.ReplicatorChange;
@@ -29,14 +31,19 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import bean.kitchenmanage.dishes.DishesC;
+import bean.kitchenmanage.dishes.DishesKindC;
 import bean.kitchenmanage.table.TableC;
 import bean.kitchenmanage.user.UsersC;
+import model.CDBHelper;
 import okhttp3.OkHttpClient;
 import untils.MyLog;
 
@@ -57,6 +64,18 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
     private static final String TAG = Application.class.getSimpleName();
 
     private final static boolean SYNC_ENABLED = false;
+
+    public Map<String, List<DishesC>> getDishesObjectCollection() {
+        return dishesObjectCollection;
+    }
+
+    private Map<String, List<DishesC>> dishesObjectCollection = new HashMap<>();
+
+    public List<DishesKindC> getDishesKindCList() {
+        return dishesKindCList;
+    }
+
+    List<DishesKindC> dishesKindCList;
 
 //    private String Company_ID="gysz";
 //    private final static String DATABASE_NAME = "gyszdb";
@@ -86,7 +105,8 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
     private UsersC usersC;
 
     public ExecutorService mExecutor;
-    OkHttpClient okHttpClient;
+
+
     @Override
     public void onCreate()
     {
@@ -99,6 +119,48 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
        CrashReport.setUserId("1002");
        startSession(DATABASE_NAME);
         mExecutor =  Executors.newCachedThreadPool();
+
+        mExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+
+                dishesKindCList = CDBHelper.getObjByWhere(getApplicationContext()
+                        , Expression.property("className").equalTo("DishesKindC")
+                                .and(Expression.property("isSetMenu").equalTo(false)), Ordering.property("kindName")
+                                .ascending(), DishesKindC.class);
+                //初始化菜品数量维护映射表
+                for (DishesKindC dishesKindC : dishesKindCList) {
+
+                    int count = dishesKindC.getDishesListId().size();
+
+                    List<String> disheList = dishesKindC.getDishesListId();
+
+                    List<DishesC> dishesCS = new ArrayList<>();
+
+                    for (int i = 0; i < count; i++) {
+
+
+                        DishesC dishesC = CDBHelper.getObjById(getApplicationContext(), disheList.get(i), DishesC.class);
+
+                        if (dishesC != null) {
+
+                            dishesCS.add(dishesC);
+                        }
+
+
+                    }
+
+                    //初始化disheKind对应的dishes实体类映射
+                    dishesObjectCollection.put(dishesKindC.get_id(), dishesCS);
+
+                    //初始化dishekind对应的dishes的数量映射
+                  //  dishesCollection.put(dishesKindC.get_id(), new float[dishesCS.size()]);
+
+                }
+
+            }
+        });
+
 
     }
     @Override

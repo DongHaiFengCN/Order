@@ -36,6 +36,19 @@ public class DishesMessage {
     //维护的当前菜类的选择的数据
     float [] numbers;
 
+
+    public String getDishKindId() {
+        return dishKindId;
+    }
+
+    public void setDishKindId(String dishKindId) {
+        this.dishKindId = dishKindId;
+    }
+
+    //设置菜类id
+    String dishKindId;
+
+
     public boolean isSingle() {
         return single;
     }

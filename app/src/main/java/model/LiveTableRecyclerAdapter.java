@@ -71,7 +71,7 @@ public class LiveTableRecyclerAdapter extends RecyclerView.Adapter<LiveTableRecy
                 while ((row = rs.next()) != null)
                 {
                     documentList.add(row.getString(0));
-                    MyLog.e("liveQuery change Id="+row.getString(0));
+                    //MyLog.e("liveQuery change Id="+row.getString(0));
                 }
                 notifyDataSetChanged();
 

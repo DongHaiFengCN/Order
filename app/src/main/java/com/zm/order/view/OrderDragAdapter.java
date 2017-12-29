@@ -3,6 +3,7 @@ package com.zm.order.view;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -170,6 +171,8 @@ public class OrderDragAdapter extends BaseAdapter {
 
         final DishesMessage dishesMessage = new DishesMessage();
 
+        dishesMessage.setDishKindId(dishesC.getDishesKindId());
+
         dishesMessage.setSingle(true);
 
         dishesMessage.setDishesC(dishesC);
@@ -237,13 +240,12 @@ public class OrderDragAdapter extends BaseAdapter {
 
             numbers[position] += 1f;
 
+
         } else {
 
             numbers[position] -= 1f;
 
         }
-
-        notifyDataSetChanged();
 
         dishesMessage.setOperation(flag);
         dishesMessage.setNumbers(numbers);
