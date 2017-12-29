@@ -687,6 +687,10 @@ public class CDBHelper
       db = ((MyApplication) context).getDatabase();
     }
     Document document=db.getDocument(id);
+    if(document == null){
+
+      return null;
+    }
 
     ObjectMapper m = new ObjectMapper();
     m .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

@@ -85,6 +85,7 @@ import bean.kitchenmanage.user.CompanyC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import model.CDBHelper;
+import model.DishesMessage;
 import untils.AnimationUtil;
 import untils.BluetoothUtil;
 import untils.MyLog;
@@ -97,6 +98,11 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.activity_frame)
     FrameLayout activityFrame;
+
+    public MyApplication getMyApp() {
+        return myApp;
+    }
+
     private MyApplication myApp;
     private ListView order_lv;
     private TextView ok_tv;
@@ -144,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+        EventBus.getDefault().register(this);
         ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
@@ -1044,7 +1051,7 @@ public class MainActivity extends AppCompatActivity {
         seekT9Adapter.notifyDataSetChanged();
     }
 
-    public    String getOrderSerialNum()
+    private   String getOrderSerialNum()
     {
         String orderNum=null;
         SimpleDateFormat formatter=new SimpleDateFormat("yyyy-MM-dd");
