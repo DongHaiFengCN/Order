@@ -112,12 +112,12 @@ public class OrderFragment extends Fragment {
 
                 orderDragAdapter.setMessage(dishesObjectCollection.get(kindId)
                         , dishesCollection.get(kindId));
-                dishesRv.setAdapter(orderDragAdapter);
+
 
 
             }
         });
-
+        dishesRv.setAdapter(orderDragAdapter);
         orderList.performItemClick(orderList.getChildAt(0), 0, orderList
                 .getItemIdAtPosition(0));
 
@@ -150,11 +150,14 @@ public class OrderFragment extends Fragment {
             booleans = new boolean[dishesKindCList.size()];
         }
 
+
         //如果有数据，数值复制给dishesCollection
         if (!goodsCList.isEmpty()) {
 
             //遍历已存的goodsList
             for (GoodsC goodsC : goodsCList) {
+
+                Log.e("Goodsanme",goodsC.getDishesKindId());
 
                 //依次获取每个Goodc对应的映射表包含的dishe集合
                 List<DishesC> dishesCList = dishesObjectCollection.get(goodsC.getDishesKindId());
