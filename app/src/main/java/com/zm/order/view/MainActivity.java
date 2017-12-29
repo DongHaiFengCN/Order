@@ -85,6 +85,7 @@ import bean.kitchenmanage.user.CompanyC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import model.CDBHelper;
+import model.DishesMessage;
 import untils.AnimationUtil;
 import untils.BluetoothUtil;
 import untils.MyLog;
@@ -144,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+        EventBus.getDefault().register(this);
         ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
