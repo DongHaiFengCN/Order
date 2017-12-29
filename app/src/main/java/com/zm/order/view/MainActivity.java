@@ -98,6 +98,11 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.activity_frame)
     FrameLayout activityFrame;
+
+    public MyApplication getMyApp() {
+        return myApp;
+    }
+
     private MyApplication myApp;
     private ListView order_lv;
     private TextView ok_tv;
