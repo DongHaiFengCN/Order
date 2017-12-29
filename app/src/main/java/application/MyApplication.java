@@ -120,13 +120,22 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
         mExecutor = Executors.newCachedThreadPool();
 
 
+
+
+    }
+
+    public void initDishesData()
+    {
+        if(dishesKindCList !=null)
+            return;
         mExecutor.execute(new Runnable() {
             @Override
             public void run() {
 
                 dishesKindCList = CDBHelper.getObjByWhere(getApplicationContext()
                         , Expression.property("className").equalTo("DishesKindC")
-                                .and(Expression.property("isSetMenu").equalTo(false)), Ordering.property("kindName")
+                                .and(Expression.property("isSetMenu").equalTo(false))
+                        , Ordering.property("kindName")
                                 .ascending(), DishesKindC.class);
                 //初始化菜品数量维护映射表
                 for (DishesKindC dishesKindC : dishesKindCList) {
@@ -145,8 +154,6 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 
                             dishesCS.add(dishesC);
                         }
-
-
                     }
 
                     //初始化disheKind对应的dishes实体类映射
@@ -159,7 +166,6 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 
             }
         });
-
 
     }
 

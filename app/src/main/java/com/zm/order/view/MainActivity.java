@@ -702,10 +702,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }//end for1
-
-
         //2\判断厨房打印机状态是否连接
-
         //3\如果是连接状态  直接判断打印
         //4\如果未连接  ，连接打印机  并在打印机连接成功信息接收后打印
     }
@@ -1118,13 +1115,9 @@ public class MainActivity extends AppCompatActivity {
                 onPrint();
                 return "打印成功";
             }
-
-
         }
         return "";
     }
-
-
     private void onPrint()
     {
         List<CompanyC> companyCs = CDBHelper.getObjByClass(getApplicationContext(),CompanyC.class);
@@ -1192,7 +1185,6 @@ public class MainActivity extends AppCompatActivity {
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             return formatter.format(date);
         }
-
         return null;
     }
 
@@ -1205,10 +1197,8 @@ public class MainActivity extends AppCompatActivity {
                 public void run()
                 {
                    zcGoodsList.clear();
-
                     OrderC newOrderObj = new OrderC(myApp.getCompany_ID());
                     OrderC zcOrderObj = new OrderC(myApp.getCompany_ID());
-
                     gOrderId = CDBHelper.createAndUpdate(getApplicationContext(),newOrderObj);
                     newOrderObj.set_id(gOrderId);
                     List<OrderC> orderCList = CDBHelper.getObjByWhere(getApplicationContext(),
@@ -1240,9 +1230,7 @@ public class MainActivity extends AppCompatActivity {
                             continue;
                         }
                         obj.setOrder(gOrderId);
-
                     }
-
                     newOrderObj.setGoodsList(goodsList);
                     newOrderObj.setAllPrice(total);
                     newOrderObj.setOrderState(1);//未买单
@@ -1404,9 +1392,6 @@ public class MainActivity extends AppCompatActivity {
      */
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     public void setMessage(DishesMessage dishesMessage) {
-
-
-
         boolean isDishes = true;
 
         // TODO 处理数据
@@ -1477,8 +1462,6 @@ public class MainActivity extends AppCompatActivity {
             goodsList.add(goodsC);
 
         }
-
-
         updataTotal();
         updataPoint();
 
@@ -1532,12 +1515,8 @@ public class MainActivity extends AppCompatActivity {
                         .getDishesC().getPrice());
             }
 
-
-
         }
 
     }
-
-
 
 }

@@ -102,8 +102,11 @@ public class DeskActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
         myapp= (MyApplication) getApplicationContext();
+        myapp.initDishesData();
 
         initWidget();
+
+        Log.e("DeskActivity","oncreate");
 
 
 }
@@ -538,7 +541,7 @@ public class DeskActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
+        Log.e("DeskActivity","onDestroy");
     }
 
     @Override
