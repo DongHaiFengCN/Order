@@ -1218,7 +1218,6 @@ public class MainActivity extends AppCompatActivity {
                         newOrderObj.setOrderNum(1);
                         newOrderObj.setSerialNum(getOrderSerialNum());
                     }
-
                     for(int i=0;i<goodsList.size();i++)
                     {
                         GoodsC obj = goodsList.get(i);
@@ -1243,7 +1242,6 @@ public class MainActivity extends AppCompatActivity {
                     newOrderObj.setAreaName(areaC.getAreaName());
 
                     CDBHelper.createAndUpdate(getApplicationContext(),newOrderObj);
-
 
                     if(zcGoodsList.size()>0)
                     {
@@ -1334,15 +1332,15 @@ public class MainActivity extends AppCompatActivity {
             }else{
                 ft.show(seekT9Fragment);;
             }
-            isFlag = false;
+            //isFlag = false;
         }else if (isTrue == false){
-            if (orderFragment == null){
-                orderFragment = new OrderFragment();
-                ft.add(R.id.activity_frame,orderFragment);
-            }else{
-                ft.show(orderFragment);
-            }
-            isFlag = true;
+//            if (orderFragment == null){
+//                orderFragment = new OrderFragment();
+//                ft.add(R.id.activity_frame,orderFragment);
+//            }else{
+//                ft.show(orderFragment);
+//            }
+//            isFlag = true;
         }
         ft.commit();
 

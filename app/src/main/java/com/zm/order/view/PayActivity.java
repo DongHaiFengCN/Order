@@ -185,12 +185,11 @@ public class PayActivity extends AppCompatActivity {
 
         for(OrderC orderC:orderCList)
         {
-
+            if(orderC.getOrderCType()==0)//正常订单
+            {
+                total = MyBigDecimal.add(total,orderC.getAllPrice(),2);
+            }
             checkOrder.addOrder(orderC);
-
-            total += orderC.getAllPrice();
-
-
             //获取当前订单下goods集合下所有的菜品
             for (GoodsC o : orderC.getGoodsList()) {
 

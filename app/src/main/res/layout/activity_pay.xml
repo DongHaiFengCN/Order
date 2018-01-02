@@ -285,13 +285,12 @@
         <ImageView
             android:id="@+id/ivwechat"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
+            android:background="@drawable/background_pay_select"
             android:clickable="true"
             android:padding="16dp"
-            android:src="@mipmap/icon_wx"
-            android:layout_height="match_parent"
-            android:background="@drawable/background_pay_select"
-            />
+            android:src="@mipmap/icon_wx" />
 
         <ImageView
             android:layout_width="0.5dp"

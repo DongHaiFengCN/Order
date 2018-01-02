@@ -257,13 +257,7 @@ public class ShowParticularsActivity extends Activity {
 
         String dishesName = oldGoods.getDishesName();
         dishesName = dishesName.substring(0, dishesName.length() - 3);
-        Log.e("----------->", "dishesName=" + dishesName);
-
-        String tmp = "(赠)";
-        String[] tmpName = oldGoods.getDishesName().split(tmp);
-        Log.e("----------->", "(dishesName=" + tmpName[0]);
-
-        newGoods.setDishesName(tmpName[0]);
+        newGoods.setDishesName(dishesName);
         List<GoodsC> tmpList = new ArrayList<>();
         tmpList.add(newGoods);
         newOrderObj.setGoodsList(tmpList);
@@ -308,11 +302,8 @@ public class ShowParticularsActivity extends Activity {
         dishesName = dishesName.substring(0, dishesName.length() - 3);
         Log.e("----------->", "dishesName=" + dishesName);
 
-        String tmp = "(赠)";
-        String[] tmpName = oldGoods.getDishesName().split(tmp);
-        Log.e("----------->", "(dishesName=" + tmpName[0]);
 
-        newGoods.setDishesName(tmpName[0] + "(退)");
+        newGoods.setDishesName(dishesName + "(退)");
 
         List<GoodsC> tmpList = new ArrayList<>();
         tmpList.add(newGoods);
