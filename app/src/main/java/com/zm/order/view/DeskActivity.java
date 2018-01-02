@@ -255,8 +255,7 @@ public class DeskActivity extends AppCompatActivity {
                             Expression.property("className").equalTo("OrderC")
                                     .and(Expression.property("tableNo").equalTo(tableC.getTableNum()))
                                     .and(Expression.property("orderState").equalTo(1))
-                                    .and(Expression.property("orderCType").notEqualTo(1))//非退菜
-                            ,null
+                                    ,null
                             ,OrderC.class);
 
                     Log.e("orderCList","orderCList.size()"+orderCList.size()+"-----"+tableC.getTableNum());
@@ -419,10 +418,11 @@ public class DeskActivity extends AppCompatActivity {
 
                 }else {//使用&&预定状态
 
-                    List<OrderC> orderCList= CDBHelper.getObjByWhere(getApplicationContext(),
+                    List<OrderC> orderCList = CDBHelper.getObjByWhere(getApplicationContext(),
                             Expression.property("className").equalTo("OrderC")
                                     .and(Expression.property("tableNo").equalTo(tableC.getTableNum()))
                                     .and(Expression.property("orderState").equalTo(1))
+                                    .and(Expression.property("orderCType").notEqualTo(1))
                             ,null
                             ,OrderC.class);
                     Log.e("orderCList","orderCList.size()"+orderCList.size());
@@ -463,6 +463,16 @@ public class DeskActivity extends AppCompatActivity {
                                         tableC.setState(0);
                                         CDBHelper.createAndUpdate(getApplicationContext(),tableC);
                                         myapp.setTable_sel_obj(tableC);
+                                        List<OrderC> orderCList = CDBHelper.getObjByWhere(getApplicationContext(),
+                                                Expression.property("className").equalTo("OrderC")
+                                                        .and(Expression.property("tableNo").equalTo(tableC.getTableNum()))
+                                                        .and(Expression.property("orderState").equalTo(1))
+                                                ,null
+                                                ,OrderC.class);
+                                        for (OrderC orderC : orderCList){
+                                            orderC.setOrderState(0);
+                                            CDBHelper.createAndUpdate(getApplicationContext(),orderC);
+                                        }
                                     }
                                 }).setPositiveButton("否",
                                 new DialogInterface.OnClickListener() {

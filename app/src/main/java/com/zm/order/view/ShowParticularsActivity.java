@@ -99,7 +99,7 @@ public class ShowParticularsActivity extends Activity {
 
         return false;
     }
-
+    //追加菜品
     private void addDishes(int pos, float counts) {
         GoodsC oldGoods = goodsCList.get(pos);
 
@@ -137,7 +137,7 @@ public class ShowParticularsActivity extends Activity {
         newOrderObj.setGoodsList(tmpList);
         CDBHelper.createAndUpdate(getApplicationContext(), newOrderObj);
     }
-
+    //退菜
     private void retreatDishes(int pos, float counts) {
         GoodsC oldGoods = goodsCList.get(pos);
         GoodsC newGoods = null;
@@ -274,7 +274,7 @@ public class ShowParticularsActivity extends Activity {
             e.printStackTrace();
         }
         newGoods.setDishesCount(counts);
-        removeGoodsFromOrder(newGoods, 1);//修改老订单
+        removeGoodsFromOrder(newGoods, 2);//修改老订单 ，2代表从赠菜中移除
 
         OrderC newOrderObj = new OrderC(myapp.getCompany_ID());
         String orderId = CDBHelper.createAndUpdate(getApplicationContext(), newOrderObj);
@@ -311,11 +311,11 @@ public class ShowParticularsActivity extends Activity {
         CDBHelper.createAndUpdate(getApplicationContext(), newOrderObj);
     }
 
-    private void removeGoodsFromOrder(GoodsC retreateObj, int type)//0,全退，1，部分退
+    private void removeGoodsFromOrder(GoodsC retreateObj, int type)
     {
-        float  retreateCounts = retreateObj.getDishesCount();
-        String retreateTaste  = retreateObj.getDishesTaste();
-        String retreateName =   retreateObj.getDishesName();
+        float  retreateCounts = retreateObj.getDishesCount();//数量
+        String retreateTaste  = retreateObj.getDishesTaste();//口味
+        String retreateName =   retreateObj.getDishesName();//名字
 
         for (int i = 0; i < orderCList.size(); i++)
         {
@@ -444,7 +444,7 @@ public class ShowParticularsActivity extends Activity {
         });
 
 
-        Button btnOk = view1.findViewById(R.id.dialog_tuicai_qd);//
+        Button btnOk = view1.findViewById(R.id.dialog_tuicai_qd);
         btnOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -725,7 +725,8 @@ public class ShowParticularsActivity extends Activity {
                 }
             }
         }
-        showTvSl.setText(goodsCList.size() + "道菜，总计：" + all + "元");
+
+        showTvSl.setText(areaName+"     "+ myapp.getTable_sel_obj().getTableName()+"     " + goodsCList.size() + "道菜，总计：" + all + "元");
 
     }
 
@@ -753,7 +754,6 @@ public class ShowParticularsActivity extends Activity {
             case R.id.show_but_dy:
 
                 if (Tool.isFastDoubleClick()) {
-                    Toast.makeText(ShowParticularsActivity.this, "点的太快", Toast.LENGTH_LONG).show();
                     return;
                 } else {
                     setPrintOrder();
@@ -798,8 +798,6 @@ public class ShowParticularsActivity extends Activity {
 
         String waiter = myapp.getUsersC().getEmployeeName();
         List<CompanyC> companyCs = CDBHelper.getObjByClass(getApplicationContext(), CompanyC.class);
-        AreaC areaCs = CDBHelper.getObjById(getApplicationContext(), myapp.getTable_sel_obj().getAreaId(), AreaC.class);
-        String tableNumber = myapp.getTable_sel_obj().getTableNum();
         PrintUtils.selectCommand(PrintUtils.RESET);
         PrintUtils.selectCommand(PrintUtils.LINE_SPACING_DEFAULT);
         PrintUtils.selectCommand(PrintUtils.ALIGN_CENTER);
@@ -807,7 +805,7 @@ public class ShowParticularsActivity extends Activity {
             PrintUtils.printText(companyCs.get(0).getPointName() + "\n\n");
         }
         PrintUtils.selectCommand(PrintUtils.DOUBLE_HEIGHT_WIDTH);
-        PrintUtils.printText(areaCs.getAreaName() + "/" + myapp.getTable_sel_obj().getTableName() + "桌\n\n");
+        PrintUtils.printText(areaName + "/" + myapp.getTable_sel_obj().getTableName() + "桌\n\n");
         PrintUtils.selectCommand(PrintUtils.NORMAL);
         PrintUtils.selectCommand(PrintUtils.ALIGN_LEFT);
         PrintUtils.printText(PrintUtils.printTwoData("订单编号", OrderId() + "\n"));
@@ -827,7 +825,7 @@ public class ShowParticularsActivity extends Activity {
                 taste = "(" + goodsC.getDishesTaste() + ")";
             }
 
-            PrintUtils.printText(PrintUtils.printThreeData(goodsC.getDishesName() + taste, goodsC.getDishesCount() + "", goodsC.getPrice() + "\n"));
+            PrintUtils.printText(PrintUtils.printThreeData(goodsC.getDishesName() + taste, goodsC.getDishesCount() + "", MyBigDecimal.mul(goodsC.getPrice(),goodsC.getDishesCount(),2) + "\n"));
 
 
         }

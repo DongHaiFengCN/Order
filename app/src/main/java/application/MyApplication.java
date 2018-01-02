@@ -190,8 +190,8 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 
     private void openDatabase(String dbname) {
         DatabaseConfiguration config = new DatabaseConfiguration(getApplicationContext());
-        File folder = new File(String.format("%s/SmartKitchenPad", Environment.getExternalStorageDirectory()));
-        config.setDirectory(folder);
+//        File folder = new File(String.format("%s/SmartKitchenPad", Environment.getExternalStorageDirectory()));
+//        config.setDirectory(folder);
         config.setConflictResolver(getConflictResolver());
         try {
             database = new Database(dbname, config);
