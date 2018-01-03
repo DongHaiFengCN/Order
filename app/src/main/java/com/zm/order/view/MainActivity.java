@@ -526,6 +526,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (Tool.isFastDoubleClick()) {
+                    Toast.makeText(MainActivity.this,"点击太快，请稍候",Toast.LENGTH_LONG).show();
                     return;
                 } else {
 

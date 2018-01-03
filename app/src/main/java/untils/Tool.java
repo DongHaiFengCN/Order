@@ -216,7 +216,7 @@ public class Tool {
     public static boolean isFastDoubleClick() {
         long time = System.currentTimeMillis();
         Log.e("TOol","time---"+time+"----lastClickTime-----"+lastClickTime);
-        if ( (time - lastClickTime) < 10000) {
+        if ( (time - lastClickTime) < 5000) {
             return true;
         }
         lastClickTime = time;

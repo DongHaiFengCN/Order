@@ -11,8 +11,11 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -171,7 +174,7 @@ public class DeskActivity extends AppCompatActivity {
                 {
 
                     final EditText  editText = new EditText(DeskActivity.this);
-
+                    editText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(2)});
                     LinearLayout linearLayout =new LinearLayout(DeskActivity.this);
 
                     //设置控件居中显示
@@ -375,9 +378,21 @@ public class DeskActivity extends AppCompatActivity {
 
                                            Log.e("执行时间3：",excTime2+"s");
                                            checkOrderC = checkOrderCS.get(f);
+                                           for (int i = 0; i < checkOrderC.getOrderList().size(); i++) {
 
-                                           EventBus.getDefault().postSticky(checkOrderC);
-                                           startActivity(new Intent(DeskActivity.this, ResetBillActivity.class));
+                                               OrderC orderC = checkOrderC.getOrderList().get(i);
+                                               orderC.setOrderState(1);
+                                               CDBHelper.createAndUpdate(getApplicationContext(), orderC);
+                                           }
+
+                                           //删除之前的checkorder记录
+                                           CDBHelper.deleDocumentById(getApplicationContext(),checkOrderC.get_id());
+
+                                           tableC.setState(2);
+                                           CDBHelper.createAndUpdate(getApplicationContext(), tableC);
+
+                                           /*EventBus.getDefault().postSticky(checkOrderC);
+                                           startActivity(new Intent(DeskActivity.this, ResetBillActivity.class));*/
                                        }else {
 
                                            Message msg = Message.obtain();
@@ -392,7 +407,20 @@ public class DeskActivity extends AppCompatActivity {
 
                                        checkOrderC = CDBHelper.getObjById(getApplicationContext(),tableC.getLastCheckOrderId(),CheckOrderC.class);
 
-                                       EventBus.getDefault().postSticky(checkOrderC);
+                                       for (int i = 0; i < checkOrderC.getOrderList().size(); i++) {
+
+                                           OrderC orderC = checkOrderC.getOrderList().get(i);
+                                           orderC.setOrderState(1);
+                                           CDBHelper.createAndUpdate(getApplicationContext(), orderC);
+                                       }
+
+                                       //删除之前的checkorder记录
+                                       CDBHelper.deleDocumentById(getApplicationContext(),checkOrderC.get_id());
+
+                                       tableC.setState(2);
+                                       CDBHelper.createAndUpdate(getApplicationContext(), tableC);
+
+                                     /*  EventBus.getDefault().postSticky(checkOrderC);
                                        try {
                                            Thread.sleep(1000);
                                        } catch (InterruptedException e) {
@@ -400,7 +428,7 @@ public class DeskActivity extends AppCompatActivity {
                                        }
 
                                        startActivity(new Intent(DeskActivity.this, ResetBillActivity.class));
-
+*/
                                    }
 
                                    proDialog.dismiss();//关闭proDialog

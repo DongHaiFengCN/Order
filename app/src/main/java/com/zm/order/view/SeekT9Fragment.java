@@ -14,6 +14,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -462,6 +463,19 @@ public class SeekT9Fragment extends Fragment {
                 final EditText cm = view1.findViewById(R.id.custom_dc_c);//菜名
                 final EditText jg = view1.findViewById(R.id.custom_dc_t);//价格
                 final EditText f_count = view1.findViewById(R.id.custom_dc_count);
+                f_count.clearFocus();
+                f_count.setFocusableInTouchMode(false);
+                f_count.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View view, MotionEvent motionEvent) {
+                        if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                            f_count.setFocusableInTouchMode(true);
+                            f_count.requestFocus();
+                            f_count.selectAll();
+                        }
+                        return false;
+                    }
+                });
                 //取消或确定按钮监听事件处理
                 final AlertDialog dialog = alert.create();
                 Button btn_cancel = view1
@@ -484,12 +498,12 @@ public class SeekT9Fragment extends Fragment {
                         GoodsC obj = new GoodsC(myapp.getCompany_ID());
                         if(TextUtils.isEmpty(f_count.getText().toString()))
                         {
-                            Toast.makeText(getActivity(), "数量不能为空", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity(), "数量不能为空或者.", Toast.LENGTH_LONG).show();
                             return;
                         }
-                        if (!cm.getText().toString().equals("") && cm.getText() != null) {
+                        if (!TextUtils.isEmpty(cm.getText())&&!cm.getText().toString().equals(".")) {
                             obj.setDishesName(cm.getText().toString());
-                            if (!jg.getText().toString().equals("") && jg.getText() != null)
+                            if (!jg.getText().toString().equals(".") && !TextUtils.isEmpty(jg.getText()))
                             {
                                 float singlePrice =  Float.parseFloat(jg.getText().toString());
                                 obj.setPrice(singlePrice);
@@ -498,7 +512,6 @@ public class SeekT9Fragment extends Fragment {
                                 String zdcDishedKindId = findZDCKindId();
                                 obj.setDishesKindId(zdcDishedKindId);
                                 obj.setGoodsType(3);
-
                                 ((MainActivity) getActivity()).getGoodsList().add(obj);
                                 //购物车计数器数据更新
                                 point = (((MainActivity) getActivity()).getPoint());
@@ -513,11 +526,11 @@ public class SeekT9Fragment extends Fragment {
 
                                 dialog.dismiss();
                             } else {
-                                Toast.makeText(getActivity(), "价格为空", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getActivity(), "价格不可以为空或者.", Toast.LENGTH_LONG).show();
                             }
 
                         } else {
-                            Toast.makeText(getActivity(), "菜名为空", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity(), "菜名不可以为空或者.", Toast.LENGTH_LONG).show();
                         }
 
                     }

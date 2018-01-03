@@ -157,7 +157,7 @@ public class PayActivity extends AppCompatActivity {
         tableC = myApplication.getTable_sel_obj();
         AreaC areaCs = CDBHelper.getObjById(getApplicationContext(),tableC.getAreaId(), AreaC.class);
 
-        tableNumber.setText(areaCs.getAreaName()+"桌/牌:"+tableC.getTableNum()+"号");
+        tableNumber.setText(areaCs.getAreaName()+"桌/牌:"+tableC.getTableName());
 
         getAll();
 
@@ -1051,7 +1051,7 @@ public class PayActivity extends AppCompatActivity {
 
             case R.id.bankcard:
 
-                //现金支付
+                //银行卡支付
 
                 AlertDialog.Builder bankDialog = new AlertDialog.Builder(PayActivity.this);
                 bankDialog.setTitle("银行卡支付");
@@ -1419,9 +1419,6 @@ public class PayActivity extends AppCompatActivity {
 
        // promotionD.setDiscounts(A.subtract(T).floatValue());
         promotionD.setDiscounts(Tool.substrct(all,total));
-
-        promotionD.setDisrate(disrate);
-
         //支付方式集合
         promotionD.setPayDetailList(payDetailList);
 

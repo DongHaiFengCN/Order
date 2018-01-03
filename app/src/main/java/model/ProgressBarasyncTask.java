@@ -131,10 +131,10 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
                 PrintUtils.printText(companyCs.get(0).getPointName()+"\n\n");
             }
             PrintUtils.selectCommand(PrintUtils.DOUBLE_HEIGHT_WIDTH);
-            PrintUtils.printText(areaCs.getAreaName()+"/"+m.getTable_sel_obj().getTableName()+"桌\n\n");
+            PrintUtils.printText(areaCs.getAreaName()+"/"+m.getTable_sel_obj().getTableName()+"\n\n");
             PrintUtils.selectCommand(PrintUtils.NORMAL);
             PrintUtils.selectCommand(PrintUtils.ALIGN_LEFT);
-            PrintUtils.printText(PrintUtils.printTwoData("订单编号", OrderId()+"\n"));
+            PrintUtils.printText(PrintUtils.printTwoData("订单编号", checkOrderC.getOrderList().get(0).getSerialNum()+"\n"));
             PrintUtils.printText(PrintUtils.printTwoData("下单时间", checkOrderC.getCheckTime()+"\n"));
             PrintUtils.printText(PrintUtils.printTwoData("人数："+m.getTable_sel_obj().getCurrentPersions(), "收银员："+waiter+"\n"));
             PrintUtils.printText("--------------------------------\n");

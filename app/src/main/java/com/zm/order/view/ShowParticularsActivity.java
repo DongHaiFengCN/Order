@@ -148,7 +148,7 @@ public class ShowParticularsActivity extends Activity {
             e.printStackTrace();
         }
         newGoods.setDishesCount(counts);
-        removeGoodsFromOrder(newGoods, 0);//修改老订单
+        removeGoodsFromOrder(newGoods, 0);//修改正常老订单
 
         OrderC newOrderObj = new OrderC(myapp.getCompany_ID());
         String orderId = CDBHelper.createAndUpdate(getApplicationContext(), newOrderObj);
@@ -253,7 +253,7 @@ public class ShowParticularsActivity extends Activity {
         newOrderObj.setAreaName(areaName);
 
         newGoods.setOrder(orderId);
-        newGoods.setGoodsType(0);//
+        newGoods.setGoodsType(0);
 
         String dishesName = oldGoods.getDishesName();
         dishesName = dishesName.substring(0, dishesName.length() - 3);
@@ -449,8 +449,13 @@ public class ShowParticularsActivity extends Activity {
             @Override
             public void onClick(View v) {
 
+
                 if (TextUtils.isEmpty(editText.getText())) {
                     Toast.makeText(getApplicationContext(), "数量不能为空", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (editText.getText().toString().equals(".")){
+                    Toast.makeText(getApplicationContext(), "数量不能为.", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 final float tmpCount = Float.parseFloat(editText.getText().toString());
@@ -577,6 +582,10 @@ public class ShowParticularsActivity extends Activity {
                     Toast.makeText(getApplicationContext(), "数量不能为空", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                if (editText.getText().toString().equals(".")){
+                    Toast.makeText(getApplicationContext(), "数量不能为.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 float tmpCount = Float.parseFloat(editText.getText().toString());
                 if (selActionId == R.id.dialog_add_zc) //恢复价格
                 {
@@ -647,6 +656,9 @@ public class ShowParticularsActivity extends Activity {
                         break;
                     case 2:
                         giveDishesDialog(position);
+                        break;
+                    case 3:
+                        normalDishesDialog(position);
                         break;
                     default:
                         break;
@@ -726,7 +738,7 @@ public class ShowParticularsActivity extends Activity {
             }
         }
 
-        showTvSl.setText(areaName+"     "+ myapp.getTable_sel_obj().getTableName()+"     " + goodsCList.size() + "道菜，总计：" + all + "元");
+        showTvSl.setText(areaName+",   "+ myapp.getTable_sel_obj().getTableName()+":  " + goodsCList.size() + "道菜，总计：" + all + "元");
 
     }
 
@@ -754,6 +766,7 @@ public class ShowParticularsActivity extends Activity {
             case R.id.show_but_dy:
 
                 if (Tool.isFastDoubleClick()) {
+                    Toast.makeText(ShowParticularsActivity.this,"点击太快，请稍候",Toast.LENGTH_LONG).show();
                     return;
                 } else {
                     setPrintOrder();
@@ -805,10 +818,10 @@ public class ShowParticularsActivity extends Activity {
             PrintUtils.printText(companyCs.get(0).getPointName() + "\n\n");
         }
         PrintUtils.selectCommand(PrintUtils.DOUBLE_HEIGHT_WIDTH);
-        PrintUtils.printText(areaName + "/" + myapp.getTable_sel_obj().getTableName() + "桌\n\n");
+        PrintUtils.printText(areaName + "/" + tableName + "\n\n");
         PrintUtils.selectCommand(PrintUtils.NORMAL);
         PrintUtils.selectCommand(PrintUtils.ALIGN_LEFT);
-        PrintUtils.printText(PrintUtils.printTwoData("订单编号", OrderId() + "\n"));
+        PrintUtils.printText(PrintUtils.printTwoData("订单编号", orderCList.get(0).getSerialNum() + "\n"));
         PrintUtils.printText(PrintUtils.printTwoData("下单时间", getFormatDate() + "\n"));
         PrintUtils.printText(PrintUtils.printTwoData("人数：" + myapp.getTable_sel_obj().getCurrentPersions(), "收银员：" + waiter + "\n"));
         PrintUtils.printText("--------------------------------\n");
