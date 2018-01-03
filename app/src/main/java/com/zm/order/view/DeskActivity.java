@@ -105,7 +105,7 @@ public class DeskActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
         myapp= (MyApplication) getApplicationContext();
-        myapp.initDishesData();
+      //  myapp.initDishesData();
 
         initWidget();
 

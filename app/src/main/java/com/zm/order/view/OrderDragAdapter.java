@@ -35,6 +35,9 @@ public class OrderDragAdapter extends BaseAdapter {
     private Context context;
 
 
+    public float[] getNumbers() {
+        return numbers;
+    }
 
     //维护数量数组
     private float[] numbers;

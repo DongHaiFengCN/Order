@@ -1428,7 +1428,6 @@ public class MainActivity extends AppCompatActivity {
         if (dishesMessage.isOperation()) {
 
             goodsList.get(i).setDishesCount(goodsList.get(i).getDishesCount() + dishesMessage.getCount());
-            //goodsList.get(i).setPrice(goodsList.get(i).getPrice());
 
         } else {
 
@@ -1438,8 +1437,7 @@ public class MainActivity extends AppCompatActivity {
 
             } else {
                 goodsList.get(i).setDishesCount(goodsList.get(i).getDishesCount() - dishesMessage.getCount());
-              /*  goodsList.get(i).setPrice(goodsList.get(i).getPrice() - dishesMessage
-                        .getDishesC().getPrice());*/
+
             }
 
         }

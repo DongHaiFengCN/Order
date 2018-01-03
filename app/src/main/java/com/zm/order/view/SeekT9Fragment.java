@@ -237,7 +237,7 @@ public class SeekT9Fragment extends Fragment {
         builder.setTitle(name);
         builder.setView(view);
         builder.setNegativeButton("取消", null);
-        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("确定",  new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i)
             {

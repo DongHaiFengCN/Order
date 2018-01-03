@@ -218,7 +218,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
                 break;
             }
         }
-
+        myApplication.initDishesData();
         startActivity(intent);
         finish();
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
