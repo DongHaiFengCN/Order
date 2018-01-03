@@ -1376,7 +1376,6 @@ public class MainActivity extends AppCompatActivity {
 
         //没找到菜品，添加菜品
         if (!isDishes && dishesMessage.isOperation()) {
-            //更新数量指示器
             GoodsC goodsC = new GoodsC();
             goodsC.setChannelId(myApp.getCompany_ID());
             goodsC.setDishesKindId(dishesMessage.getDishKindId());
@@ -1385,7 +1384,7 @@ public class MainActivity extends AppCompatActivity {
             goodsC.setDishesCount(dishesMessage.getCount());
             goodsC.setDishesId(dishesMessage.getDishesC().get_id());
             goodsC.setGoodsType(0);
-            goodsC.setPrice(dishesMessage.getTotal());
+            goodsC.setPrice(dishesMessage.getDishesC().getPrice());
 
             goodsList.add(goodsC);
 
@@ -1413,7 +1412,7 @@ public class MainActivity extends AppCompatActivity {
 
             for (int i = 0; i < goodsList.size(); i++) {
 
-                t += goodsList.get(i).getPrice();
+                t += (goodsList.get(i).getPrice()*getGoodsList().get(i).getDishesCount());
 
 
             }
@@ -1429,7 +1428,7 @@ public class MainActivity extends AppCompatActivity {
         if (dishesMessage.isOperation()) {
 
             goodsList.get(i).setDishesCount(goodsList.get(i).getDishesCount() + dishesMessage.getCount());
-            goodsList.get(i).setPrice(goodsList.get(i).getPrice() + dishesMessage.getTotal());
+            //goodsList.get(i).setPrice(goodsList.get(i).getPrice());
 
         } else {
 
@@ -1439,8 +1438,8 @@ public class MainActivity extends AppCompatActivity {
 
             } else {
                 goodsList.get(i).setDishesCount(goodsList.get(i).getDishesCount() - dishesMessage.getCount());
-                goodsList.get(i).setPrice(goodsList.get(i).getPrice() - dishesMessage
-                        .getDishesC().getPrice());
+              /*  goodsList.get(i).setPrice(goodsList.get(i).getPrice() - dishesMessage
+                        .getDishesC().getPrice());*/
             }
 
         }
