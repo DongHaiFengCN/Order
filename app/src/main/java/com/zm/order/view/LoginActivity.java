@@ -232,7 +232,6 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
     @Override
     public void success() {
 
-        Log.e("DOAING","success!!");
         proDialog.setTitle("配置");
         proDialog.setMessage("正在加载数据请稍等");
         proDialog.show();
