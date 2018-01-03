@@ -317,7 +317,7 @@ public class DeskActivity extends AppCompatActivity {
                                    //老数据没有字段遍历查询
                                    if(tableC.getLastCheckOrderId() == null || tableC.getLastCheckOrderId().isEmpty()){
 
-                                       long startTime=System.currentTimeMillis();//记录开始时间
+                                     //  long startTime=System.currentTimeMillis();//记录开始时间
 
                                        Date date = new Date();
                                        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
@@ -330,11 +330,11 @@ public class DeskActivity extends AppCompatActivity {
                                                , null, CheckOrderC.class);
 
 
-                                       long endTime=System.currentTimeMillis();//记录结束时间
+                                /*       long endTime=System.currentTimeMillis();//记录结束时间
 
                                        float excTime=(float)(endTime-startTime)/1000;
 
-                                       Log.e("执行时间1：",excTime+"s");
+                                       Log.e("执行时间1：",excTime+"s");*/
                                        Iterator<CheckOrderC> iterator = checkOrderCS.iterator();
 
 
@@ -363,20 +363,20 @@ public class DeskActivity extends AppCompatActivity {
 
                                            }
 
-                                           long endTime1=System.currentTimeMillis();//记录结束时间
+                      /*                     long endTime1=System.currentTimeMillis();//记录结束时间
 
                                            float excTime1=(float)(endTime1-endTime)/1000;
 
-                                           Log.e("执行时间2：",excTime1+"s");
+                                           Log.e("执行时间2：",excTime1+"s");*/
 
                                            //得到最近订单的坐标
                                            int f =  Tool.getLastCheckOrder(dateList);
-
+/*
                                            long endTime2=System.currentTimeMillis();//记录结束时间
 
                                            float excTime2=(float)(endTime2-endTime1)/1000;
 
-                                           Log.e("执行时间3：",excTime2+"s");
+                                           Log.e("执行时间3：",excTime2+"s");*/
                                            checkOrderC = checkOrderCS.get(f);
                                            for (int i = 0; i < checkOrderC.getOrderList().size(); i++) {
 
