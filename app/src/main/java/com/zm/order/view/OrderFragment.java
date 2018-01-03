@@ -21,7 +21,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +30,6 @@ import bean.kitchenmanage.dishes.DishesKindC;
 import bean.kitchenmanage.order.GoodsC;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import model.CDBHelper;
 import model.DishesMessage;
 
 /**
@@ -90,10 +88,16 @@ public class OrderFragment extends Fragment {
 
         dishesObjectCollection = ((MainActivity) getActivity()).getMyApp().getDishesObjectCollection();
 
+
+        //初始化数量
         for (Map.Entry<String, List<DishesC>> entry : dishesObjectCollection.entrySet()) {
 
             dishesCollection.put(entry.getKey(), new float[entry.getValue().size()]);
+
+            Log.e("DOAING","菜类："+entry.getKey()+"    "+entry.getValue().size());
         }
+
+
 
         leftAdapter = new DishesKindAdapter();
 
@@ -105,7 +109,7 @@ public class OrderFragment extends Fragment {
 
         orderDragAdapter = new OrderDragAdapter(getActivity());
 
-        myNotifyDataSetChanged();
+
 
 
         orderList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -120,7 +124,6 @@ public class OrderFragment extends Fragment {
                         , dishesCollection.get(kindId));
 
 
-
             }
         });
         dishesRv.setAdapter(orderDragAdapter);
@@ -131,7 +134,7 @@ public class OrderFragment extends Fragment {
 
                 DishesC dishesC = (DishesC) orderDragAdapter.getItem(position);
 
-                showDialog(dishesC,position,orderDragAdapter.getNumbers()[position]);
+                showDialog(dishesC, position, orderDragAdapter.getNumbers()[position]);
             }
         });
         orderList.performItemClick(orderList.getChildAt(0), 0, orderList
@@ -147,7 +150,7 @@ public class OrderFragment extends Fragment {
             }
         });
 
-
+        myNotifyDataSetChanged();
     }
 
     /**
@@ -157,7 +160,6 @@ public class OrderFragment extends Fragment {
 
         //获取order数据
         goodsCList = ((MainActivity) getActivity()).getGoodsList();
-
 
 
         //如果有数据，数值复制给dishesCollection
@@ -210,13 +212,17 @@ public class OrderFragment extends Fragment {
     private void markDishesKindFlag() {
 
 
-        //更新DishesKind 标价
+        //更新DishesKind 标记
         for (int j = 0; j < dishesKindCList.size(); j++) {
 
 
             String id = dishesKindCList.get(j).get_id();
 
+
+
             float[] floats = dishesCollection.get(id);
+
+
             float count = 0f;
 
             for (float f : floats) {
@@ -239,12 +245,10 @@ public class OrderFragment extends Fragment {
     }
 
 
-
     /**
      * 菜品选择弹出框编辑模块
-     *
      */
-    private void showDialog(final DishesC dishesC, final int position,float number) {
+    private void showDialog(final DishesC dishesC, final int position, float number) {
 
         view = LayoutInflater.from(getActivity()).inflate(R.layout.view_item_dialog, null);
 
@@ -252,7 +256,7 @@ public class OrderFragment extends Fragment {
 
         final AmountView amountView = view.findViewById(R.id.amount_view);
 
-        amountView.setNumber(number+"");
+        amountView.setNumber(number + "");
 
         String all = MyBigDecimal.mul(amountView.getAmount() + "", dishesC.getPrice() + "", 2);
 
@@ -305,6 +309,7 @@ public class OrderFragment extends Fragment {
             @Override
             public void onClick(View view) {
 
+
                 if (amountView.getAmount() > 0f) {
 
                     orderDragAdapter.updata(position, amountView.getAmount());
@@ -332,7 +337,7 @@ public class OrderFragment extends Fragment {
 
         if (!hidden) {
 
-            Log.e("onHiddenChanged","onHiddenChanged");
+            Log.e("onHiddenChanged", "onHiddenChanged");
 
             myNotifyDataSetChanged();
 

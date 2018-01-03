@@ -217,6 +217,7 @@ public class AmountView extends LinearLayout implements View.OnClickListener {
 
     public void setNumber(String number){
 
+        amount = Float.valueOf(number);
         etAmount.setText(number);
     }
 
