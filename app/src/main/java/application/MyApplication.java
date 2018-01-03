@@ -63,7 +63,7 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 
     private static final String TAG = Application.class.getSimpleName();
 
-    private final static boolean SYNC_ENABLED = false;
+    private final static boolean SYNC_ENABLED = true;
 
     public Map<String, List<DishesC>> getDishesObjectCollection() {
         return dishesObjectCollection;
@@ -181,7 +181,7 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 
     private void startSession(String dbName) {
         openDatabase(dbName);
-        //startReplication(getCompany_ID(), "123456");
+        startReplication(getCompany_ID(), "123456");
     }
 
     // -------------------------

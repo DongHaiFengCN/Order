@@ -120,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
     private float total = 0.0f;
     private Fragment seekT9Fragment;
     private Fragment orderFragment;
+    private List<GoodsC> t9GoodsList;
     private SeekT9Adapter seekT9Adapter;
     private FragmentManager fm;//获得Fragment管理器
     private FragmentTransaction ft; //开启一个事务
@@ -296,7 +297,14 @@ public class MainActivity extends AppCompatActivity {
         orderItem.add(sparseArray);
     }
 
-    public void setT9Adapter(SeekT9Adapter seekT9Adapter){
+    public void setT9GoodsList(List<GoodsC> t9GoodsList){
+        this.t9GoodsList = t9GoodsList;
+    }
+
+    public List<GoodsC> getT9GoodsList(){
+        return t9GoodsList;
+    }
+    public void setSeekT9Adapter(SeekT9Adapter seekT9Adapter){
         this.seekT9Adapter = seekT9Adapter;
     }
 
@@ -304,7 +312,8 @@ public class MainActivity extends AppCompatActivity {
         return seekT9Adapter;
     }
 
-//    public void setOrderAdapter(OrderAdapter o) {
+
+    //    public void setOrderAdapter(OrderAdapter o) {
 //        this.orderAdapter = o;
 //
 //    }
@@ -320,6 +329,7 @@ public class MainActivity extends AppCompatActivity {
     }
     public void changeOrderGoodsByT9(GoodsC goodsObj)
     {
+        boolean isName = false;
         for (int i = 0; i<goodsList.size();i++)//+for
         {
             if (goodsList.get(i).getDishesName().toString().equals(goodsObj.getDishesName()))//名称相等
@@ -328,20 +338,45 @@ public class MainActivity extends AppCompatActivity {
                 {
                     if(goodsList.get(i).getDishesTaste().equals(goodsObj.getDishesTaste()))//口味相等
                     {
+
+                        float tmp = MyBigDecimal.mul(goodsObj.getPrice(),MyBigDecimal.sub(goodsObj.getDishesCount(),goodsList.get(i).getDishesCount(),2),2);
                         goodsList.get(i).setDishesCount(goodsObj.getDishesCount());
+                        total =  getTotal();
+                        total = MyBigDecimal.add(total,tmp,2);
+                        setTotal(total);
+                        isName = true;
                         break;
                     }
 
                 }//口味为空
                 else
                 {
+                    float tmp = MyBigDecimal.mul(goodsObj.getPrice(),MyBigDecimal.sub(goodsObj.getDishesCount(),goodsList.get(i).getDishesCount(),2),2);
                     goodsList.get(i).setDishesCount(goodsObj.getDishesCount());
+                    total =  getTotal();
+                    total = MyBigDecimal.add(total,tmp,2);
+                    setTotal(total);
+                    isName = true;
                     break;
 
                 }
 
             }
         }//-for
+
+        if (!isName){
+            goodsList.add(goodsObj);
+            //购物车计数器数据更新
+            point = getPoint();
+            point++;
+            setPoint(point);
+
+            //计算总价
+            total =getTotal();
+            total = MyBigDecimal.add(total,MyBigDecimal.mul(goodsObj.getDishesCount(),goodsObj.getPrice(),2),2);
+            setTotal(total);
+
+        }
 
 
     }
@@ -640,20 +675,21 @@ public class MainActivity extends AppCompatActivity {
         allKitchenClientGoods.clear();
         allKitchenClientPrintNames.clear();
 
-        for(KitchenClientC kitchenClientObj:kitchenClientList)//1 for 遍历所有厨房
+        for(KitchenClientC kitchenClientObj : kitchenClientList)//1 for 遍历所有厨房
         {
             boolean findflag = false;
             ArrayList<GoodsC> oneKitchenClientGoods = new ArrayList<GoodsC>();
-
-            for(String dishKindId:kitchenClientObj.getDishesKindIDList())//2 for 遍历厨房下所含菜系
+            //2 for 遍历厨房下所含菜系
+            for(String dishKindId : kitchenClientObj.getDishesKindIDList())
             {
-
-                for(GoodsC goodsC:goodsList)//3 for 该厨房下所应得商品
+                //3 for 该厨房下所应得商品
+                for(GoodsC goodsC : goodsList)
                 {
                     if(dishKindId.equals(goodsC.getDishesKindId()))
                     {
                         findflag = true;
-                        // g_printGoodsList.remove(goodsC);//为了降低循环次数，因为菜品只可能在一个厨房打印分发，故分发完后移除掉。
+                        //为了降低循环次数，因为菜品只可能在一个厨房打印分发，故分发完后移除掉。
+                        // g_printGoodsList.remove(goodsC);
                         oneKitchenClientGoods.add(goodsC);
                     }
 
@@ -714,7 +750,7 @@ public class MainActivity extends AppCompatActivity {
 
         //2、获得该打印机内容 打印机名称
         String printname= allKitchenClientPrintNames.get(""+printerId);
-        String printcontent=getPrintContentforClient(myshangpinlist,printname);
+        String printcontent = getPrintContentforClient(myshangpinlist,printname);
         if( printContent(printcontent,printerId)==0)//打印成功，没有打印完成回调
         {
             MyLog.d(printname+"分单打印完成");
@@ -731,7 +767,7 @@ public class MainActivity extends AppCompatActivity {
     private void setOrderPrintState(String orderId)
     {
 
-        OrderC obj = CDBHelper.getObjById(getApplicationContext(),orderId,OrderC.class);
+        OrderC obj = CDBHelper.getObjById(getApplicationContext() , orderId , OrderC.class);
         obj.setPrintFlag(1);
         CDBHelper.createAndUpdate(getApplicationContext(),obj);
     }
@@ -1051,6 +1087,7 @@ public class MainActivity extends AppCompatActivity {
         total = 0;
 
         getGoodsList().clear();
+        getT9GoodsList().clear();
         orderAdapter.notifyDataSetChanged();
         seekT9Adapter.notifyDataSetChanged();
     }

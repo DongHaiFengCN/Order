@@ -108,7 +108,6 @@ public class SeekT9Fragment extends Fragment {
     private Handler mHandler = null;
     private MyApplication myapp;
 
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -157,7 +156,9 @@ public class SeekT9Fragment extends Fragment {
 
         });
         activitySeekList.setAdapter(seekT9Adapter);
-        ((MainActivity) getActivity()).setT9Adapter(seekT9Adapter);
+        ((MainActivity) getActivity()).setT9GoodsList(t9GoodsList);
+        ((MainActivity) getActivity()).setSeekT9Adapter(seekT9Adapter);
+
 
 
         setSeetSearch();
@@ -242,7 +243,8 @@ public class SeekT9Fragment extends Fragment {
             public void onClick(DialogInterface dialogInterface, int i)
             {
                 mainActivity = (MainActivity) getActivity();
-                float destCount = amountView.getAmount();
+                float destCount = Float.parseFloat(amountView.getEtAmount().getText().toString());
+                Log.e("SeekT9",destCount+"----------"+amountView.getAmount());
                 if(destCount<=0)
                 {
                     Toast.makeText(getActivity(), "没有选择商品数量！", Toast.LENGTH_SHORT).show();
@@ -264,7 +266,9 @@ public class SeekT9Fragment extends Fragment {
                 goodsC.setGoodsType(0);
                 goodsC.setDishesId(dishesC.get_id());
                 goodsC.setDishesKindId(dishesC.getDishesKindId());
-                //1、还未点此菜弹出
+                ((MainActivity) getActivity()).changeOrderGoodsByT9(goodsC);
+                activitySeekEdit.setText("");
+               /* //1、还未点此菜弹出
                 if(sourceCount==0.0)
                 {
                         ((MainActivity) getActivity()).getGoodsList().add(goodsC);
@@ -290,7 +294,7 @@ public class SeekT9Fragment extends Fragment {
                     ((MainActivity) getActivity()).setTotal(total);
 
                 }
-
+*/
 
 
 
