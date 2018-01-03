@@ -83,12 +83,8 @@ public class OrderFragment extends Fragment {
     private void intiData1() {
 
 
-        long startTime = System.currentTimeMillis();//记录结束时间
-
         //获取初始化数据
         dishesKindCList = ((MainActivity) getActivity()).getMyApp().getDishesKindCList();
-
-        Log.e("dishesKindCList",dishesKindCList.size()+"");
 
         booleans = new boolean[dishesKindCList.size()];
 
@@ -98,14 +94,6 @@ public class OrderFragment extends Fragment {
 
             dishesCollection.put(entry.getKey(), new float[entry.getValue().size()]);
         }
-
-        long endTime1 = System.currentTimeMillis();//记录结束时间
-
-        float excTime = (float) (endTime1 - startTime) / 1000;
-
-        Log.e("执行时间FFFF：", +excTime + "s");
-
-
 
         leftAdapter = new DishesKindAdapter();
 
@@ -136,6 +124,16 @@ public class OrderFragment extends Fragment {
             }
         });
         dishesRv.setAdapter(orderDragAdapter);
+
+        dishesRv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                DishesC dishesC = (DishesC) orderDragAdapter.getItem(position);
+
+                showDialog(dishesC,position,orderDragAdapter.getNumbers()[position]);
+            }
+        });
         orderList.performItemClick(orderList.getChildAt(0), 0, orderList
                 .getItemIdAtPosition(0));
 
@@ -156,8 +154,6 @@ public class OrderFragment extends Fragment {
      * 刷新所有展示数据
      */
     private void myNotifyDataSetChanged() {
-
-        long startTime = System.currentTimeMillis();//记录开始时间
 
         //获取order数据
         goodsCList = ((MainActivity) getActivity()).getGoodsList();
@@ -201,14 +197,6 @@ public class OrderFragment extends Fragment {
 
 
         }
-        long endTime1 = System.currentTimeMillis();//记录结束时间
-
-        float excTime = (float) (endTime1 - startTime) / 1000;
-
-        Log.e("执行时间A：", +excTime + "s");
-
-
-        long endTime = System.currentTimeMillis();//记录结束时间
 
         markDishesKindFlag();
 
@@ -216,14 +204,12 @@ public class OrderFragment extends Fragment {
         leftAdapter.notifyDataSetChanged();
         orderDragAdapter.notifyDataSetChanged();
 
-        long endTime2 = System.currentTimeMillis();//记录结束时间
-        float excTime1 = (float) (endTime2 - endTime) / 1000;
-
-        Log.e("执行时间B：", +excTime1 + "s");
 
     }
 
     private void markDishesKindFlag() {
+
+
         //更新DishesKind 标价
         for (int j = 0; j < dishesKindCList.size(); j++) {
 
@@ -257,10 +243,8 @@ public class OrderFragment extends Fragment {
     /**
      * 菜品选择弹出框编辑模块
      *
-     * @param name  传入的菜品的名称
-     * @param price 传入的菜品的价格
      */
-    private void showDialog(final String name, final float price, final int position) {
+    private void showDialog(final DishesC dishesC, final int position,float number) {
 
         view = LayoutInflater.from(getActivity()).inflate(R.layout.view_item_dialog, null);
 
@@ -268,9 +252,11 @@ public class OrderFragment extends Fragment {
 
         final AmountView amountView = view.findViewById(R.id.amount_view);
 
-        String all = MyBigDecimal.mul(amountView.getAmount() + "", price + "", 2);
+        amountView.setNumber(number+"");
 
-        price_tv.setText("总计 " + Float.parseFloat(all) + " 元");
+        String all = MyBigDecimal.mul(amountView.getAmount() + "", dishesC.getPrice() + "", 2);
+
+        price_tv.setText("总计 " + all + " 元");
 
 
         final DishesMessage dishesMessage = new DishesMessage();
@@ -291,7 +277,7 @@ public class OrderFragment extends Fragment {
             @Override
             public void OnChange(float ls, boolean flag) {
 
-                String all = MyBigDecimal.mul(ls + "", price + "", 2);
+                String all = MyBigDecimal.mul(ls + "", dishesC.getPrice() + "", 2);
                 l[0] = Float.parseFloat(all);//实时计算当前菜品选择不同数量后的单品总价
 
                 dishesMessage.setTotal(l[0]);
@@ -301,8 +287,6 @@ public class OrderFragment extends Fragment {
             }
         });
 
-        DishesC dishesC = CDBHelper.getObjById(getActivity().getApplicationContext(), dishesIdList.get(position).toString(), DishesC.class);
-
         dishesMessage.setName(dishesC.getDishesName());
 
         dishesMessage.setDishesC(dishesC);
@@ -310,7 +294,7 @@ public class OrderFragment extends Fragment {
 
         AlertDialog.Builder builder = new AlertDialog
                 .Builder(getActivity());
-        builder.setTitle(name);
+        builder.setTitle(dishesC.getDishesName());
         builder.setView(view);
         builder.setNegativeButton("取消", null);
         builder.setPositiveButton("确定", null);

@@ -27,7 +27,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.Expression;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -47,7 +46,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TimerTask;
 
 import application.MyApplication;
 import bean.kitchenmanage.order.CheckOrderC;
@@ -107,7 +105,7 @@ public class DeskActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
         myapp= (MyApplication) getApplicationContext();
-        myapp.initDishesData();
+      //  myapp.initDishesData();
 
         initWidget();
 
@@ -313,16 +311,124 @@ public class DeskActivity extends AppCompatActivity {
                                @Override
                                public void run() {
 
-                                   try {
-                                       CDBHelper.db.inBatch(new TimerTask() {
-                                           @Override
-                                           public void run() {
-                                               //返单
-                                               setReorder(tableC);
+                                   CheckOrderC checkOrderC = null;
+
+
+                                   //老数据没有字段遍历查询
+                                   if(tableC.getLastCheckOrderId() == null || tableC.getLastCheckOrderId().isEmpty()){
+
+                                     //  long startTime=System.currentTimeMillis();//记录开始时间
+
+                                       Date date = new Date();
+                                       SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+
+
+                                       //查询当日的订单
+                                       List<CheckOrderC> checkOrderCS = CDBHelper.getObjByWhere(getApplicationContext()
+                                               , Expression.property("className").equalTo("CheckOrderC")
+                                                       .and(Expression.property("checkTime").like(formatter.format(date)+"%"))
+                                               , null, CheckOrderC.class);
+
+
+                                /*       long endTime=System.currentTimeMillis();//记录结束时间
+
+                                       float excTime=(float)(endTime-startTime)/1000;
+
+                                       Log.e("执行时间1：",excTime+"s");*/
+                                       Iterator<CheckOrderC> iterator = checkOrderCS.iterator();
+
+
+
+                                       //移除不是当前桌的订单
+                                       while (iterator.hasNext()){
+
+                                           CheckOrderC c = iterator.next();
+
+                                           if(!c.getTableNo().equals(tableC.getTableNum())){
+
+                                               iterator.remove();
+
                                            }
-                                       });
-                                   } catch (CouchbaseLiteException e) {
-                                       e.printStackTrace();
+                                       }
+
+                                       if(checkOrderCS.size() > 0){
+
+                                           List<String> dateList = new ArrayList<>();
+
+                                           //获取当前桌订单今日时间集合
+                                           for (int i1 = 0; i1 < checkOrderCS.size(); i1++) {
+
+
+                                               dateList.add(checkOrderCS.get(i1).getCheckTime());
+
+                                           }
+
+                      /*                     long endTime1=System.currentTimeMillis();//记录结束时间
+
+                                           float excTime1=(float)(endTime1-endTime)/1000;
+
+                                           Log.e("执行时间2：",excTime1+"s");*/
+
+                                           //得到最近订单的坐标
+                                           int f =  Tool.getLastCheckOrder(dateList);
+/*
+                                           long endTime2=System.currentTimeMillis();//记录结束时间
+
+                                           float excTime2=(float)(endTime2-endTime1)/1000;
+
+                                           Log.e("执行时间3：",excTime2+"s");*/
+                                           checkOrderC = checkOrderCS.get(f);
+                                           for (int i = 0; i < checkOrderC.getOrderList().size(); i++) {
+
+                                               OrderC orderC = checkOrderC.getOrderList().get(i);
+                                               orderC.setOrderState(1);
+                                               CDBHelper.createAndUpdate(getApplicationContext(), orderC);
+                                           }
+
+                                           //删除之前的checkorder记录
+                                           CDBHelper.deleDocumentById(getApplicationContext(),checkOrderC.get_id());
+
+                                           tableC.setState(2);
+                                           CDBHelper.createAndUpdate(getApplicationContext(), tableC);
+
+                                           /*EventBus.getDefault().postSticky(checkOrderC);
+                                           startActivity(new Intent(DeskActivity.this, ResetBillActivity.class));*/
+                                       }else {
+
+                                           Message msg = Message.obtain();
+                                           msg.what = 2;
+                                           uiHandler.sendMessage(msg);
+                                       }
+
+                                   }else {
+
+                                       //新数据查询
+
+
+                                       checkOrderC = CDBHelper.getObjById(getApplicationContext(),tableC.getLastCheckOrderId(),CheckOrderC.class);
+
+                                       for (int i = 0; i < checkOrderC.getOrderList().size(); i++) {
+
+                                           OrderC orderC = checkOrderC.getOrderList().get(i);
+                                           orderC.setOrderState(1);
+                                           CDBHelper.createAndUpdate(getApplicationContext(), orderC);
+                                       }
+
+                                       //删除之前的checkorder记录
+                                       CDBHelper.deleDocumentById(getApplicationContext(),checkOrderC.get_id());
+
+                                       tableC.setState(2);
+                                       CDBHelper.createAndUpdate(getApplicationContext(), tableC);
+
+                                     /*  EventBus.getDefault().postSticky(checkOrderC);
+                                       try {
+                                           Thread.sleep(1000);
+                                       } catch (InterruptedException e) {
+                                           e.printStackTrace();
+                                       }
+
+                                       startActivity(new Intent(DeskActivity.this, ResetBillActivity.class));
+*/
                                    }
 
                                    proDialog.dismiss();//关闭proDialog
@@ -418,128 +524,6 @@ public class DeskActivity extends AppCompatActivity {
         listViewDesk.setLayoutManager(new GridLayoutManager(this,3));
         listViewDesk.setAdapter(tableadapter);
 
-    }
-
-    //完成返单操作
-    private void setReorder(TableC tableC){
-        CheckOrderC checkOrderC = null;
-        //老数据没有字段遍历查询
-        if(tableC.getLastCheckOrderId() == null || tableC.getLastCheckOrderId().isEmpty()){
-
-            long startTime=System.currentTimeMillis();//记录开始时间
-
-            Date date = new Date();
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-
-
-            //查询当日的订单
-            List<CheckOrderC> checkOrderCS = CDBHelper.getObjByWhere(getApplicationContext()
-                    , Expression.property("className").equalTo("CheckOrderC")
-                            .and(Expression.property("checkTime").like(formatter.format(date)+"%"))
-                    , null, CheckOrderC.class);
-
-
-            long endTime=System.currentTimeMillis();//记录结束时间
-
-            float excTime=(float)(endTime-startTime)/1000;
-
-            Log.e("执行时间1：",excTime+"s");
-            Iterator<CheckOrderC> iterator = checkOrderCS.iterator();
-
-
-
-            //移除不是当前桌的订单
-            while (iterator.hasNext()){
-
-                CheckOrderC c = iterator.next();
-
-                if(!c.getTableNo().equals(tableC.getTableNum())){
-
-                    iterator.remove();
-
-                }
-            }
-
-            if(checkOrderCS.size() > 0){
-
-                List<String> dateList = new ArrayList<>();
-
-                //获取当前桌订单今日时间集合
-                for (int i1 = 0; i1 < checkOrderCS.size(); i1++) {
-
-
-                    dateList.add(checkOrderCS.get(i1).getCheckTime());
-
-                }
-
-                long endTime1=System.currentTimeMillis();//记录结束时间
-
-                float excTime1=(float)(endTime1-endTime)/1000;
-
-                Log.e("执行时间2：",excTime1+"s");
-
-                //得到最近订单的坐标
-                int f =  Tool.getLastCheckOrder(dateList);
-
-                long endTime2=System.currentTimeMillis();//记录结束时间
-
-                float excTime2=(float)(endTime2-endTime1)/1000;
-
-                Log.e("执行时间3：",excTime2+"s");
-                checkOrderC = checkOrderCS.get(f);
-                for (int i = 0; i < checkOrderC.getOrderList().size(); i++) {
-
-                    OrderC orderC = checkOrderC.getOrderList().get(i);
-                    orderC.setOrderState(1);
-                    CDBHelper.createAndUpdate(getApplicationContext(), orderC);
-                }
-
-                //删除之前的checkorder记录
-                CDBHelper.deleDocumentById(getApplicationContext(),checkOrderC.get_id());
-
-                tableC.setState(2);
-                CDBHelper.createAndUpdate(getApplicationContext(), tableC);
-
-                                           /*EventBus.getDefault().postSticky(checkOrderC);
-                                           startActivity(new Intent(DeskActivity.this, ResetBillActivity.class));*/
-            }else {
-
-                Message msg = Message.obtain();
-                msg.what = 2;
-                uiHandler.sendMessage(msg);
-            }
-
-        }else {
-
-            //新数据查询
-
-
-            checkOrderC = CDBHelper.getObjById(getApplicationContext(),tableC.getLastCheckOrderId(),CheckOrderC.class);
-
-            for (int i = 0; i < checkOrderC.getOrderList().size(); i++) {
-
-                OrderC orderC = checkOrderC.getOrderList().get(i);
-                orderC.setOrderState(1);
-                CDBHelper.createAndUpdate(getApplicationContext(), orderC);
-            }
-
-            //删除之前的checkorder记录
-            CDBHelper.deleDocumentById(getApplicationContext(),checkOrderC.get_id());
-
-
-            tableC.setState(2);
-            CDBHelper.createAndUpdate(getApplicationContext(), tableC);
-
-                                     /*  EventBus.getDefault().postSticky(checkOrderC);
-                                       try {
-                                           Thread.sleep(1000);
-                                       } catch (InterruptedException e) {
-                                           e.printStackTrace();
-                                       }
-
-                                       startActivity(new Intent(DeskActivity.this, ResetBillActivity.class));
-*/
-        }
     }
 
     private void turnMainActivity() {
