@@ -1,11 +1,15 @@
 package com.zm.order.view;
 
+import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -20,16 +24,22 @@ import android.widget.EditText;
 
 import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
+import com.couchbase.lite.Ordering;
 import com.tencent.bugly.Bugly;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.zm.order.R;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import application.ISharedPreferences;
 import application.MyApplication;
+import bean.kitchenmanage.dishes.DishesC;
+import bean.kitchenmanage.dishes.DishesKindC;
 import bean.kitchenmanage.user.UsersC;
 import model.CDBHelper;
 import model.DBFactory;
@@ -40,75 +50,88 @@ import presenter.LoginPresentImpl;
 import untils.MyLog;
 
 /**
- *
- *
  * @author 董海峰
  * @date 2017/10/25
  */
-public class LoginActivity extends AppCompatActivity implements ILoginView, ISharedPreferences{
+public class LoginActivity extends AppCompatActivity implements ILoginView, ISharedPreferences {
     private EditText name;
     private EditText password;
     private Button submit;
     private CheckBox saveloginstatueChk;
-    private  MyApplication myApplication;
+    private MyApplication myApplication;
 
-    private String userNumber,userPsw;
+    private String userNumber, userPsw;
     private InputMethodManager inputMethodManager;
     private Intent intent;
     private List<UsersC> usersCList;
     private MyApplication myapp;
+    ProgressDialog proDialog;
+/*
+    @SuppressLint("HandlerLeak")
+    private Handler uiHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case 1:
 
-    private IDBManager idbManager;
+//                    proDialog.dismiss();
+
+                    break;
+
+                default:
+
+                    break;
+            }
+        }
+    };*/
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         myapp = (MyApplication) getApplication();
 
-
-        //Document document = CDBHelper.getDocByID(getApplicationContext()," DishesC.975c2506-e2ea-477c-8d08-dd6778625240");
-
-       // this.success();
+        proDialog = new ProgressDialog(this);
         inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        intent = new Intent(this,DeskActivity.class);
+        intent = new Intent(this, DeskActivity.class);
         usersCList = CDBHelper.getObjByWhere(getApplicationContext(),
                 Expression.property("className")
-                        .equalTo("UsersC"),null, UsersC.class);
+                        .equalTo("UsersC"), null, UsersC.class);
 
-        for (int i = 0; i<usersCList.size();i++)
-        {
-            Log.e("Login",usersCList.get(i).getUserName().toString()+"_"+usersCList.get(i).getEmployeeName());
+        for (int i = 0; i < usersCList.size(); i++) {
+
+            Log.e("Login", usersCList.get(i).getUserName().toString() + "_" + usersCList.get(i).getEmployeeName());
 
         }
-         myApplication = (MyApplication) getApplication();
-      //  myApplication.cancleSharePreferences();
+        myApplication = (MyApplication) getApplication();
+        //  myApplication.cancleSharePreferences();
 
-          //查看是否有缓存
+        //查看是否有缓存
 
-        userNumber = myApplication.getSharePreferences().getString("name","");
-        userPsw = myApplication.getSharePreferences().getString("password","");
+        userNumber = myApplication.getSharePreferences().getString("name", "");
+        userPsw = myApplication.getSharePreferences().getString("password", "");
+
+        //success();
+
+        //无缓存
+        if ("".equals(userNumber)) {
+
+            initView();
+
+        } else {
+
+            //有缓存
+            initView();
+            name.setText(userNumber);
+            password.setText(userPsw);
+            saveloginstatueChk.setChecked(true);
+            password.clearFocus();
+            password.setFocusableInTouchMode(false);
+
+        }
 
 
-          //无缓存
-           if("".equals(userNumber)){
-
-                initView();
-
-           }else {
-
-               //有缓存
-               initView();
-               name.setText(userNumber);
-               password.setText(userPsw);
-               saveloginstatueChk.setChecked(true);
-               password.clearFocus();
-               password.setFocusableInTouchMode(false);
-
-           }
-
-
-
-}
+    }
 
 
     private void initView() {
@@ -131,9 +154,9 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
             @Override
             public void afterTextChanged(Editable editable) {
 
-                if(editable.length()==6){
+                if (editable.length() == 6) {
 
-                    if(inputMethodManager.isActive()){
+                    if (inputMethodManager.isActive()) {
                         inputMethodManager.hideSoftInputFromWindow(LoginActivity.this.getCurrentFocus().getWindowToken(), 0);
                     }
                 }
@@ -144,7 +167,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
 
         submit = (Button) findViewById(R.id.login_bt);
 
-        final ILoginPresenter iLoginPresenter = new LoginPresentImpl(this,getApplicationContext());
+        final ILoginPresenter iLoginPresenter = new LoginPresentImpl(this, getApplicationContext());
 
         name.addTextChangedListener(new TextWatcher() {
             @Override
@@ -160,7 +183,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
             @Override
             public void afterTextChanged(Editable editable) {
 
-                if(editable.length()==3){
+                if (editable.length() == 3) {
 
                     password.setFocusable(true);
                     password.setFocusableInTouchMode(true);
@@ -173,14 +196,14 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                myApplication.mExecutor.submit(new Runnable() {
+                iLoginPresenter.doLogin();
+          /*      myApplication.mExecutor.submit(new Runnable() {
                     @Override
                     public void run() {
 
-                        iLoginPresenter.doLogin();
+
                     }
-                });
+                });*/
 
 
             }
@@ -192,7 +215,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
 
         String[] info = new String[2];
         info[0] = name.getText().toString();
-        info[1]= password.getText().toString();
+        info[1] = password.getText().toString();
         userNumber = info[0];
 
         return info;
@@ -207,21 +230,21 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
     }
 
     @Override
-    public void success()
-    {
+    public void success() {
 
-        for(UsersC u : usersCList)
-        {
-            if(u.getUserName().equals(userNumber))
-            {
+        Log.e("DOAING","success!!");
+        proDialog.setTitle("配置");
+        proDialog.setMessage("正在加载数据请稍等");
+        proDialog.show();
+        for (UsersC u : usersCList) {
+            if (u.getUserName().equals(userNumber)) {
                 myApplication.setUsersC(u);
                 break;
             }
         }
-        myApplication.initDishesData();
-        startActivity(intent);
-        finish();
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+
+        initDishesData();
+
     }
 
     @Override
@@ -242,4 +265,63 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
 
         return myApplication.cancleSharePreferences();
     }
+
+
+    public void initDishesData() {
+
+
+        myApplication.mExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+
+                final Map<String, List<DishesC>> dishesObjectCollection = new HashMap<>();
+                List<DishesKindC> dishesKindCList;
+
+                dishesKindCList = CDBHelper.getObjByWhere(getApplicationContext()
+                        , Expression.property("className").equalTo("DishesKindC")
+                                .and(Expression.property("isSetMenu").equalTo(false))
+                        , Ordering.property("kindName")
+                                .ascending(), DishesKindC.class);
+                //初始化菜品数量维护映射表
+                for (DishesKindC dishesKindC : dishesKindCList) {
+
+                    int count = dishesKindC.getDishesListId().size();
+
+                    List<String> disheList = dishesKindC.getDishesListId();
+
+                    List<DishesC> dishesCS = new ArrayList<>();
+
+                    for (int i = 0; i < count; i++) {
+
+                        DishesC dishesC = CDBHelper.getObjById(getApplicationContext(), disheList.get(i), DishesC.class);
+
+                        if (dishesC != null) {
+
+                            dishesCS.add(dishesC);
+                        }
+                    }
+
+                    //初始化disheKind对应的dishes实体类映射
+                    dishesObjectCollection.put(dishesKindC.get_id(), dishesCS);
+
+                    //初始化dishekind对应的dishes的数量映射
+
+                }
+
+                myapp.setDishesKindCList(dishesKindCList);
+                myapp.setDishesObjectCollection(dishesObjectCollection);
+      /*          Message msg = new Message();
+                msg.what = 1;
+                uiHandler.sendMessage(msg);*/
+
+                proDialog.dismiss();
+                startActivity(intent);
+                finish();
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            }
+        });
+
+    }
+
+
 }

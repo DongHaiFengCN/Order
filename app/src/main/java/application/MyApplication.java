@@ -69,10 +69,18 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
         return dishesObjectCollection;
     }
 
+    public void setDishesObjectCollection(Map<String, List<DishesC>> dishesObjectCollection) {
+        this.dishesObjectCollection = dishesObjectCollection;
+    }
+
     private Map<String, List<DishesC>> dishesObjectCollection = new HashMap<>();
 
     public List<DishesKindC> getDishesKindCList() {
         return dishesKindCList;
+    }
+
+    public void setDishesKindCList(List<DishesKindC> dishesKindCList) {
+        this.dishesKindCList = dishesKindCList;
     }
 
     List<DishesKindC> dishesKindCList;
@@ -181,7 +189,7 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 
     private void startSession(String dbName) {
         openDatabase(dbName);
-        startReplication(getCompany_ID(), "123456");
+        //startReplication(getCompany_ID(), "123456");
     }
 
     // -------------------------
