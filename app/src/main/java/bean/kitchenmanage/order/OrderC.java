@@ -110,8 +110,6 @@ public class OrderC implements Serializable{
 
 
 
-
-
 	public OrderC()
 	{
 	}

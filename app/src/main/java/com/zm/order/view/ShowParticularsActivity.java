@@ -466,6 +466,7 @@ public class ShowParticularsActivity extends Activity {
                         return;
                     }
                     addDishes(position, tmpCount);
+                    printerToKitchen(goodsCList.get(position), 0 ,areaName,tableName);
                     setAll();
 
                 } else if (selActionId == R.id.dialog_delete_tc)//退菜
@@ -495,7 +496,7 @@ public class ShowParticularsActivity extends Activity {
 
                     }
 
-
+                    printerToKitchen(goodsCList.get(position), 1 ,areaName,tableName);
                     setAll();
                 } else {
                     if (tmpCount <= 0) {
@@ -507,6 +508,7 @@ public class ShowParticularsActivity extends Activity {
                         return;
                     }
                     giveDishes(position, tmpCount);
+                    printerToKitchen(goodsCList.get(position), 2 ,areaName,tableName);
                     setAll();
                 }
                 dialog.dismiss();
@@ -598,6 +600,7 @@ public class ShowParticularsActivity extends Activity {
                         return;
                     }
                     backDishes(position, tmpCount);
+                    printerToKitchen(goodsCList.get(position), 0 ,areaName,tableName);
                     setAll();
                 } else //退菜处理
                 {
@@ -610,6 +613,7 @@ public class ShowParticularsActivity extends Activity {
                         return;
                     }
                     retreatDishesFromZC(position, tmpCount);
+                    printerToKitchen(goodsCList.get(position), 1 ,areaName,tableName);
                     setAll();
                 }
                 dialog.dismiss();

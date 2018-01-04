@@ -87,14 +87,13 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 
 //    private String Company_ID="gysz";
 //    private final static String DATABASE_NAME = "gyszdb";
-//    private final static String SYNCGATEWAY_URL = "blip://123.207.174.171:4984/kitchendb/";
+   //private final static String SYNCGATEWAY_URL = "blip://123.207.174.171:4984/kitchendb/";
 
     private String Company_ID = "gysz";
-    private final static String DATABASE_NAME = "gyszdbD";
-    //private final static String DATABASE_NAME = "GYSZDB";
-    // private final static String SYNCGATEWAY_URL = "blip://192.168.2.174:4984/kitchendb/";
-    private final static String SYNCGATEWAY_URL = "blip://192.168.2.166:4984/kitchendb/";
+    //private final static String DATABASE_NAME = "gyszdbD";
+    private final static String DATABASE_NAME = "GYSZDB";
 
+    private final static String SYNCGATEWAY_URL = "blip://192.168.2.166:4984/kitchendb/";
 
     private Database database = null;
     private Replicator replicator;
@@ -118,18 +117,12 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
     @Override
     public void onCreate() {
         super.onCreate();
-
-
         CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(this);
         strategy.setAppChannel("开发部");
         Bugly.init(getApplicationContext(), "c11c0d8e58", true, strategy);
         CrashReport.setUserId("1002");
         startSession(DATABASE_NAME);
         mExecutor = Executors.newCachedThreadPool();
-
-
-
-
     }
 
     public void initDishesData()
@@ -189,7 +182,7 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 
     private void startSession(String dbName) {
         openDatabase(dbName);
-        //startReplication(getCompany_ID(), "123456");
+        startReplication(getCompany_ID(), "123456");
     }
 
     // -------------------------
@@ -284,6 +277,7 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
         config.setContinuous(true);
 
         // authentication
+         Log.e("----->","username="+username+"____psw="+password);
         if (username != null && password != null)
             config.setAuthenticator(new BasicAuthenticator(username, password));
 
