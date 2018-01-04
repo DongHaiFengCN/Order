@@ -9,6 +9,7 @@ android {
         exclude 'META-INF/NOTICE'
     }
     defaultConfig {
+        multiDexEnabled true
         applicationId "com.zm.order"
         minSdkVersion 16
         targetSdkVersion 26
@@ -24,12 +25,16 @@ android {
         }
     }
 }
+
+
 repositories {
     flatDir {
         dirs 'libs' //就是你放aar的目录地址
     }
 }
 dependencies {
+
+    compile 'com.android.support:multidex:'
     compile fileTree(include: ['*.jar'], dir: 'libs')
     //微信
     compile 'com.tencent.mm.opensdk:wechat-sdk-android-with-mta:+'
@@ -51,13 +56,9 @@ dependencies {
     compile 'com.android.support:design:26.+'
     compile 'com.android.support:support-v4:26.+'
     compile 'com.android.support:support-vector-drawable:26.+'
-    testCompile 'junit:junit:4.12'
-    compile 'com.squareup.okhttp3:okhttp:3.9.0'
-    compile 'com.squareup.okio:okio:1.13.0'
     compile 'com.jakewharton:butterknife:8.5.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
     compile 'com.squareup.retrofit2:retrofit:2.3.0'
-    compile 'com.squareup.okhttp3:okhttp:3.8.1'
     compile 'com.squareup.retrofit2:converter-gson:2.3.0'
     compile 'org.greenrobot:eventbus:3.0.0'
     compile files('libs/gprintersdkv22.jar')
@@ -65,4 +66,8 @@ dependencies {
     compile files('libs/ksoap2-android-assembly-2.5.2-jar-with-dependencies.jar')
 
     compile 'com.tencent.bugly:crashreport_upgrade:latest.release'
+
+
+    compile 'io.reactivex:rxandroid:1.1.0' // RxAndroid
+    compile 'io.reactivex:rxjava:1.1.0' // RxJava
 }
