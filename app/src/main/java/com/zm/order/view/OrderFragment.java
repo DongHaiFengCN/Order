@@ -144,12 +144,12 @@ public class OrderFragment extends Fragment {
                     //初始化disheKind对应的dishes实体类映射
                     dishesObjectCollection.put(dishesKindC.get_id(), mlistDishes);
 
-                    Log.e("DOAING", dishesKindC.getKindName() + " 首次加载~~~");
+                    //Log.e("DOAING", dishesKindC.getKindName() + " 首次加载~~~");
                 }
                 dishesCollection.put(dishesKindC.get_id(), new float[mlistDishes.size()]);
 
 
-                Log.e("DOAING", dishesObjectCollection.get(dishesKindC.get_id()).size() + " 长度~~~");
+               // Log.e("DOAING", dishesObjectCollection.get(dishesKindC.get_id()).size() + " 长度~~~");
                 orderDragAdapter.setMessage(dishesObjectCollection.get(dishesKindC.get_id())
                         , dishesCollection.get(dishesKindC.get_id()));
 
@@ -184,7 +184,7 @@ public class OrderFragment extends Fragment {
 
             dishesCollection.put(entry.getKey(), new float[entry.getValue().size()]);
 
-            Log.e("DOAING", "菜类：" + entry.getKey() + "    " + entry.getValue().size());
+            //Log.e("DOAING", "菜类：" + entry.getKey() + "    " + entry.getValue().size());
         }
 
 
@@ -284,6 +284,29 @@ public class OrderFragment extends Fragment {
                 }
             }
 
+
+        }else {
+            //重置所有标记
+
+            for (int i = 0; i < booleans.length ; i++) {
+
+                booleans[i] = false;
+
+            }
+
+            //重置数量
+
+            //初始化数量
+            for (Map.Entry<String, List<DishesC>> entry : dishesObjectCollection.entrySet()) {
+
+              float[] floats =  dishesCollection.get(entry.getKey());
+
+                for (int i = 0; i < floats.length; i++) {
+
+                    floats[i] = 0f;
+                }
+
+            }
 
         }
 
@@ -526,6 +549,8 @@ public class OrderFragment extends Fragment {
     public void setOrderList(String s) {
 
         myNotifyDataSetChanged();
+
+        Log.e("DOAING","清空~~");
     }
 
 

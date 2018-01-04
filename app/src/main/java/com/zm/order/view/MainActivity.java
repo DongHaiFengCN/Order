@@ -1025,12 +1025,14 @@ public class MainActivity extends AppCompatActivity {
         point = 0;
         point_tv.setVisibility(View.INVISIBLE);
 
-        total_tv.setText("0元");
+        total_tv.setText("0.0元");
         total = 0;
 
         getGoodsList().clear();
         orderAdapter.notifyDataSetChanged();
         seekT9Adapter.notifyDataSetChanged();
+
+        EventBus.getDefault().postSticky("1");
     }
 
     private String getOrderSerialNum() {

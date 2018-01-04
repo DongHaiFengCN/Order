@@ -117,9 +117,6 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
             }
 
 
-            String tableNumber = checkOrderC.getTableNo();
-
-
             setAll();
             //List<OrderC> list = checkOrderC.getOrderList();
             List<CompanyC> companyCs = CDBHelper.getObjByClass(payActivity.getApplicationContext(),CompanyC.class);
@@ -234,9 +231,9 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
     //主要用于将异步操作任务执行的结果展示给用户
     @Override
     protected void onPostExecute(String result) {
-        Log.e("Test",result);
 
         payActivity.closeDialog();
+
         payActivity.turnDesk();
 
 

@@ -839,8 +839,6 @@ public class PayActivity extends AppCompatActivity {
 
     private void printOrder() {
 
-        Log.e("Test", "OOOOO");
-
         ProgressBarasyncTask progressBarasyncTask = new ProgressBarasyncTask(PayActivity.this);
         progressBarasyncTask.setDate(checkOrder);
         progressBarasyncTask.execute();
