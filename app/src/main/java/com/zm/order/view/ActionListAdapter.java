@@ -39,22 +39,22 @@ public class ActionListAdapter extends BaseAdapter {
     ListView listView;
     private List list;
     PayActivity payActivity;
-    int [] flag;
+    int[] flag;
 
     public ActionListAdapter(List list, PayActivity payActivity) {
 
         super();
         this.list = list;
         this.payActivity = payActivity;
-       flag = new int[list.size()];
-       // flag  = new int[20];
+        flag = new int[list.size()];
+        // flag  = new int[20];
     }
 
     @Override
     public int getCount() {
 
-        return list.isEmpty()?0:list.size();
-       // return 20;
+        return list.isEmpty() ? 0 : list.size();
+        // return 20;
     }
 
     @Override
@@ -72,32 +72,32 @@ public class ActionListAdapter extends BaseAdapter {
 
         ViewHold viewHold = null;
 
-        if(view == null){
+        if (view == null) {
 
             //加载布局管理器
             LayoutInflater inflater = LayoutInflater.from(payActivity);
-            view = inflater.inflate(R.layout.view_payactivity_action_dialog_adapteritem,null);
+            view = inflater.inflate(R.layout.view_payactivity_action_dialog_adapteritem, null);
             viewHold = new ViewHold();
-            viewHold.actionName =view.findViewById(R.id.actionName_tv);
-            viewHold.actionTime =view.findViewById(R.id.actionTime_tv);
+            viewHold.actionName = view.findViewById(R.id.actionName_tv);
+            viewHold.actionTime = view.findViewById(R.id.actionTime_tv);
             viewHold.actionType = view.findViewById(R.id.actionType_tv);
-            viewHold.actionIsCheck_ck =view.findViewById(R.id.actionIsCheck_ck);
+            viewHold.actionIsCheck_ck = view.findViewById(R.id.actionIsCheck_ck);
 
             view.setTag(viewHold);
 
-        }else{
+        } else {
 
             viewHold = (ViewHold) view.getTag();
         }
-      PromotionC promotionC = (PromotionC) list.get(i);
+        PromotionC promotionC = (PromotionC) list.get(i);
         viewHold.actionName.setText(promotionC.getPromotionName());
-        viewHold.actionTime.setText(promotionC.getStartTime()+"    /     "+promotionC.getEndTime());
+        viewHold.actionTime.setText(promotionC.getStartTime() + "    /     " + promotionC.getEndTime());
 
-        if(promotionC.getPromotionType() == 1){
+        if (promotionC.getPromotionType() == 1) {
 
             viewHold.actionType.setText("打折");
 
-        }else if(promotionC.getPromotionType()  == 2){
+        } else if (promotionC.getPromotionType() == 2) {
 
             viewHold.actionType.setText("赠券");
 
@@ -108,7 +108,7 @@ public class ActionListAdapter extends BaseAdapter {
             @Override
             public void onClick(View view) {
 
-                if(flag[i] == 0){
+                if (flag[i] == 0) {
 
                     callback.click(i);
 
@@ -116,7 +116,7 @@ public class ActionListAdapter extends BaseAdapter {
 
                     for (int j = 0; j < flag.length; j++) {
 
-                        if(j != i && flag[j] == 1){
+                        if (j != i && flag[j] == 1) {
 
                             flag[j] = 0;
 
@@ -125,18 +125,18 @@ public class ActionListAdapter extends BaseAdapter {
                     }
                     notifyDataSetChanged();
 
-                }else{
+                } else {
 
                     flag[i] = 0;
                 }
             }
         });
 
-        if(flag[i] == 1){
+        if (flag[i] == 1) {
 
             viewHold.actionIsCheck_ck.setChecked(true);
 
-        }else {
+        } else {
 
             viewHold.actionIsCheck_ck.setChecked(false);
         }
@@ -144,12 +144,12 @@ public class ActionListAdapter extends BaseAdapter {
         return view;
     }
 
-    public int[] getFlag(){
+    public int[] getFlag() {
 
         return flag;
     }
 
-    class ViewHold{
+    class ViewHold {
 
         TextView actionName;
 
@@ -167,7 +167,8 @@ public class ActionListAdapter extends BaseAdapter {
     }
 
     Callback callback;
+
     public interface Callback {
-         public void click(int p);
-     }
+        public void click(int p);
+    }
 }
