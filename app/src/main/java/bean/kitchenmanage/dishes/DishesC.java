@@ -36,6 +36,10 @@ public class DishesC implements Serializable {
 	 */
 	private String dishesNameCode9;
 	/**
+	 *
+	 */
+	private String dishesNameCode26;
+	/**
 	 * 是否外卖 true 是外卖菜品，false 非外卖菜品
 	 */
 	private boolean takeout;//是否外卖，未使用
@@ -231,6 +235,15 @@ public class DishesC implements Serializable {
 //	public void setImage(String image) {
 //		this.image = image;
 //	}
+
+
+	public String getDishesNameCode26() {
+		return dishesNameCode26;
+	}
+
+	public void setDishesNameCode26(String dishesNameCode26) {
+		this.dishesNameCode26 = dishesNameCode26;
+	}
 
 	public String get_id() {
 		return _id;

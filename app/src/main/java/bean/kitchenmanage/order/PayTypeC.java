@@ -30,7 +30,6 @@ public class PayTypeC {
 	 */
 	private String _id;
 
-
 	/**
 	 * 支付类型名称
 	 */
