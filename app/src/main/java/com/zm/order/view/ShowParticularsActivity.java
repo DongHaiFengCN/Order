@@ -614,6 +614,7 @@ public class ShowParticularsActivity extends Activity {
                     }
                     retreatDishesFromZC(position, tmpCount);
                     printerToKitchen(goodsCList.get(position), 1 ,areaName,tableName);
+
                     setAll();
                 }
                 dialog.dismiss();
@@ -692,7 +693,7 @@ public class ShowParticularsActivity extends Activity {
         {
             if (orderC.getOrderCType() == 0)//0，正常菜订单
             {
-                all = MyBigDecimal.add(all, orderC.getAllPrice(), 1);
+                all = MyBigDecimal.add(all, orderC.getAllPrice(), 2);
             }
 
             for (GoodsC goodsb : orderC.getGoodsList())
