@@ -120,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
     private float total = 0.0f;
     private Fragment seekT9Fragment;
     private Fragment orderFragment;
+    private List<GoodsC> t9GoodsList;
     private SeekT9Adapter seekT9Adapter;
     private FragmentManager fm;//获得Fragment管理器
     private FragmentTransaction ft; //开启一个事务
@@ -281,12 +282,19 @@ public class MainActivity extends AppCompatActivity {
         orderItem.add(sparseArray);
     }
 
-    public void setT9Adapter(SeekT9Adapter seekT9Adapter) {
+    public void setSeekT9Adapter(SeekT9Adapter seekT9Adapter) {
         this.seekT9Adapter = seekT9Adapter;
     }
 
     public SeekT9Adapter getSeekT9Adapter() {
         return seekT9Adapter;
+    }
+    public void setT9GoodsList(List<GoodsC> t9GoodsList) {
+        this.t9GoodsList = t9GoodsList;
+    }
+
+    public List<GoodsC> getT9GoodsList() {
+        return t9GoodsList;
     }
 
     //    public void setOrderAdapter(OrderAdapter o) {
