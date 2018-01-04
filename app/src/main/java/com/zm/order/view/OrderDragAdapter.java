@@ -42,9 +42,6 @@ public class OrderDragAdapter extends BaseAdapter {
     //维护数量数组
     private float[] numbers;
 
-
-    Map<String, Float> floatMap = new HashMap<>();
-
     ListView listview;
 
     public void setMessage( List<DishesC> mlistDishes,float[] numbers){

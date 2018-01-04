@@ -1431,12 +1431,12 @@ public class MainActivity extends AppCompatActivity {
 
         } else {
 
-            if ((goodsList.get(i).getDishesCount() - dishesMessage.getCount()) == 0) {
+            if ((goodsList.get(i).getDishesCount() - 1f) == 0) {
 
                 goodsList.remove(i);
 
             } else {
-                goodsList.get(i).setDishesCount(goodsList.get(i).getDishesCount() - dishesMessage.getCount());
+                goodsList.get(i).setDishesCount(goodsList.get(i).getDishesCount() -  1f);
 
             }
 

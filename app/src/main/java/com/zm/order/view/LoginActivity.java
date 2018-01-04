@@ -65,25 +65,9 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
     private Intent intent;
     private List<UsersC> usersCList;
     private MyApplication myapp;
-    ProgressDialog proDialog;
-/*
-    @SuppressLint("HandlerLeak")
-    private Handler uiHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case 1:
-
-//                    proDialog.dismiss();
-
-                    break;
-
-                default:
-
-                    break;
-            }
-        }
-    };*/
+    List<DishesKindC> dishesKindCList;
+    private UsersC usersC;
+    private Map<String, List<DishesC>> dishesObjectCollection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +75,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
         setContentView(R.layout.activity_login);
         myapp = (MyApplication) getApplication();
 
-        proDialog = new ProgressDialog(this);
+
         inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         intent = new Intent(this, DeskActivity.class);
         usersCList = CDBHelper.getObjByWhere(getApplicationContext(),
@@ -111,7 +95,25 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
         userNumber = myApplication.getSharePreferences().getString("name", "");
         userPsw = myApplication.getSharePreferences().getString("password", "");
 
-        //success();
+        for (UsersC u : usersCList) {
+            if (u.getUserName().equals(userNumber)) {
+
+                usersC = u;
+
+                break;
+            }
+        }
+
+
+
+        dishesKindCList = CDBHelper.getObjByWhere(getApplicationContext()
+                , Expression.property("className").equalTo("DishesKindC")
+                        .and(Expression.property("isSetMenu").equalTo(false))
+                , Ordering.property("kindName")
+                        .ascending(), DishesKindC.class);
+
+
+        dishesObjectCollection = new HashMap<>();
 
         //无缓存
         if ("".equals(userNumber)) {
@@ -197,13 +199,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
             @Override
             public void onClick(View view) {
                 iLoginPresenter.doLogin();
-          /*      myApplication.mExecutor.submit(new Runnable() {
-                    @Override
-                    public void run() {
 
-
-                    }
-                });*/
 
 
             }
@@ -232,18 +228,11 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
     @Override
     public void success() {
 
-        proDialog.setTitle("配置");
-        proDialog.setMessage("正在加载数据请稍等");
-        proDialog.show();
-        for (UsersC u : usersCList) {
-            if (u.getUserName().equals(userNumber)) {
-                myApplication.setUsersC(u);
-                break;
-            }
-        }
+        myApplication.setUsersC(usersC);
 
         initDishesData();
-
+      //  startActivity(intent);
+       // finish();
     }
 
     @Override
@@ -267,20 +256,15 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
 
 
     public void initDishesData() {
-
-
+        final ProgressDialog proDialog;
+        proDialog = new ProgressDialog(this);
+        proDialog.setTitle("配置");
+        proDialog.setMessage("正在加载数据请稍等");
+        proDialog.show();
         myApplication.mExecutor.execute(new Runnable() {
             @Override
             public void run() {
 
-                final Map<String, List<DishesC>> dishesObjectCollection = new HashMap<>();
-                List<DishesKindC> dishesKindCList;
-
-                dishesKindCList = CDBHelper.getObjByWhere(getApplicationContext()
-                        , Expression.property("className").equalTo("DishesKindC")
-                                .and(Expression.property("isSetMenu").equalTo(false))
-                        , Ordering.property("kindName")
-                                .ascending(), DishesKindC.class);
                 //初始化菜品数量维护映射表
                 for (DishesKindC dishesKindC : dishesKindCList) {
 
@@ -302,21 +286,12 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
 
                     //初始化disheKind对应的dishes实体类映射
                     dishesObjectCollection.put(dishesKindC.get_id(), dishesCS);
-
-                    //初始化dishekind对应的dishes的数量映射
-
                 }
-
                 myapp.setDishesKindCList(dishesKindCList);
                 myapp.setDishesObjectCollection(dishesObjectCollection);
-      /*          Message msg = new Message();
-                msg.what = 1;
-                uiHandler.sendMessage(msg);*/
-
                 proDialog.dismiss();
                 startActivity(intent);
                 finish();
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         });
 
