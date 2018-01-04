@@ -592,6 +592,9 @@ public class SeekT9Fragment extends Fragment {
             case R.id.ibtn_key_r:
                 tlKeyGrid.setVisibility(View.GONE);
                 activitySeekLin26.setVisibility(View.VISIBLE);
+                activitySeekEdit.setText("");
+                t9GoodsList.clear();
+                seekT9Adapter.notifyDataSetChanged();
                 break;
             case R.id.ibtn_key_del:
                 int length = activitySeekEdit.getSelectionEnd();
@@ -716,6 +719,9 @@ public class SeekT9Fragment extends Fragment {
             case R.id.seek_26_qh:
                 tlKeyGrid.setVisibility(View.VISIBLE);
                 activitySeekLin26.setVisibility(View.GONE);
+                activitySeekEdit.setText("");
+                t9GoodsList.clear();
+                seekT9Adapter.notifyDataSetChanged();
                 break;
 
             case R.id.seek_26_sc:
