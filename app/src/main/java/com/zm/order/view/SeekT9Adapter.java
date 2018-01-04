@@ -267,7 +267,7 @@ public class SeekT9Adapter extends BaseAdapter {
         goodsObj.setDishesCount(1);
         goodsObj.setPrice(mGoodsList.get(position).getPrice());
         goodsObj.setGoodsType(0);
-        goodsObj.setDishesId(mGoodsList.get(position).get_id());
+        goodsObj.setDishesId(mGoodsList.get(position).getDishesId());
         goodsObj.setDishesKindId(mGoodsList.get(position).getDishesKindId());
 
 

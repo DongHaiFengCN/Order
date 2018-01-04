@@ -313,22 +313,36 @@ public class MainActivity extends AppCompatActivity {
         return goodsList;
     }
 
-    public void changeOrderGoodsByT9(GoodsC goodsObj) {
-        for (int i = 0; i < goodsList.size(); i++)//+for
+    public void changeOrderGoodsByT9(GoodsC goodsObj)
+    {
+        boolean isName = false;
+        for (int i = 0; i<goodsList.size();i++)//+for
         {
             if (goodsList.get(i).getDishesName().toString().equals(goodsObj.getDishesName()))//名称相等
             {
-                if (goodsList.get(i).getDishesTaste() != null)//口味不为空
+                if(goodsList.get(i).getDishesTaste()!=null)//口味不为空
                 {
-                    if (goodsList.get(i).getDishesTaste().equals(goodsObj.getDishesTaste()))//口味相等
+                    if(goodsList.get(i).getDishesTaste().equals(goodsObj.getDishesTaste()))//口味相等
                     {
-                        goodsList.get(i).setDishesCount(goodsObj.getDishesCount());
+
+                        float tmp = MyBigDecimal.mul(goodsObj.getPrice(),goodsObj.getDishesCount(),2);
+                        goodsList.get(i).setDishesCount(MyBigDecimal.add(goodsObj.getDishesCount(),goodsList.get(i).getDishesCount(),2));
+                        total =  getTotal();
+                        total = MyBigDecimal.add(total,tmp,2);
+                        setTotal(total);
+                        isName = true;
                         break;
                     }
 
                 }//口味为空
-                else {
-                    goodsList.get(i).setDishesCount(goodsObj.getDishesCount());
+                else
+                {
+                    float tmp = MyBigDecimal.mul(goodsObj.getPrice(),goodsObj.getDishesCount(),2);
+                    goodsList.get(i).setDishesCount(MyBigDecimal.add(goodsObj.getDishesCount(),goodsList.get(i).getDishesCount(),2));
+                    total =  getTotal();
+                    total = MyBigDecimal.add(total,tmp,2);
+                    setTotal(total);
+                    isName = true;
                     break;
 
                 }
@@ -336,9 +350,20 @@ public class MainActivity extends AppCompatActivity {
             }
         }//-for
 
+        if (!isName){
+            goodsList.add(goodsObj);
+            //购物车计数器数据更新
+            point = getPoint();
+            point++;
+            setPoint(point);
 
+            //计算总价
+            total =getTotal();
+            total = MyBigDecimal.add(total,MyBigDecimal.mul(goodsObj.getDishesCount(),goodsObj.getPrice(),2),2);
+            setTotal(total);
+
+        }
     }
-
     public void setTotal(float total) {
         this.total = total;
         String to = MyBigDecimal.round(total + "", 2);

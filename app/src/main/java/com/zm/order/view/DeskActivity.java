@@ -406,7 +406,7 @@ public class DeskActivity extends AppCompatActivity {
 
 
                                        checkOrderC = CDBHelper.getObjById(getApplicationContext(),tableC.getLastCheckOrderId(),CheckOrderC.class);
-                                       if (checkOrderC == null&&checkOrderC.getOrderList() == null){
+                                       if (checkOrderC == null&&checkOrderC.getOrderList().size()==0){
                                            return;
                                        }
 
