@@ -130,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
     private String gOrderId;
     private Document document;
     private Handler mHandler;
+
     //打印机连接
     private PrinterServiceConnection conn = null;
     private GpService mGpService = null;
