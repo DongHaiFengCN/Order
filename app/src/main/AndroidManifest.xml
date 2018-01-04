@@ -85,6 +85,11 @@
             android:configChanges="keyboard|keyboardHidden|orientation"
             android:theme="@style/AppTheme.NoActionBar"
             ></activity>
+        <activity
+            android:name=".view.MainActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation"
+            android:theme="@style/AppTheme.NoActionBar"
+            ></activity>
         <service
             android:name="com.gprinter.service.GpPrintService"
             android:enabled="true"

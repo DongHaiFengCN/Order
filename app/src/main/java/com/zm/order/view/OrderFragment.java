@@ -299,35 +299,6 @@ public class OrderFragment extends Fragment {
     private void markDishesKindFlag() {
 
 
-   /*    for (int i = 0; i < goodsCList.size(); i++) {
-
-
-            Log.e("DOAING", "goods的id" + goodsCList.get(i).getDishesKindId());
-
-            for (int j = 0; j < dishesKindCList.size(); j++) {
-
-
-                Log.e("DOAING", "dishesKindCList的id" + dishesKindCList.get(j).get_id());
-
-                if (goodsCList.get(i).getDishesKindId().equals(dishesKindCList.get(j).get_id())) {
-
-                    booleans[j] = true;
-
-                    Log.e("DOAING", "相等");
-
-                    break;
-
-                } else {
-
-                    booleans[j] = false;
-
-                }
-
-            }
-
-        }*/
-
-
         //更新DishesKind 标记
         for (int j = 0; j < dishesKindCList.size(); j++) {
 
