@@ -27,8 +27,9 @@
         />
     <ImageView
         android:id="@+id/substruct_iv"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_gravity="center"
         android:clickable="true"
         android:src="@mipmap/icon_jian"
         android:visibility="invisible"
@@ -48,10 +49,11 @@
         />
     <ImageView
         android:id="@+id/addtion_iv"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:clickable="true"
         android:src="@mipmap/icon_tj"
+        android:layout_gravity="center"
         android:text="2"
 
         />

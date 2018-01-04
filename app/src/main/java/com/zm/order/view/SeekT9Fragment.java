@@ -30,6 +30,7 @@ import android.widget.Toast;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
+import com.couchbase.lite.Ordering;
 import com.zm.order.R;
 import com.zm.order.view.adapter.MyGridAdapter;
 
@@ -107,6 +108,7 @@ public class SeekT9Fragment extends Fragment {
     private MainActivity mainActivity;
     private Handler mHandler = null;
     private MyApplication myapp;
+    private boolean isT9And26 = true;
 
     @Nullable
     @Override
@@ -318,7 +320,12 @@ public class SeekT9Fragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                search(ChangeSZ(activitySeekEdit.getText().toString()));
+                if (isT9And26){
+                    search(activitySeekEdit.getText().toString());
+                }else{
+                    search26(activitySeekEdit.getText().toString());
+                }
+
             }
         });
 
@@ -377,6 +384,39 @@ public class SeekT9Fragment extends Fragment {
 
     }
 
+    // 查询方法
+    public void search26(final String search) {
+        if (search.length() < 2)
+            return;
+
+        t9GoodsList.clear();
+
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                List<DishesC> dishesCs = CDBHelper.getObjByWhere(getActivity().getApplicationContext()
+                        , Expression.property("className").equalTo("DishesC")
+                                .and(Expression.property("dishesNameCode26").like(search + "%"))
+                        , Ordering.property("dishesName").ascending(), DishesC.class);
+                for (DishesC obj : dishesCs) {
+                    GoodsC goodsObj = new GoodsC(myapp.getCompany_ID());
+                    goodsObj.setDishesName(obj.getDishesName());
+                    goodsObj.setDishesCount(0);
+                    goodsObj.setPrice(obj.getPrice());
+                    goodsObj.setDishesId(obj.get_id());
+                    goodsObj.setDishesKindId(obj.getDishesKindId());
+                    t9GoodsList.add(goodsObj);
+                }
+                seekT9Adapter.notifyDataSetChanged();
+            }
+
+        });
+
+        //        List<Document> documentList=CDBHelper.getDocmentsByWhere((getActivity().getApplicationContext(), Expression.property("className").equalTo("DishesC")
+//                .and(Expression.property("dishesNameCode9").like(search+"%")),null,DishesC.class);
+
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -404,56 +444,56 @@ public class SeekT9Fragment extends Fragment {
             case R.id.ibtn_key_1:
 
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "1");
-                search(activitySeekEdit.getText().toString());
+                isT9And26 = true;
                 break;
 
             case R.id.ibtn_key_2:
 
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "2");
-                search(activitySeekEdit.getText().toString());
+                isT9And26 = true;
 
                 break;
 
             case R.id.ibtn_key_3:
 
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "3");
-                search(activitySeekEdit.getText().toString());
+                isT9And26 = true;
                 break;
 
             case R.id.ibtn_key_4:
 
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "4");
-                search(activitySeekEdit.getText().toString());
+                isT9And26 = true;
                 break;
 
             case R.id.ibtn_key_5:
 
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "5");
-                search(activitySeekEdit.getText().toString());
+                isT9And26 = true;
                 break;
 
             case R.id.ibtn_key_6:
 
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "6");
-                search(activitySeekEdit.getText().toString());
+                isT9And26 = true;
                 break;
 
             case R.id.ibtn_key_7:
 
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "7");
-                search(activitySeekEdit.getText().toString());
+                isT9And26 = true;
                 break;
 
             case R.id.ibtn_key_8:
 
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "8");
-                search(activitySeekEdit.getText().toString());
+                isT9And26 = true;
                 break;
 
             case R.id.ibtn_key_9:
 
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "9");
-                search(activitySeekEdit.getText().toString());
+                isT9And26 = true;
                 break;
 
             case R.id.ibtn_key_l:
@@ -570,81 +610,107 @@ public class SeekT9Fragment extends Fragment {
                 break;
             case R.id.seek_26_q:
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "q");
+                isT9And26 = false;
                 break;
             case R.id.seek_26_w:
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "w");
+                isT9And26 = false;
                 break;
             case R.id.seek_26_e:
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "e");
+                isT9And26 = false;
                 break;
             case R.id.seek_26_r:
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "r");
+                isT9And26 = false;
                 break;
             case R.id.seek_26_t:
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "t");
+                isT9And26 = false;
                 break;
             case R.id.seek_26_y:
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "y");
+                isT9And26 = false;
                 break;
             case R.id.seek_26_u:
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "u");
+                isT9And26 = false;
                 break;
             case R.id.seek_26_i:
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "i");
+                isT9And26 = false;
                 break;
             case R.id.seek_26_o:
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "o");
+                isT9And26 = false;
                 break;
             case R.id.seek_26_p:
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "p");
+                isT9And26 = false;
                 break;
             case R.id.seek_26_a:
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "a");
+                isT9And26 = false;
                 break;
             case R.id.seek_26_s:
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "s");
+                isT9And26 = false;
                 break;
             case R.id.seek_26_d:
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "d");
+                isT9And26 = false;
                 break;
             case R.id.seek_26_f:
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "f");
+                isT9And26 = false;
                 break;
             case R.id.seek_26_g:
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "g");
+                isT9And26 = false;
                 break;
             case R.id.seek_26_h:
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "h");
+                isT9And26 = false;
                 break;
             case R.id.seek_26_j:
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "j");
+                isT9And26 = false;
                 break;
             case R.id.seek_26_k:
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "k");
+                isT9And26 = false;
                 break;
             case R.id.seek_26_l:
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "l");
+                isT9And26 = false;
                 break;
             case R.id.seek_26_z:
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "z");
+                isT9And26 = false;
                 break;
             case R.id.seek_26_x:
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "x");
+                isT9And26 = false;
                 break;
             case R.id.seek_26_c:
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "c");
+                isT9And26 = false;
                 break;
             case R.id.seek_26_v:
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "v");
+                isT9And26 = false;
                 break;
             case R.id.seek_26_b:
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "b");
+                isT9And26 = false;
                 break;
             case R.id.seek_26_n:
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "n");
+                isT9And26 = false;
                 break;
             case R.id.seek_26_m:
                 activitySeekEdit.getText().insert(activitySeekEdit.getSelectionEnd(), "m");
+                isT9And26 = false;
                 break;
 
             case R.id.seek_26_qh:

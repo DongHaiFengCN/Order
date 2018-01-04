@@ -1370,15 +1370,15 @@ public class MainActivity extends AppCompatActivity {
             }else{
                 ft.show(seekT9Fragment);;
             }
-            //isFlag = false;
+            isFlag = false;
         }else if (isTrue == false){
-//            if (orderFragment == null){
-//                orderFragment = new OrderFragment();
-//                ft.add(R.id.activity_frame,orderFragment);
-//            }else{
-//                ft.show(orderFragment);
-//            }
-//            isFlag = true;
+            if (orderFragment == null){
+                orderFragment = new OrderFragment();
+                ft.add(R.id.activity_frame,orderFragment);
+            }else{
+                ft.show(orderFragment);
+            }
+            isFlag = true;
         }
         ft.commit();
 
