@@ -1417,6 +1417,7 @@ public class MainActivity extends AppCompatActivity {
 
 
             }
+
             setTotal(t);
 
         }
