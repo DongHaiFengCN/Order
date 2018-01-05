@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -19,6 +20,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.os.RemoteException;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -138,13 +140,17 @@ public class MainActivity extends AppCompatActivity {
     private Map<String, ArrayList<GoodsC>> allKitchenClientGoods = new HashMap<String, ArrayList<GoodsC>>();
     private Map<String, String> allKitchenClientPrintNames = new HashMap<String, String>();
     //  private static String pIp = "192.168.1.249";
-    private static String pIp = "192.168.2.101";
+    private static String pIp = "192.168.2.100";
     private static int pPortNum = 9100;
     private String tableName, areaName, currentPersions, serNum;
     private static final int MAIN_QUERY_PRINTER_STATUS = 0xfe;
     private static final int REQUEST_PRINT_LABEL = 0xfd;
     private static final int REQUEST_PRINT_RECEIPT = 0xfc;
-    private boolean printerSat = false;
+    //private boolean printerSat = false;
+    private int changeFlag = 0;
+    private ProgressDialog proDialog =null;
+    private int printerType = 58;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,8 +173,10 @@ public class MainActivity extends AppCompatActivity {
         myApp = (MyApplication) getApplicationContext();
 
 
-        mHandler = new Handler();
+
         initView();
+
+
         //连接打印机服务
         registerPrinterBroadcast();
         connectPrinter();
@@ -184,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        MyLog.d("onDestroy");
+        MyLog.e("Main activity onDestroy");
         EventBus.getDefault().unregister(this);
         unregisterReceiver(PrinterStatusBroadcastReceiver);
         // 2、注销打印消息
@@ -214,13 +222,26 @@ public class MainActivity extends AppCompatActivity {
             {
                 int type = intent.getIntExtra(GpPrintService.CONNECT_STATUS, 0);
                 int id = intent.getIntExtra(GpPrintService.PRINTER_ID, 0);
-
+                android.util.Log.e("**********", "connect status " + type);
                 if (type == GpDevice.STATE_CONNECTING)//2
                 {
                     MyLog.d("打印机正在连接");
-                } else if (type == GpDevice.STATE_NONE) {
+                } else if (type == GpDevice.STATE_NONE)//0
+                {
                     MyLog.d("打印机未连接");
-                } else if (type == GpDevice.STATE_VALID_PRINTER)//连接成功 5
+
+            try {
+
+                mGpService.queryPrinterStatus(0, 500, MAIN_QUERY_PRINTER_STATUS);
+            } catch (RemoteException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+                    proDialog.setMessage("分单打印失败");
+
+
+                }
+                else if (type == GpDevice.STATE_VALID_PRINTER)//连接成功 5
                 {
                     MyLog.d("打印机连接成功");
 
@@ -228,13 +249,22 @@ public class MainActivity extends AppCompatActivity {
                     if (goodsList == null || goodsList.size() <= 0)
                         return;
                     printGoodsAtRomoteByIndex(id);
-                } else if (type == GpDevice.STATE_INVALID_PRINTER) {
-                    MyLog.d("打印机已连接");
+                }
+                else if (type == GpDevice.STATE_INVALID_PRINTER)
+                {
+                    MyLog.e("打印机不能连接");
 
                 }
-            } else if (action.equals(GpCom.ACTION_RECEIPT_RESPONSE))//本地打印完成回调
+            }
+            else if (action.equals(GpCom.ACTION_RECEIPT_RESPONSE))//本地打印完成回调
             {
-
+                proDialog.setMessage("分单打印完成");
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                uiHandler.obtainMessage(4).sendToTarget();
 
             } else if (action.equals(GpCom.ACTION_DEVICE_REAL_STATUS)) {
 
@@ -247,8 +277,9 @@ public class MainActivity extends AppCompatActivity {
                     String str;
                     if (status == GpCom.STATE_NO_ERR) {
                         str = "打印机正常";
-                        printerSat = true;
-                    } else {
+                       //printerSat = true;
+                    }
+                    else {
                         str = "打印机 ";
                         if ((byte) (status & GpCom.STATE_OFFLINE) > 0) {
                             str += "脱机";
@@ -265,10 +296,12 @@ public class MainActivity extends AppCompatActivity {
                         if ((byte) (status & GpCom.STATE_TIMES_OUT) > 0) {
                             str += "查询超时";
                         }
-                        printerSat = false;
+                        //printerSat = false;
 
                         Toast.makeText(getApplicationContext(), "厨房打印机：" + " 状态：" + str, Toast.LENGTH_SHORT)
                                 .show();
+
+                        uiHandler.obtainMessage(4).sendToTarget();
                     }
 
 
@@ -558,40 +591,61 @@ public class MainActivity extends AppCompatActivity {
                         Button fou = view1.findViewById(R.id.view_pay_fou);
                         shi.setOnClickListener(new View.OnClickListener() {
                             @Override
-                            public void onClick(View v) {
+                            public void onClick(View v)
+                            {
 
-                                saveOrder();
-                                Intent intent = new Intent(MainActivity.this, PayActivity.class);
-                                startActivityForResult(intent, 1);
-                                finish();
+                                changeFlag = 0;
+                                proDialog = new ProgressDialog( MainActivity.this);
+                                proDialog.setTitle("提示");
+                                proDialog.setMessage("正在生成订单信息...");
+                                proDialog.setCanceledOnTouchOutside(false);// 设置在点击Dialog外是否取消Dialog进度条
+                                proDialog.show();
+
+                                uiHandler.obtainMessage(0).sendToTarget();
+
                                 dialog.dismiss();
+
+
                             }
                         });
                         fou.setOnClickListener(new View.OnClickListener() {
                             @Override
-                            public void onClick(View v) {
-                                saveOrder();
-                                Intent intent = new Intent(MainActivity.this, DeskActivity.class);
-                                startActivity(intent);
+                            public void onClick(View v)
+                            {
+                                changeFlag = 1;
+
+                                proDialog = new ProgressDialog( MainActivity.this);
+                                proDialog.setTitle("提示");
+                                proDialog.setMessage("正在生成订单信息...");
+                                proDialog.setCanceledOnTouchOutside(false);// 设置在点击Dialog外是否取消Dialog进度条
+                                proDialog.show();
+
+                                uiHandler.obtainMessage(0).sendToTarget();
+
                                 dialog.dismiss();
-                                finish();
+
+
                             }
                         });
 
                         Button dy = view1.findViewById(R.id.view_pay_dy);
                         dy.setOnClickListener(new View.OnClickListener() {
                             @Override
-                            public void onClick(View v) {
-                                saveOrder();
+                            public void onClick(View v)
+                            {
+                                changeFlag = 2;
+                                proDialog = new ProgressDialog( MainActivity.this);
+                                proDialog.setTitle("提示");
+                                proDialog.setMessage("正在生成订单信息...");
+                                proDialog.setCanceledOnTouchOutside(false);// 设置在点击Dialog外是否取消Dialog进度条
+                                proDialog.show();
 
-                                if (setPrintOrder().equals("")) {
-                                    Toast.makeText(MainActivity.this, "没有链接蓝牙打印机", Toast.LENGTH_LONG).show();
-                                }
+                                uiHandler.obtainMessage(1).sendToTarget();//
 
-                                Intent intent = new Intent(MainActivity.this, DeskActivity.class);
-                                startActivity(intent);
                                 dialog.dismiss();
-                                finish();
+
+
+
 
 
                             }
@@ -640,7 +694,8 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 厨房分单打印
      */
-    private void printOrderToKitchen() {
+    private void printOrderToKitchen()
+    {
         //1\ 查询出所有厨房,并分配菜品
         List<KitchenClientC> kitchenClientList = CDBHelper.getObjByClass(getApplicationContext(), KitchenClientC.class);
         if (kitchenClientList.size() <= 0) {
@@ -682,6 +737,9 @@ public class MainActivity extends AppCompatActivity {
 
             if (findflag)  //如果有所属菜品，就去打印
             {
+
+                proDialog.setMessage("正在分发到厨房打印机");
+
                 String clientKtname = "" + kitchenClientObj.getName();//厨房名称
                 String printname = "" + kitchenClientObj.getKitchenAdress();//打印机名称
 
@@ -691,40 +749,58 @@ public class MainActivity extends AppCompatActivity {
                 allKitchenClientPrintNames.put("" + printerId, clientKtname);
                 if (!isPrinterConnected(printerId)) // 未连接
                 {
-                    if (connectClientPrint(printerId) == 0) {
+                    proDialog.setMessage(""+clientKtname+"厨房打印机未连接，正在连接");
+                    if (connectClientPrint(printerId) == 0)
+                    {
                         MyLog.d("***********打印机连接命令发送成功");
+                        //proDialog.setMessage("打印机连接命令发送成功");
+                        //uiHandler.obtainMessage(4).sendToTarget();
                     } else {
                         MyLog.d("***********打印机连接命令发送失败");
+                        proDialog.setMessage("打印机连接命令发送失败");
+                        uiHandler.obtainMessage(4).sendToTarget();
                     }
-                } else//已连接
+                }
+                else//已连接
                 {
-                    MyLog.d("*******厨房打印机已连接，正在分发打印");
+                    proDialog.setMessage(""+clientKtname+"厨房打印机已连接");
                     printGoodsAtRomoteByIndex(printerId);
                 }
-
-
+            }
+            else//不分发打印，就直接跳转
+            {
+                proDialog.setMessage("不属于厨房打印菜品");
+                uiHandler.obtainMessage(5).sendToTarget();//
             }
 
         }//end for1
+
+
         //2\判断厨房打印机状态是否连接
         //3\如果是连接状态  直接判断打印
         //4\如果未连接  ，连接打印机  并在打印机连接成功信息接收后打印
     }
 
-    private void printGoodsAtRomoteByIndex(int printerId) {
+    private void printGoodsAtRomoteByIndex(int printerId)
+    {
+        proDialog.setMessage("正在打印，请稍候");
         //1、程序连接上厨房端打印机后要进行分厨房打印
         ArrayList<GoodsC> myshangpinlist = allKitchenClientGoods.get("" + printerId);
 
         //2、获得该打印机内容 打印机名称
         String printname = allKitchenClientPrintNames.get("" + printerId);
         String printcontent = getPrintContentforClient(myshangpinlist, printname);
-        if (printContent(printcontent, printerId) == 0)//打印成功，没有打印完成回调
+        if (printContent(printcontent, printerId) == 0)//打印成功，使用打印完成回调
         {
             MyLog.d(printname + "分单打印完成");
-        } else {
-            MyLog.d("厨房打印失败");
-        }
 
+        }
+        else
+        {
+            MyLog.d("厨房打印失败");
+            proDialog.setMessage("厨房打印失败");
+            uiHandler.obtainMessage(4).sendToTarget();
+        }
         setOrderPrintState(gOrderId);
 
     }
@@ -754,78 +830,122 @@ public class MainActivity extends AppCompatActivity {
             return 0;//把数据发送打印机成功
     }
 
-    private String getPrintContentforClient(ArrayList<GoodsC> myshangpinlist, String clientname) {
+    private String getPrintContentforClient(ArrayList<GoodsC> myshangpinlist, String clientname)
+    {
+
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");// 设置日期格式
         String date = df.format(new Date());
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");// 设置日期格式
         String endtime = sdf.format(new Date());
         EscCommand esc = new EscCommand();
-        try {
-            // 打印标题
-            esc.addSelectJustification(EscCommand.JUSTIFICATION.CENTER);
-            // 设置打印居中
-            esc.addSelectPrintModes(EscCommand.FONT.FONTA, EscCommand.ENABLE.OFF, EscCommand.ENABLE.ON, EscCommand.ENABLE.ON, EscCommand.ENABLE.OFF); // 设置为倍高倍宽
-            esc.addText(clientname + "\n");// 打印文字
-            esc.addPrintAndLineFeed();
-            // 打印文字
-            esc.addSelectPrintModes(EscCommand.FONT.FONTA, EscCommand.ENABLE.OFF, EscCommand.ENABLE.OFF, EscCommand.ENABLE.OFF, EscCommand.ENABLE.OFF);// 取消倍高倍宽
-            esc.addSelectJustification(EscCommand.JUSTIFICATION.LEFT);// 设置打印左对齐
+        // 打印标题居中
+        esc.addSelectJustification(EscCommand.JUSTIFICATION.CENTER);
+        // 设置字体宽高增倍
+        esc.addSelectPrintModes(EscCommand.FONT.FONTA, EscCommand.ENABLE.OFF, EscCommand.ENABLE.ON, EscCommand.ENABLE.ON, EscCommand.ENABLE.OFF); // 设置为倍高倍宽
+        esc.addText(clientname + "\n");// 打印文字
+        //打印并换行
+        esc.addPrintAndLineFeed();
+        // 打印文字
+        esc.addSelectPrintModes(EscCommand.FONT.FONTA, EscCommand.ENABLE.OFF, EscCommand.ENABLE.OFF, EscCommand.ENABLE.OFF, EscCommand.ENABLE.OFF);// 取消倍高倍宽
+        esc.addSelectJustification(EscCommand.JUSTIFICATION.LEFT);// 设置打印左对齐
+
+        if(printerType == 80)
+        {
+
             // esc.addSetLeftMargin((short)10);
             esc.addText("流水号:" + serNum + "\n");//流水号生成机制开发
             esc.addText("房间:" + areaName + "   " + "桌位：" + tableName + "\n");// 打印文字
             esc.addText("人数:" + currentPersions + "\n");//流水号生成机制开发
             esc.addText("时间:" + date + " " + endtime + "\n"); // 时间
+            esc.addText("--------------------------------\n");
             esc.addText("------------------------------------------\n");
             esc.addText("菜品名称         单价     数量    金额 \n"); // 菜品名称(14) 单价(6) 数量(5) 金额(7)
             esc.addText("\n");
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        for (int i = 0; i < myshangpinlist.size(); i++) {
-            float num = 1; // 数量 默认为1
-            num = myshangpinlist.get(i).getDishesCount();
-            esc.addText(myshangpinlist.get(i).getDishesName().toString());
-            String temp = myshangpinlist.get(i).getDishesTaste();
-            if (temp == null || "".equals(temp)) {
-                try {
-                    for (int j = 0; j < (18 - myshangpinlist.get(i).getDishesName().toString().getBytes("gbk").length); j++)
-                        esc.addText(" ");
-                } catch (UnsupportedEncodingException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+
+            for (int i = 0; i < myshangpinlist.size(); i++) {
+                float num = 1; // 数量 默认为1
+                num = myshangpinlist.get(i).getDishesCount();
+                esc.addText(myshangpinlist.get(i).getDishesName().toString());
+                String temp = myshangpinlist.get(i).getDishesTaste();
+                if (temp == null || "".equals(temp)) {
+                    try {
+                        for (int j = 0; j < (18 - myshangpinlist.get(i).getDishesName().toString().getBytes("gbk").length); j++)
+                            esc.addText(" ");
+                    } catch (UnsupportedEncodingException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                } else {
+                    esc.addText("(" + temp + ")");
+                    try {
+                        for (int j = 0; j < (18 - myshangpinlist.get(i).getDishesName().toString().getBytes("gbk").length
+                                - temp.getBytes("gbk").length - 2); j++)
+                            esc.addText(" ");
+                    } catch (UnsupportedEncodingException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
                 }
-            } else {
-                esc.addText("(" + temp + ")");
-                try {
-                    for (int j = 0; j < (18 - myshangpinlist.get(i).getDishesName().toString().getBytes("gbk").length
-                            - temp.getBytes("gbk").length - 2); j++)
-                        esc.addText(" ");
-                } catch (UnsupportedEncodingException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+                // 查找菜品的单价
+
+                String strprice = "" + myshangpinlist.get(i).getPrice();//""+ MyBigDecimal.div(myshangpinlist.get(i).getAllPrice(),myshangpinlist.get(i).getDishesCount(),2);//myshangpinlist.get(i).getSinglePrice;
+                esc.addText(strprice);
+                for (int j = 0; j < 9 - strprice.length(); j++)
+                    esc.addText(" ");
+
+                esc.addText("" + num);
+                for (int j = 0; j < 7 - ("" + num).length(); j++)
+                    esc.addText(" ");
+
+                esc.addText("" + (MyBigDecimal.mul(myshangpinlist.get(i).getPrice(), myshangpinlist.get(i).getDishesCount(), 2)) + "\n");
+                esc.addPrintAndLineFeed();
+
             }
-            // 查找菜品的单价
+            esc.addText("--------------------------------------------\n");
+            esc.addPrintAndLineFeed();
 
-            String strprice = "" + myshangpinlist.get(i).getPrice();//""+ MyBigDecimal.div(myshangpinlist.get(i).getAllPrice(),myshangpinlist.get(i).getDishesCount(),2);//myshangpinlist.get(i).getSinglePrice;
-            esc.addText(strprice);
-            for (int j = 0; j < 9 - strprice.length(); j++)
-                esc.addText(" ");
+            byte len = 0x01;
+            esc.addCutAndFeedPaper(len);
 
-            esc.addText("" + num);
-            for (int j = 0; j < 7 - ("" + num).length(); j++)
-                esc.addText(" ");
+        }
+        else //58型打印机
+        {
+            esc.addText("流水号:" + serNum + "\n");//流水号生成机制开发
+            esc.addText("房间:" + areaName + "   " + "桌位：" + tableName + "\n");// 打印文字
+            esc.addText("人数:" + currentPersions + "\n");//流水号生成机制开发
+            esc.addText("时间:" + date + " " + endtime + "\n"); // 时间
+            esc.addText("--------------------------------\n"); //32横线==16个汉字
+            esc.addText("菜品名称                数量    \n"); // 菜品名称+16个空格即占12个汉字长度；  数量+4个空格即占4个汉字长度 )
+            esc.addText("\n");
 
-            esc.addText("" + (MyBigDecimal.mul(myshangpinlist.get(i).getPrice(), myshangpinlist.get(i).getDishesCount(), 2)) + "\n");
+            esc.addSetHorAndVerMotionUnits((byte)8, (byte) 0);//设置移动单位
+
+            for (int i = 0; i < myshangpinlist.size(); i++)
+            {
+                String dishesName = myshangpinlist.get(i).getDishesName();
+                float num = myshangpinlist.get(i).getDishesCount();
+                String temp = myshangpinlist.get(i).getDishesTaste();
+                esc.addSetAbsolutePrintPosition((short) 0);
+                if (temp == null || "".equals(temp))//无口味
+                {
+                    esc.addText(dishesName);
+                }
+                else//有口味
+                {
+                    esc.addText(dishesName+"("+temp+")");
+                }
+                esc.addSetAbsolutePrintPosition((short) 13);
+                esc.addText("" + num+"\n");
+                //换行
+                esc.addPrintAndLineFeed();
+
+            }
+            esc.addText("--------------------------------------------\n");
             esc.addPrintAndLineFeed();
 
         }
-        esc.addText("--------------------------------------------\n");
-        esc.addPrintAndLineFeed();
 
-        byte len = 0x01;
-        esc.addCutAndFeedPaper(len);
 
 /*
         for (int i = 0; i < myshangpinlist.size(); i++)
@@ -862,6 +982,9 @@ public class MainActivity extends AppCompatActivity {
 
         }
 */
+
+// 加入查询打印机状态，打印完成后，此时会接收到GpCom.ACTION_DEVICE_STATUS广播
+        esc.addQueryPrinterStatus();
 
         Vector<Byte> datas = esc.getCommand();
         // 发送数据
@@ -964,8 +1087,8 @@ public class MainActivity extends AppCompatActivity {
      * @return
      */
     private Boolean isPrinterConnected(int index) {
-        if (!printerSat)
-            return false;
+//        if (!printerSat)
+//            return false;
         // 一上来就先连接蓝牙设备
         int status = 0;
         if (mGpService == null)
@@ -991,26 +1114,30 @@ public class MainActivity extends AppCompatActivity {
         MyLog.e("connectPrinter ret=" + ret);
     }
 
+    /**
+     * @author  loongsun
+     * @Time    0104
+     * @version v2  去掉实时状态判断，这个功能不准确
+     */
     class PrinterServiceConnection implements ServiceConnection {
         @Override
         public void onServiceDisconnected(ComponentName name) {
             MyLog.e("PrinterServiceConnection onServiceDisconnected() called");
             mGpService = null;
         }
-
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mGpService = GpService.Stub.asInterface(service);
             //myapp.setmGpService(mGpService);
             MyLog.e("PrinterServiceConnection onServiceConnected() called");
 
-            try {
-
-                mGpService.queryPrinterStatus(0, 500, MAIN_QUERY_PRINTER_STATUS);
-            } catch (RemoteException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
+//            try {
+//
+//                mGpService.queryPrinterStatus(0, 500, MAIN_QUERY_PRINTER_STATUS);
+//            } catch (RemoteException e1) {
+//                // TODO Auto-generated catch block
+//                e1.printStackTrace();
+//            }
 
 
         }
@@ -1111,7 +1238,7 @@ public class MainActivity extends AppCompatActivity {
         PrintUtils.printText(areaName + "/" + tableName + "\n\n");
         PrintUtils.selectCommand(PrintUtils.NORMAL);
         PrintUtils.selectCommand(PrintUtils.ALIGN_LEFT);
-        PrintUtils.printText(PrintUtils.printTwoData("订单编号", serNum + "\n"));
+        PrintUtils.printText(PrintUtils.printTwoData("流 水 号", serNum + "\n"));
         PrintUtils.printText(PrintUtils.printTwoData("下单时间", getFormatDate() + "\n"));
         PrintUtils.printText(PrintUtils.printTwoData("人数：" + myApp.getTable_sel_obj().getCurrentPersions(), "收银员：" + waiter + "\n"));
         PrintUtils.printText("--------------------------------\n");
@@ -1165,7 +1292,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void saveOrder() {
+    private void saveOrder()
+    {
+
         try {
             CDBHelper.db.inBatch(new TimerTask() {
                 @Override
@@ -1251,7 +1380,6 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-        printOrderToKitchen();
 
     }
 
@@ -1478,5 +1606,59 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+    private Handler uiHandler = new Handler()
+    {
+
+        @Override
+        public void handleMessage(Message msg)
+        {
+
+            switch (msg.what)
+            {
+                case 0:
+                    saveOrder();
+                    printOrderToKitchen();
+                    break;
+                case 1:
+                    saveOrder();
+                    if (setPrintOrder().equals(""))
+                    {
+                        Toast.makeText(MainActivity.this, "没有链接蓝牙打印机", Toast.LENGTH_LONG).show();
+                    }
+                    printOrderToKitchen();
+
+                    break;
+                case 4:
+                    proDialog.dismiss();
+                    uiHandler.obtainMessage(5).sendToTarget();//跳转界面
+                    break;
+                case 5:
+                    if(changeFlag==0)
+                    {
+                        Intent intent = new Intent(MainActivity.this, PayActivity.class);
+                        startActivityForResult(intent, 1);
+                        finish();
+                    }
+                    else if(changeFlag ==1)
+                    {
+                        Intent intent = new Intent(MainActivity.this, DeskActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                    else if(changeFlag ==2)
+                    {
+                        Intent intent = new Intent(MainActivity.this, DeskActivity.class);
+                        startActivity(intent);
+                        finish();
+
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+            super.handleMessage(msg);
+        }
+    };
 
 }
