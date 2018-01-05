@@ -17,6 +17,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -30,6 +31,7 @@ import android.util.DisplayMetrics;
 import android.util.SparseArray;
 import android.view.Display;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -162,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
+        hideNavigationBar();
         //关键下面两句话，设置了回退按钮，及点击事件的效果
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -184,6 +187,32 @@ public class MainActivity extends AppCompatActivity {
         MyLog.d("onCreate");
     }
 
+    private void hideNavigationBar() {
+        int systemUiVisibility = getWindow().getDecorView().getSystemUiVisibility();
+
+        // Navigation bar hiding:  Backwards compatible to ICS.
+        if (Build.VERSION.SDK_INT >= 14) {
+            systemUiVisibility ^= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+        }
+
+        // 全屏展示
+        /*if (Build.VERSION.SDK_INT >= 16) {
+            systemUiVisibility ^= View.SYSTEM_UI_FLAG_FULLSCREEN;
+        }*/
+
+        if (Build.VERSION.SDK_INT >= 18) {
+            systemUiVisibility ^= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+        }
+
+        getWindow().getDecorView().setSystemUiVisibility(systemUiVisibility);
+    }
+
+    /*public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            return true;
+        }
+        return false;
+    }*/
     @Override
     protected void onStart() {
         super.onStart();
