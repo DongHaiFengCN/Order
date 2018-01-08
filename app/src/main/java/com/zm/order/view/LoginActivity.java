@@ -21,6 +21,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
@@ -67,7 +68,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
     private MyApplication myapp;
     List<DishesKindC> dishesKindCList;
     private UsersC usersC;
-    private Map<String, List<DishesC>> dishesObjectCollection;
+    private Map<String, List<Document>> dishesObjectCollection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -220,7 +221,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
     @Override
     public void showError(String error) {
 
-        ConstraintLayout constraintLayout = (ConstraintLayout) findViewById(R.id.constraintLayout);
+        LinearLayout constraintLayout = findViewById(R.id.linearLayout);
 
         Snackbar.make(constraintLayout, error, Snackbar.LENGTH_LONG).show();
     }
@@ -231,8 +232,8 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
         myApplication.setUsersC(usersC);
 
         initDishesData();
-      //  startActivity(intent);
-       // finish();
+        startActivity(intent);
+        finish();
     }
 
     @Override
@@ -256,11 +257,6 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
 
 
     public void initDishesData() {
-        final ProgressDialog proDialog;
-        proDialog = new ProgressDialog(this);
-        proDialog.setTitle("配置");
-        proDialog.setMessage("正在加载数据请稍等");
-        proDialog.show();
         myApplication.mExecutor.execute(new Runnable() {
             @Override
             public void run() {
@@ -272,16 +268,13 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
 
                     List<String> disheList = dishesKindC.getDishesListId();
 
-                    List<DishesC> dishesCS = new ArrayList<>();
+                    List<Document> dishesCS = new ArrayList<>();
 
                     for (int i = 0; i < count; i++) {
 
-                        DishesC dishesC = CDBHelper.getObjById(getApplicationContext(), disheList.get(i), DishesC.class);
-
-                        if (dishesC != null) {
+                        Document dishesC = CDBHelper.getDocByID(getApplicationContext(), disheList.get(i));
 
                             dishesCS.add(dishesC);
-                        }
                     }
 
                     //初始化disheKind对应的dishes实体类映射
@@ -289,9 +282,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
                 }
                 myapp.setDishesKindCList(dishesKindCList);
                 myapp.setDishesObjectCollection(dishesObjectCollection);
-                proDialog.dismiss();
-                startActivity(intent);
-                finish();
+
             }
         });
 

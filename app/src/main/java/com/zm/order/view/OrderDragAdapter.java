@@ -8,20 +8,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.couchbase.lite.Document;
+import com.couchbase.lite.Log;
 import com.zm.order.R;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import bean.kitchenmanage.dishes.DishesC;
 import bean.kitchenmanage.dishes.DishesTasteC;
-import bean.kitchenmanage.order.GoodsC;
 import model.CDBHelper;
 import model.DishesMessage;
 
@@ -31,30 +31,45 @@ import model.DishesMessage;
 
 public class OrderDragAdapter extends BaseAdapter {
 
-    private List<DishesC>   mlistDishes;
+    private List<Document>   mlistDishes;
     private Context context;
-
 
     public float[] getNumbers() {
         return numbers;
     }
+
+    public void setList(List<String> toastList) {
+        this.toastList = toastList;
+    }
+
+    private List<String> toastList;
 
     //维护数量数组
     private float[] numbers;
 
     ListView listview;
 
-    public void setMessage( List<DishesC> mlistDishes,float[] numbers){
+    public void setMessage(List<Document> mlistDishes, float[] numbers){
 
         this.mlistDishes = mlistDishes;
 
         this.numbers = numbers;
-
         notifyDataSetChanged();
+
 
     }
 
     ChangerNumbersListener changerNumbersListener;
+
+    public SubtractionTouchListener getTouchListener() {
+        return touchListener;
+    }
+
+    public void setTouchListener(SubtractionTouchListener touchListener) {
+        this.touchListener = touchListener;
+    }
+
+    SubtractionTouchListener touchListener;
 
     public void setChangerNumbersListener(ChangerNumbersListener changerNumbersListener) {
         this.changerNumbersListener = changerNumbersListener;
@@ -133,8 +148,9 @@ public class OrderDragAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
 
-                setMessage(mlistDishes.get(position), true, position);
-                changerNumbersListener.getNumber(numbers);
+               DishesC dishesC = CDBHelper.getObjById(context,mlistDishes.get(position).getId(),DishesC.class);
+
+                setMessage(dishesC, true, position);
 
             }
         });
@@ -144,16 +160,17 @@ public class OrderDragAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
 
-                setMessage(mlistDishes.get(position), false, position);
-                changerNumbersListener.getNumber(numbers);
+                DishesC dishesC = CDBHelper.getObjById(context,mlistDishes.get(position).getId(),DishesC.class);
+
+                setMessage(dishesC, false, position);
 
             }
         });
 
 
-        view.name.setText(mlistDishes.get(position).getDishesName());
+        view.name.setText(mlistDishes.get(position).getString("dishesName"));
 
-        view.price.setText(mlistDishes.get(position).getPrice() + " 元/份");
+        view.price.setText(mlistDishes.get(position).getFloat("price") + " 元/份");
 
 
         return convertView;
@@ -182,48 +199,96 @@ public class OrderDragAdapter extends BaseAdapter {
         //有口味，添加选择口味dialog
         if (dishesC.getTasteList() != null && dishesC.getTasteList().size() > 0) {
 
-            //初始化一个缓存口味的数组
-            final String[] strings = new String[dishesC.getTasteList().size()];
+           if(flag){
 
-            for (int i = 0; i < dishesC.getTasteList().size(); i++) {
+               //初始化一个缓存口味的数组
+               final String[] strings = new String[dishesC.getTasteList().size()];
 
-                DishesTasteC dishesTasteC = CDBHelper.getObjById(context, dishesC.getTasteList().get(i), DishesTasteC.class);
+               for (int i = 0; i < dishesC.getTasteList().size(); i++) {
 
-                if (dishesTasteC != null) {
+                   DishesTasteC dishesTasteC = CDBHelper.getObjById(context, dishesC.getTasteList().get(i), DishesTasteC.class);
 
-                    strings[i] = dishesTasteC.getTasteName();
-                }
+                   if (dishesTasteC != null) {
 
-            }
-            dishesMessage.setDishesTaste(strings[0]);
-            new AlertDialog.Builder(context).setTitle("选择口味")
+                       strings[i] = dishesTasteC.getTasteName();
+                   }
 
-
-                    .setSingleChoiceItems(strings, 0, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-
-                            //得到口味
-
-                            dishesMessage.setDishesTaste(strings[i]);
-
-                        }
-                    })
-                    .setPositiveButton("确认", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-
-                            Refresh(flag, position, dishesMessage);
+               }
+               dishesMessage.setDishesTaste(strings[0]);
+               new AlertDialog.Builder(context).setTitle("全部口味")
 
 
-                        }
-                    })
-                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
+                       .setSingleChoiceItems(strings, 0, new DialogInterface.OnClickListener() {
+                           @Override
+                           public void onClick(DialogInterface dialogInterface, int i) {
 
-                        }
-                    }).show();
+                               //得到口味
+
+                               dishesMessage.setDishesTaste(strings[i]);
+
+                           }
+                       })
+                       .setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                           @Override
+                           public void onClick(DialogInterface dialogInterface, int i) {
+
+                               Refresh(flag, position, dishesMessage);
+
+
+                           }
+                       })
+                       .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                           @Override
+                           public void onClick(DialogInterface dialogInterface, int i) {
+
+                           }
+                       }).show();
+
+           } else {
+
+
+
+               touchListener.setSubtractionTouchListener(dishesC.get_id());
+
+
+
+               //获取这个当前菜品的id 找到goodsList中相同的，加载口味 ok？
+
+
+               final String[] arr = toastList.toArray(new String[toastList.size()]);
+               dishesMessage.setDishesTaste(arr[0]);
+               new AlertDialog.Builder(context).setTitle("已选择口味")
+
+
+                       .setSingleChoiceItems(arr, 0, new DialogInterface.OnClickListener() {
+                           @Override
+                           public void onClick(DialogInterface dialogInterface, int i) {
+
+                               //得到口味
+
+                               dishesMessage.setDishesTaste(arr[i]);
+
+                           }
+                       })
+                       .setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                           @Override
+                           public void onClick(DialogInterface dialogInterface, int i) {
+
+                               Refresh(flag, position, dishesMessage);
+
+
+                           }
+                       })
+                       .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                           @Override
+                           public void onClick(DialogInterface dialogInterface, int i) {
+
+                           }
+                       }).show();
+
+           }
+
+
 
         } else {
 
@@ -245,13 +310,15 @@ public class OrderDragAdapter extends BaseAdapter {
 
         }
 
-         notifyDataSetChanged();
+        // notifyDataSetChanged();
 
 
         dishesMessage.setOperation(flag);
-        dishesMessage.setNumbers(numbers);
 
         EventBus.getDefault().postSticky(dishesMessage);
+
+        changerNumbersListener.getNumber(numbers);
+
     }
 
 
@@ -280,5 +347,10 @@ public class OrderDragAdapter extends BaseAdapter {
         void getNumber(float[] numbers);
 
     }
+    interface SubtractionTouchListener {
 
+        void setSubtractionTouchListener(String id);
+
+
+    }
 }

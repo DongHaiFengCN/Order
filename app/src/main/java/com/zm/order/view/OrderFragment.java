@@ -15,6 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
 import com.couchbase.lite.Ordering;
 import com.zm.order.R;
@@ -54,7 +55,7 @@ public class OrderFragment extends Fragment {
     //缓存disheskind 与 对应菜品数量的number集合
 
     private Map<String, float[]> dishesCollection = new HashMap<>();
-    private Map<String, List<DishesC>> dishesObjectCollection;
+    private Map<String, List<Document>> dishesObjectCollection;
     private boolean[] booleans;
     //*************************
     List<DishesKindC> dishesKindCList;
@@ -68,98 +69,8 @@ public class OrderFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         EventBus.getDefault().register(this);
         intiData1();
-        //intiData2();
     }
 
-    private void intiData2() {
-
-        orderDragAdapter = new OrderDragAdapter(getActivity());
-
-
-        //初始化ListKind
-        dishesKindCList = ((MainActivity) getActivity()).getMyApp().getDishesKindCList();
-
-
-        //为空的状态下重新设置
-        if (dishesKindCList == null) {
-
-            dishesKindCList = CDBHelper.getObjByWhere(getActivity().getApplicationContext()
-                    , Expression.property("className").equalTo("DishesKindC")
-                            .and(Expression.property("isSetMenu").equalTo(false))
-                    , Ordering.property("kindName")
-                            .ascending(), DishesKindC.class);
-
-
-            ((MainActivity) getActivity()).getMyApp().setDishesKindCList(dishesKindCList);
-        }
-
-
-        //设置Kind标记
-        booleans = new boolean[dishesKindCList.size()];
-
-        //得到映射表
-
-        dishesObjectCollection = ((MainActivity) getActivity()).getMyApp().getDishesObjectCollection();
-
-
-        dishesRv.setAdapter(orderDragAdapter);
-
-        //设置kind的adapter
-
-        leftAdapter = new DishesKindAdapter();
-
-        leftAdapter.setaBoolean(booleans);
-
-        leftAdapter.setNames(dishesKindCList);
-
-        orderList.setAdapter(leftAdapter);
-
-        orderList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                leftAdapter.changeSelected(position);
-
-                DishesKindC dishesKindC = dishesKindCList.get(position);
-
-                List<DishesC> mlistDishes = dishesObjectCollection.get(dishesKindC.get_id());
-
-                if (mlistDishes == null) {
-
-                    List<String> disheList = dishesKindC.getDishesListId();
-
-
-                    mlistDishes = new ArrayList<>();
-
-                    for (int i = 0; i < disheList.size(); i++) {
-
-                        DishesC dishesC = CDBHelper.getObjById(getActivity().getApplication(), disheList.get(i), DishesC.class);
-
-                        if (dishesC != null) {
-
-                            mlistDishes.add(dishesC);
-                        }
-                    }
-
-                    //初始化disheKind对应的dishes实体类映射
-                    dishesObjectCollection.put(dishesKindC.get_id(), mlistDishes);
-
-                    //Log.e("DOAING", dishesKindC.getKindName() + " 首次加载~~~");
-                }
-                dishesCollection.put(dishesKindC.get_id(), new float[mlistDishes.size()]);
-
-
-               // Log.e("DOAING", dishesObjectCollection.get(dishesKindC.get_id()).size() + " 长度~~~");
-                orderDragAdapter.setMessage(dishesObjectCollection.get(dishesKindC.get_id())
-                        , dishesCollection.get(dishesKindC.get_id()));
-
-            }
-        });
-        orderList.performItemClick(orderList.getChildAt(0), 0, orderList
-                .getItemIdAtPosition(0));
-
-        myNotifyDataSetChanged();
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -180,11 +91,10 @@ public class OrderFragment extends Fragment {
 
 
         //初始化数量
-        for (Map.Entry<String, List<DishesC>> entry : dishesObjectCollection.entrySet()) {
+        for (Map.Entry<String, List<Document>> entry : dishesObjectCollection.entrySet()) {
 
             dishesCollection.put(entry.getKey(), new float[entry.getValue().size()]);
 
-            //Log.e("DOAING", "菜类：" + entry.getKey() + "    " + entry.getValue().size());
         }
 
 
@@ -219,7 +129,10 @@ public class OrderFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                DishesC dishesC = (DishesC) orderDragAdapter.getItem(position);
+                Document document = (Document) orderDragAdapter.getItem(position);
+
+                DishesC dishesC = CDBHelper.getObjById(getActivity().getApplication(), document.getId()
+                        , DishesC.class);
 
                 showDialog(dishesC, position, orderDragAdapter.getNumbers()[position]);
             }
@@ -230,11 +143,31 @@ public class OrderFragment extends Fragment {
         orderDragAdapter.setChangerNumbersListener(new OrderDragAdapter.ChangerNumbersListener() {
             @Override
             public void getNumber(float[] numbers) {
+
                 //更新缓存数据
                 myNotifyDataSetChanged();
 
-
             }
+        });
+
+        orderDragAdapter.setTouchListener(new OrderDragAdapter.SubtractionTouchListener() {
+            @Override
+            public void setSubtractionTouchListener(String id) {
+
+                List<String> stringList = new ArrayList<>();
+
+                for (int i = 0; i < goodsCList.size(); i++) {
+
+                    if(id.equals(goodsCList.get(i).getDishesId())){
+
+                        stringList.add(goodsCList.get(i).getDishesTaste());
+
+                    }
+
+                }
+                orderDragAdapter.setList(stringList);
+            }
+
         });
 
         myNotifyDataSetChanged();
@@ -256,7 +189,7 @@ public class OrderFragment extends Fragment {
             for (GoodsC goodsC : goodsCList) {
 
                 //依次获取每个Goodc对应的映射表包含的dishe集合
-                List<DishesC> dishesCList = dishesObjectCollection.get(goodsC.getDishesKindId());
+                List<Document> dishesCList = dishesObjectCollection.get(goodsC.getDishesKindId());
 
                 //获取缓存的数量对应数组
                 float[] floats = dishesCollection.get(goodsC.getDishesKindId());
@@ -266,7 +199,7 @@ public class OrderFragment extends Fragment {
                 for (int i = 0; i < dishesCList.size(); i++) {
 
                     //找到对应的位置
-                    if (dishesCList.get(i).getDishesName().equals(goodsC.getDishesName())) {
+                    if (dishesCList.get(i).getString("dishesName").equals(goodsC.getDishesName())) {
 
 
                         //数值不相等更新数值
@@ -285,10 +218,10 @@ public class OrderFragment extends Fragment {
             }
 
 
-        }else {
+        } else {
             //重置所有标记
 
-            for (int i = 0; i < booleans.length ; i++) {
+            for (int i = 0; i < booleans.length; i++) {
 
                 booleans[i] = false;
 
@@ -297,9 +230,9 @@ public class OrderFragment extends Fragment {
             //重置数量
 
             //初始化数量
-            for (Map.Entry<String, List<DishesC>> entry : dishesObjectCollection.entrySet()) {
+            for (Map.Entry<String, float[]> entry : dishesCollection.entrySet()) {
 
-              float[] floats =  dishesCollection.get(entry.getKey());
+                float[] floats = dishesCollection.get(entry.getKey());
 
                 for (int i = 0; i < floats.length; i++) {
 
@@ -311,8 +244,6 @@ public class OrderFragment extends Fragment {
         }
 
         markDishesKindFlag();
-
-        leftAdapter.setaBoolean(booleans);
         leftAdapter.notifyDataSetChanged();
         orderDragAdapter.notifyDataSetChanged();
 
@@ -349,8 +280,8 @@ public class OrderFragment extends Fragment {
                 booleans[j] = true;
             }
 
-
         }
+
     }
 
 
@@ -358,6 +289,7 @@ public class OrderFragment extends Fragment {
      * 菜品选择弹出框编辑模块
      */
     private void showDialog(final DishesC dishesC, final int position, float number) {
+
 
         view = LayoutInflater.from(getActivity()).inflate(R.layout.view_item_dialog, null);
 
@@ -381,8 +313,6 @@ public class OrderFragment extends Fragment {
 
         l[0] = Float.parseFloat(all);
 
-        //dishesMessage.setTotal(l[0]);
-
 
         //增删选择器的数据改变的监听方法
 
@@ -391,9 +321,8 @@ public class OrderFragment extends Fragment {
             public void OnChange(float ls, boolean flag) {
 
                 String all = MyBigDecimal.mul(ls + "", dishesC.getPrice() + "", 2);
-                l[0] = Float.parseFloat(all);//实时计算当前菜品选择不同数量后的单品总价
+                l[0] = Float.parseFloat(all);
 
-                //dishesMessage.setTotal(l[0]);
 
                 price_tv.setText("总计 " + l[0] + " 元");
 
@@ -425,9 +354,9 @@ public class OrderFragment extends Fragment {
 
                     dishesMessage.setCount(amountView.getAmount());
 
-                    EventBus.getDefault().postSticky(dishesMessage);
-
                     myNotifyDataSetChanged();
+
+                    EventBus.getDefault().postSticky(dishesMessage);
 
                     alertDialog.dismiss();
 
@@ -447,7 +376,6 @@ public class OrderFragment extends Fragment {
         super.onHiddenChanged(hidden);
 
         if (!hidden) {
-
 
 
             myNotifyDataSetChanged();
@@ -550,7 +478,6 @@ public class OrderFragment extends Fragment {
 
         myNotifyDataSetChanged();
 
-        Log.e("DOAING","清空~~");
     }
 
 

@@ -63,19 +63,19 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 
     private static final String TAG = Application.class.getSimpleName();
 
-    private final static boolean SYNC_ENABLED = true;
+    private final static boolean SYNC_ENABLED = false;
 
-    public Map<String, List<DishesC>> getDishesObjectCollection() {
+    public Map<String, List<Document>> getDishesObjectCollection() {
         return dishesObjectCollection;
     }
 
-    public void setDishesObjectCollection(Map<String, List<DishesC>> dishesObjectCollection) {
+    public void setDishesObjectCollection(Map<String, List<Document>> dishesObjectCollection) {
 
         this.dishesObjectCollection = dishesObjectCollection;
 
     }
 
-    private Map<String, List<DishesC>> dishesObjectCollection = new HashMap<>();
+    private Map<String, List<Document>> dishesObjectCollection = new HashMap<>();
 
     public List<DishesKindC> getDishesKindCList() {
         return dishesKindCList;
@@ -127,50 +127,6 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
         mExecutor = Executors.newCachedThreadPool();
     }
 
-    public void initDishesData()
-    {
-        if(dishesKindCList !=null)
-            return;
-        mExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-
-                dishesKindCList = CDBHelper.getObjByWhere(getApplicationContext()
-                        , Expression.property("className").equalTo("DishesKindC")
-                                .and(Expression.property("isSetMenu").equalTo(false))
-                        , Ordering.property("kindName")
-                                .ascending(), DishesKindC.class);
-                //初始化菜品数量维护映射表
-                for (DishesKindC dishesKindC : dishesKindCList) {
-
-                    int count = dishesKindC.getDishesListId().size();
-
-                    List<String> disheList = dishesKindC.getDishesListId();
-
-                    List<DishesC> dishesCS = new ArrayList<>();
-
-                    for (int i = 0; i < count; i++) {
-
-                        DishesC dishesC = CDBHelper.getObjById(getApplicationContext(), disheList.get(i), DishesC.class);
-
-                        if (dishesC != null) {
-
-                            dishesCS.add(dishesC);
-                        }
-                    }
-
-                    //初始化disheKind对应的dishes实体类映射
-                    dishesObjectCollection.put(dishesKindC.get_id(), dishesCS);
-
-                    //初始化dishekind对应的dishes的数量映射
-                    //  dishesCollection.put(dishesKindC.get_id(), new float[dishesCS.size()]);
-
-                }
-
-            }
-        });
-
-    }
 
     @Override
     public void onTerminate() {

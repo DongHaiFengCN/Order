@@ -33,8 +33,6 @@ public class DishesMessage {
     //多数量状态下
     float count;
 
-    //维护的当前菜类的选择的数据
-    float [] numbers;
 
 
     public String getDishKindId() {
@@ -58,14 +56,6 @@ public class DishesMessage {
     }
 
     boolean single;
-
-    public float[] getNumbers() {
-        return numbers;
-    }
-
-    public void setNumbers(float[] numbers) {
-        this.numbers = numbers;
-    }
 
 
 

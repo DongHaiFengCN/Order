@@ -1260,7 +1260,7 @@ public class PayActivity extends AppCompatActivity {
                                     f1 = MyBigDecimal.div(disrate+"",100+"",3);
 
                                    // MyLog.e("处理后的折扣率： " + f1);
-
+;
                                     copy = MyBigDecimal.mul(copy,(1-Float.valueOf(f1)),3);
 
                                    // copy = copy*(1-Float.valueOf(f1));

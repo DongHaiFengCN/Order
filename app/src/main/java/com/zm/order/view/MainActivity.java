@@ -1376,7 +1376,7 @@ public class MainActivity extends AppCompatActivity {
 
             for (int i = 0; i < goodsList.size(); i++) {
 
-                if (goodsList.get(i).getDishesName().equals(dishesMessage.getName())) {
+                if (goodsList.get(i).getDishesName().equals(dishesMessage.getDishesC().getDishesName())) {
 
                     if (goodsList.get(i).getDishesTaste() == null &&
                             dishesMessage.getDishesTaste() == null) {
@@ -1387,7 +1387,6 @@ public class MainActivity extends AppCompatActivity {
                         break;
 
                     } else if (goodsList.get(i).getDishesTaste().equals(dishesMessage.getDishesTaste())) {
-
 
                         upOrderData(dishesMessage, i);
                         isDishes = true;
@@ -1471,6 +1470,7 @@ public class MainActivity extends AppCompatActivity {
                 goodsList.remove(i);
 
             } else {
+
                 goodsList.get(i).setDishesCount(goodsList.get(i).getDishesCount() - dishesMessage.getCount());
 
             }
