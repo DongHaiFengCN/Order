@@ -36,7 +36,7 @@ public class DishesC implements Serializable {
 	 */
 	private String dishesNameCode9;
 	/**
-	 *
+	 *菜品名称26个首字母
 	 */
 	private String dishesNameCode26;
 	/**

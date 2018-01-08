@@ -396,7 +396,7 @@ public class SeekT9Fragment extends Fragment {
             public void run() {
                 List<DishesC> dishesCs = CDBHelper.getObjByWhere(getActivity().getApplicationContext()
                         , Expression.property("className").equalTo("DishesC")
-                                .and(Expression.property("dishesNameCode26").like(search + "%"))
+                                .and(Expression.property("dishesNameCode26").like("%"+search + "%"))
                         , Ordering.property("dishesName").ascending(), DishesC.class);
                 for (DishesC obj : dishesCs) {
                     GoodsC goodsObj = new GoodsC(myapp.getCompany_ID());
