@@ -63,7 +63,7 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 
     private static final String TAG = Application.class.getSimpleName();
 
-    private final static boolean SYNC_ENABLED = false;
+    private final static boolean SYNC_ENABLED = true;
 
     public Map<String, List<Document>> getDishesObjectCollection() {
         return dishesObjectCollection;
@@ -89,13 +89,14 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 
 //    private String Company_ID="gysz";
 //    private final static String DATABASE_NAME = "gyszdb";
-   //private final static String SYNCGATEWAY_URL = "blip://123.207.174.171:4984/kitchendb/";
+    private final static String SYNCGATEWAY_URL = "blip://123.207.174.171:4984/kitchendb/";
 
     private String Company_ID = "gysz";
     //private final static String DATABASE_NAME = "gyszdbD";
     private final static String DATABASE_NAME = "GYSZDB";
 
-    private final static String SYNCGATEWAY_URL = "blip://192.168.2.166:4984/kitchendb/";
+    //private final static String SYNCGATEWAY_URL = "blip://192.168.2.166:4984/kitchendb/";
+
 
     private Database database = null;
     private Replicator replicator;

@@ -22,6 +22,11 @@ public class DishesC implements Serializable {
 
 	private String className;
 
+	/**
+	 *对象id,等于docmentid,一般用于Pojo操作时使用。
+	 */
+	private  String _id;
+
 
 	/**
 	 * 菜品的序号，代表的添加顺序，可以用它来做显示顺序
@@ -82,9 +87,27 @@ public class DishesC implements Serializable {
 	private List<String> dishesIdList;
 
 	/**
-	 *对象id,等于docmentid,一般用于Pojo操作时使用。
+	 * 是否有子商品
 	 */
-	private  String _id;
+	private boolean haveSupDishes;
+	/**
+	 * 辅助计量单位id
+	 */
+	private String supDishesId;
+	/**
+	 * 主计量1个单位包含几个辅助计量单位
+	 */
+	private float supCount;
+	/**
+	 * 辅助计量单位价格
+	 */
+	private float  supPrice;
+	/**
+	 * 辅助计量单位名字
+	 */
+	private String supDishesName;
+
+
 
 	public DishesC()
 	{
@@ -253,4 +276,43 @@ public class DishesC implements Serializable {
 		this._id = _id;
 	}
 
+	public boolean isHaveSupDishes() {
+		return haveSupDishes;
+	}
+
+	public void setHaveSupDishes(boolean haveSupDishes) {
+		this.haveSupDishes = haveSupDishes;
+	}
+
+	public String getSupDishesId() {
+		return supDishesId;
+	}
+
+	public void setSupDishesId(String supDishesId) {
+		this.supDishesId = supDishesId;
+	}
+
+	public String getSupDishesName() {
+		return supDishesName;
+	}
+
+	public void setSupDishesName(String supDishesName) {
+		this.supDishesName = supDishesName;
+	}
+
+	public float getSupCount() {
+		return supCount;
+	}
+
+	public void setSupCount(float supCount) {
+		this.supCount = supCount;
+	}
+
+	public float getSupPrice() {
+		return supPrice;
+	}
+
+	public void setSupPrice(float supPrice) {
+		this.supPrice = supPrice;
+	}
 }

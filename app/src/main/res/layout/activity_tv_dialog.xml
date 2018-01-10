@@ -117,7 +117,57 @@
             />
 
     </RadioGroup>
+    <!--<RadioGroup
+        android:id="@+id/dialog_unit"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:orientation="horizontal"
+        android:visibility="visible">
 
+        <RadioButton
+            android:id="@+id/dialog_delete_unit"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:layout_marginTop="8dp"
+            android:layout_weight="1"
+            android:checked="true"
+            android:gravity="center"
+            android:text="退箱"
+            android:textSize="16sp" />
+
+        <View
+            android:layout_width="1sp"
+            android:layout_height="match_parent" />
+
+        <RadioButton
+            android:id="@+id/dialog_delete_supUnit"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:layout_marginTop="8dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="退瓶"
+            android:textSize="16sp" />
+
+
+    </RadioGroup>-->
+
+    <CheckBox
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="包含副菜品，是否切换"
+        android:id="@+id/dialog_delete_supDishes"
+        android:layout_marginLeft="10dp"
+        android:visibility="gone"
+        />
 
     <LinearLayout
         android:layout_marginTop="25dp"

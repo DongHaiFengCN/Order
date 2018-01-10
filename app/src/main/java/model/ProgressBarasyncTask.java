@@ -8,6 +8,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.couchbase.lite.Expression;
+import com.couchbase.lite.Ordering;
 import com.zm.order.view.MyBigDecimal;
 import com.zm.order.view.PayActivity;
 
@@ -274,45 +275,130 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
 
     private void setAll() {
         boolean flag = false;
-        for (OrderC orderC : checkOrderC.getOrderList()) {
-            for (GoodsC goodsb : orderC.getGoodsList()) {
-                flag = false;
 
-                for (GoodsC goodsC : goodsCList) {
-                    if (goodsC.getDishesName().equals(goodsb.getDishesName())) {
 
-                        if (goodsb.getDishesTaste() != null) {
+        for (OrderC orderC : checkOrderC.getOrderList())
+        {
+            if (orderC.getOrderCType() == 0)//0，正常菜订单
+            {
+                for (GoodsC goodsb : orderC.getGoodsList()) {
+                    flag = false;
+                    for (GoodsC goodsC : goodsCList) {
+                        if (goodsb.getGoodsType() == goodsC.getGoodsType()){
+                            if (goodsC.getDishesId().equals(goodsb.getDishesId())) {
+                                if (goodsb.getDishesTaste() != null) {
+                                    if (goodsb.getDishesTaste().equals(goodsC.getDishesTaste())) {
+                                        float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
+                                        goodsC.setDishesCount(count);
+                                        flag = true;
+                                    }
 
-                            if (goodsb.getDishesTaste().equals(goodsC.getDishesTaste())) {
+                                } else {
 
-                                float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
-                                goodsC.setDishesCount(count);
-                                flag = true;
+                                    float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
+                                    goodsC.setDishesCount(count);
+
+                                    flag = true;
+                                }
+
+                                break;
                             }
 
-                        } else {
-
-                            float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
-                            goodsC.setDishesCount(count);
-
-                            flag = true;
                         }
+                    }
+                    if (!flag) {
+                        GoodsC objClone = null;
+                        try {
+                            objClone = (GoodsC) goodsb.clone();
+                        } catch (CloneNotSupportedException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                        goodsCList.add(objClone);
 
-                        break;
                     }
                 }
-                if (!flag) {
-                    GoodsC objClone = null;
-                    try {
-                        objClone = (GoodsC) goodsb.clone();
-                    } catch (CloneNotSupportedException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+            }else if (orderC.getOrderCType() == 1){
+                for (GoodsC goodsb : orderC.getGoodsList()) {
+                    flag = false;
+                    for (GoodsC goodsC : goodsCList) {
+
+                        if (goodsb.getGoodsType() == goodsC.getGoodsType()){
+                            if (goodsC.getDishesId().equals(goodsb.getDishesId())) {
+
+                                if (goodsb.getDishesTaste() != null) {
+
+                                    if (goodsb.getDishesTaste().equals(goodsC.getDishesTaste())) {
+
+                                        float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
+                                        goodsC.setDishesCount(count);
+                                        flag = true;
+                                    }
+
+                                } else {
+
+                                    float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
+                                    goodsC.setDishesCount(count);
+
+                                    flag = true;
+                                }
+
+                                break;
+                            }
+                        }
                     }
-                    goodsCList.add(objClone);
+                    if (!flag) {
+                        GoodsC objClone = null;
+                        try {
+                            objClone = (GoodsC) goodsb.clone();
+                        } catch (CloneNotSupportedException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                        goodsCList.add(objClone);
 
+                    }
                 }
+            }else if (orderC.getOrderCType() == 2){
+                for (GoodsC goodsb : orderC.getGoodsList()) {
+                    flag = false;
+                    for (GoodsC goodsC : goodsCList) {
+                        if (goodsb.getGoodsType() != goodsC.getGoodsType()){
+                            if (goodsC.getDishesId().equals(goodsb.getDishesId())) {
 
+                                if (goodsb.getDishesTaste() != null) {
+
+                                    if (goodsb.getDishesTaste().equals(goodsC.getDishesTaste())) {
+
+                                        float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
+                                        goodsC.setDishesCount(count);
+                                        flag = true;
+                                    }
+
+                                } else {
+
+                                    float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
+                                    goodsC.setDishesCount(count);
+
+                                    flag = true;
+                                }
+
+                                break;
+                            }
+                        }
+                    }
+                    if (!flag) {
+                        GoodsC objClone = null;
+                        try {
+                            objClone = (GoodsC) goodsb.clone();
+                        } catch (CloneNotSupportedException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                        goodsCList.add(objClone);
+
+                    }
+                }
             }
 
         }
