@@ -19,7 +19,7 @@
         android:layout_height="45dp"
         android:background="@color/md_white"
         android:paddingLeft="18dp"
-        android:drawableLeft="@mipmap/icon_m"
+        android:drawableLeft="@mipmap/icon_y"
         android:drawablePadding="16dp"
         android:inputType="number"
         android:hint="请输入你的用户名"
