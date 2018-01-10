@@ -380,7 +380,7 @@ public class MainActivity extends AppCompatActivity {
         boolean isName = false;
         for (int i = 0; i<goodsList.size();i++)//+for
         {
-            if (goodsList.get(i).getDishesName().toString().equals(goodsObj.getDishesName()))//名称相等
+            if (goodsList.get(i).getDishesId().toString().equals(goodsObj.getDishesId()))//名称相等
             {
                 if(goodsList.get(i).getDishesTaste()!=null)//口味不为空
                 {
@@ -727,14 +727,16 @@ public class MainActivity extends AppCompatActivity {
     {
         //1\ 查询出所有厨房,并分配菜品
         List<KitchenClientC> kitchenClientList = CDBHelper.getObjByClass(getApplicationContext(), KitchenClientC.class);
-        if (kitchenClientList.size() <= 0) {
+        if (kitchenClientList.size() <= 0)
+        {
             Toast.makeText(getApplicationContext(), "未配置厨房数据", Toast.LENGTH_SHORT).show();
+            uiHandler.obtainMessage(4).sendToTarget();
             return;
         }
 
         allKitchenClientGoods.clear();
         allKitchenClientPrintNames.clear();
-
+        proDialog.setMessage("正在整理数据");
         for (KitchenClientC kitchenClientObj : kitchenClientList)//1 for 遍历所有厨房
         {
             boolean findflag = false;
@@ -1399,6 +1401,8 @@ public class MainActivity extends AppCompatActivity {
                         serNum = newOrderObj.getSerialNum();//流水号
                     else //多次下单
                         serNum = newOrderObj.getSerialNum() + "_" + newOrderObj.getOrderNum();
+
+                    proDialog.setMessage("订单已生成，真准备打印");
 
                 }
             });

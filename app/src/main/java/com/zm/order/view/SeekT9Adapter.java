@@ -207,7 +207,7 @@ public class SeekT9Adapter extends BaseAdapter {
         {
             for (int i = 0; i < activity.getGoodsList().size(); i++)
             {
-                if (activity.getGoodsList().get(i).getDishesName().toString().equals(goodsObj.getDishesName()))//名称相同
+                if (activity.getGoodsList().get(i).getDishesId().toString().equals(goodsObj.getDishesId()))//名称相同
                 {
                     if(TextUtils.isEmpty(goodsObj.getDishesTaste()))
                     {
@@ -294,7 +294,7 @@ public class SeekT9Adapter extends BaseAdapter {
 
             for (int i = 0; i < activity.getGoodsList().size(); i++)//+for
             {
-                if (activity.getGoodsList().get(i).getDishesName().toString().equals(goodsObj.getDishesName()))//名称相等
+                if (activity.getGoodsList().get(i).getDishesId().toString().equals(goodsObj.getDishesId()))//名称相等
                 {
                     if (activity.getGoodsList().get(i).getDishesTaste() != null)//口味不为空
                     {

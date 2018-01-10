@@ -20,6 +20,8 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -81,10 +83,8 @@ public class ShowParticularsActivity extends Activity {
 
     ShowParticularsAdapter adatper;
     private List<GoodsC> goodsCList;
-    private List<GoodsC> goodsCListT;
     private MyApplication myapp;
     private float all = 0f;
-    private ImageView getShowImg;
 
     private BluetoothAdapter btAdapter;
     private BluetoothDevice device;
@@ -92,6 +92,8 @@ public class ShowParticularsActivity extends Activity {
     private List<OrderC> orderCList;
     private String areaName, tableName;
     private int selActionId;
+    private boolean isSupDishesCheck = false;
+    private float supCount;
 
     public static final String TAG = "ShowParticularsActivity";
 
@@ -140,14 +142,17 @@ public class ShowParticularsActivity extends Activity {
     //退菜
     private void retreatDishes(int pos, float counts) {
         GoodsC oldGoods = goodsCList.get(pos);
+        Log.e("Show",""+oldGoods.getDishesCount());
         GoodsC newGoods = null;
         try {
             newGoods = (GoodsC) oldGoods.clone();//向下转型----P2没有被实例化
+
         } catch (CloneNotSupportedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
         newGoods.setDishesCount(counts);
+        Log.e("Show",newGoods.getDishesId());
         removeGoodsFromOrder(newGoods, 0);//修改正常老订单
 
         OrderC newOrderObj = new OrderC(myapp.getCompany_ID());
@@ -315,7 +320,7 @@ public class ShowParticularsActivity extends Activity {
     {
         float  retreateCounts = retreateObj.getDishesCount();//数量
         String retreateTaste  = retreateObj.getDishesTaste();//口味
-        String retreateName =   retreateObj.getDishesName();//名字
+        String retreateId =   retreateObj.getDishesId();//名字相同
 
         for (int i = 0; i < orderCList.size(); i++)
         {
@@ -332,8 +337,8 @@ public class ShowParticularsActivity extends Activity {
                     break;
 
                 GoodsC oldGoods = oldGoodsList.get(j);
-
-                if (retreateName.equals(oldGoods.getDishesName()))//名称相同
+                Log.e("Show","oldGoodsID"+oldGoods.getDishesId());
+                if (retreateId.equals(oldGoods.getDishesId()))//ID相同
                 {
                     if (TextUtils.isEmpty(retreateTaste)&&TextUtils.isEmpty(oldGoods.getDishesTaste()))//口味都为空
                     {
@@ -359,7 +364,7 @@ public class ShowParticularsActivity extends Activity {
 
                             float  lastCount = MyBigDecimal.sub(oldGoods.getDishesCount(),retreateCounts,2);
                             oldGoods.setDishesCount(lastCount);
-
+                            Log.e("Show",""+lastCount);
                             CDBHelper.createAndUpdate(getApplicationContext(), orderObj);
                             retreateCounts = 0;
                         }
@@ -389,6 +394,7 @@ public class ShowParticularsActivity extends Activity {
 
                             float  lastCount = MyBigDecimal.sub(oldGoods.getDishesCount(),retreateCounts,2);
                             oldGoods.setDishesCount(lastCount);
+                            Log.e("Show",""+lastCount);
                             CDBHelper.createAndUpdate(getApplicationContext(), orderObj);
                             retreateCounts = 0;
                         }
@@ -403,18 +409,15 @@ public class ShowParticularsActivity extends Activity {
      *
      * @param pos
      */
-    private void normalDishesDialog(int pos) {
+    private void normalDishesDialog(final int pos) {
         final int position = pos;
-
         final AlertDialog.Builder alertDialog = new AlertDialog.Builder(ShowParticularsActivity.this);
-        View view1 = LayoutInflater.from(ShowParticularsActivity.this).inflate(R.layout.activity_tv_dialog, null);
+        final View view1 = LayoutInflater.from(ShowParticularsActivity.this).inflate(R.layout.activity_tv_dialog, null);
         alertDialog.setView(view1);
         final AlertDialog dialog = alertDialog.create();
         dialog.setCancelable(false);
-
-        TextView title = view1.findViewById(R.id.dialog_dishesName);
+        final TextView title = view1.findViewById(R.id.dialog_dishesName);
         title.setText(goodsCList.get(position).getDishesName() + "(已点数量 " + goodsCList.get(pos).getDishesCount() + ")");
-
         final EditText editText = view1.findViewById(R.id.dialog_ed_sl);
         editText.setText(goodsCList.get(position).getDishesCount() + "");
         editText.clearFocus();
@@ -430,26 +433,21 @@ public class ShowParticularsActivity extends Activity {
                 return false;
             }
         });
-
         selActionId = R.id.dialog_add_zc;
         //根据ID找到RadioGroup实例
         RadioGroup group = (RadioGroup) view1.findViewById(R.id.dialog_radio);
         //绑定一个匿名监听器
         group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-
             @Override
             public void onCheckedChanged(RadioGroup arg0, int arg1) {
                 selActionId = arg1;
+                modificationUnit(view1,title,position,editText);
             }
         });
-
-
         Button btnOk = view1.findViewById(R.id.dialog_tuicai_qd);
         btnOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
                 if (TextUtils.isEmpty(editText.getText())) {
                     Toast.makeText(getApplicationContext(), "数量不能为空", Toast.LENGTH_SHORT).show();
                     return;
@@ -468,37 +466,86 @@ public class ShowParticularsActivity extends Activity {
                     addDishes(position, tmpCount);
                     printerToKitchen(goodsCList.get(position), 0 ,areaName,tableName);
                     setAll();
-
                 } else if (selActionId == R.id.dialog_delete_tc)//退菜
                 {
                     if (tmpCount <= 0) {
                         Toast.makeText(getApplicationContext(), "数量要求大于0", Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    if (tmpCount > goodsCList.get(position).getDishesCount()) {
-                        Toast.makeText(getApplicationContext(), "退菜数量不能大于原始数量", Toast.LENGTH_SHORT).show();
-                        return;
+                    if (isSupDishesCheck){
+                        if (tmpCount > supCount) {
+                            Toast.makeText(getApplicationContext(), "退菜数量不能大于原始数量", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                    }else{
+                        if (tmpCount > goodsCList.get(position).getDishesCount()) {
+                            Toast.makeText(getApplicationContext(), "退菜数量不能大于原始数量", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
                     }
 
-
                     try {
+
                         CDBHelper.db.inBatch(new TimerTask() {
                                                  @Override
                                                  public void run() {
+
+                                                     GoodsC obj = goodsCList.get(position);
+                                                     DishesC dishesC = CDBHelper.getObjById(getApplicationContext(),obj.getDishesId(),DishesC.class);
+                                                     if (isSupDishesCheck){
+                                                         //1
+                                                         //2
+
+                                                         for (OrderC orderC : orderCList)
+                                                         {
+                                                             if (orderC.getOrderCType() != 0){
+                                                                 continue;
+                                                             }
+                                                             for (GoodsC goodsObj : orderC.getGoodsList())
+                                                             {
+                                                                 if (goodsObj.getDishesId().equals(obj.getDishesId()))
+                                                                 {
+                                                                     if (TextUtils.isEmpty(goodsObj.getDishesTaste())&&TextUtils.isEmpty(obj.getDishesTaste())){
+
+                                                                         goodsObj.setDishesCount(MyBigDecimal.mul(goodsObj.getDishesCount(),dishesC.getSupCount(),2));
+                                                                         goodsObj.setPrice(dishesC.getSupPrice());
+                                                                         goodsObj.setDishesId(dishesC.getSupDishesId());
+                                                                         goodsObj.setDishesName(dishesC.getSupDishesName());
+                                                                         CDBHelper.createAndUpdate(getApplicationContext(),orderC);
+                                                                     }else{
+                                                                         if (!TextUtils.isEmpty(goodsObj.getDishesTaste())&&!TextUtils.isEmpty(obj.getDishesTaste())&&goodsObj.getDishesTaste().equals(obj.getDishesTaste())){
+                                                                             goodsObj.setDishesCount(MyBigDecimal.mul(goodsObj.getDishesCount(),dishesC.getSupCount(),2));
+                                                                             goodsObj.setPrice(dishesC.getSupPrice());
+                                                                             goodsObj.setDishesId(dishesC.getSupDishesId());
+                                                                             goodsObj.setDishesName(dishesC.getSupDishesName());
+                                                                             CDBHelper.createAndUpdate(getApplicationContext(),orderC);
+                                                                         }
+                                                                     }
+                                                                 }
+                                                             }
+                                                         }
+                                                         obj.setDishesName(dishesC.getSupDishesName());
+                                                         obj.setPrice(dishesC.getSupPrice());
+                                                         obj.setDishesCount(goodsCList.get(position).getDishesCount());
+                                                         obj.setDishesId(dishesC.getSupDishesId());
+                                                         isSupDishesCheck = false;
+
+                                                     }
+
                                                      retreatDishes(position, tmpCount);
+
                                                  }
                                              }
                         );
                     } catch (CouchbaseLiteException e) {
-
                         e.printStackTrace();
                         CrashReport.postCatchedException(e);
-
                     }
 
                     printerToKitchen(goodsCList.get(position), 1 ,areaName,tableName);
                     setAll();
                 } else {
+
                     if (tmpCount <= 0) {
                         Toast.makeText(getApplicationContext(), "数量要求大于0", Toast.LENGTH_SHORT).show();
                         return;
@@ -511,21 +558,29 @@ public class ShowParticularsActivity extends Activity {
                     printerToKitchen(goodsCList.get(position), 2 ,areaName,tableName);
                     setAll();
                 }
+
                 dialog.dismiss();
+
                 adatper.notifyDataSetChanged();
+
             }
         });
 
         Button btnCancel = view1.findViewById(R.id.dialog_tuicai_qx);//退菜
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+
+            public void onClick(View v) {
                 dialog.dismiss();
 
             }
+
         });
+
         dialog.show();
+
     }
 
     private void giveDishesDialog(int pos)//对赠菜的处理窗口
@@ -533,12 +588,12 @@ public class ShowParticularsActivity extends Activity {
         final int position = pos;
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(ShowParticularsActivity.this);
-        View view1 = LayoutInflater.from(ShowParticularsActivity.this).inflate(R.layout.activity_tv_dialog, null);
+        final View view1 = LayoutInflater.from(ShowParticularsActivity.this).inflate(R.layout.activity_tv_dialog, null);
         builder.setView(view1);
         final AlertDialog dialog = builder.create();
         dialog.setCancelable(false);
 
-        TextView title = view1.findViewById(R.id.dialog_dishesName);
+        final TextView title = view1.findViewById(R.id.dialog_dishesName);
         title.setText(goodsCList.get(position).getDishesName() + "(已点数量 " + goodsCList.get(pos).getDishesCount() + ")");
 
         final EditText editText = view1.findViewById(R.id.dialog_ed_sl);
@@ -566,6 +621,7 @@ public class ShowParticularsActivity extends Activity {
             @Override
             public void onCheckedChanged(RadioGroup arg0, int arg1) {
                 selActionId = arg1;
+
             }
         });
         RadioButton rb1 = (RadioButton) view1.findViewById(R.id.dialog_add_zc);
@@ -634,6 +690,48 @@ public class ShowParticularsActivity extends Activity {
         dialog.show();
     }
 
+    /**
+     * 转换为辅助单位
+     */
+    private void modificationUnit(View view, final TextView title, final int position,final EditText editText){
+        final CheckBox checkBox = view.findViewById(R.id.dialog_delete_supDishes);
+        if (selActionId == R.id.dialog_add_zc){
+            checkBox.setVisibility(View.GONE);
+        }else if (selActionId == R.id.dialog_delete_tc)
+        {
+            GoodsC obj = goodsCList.get(position);
+            final DishesC dishesC = CDBHelper.getObjById(getApplicationContext(),obj.getDishesId(),DishesC.class);
+            if (dishesC.isHaveSupDishes())
+            {
+                checkBox.setVisibility(View.VISIBLE);
+                final float unitCount = goodsCList.get(position).getDishesCount();
+                checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if (isChecked){
+                            supCount = MyBigDecimal.mul(dishesC.getSupCount(),unitCount,2);
+                            title.setText(goodsCList.get(position).getDishesName() + "(已点数量 " + supCount + ")");
+                            editText.setText(""+supCount);
+                            isSupDishesCheck = true;
+                        }else{
+                            editText.setText(""+unitCount);
+                            title.setText(goodsCList.get(position).getDishesName() + "(已点数量 " + unitCount+ ")");
+                            isSupDishesCheck = false;
+                        }
+                    }
+                });
+
+
+
+            }else{
+                checkBox.setVisibility(View.GONE);
+            }
+        }else{
+            checkBox.setVisibility(View.GONE);
+        }
+
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -657,7 +755,9 @@ public class ShowParticularsActivity extends Activity {
                 GoodsC obj = goodsCList.get(position);
                 switch (obj.getGoodsType()) {
                     case 0:
+
                         normalDishesDialog(position);
+
                         break;
                     case 2:
                         giveDishesDialog(position);
@@ -694,57 +794,128 @@ public class ShowParticularsActivity extends Activity {
             if (orderC.getOrderCType() == 0)//0，正常菜订单
             {
                 all = MyBigDecimal.add(all, orderC.getAllPrice(), 2);
-            }
+                for (GoodsC goodsb : orderC.getGoodsList()) {
+                    flag = false;
+                    for (GoodsC goodsC : goodsCList) {
+                        if (goodsb.getGoodsType() == goodsC.getGoodsType()){
+                            if (goodsC.getDishesId().equals(goodsb.getDishesId())) {
+                                if (goodsb.getDishesTaste() != null) {
+                                    if (goodsb.getDishesTaste().equals(goodsC.getDishesTaste())) {
+                                        float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
+                                        goodsC.setDishesCount(count);
+                                        flag = true;
+                                    }
 
-            for (GoodsC goodsb : orderC.getGoodsList())
-            {
-                flag = false;
+                                } else {
 
-                for (GoodsC goodsC : goodsCList)
-                {
-                    if (goodsC.getDishesName().equals(goodsb.getDishesName())) {
+                                    float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
+                                    goodsC.setDishesCount(count);
 
-                        if (goodsb.getDishesTaste() != null)
-                        {
+                                    flag = true;
+                                }
 
-                            if (goodsb.getDishesTaste().equals(goodsC.getDishesTaste()))
-                            {
-
-                                float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
-                                goodsC.setDishesCount(count);
-                                flag = true;
+                                break;
                             }
 
                         }
-                        else
-                        {
-
-                            float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
-                            goodsC.setDishesCount(count);
-
-                            flag = true;
+                    }
+                    if (!flag) {
+                        GoodsC objClone = null;
+                        try {
+                            objClone = (GoodsC) goodsb.clone();
+                        } catch (CloneNotSupportedException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
                         }
+                        goodsCList.add(objClone);
 
-                        break;
                     }
                 }
-                if (!flag)
-                {
-                    GoodsC objClone = null;
-                    try {
-                          objClone = (GoodsC)goodsb.clone();
-                    } catch (CloneNotSupportedException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                    goodsCList.add(objClone);
+            }else if (orderC.getOrderCType() == 1){
+                for (GoodsC goodsb : orderC.getGoodsList()) {
+                    flag = false;
+                    for (GoodsC goodsC : goodsCList) {
 
+                        if (goodsb.getGoodsType() == goodsC.getGoodsType()){
+                            if (goodsC.getDishesId().equals(goodsb.getDishesId())) {
+
+                                if (goodsb.getDishesTaste() != null) {
+
+                                    if (goodsb.getDishesTaste().equals(goodsC.getDishesTaste())) {
+
+                                        float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
+                                        goodsC.setDishesCount(count);
+                                        flag = true;
+                                    }
+
+                                } else {
+
+                                    float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
+                                    goodsC.setDishesCount(count);
+
+                                    flag = true;
+                                }
+
+                                break;
+                            }
+                        }
+                    }
+                    if (!flag) {
+                        GoodsC objClone = null;
+                        try {
+                            objClone = (GoodsC) goodsb.clone();
+                        } catch (CloneNotSupportedException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                        goodsCList.add(objClone);
+
+                    }
+                }
+            }else if (orderC.getOrderCType() == 2){
+                for (GoodsC goodsb : orderC.getGoodsList()) {
+                    flag = false;
+                    for (GoodsC goodsC : goodsCList) {
+                        if (goodsb.getGoodsType() != goodsC.getGoodsType()){
+                            if (goodsC.getDishesId().equals(goodsb.getDishesId())) {
+
+                                if (goodsb.getDishesTaste() != null) {
+
+                                    if (goodsb.getDishesTaste().equals(goodsC.getDishesTaste())) {
+
+                                        float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
+                                        goodsC.setDishesCount(count);
+                                        flag = true;
+                                    }
+
+                                } else {
+
+                                    float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
+                                    goodsC.setDishesCount(count);
+
+                                    flag = true;
+                                }
+
+                                break;
+                            }
+                        }
+                    }
+                    if (!flag) {
+                        GoodsC objClone = null;
+                        try {
+                            objClone = (GoodsC) goodsb.clone();
+                        } catch (CloneNotSupportedException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                        goodsCList.add(objClone);
+
+                    }
                 }
             }
+
         }
-
         showTvSl.setText(areaName+",   "+ myapp.getTable_sel_obj().getTableName()+":  " + goodsCList.size() + "道菜，总计：" + all + "元");
-
     }
 
     @OnClick({R.id.show_but_dc, R.id.show_but_md, R.id.show_img, R.id.show_but_dy})
