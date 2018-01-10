@@ -31,10 +31,11 @@ repositories {
     flatDir {
         dirs 'libs' //就是你放aar的目录地址
     }
+    google()
 }
 dependencies {
 
-    compile 'com.android.support:multidex:'
+    //compile 'com.android.support:multidex:'
     compile fileTree(include: ['*.jar'], dir: 'libs')
     //微信
     compile 'com.tencent.mm.opensdk:wechat-sdk-android-with-mta:+'
@@ -70,4 +71,5 @@ dependencies {
 
     compile 'io.reactivex:rxandroid:1.1.0' // RxAndroid
     compile 'io.reactivex:rxjava:1.1.0' // RxJava
+    compile 'com.jakewharton.rxbinding:rxbinding:0.4.0'//RxView
 }
