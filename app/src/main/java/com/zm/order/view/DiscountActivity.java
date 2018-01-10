@@ -118,9 +118,6 @@ public class DiscountActivity extends AppCompatActivity {
 
                            totalTv.setText(Tool.substrct(stashTotal,Float.valueOf(discountEt.getText().toString()))+"");
 
-
-                          // totalTv.setText((stashTotal-Float.valueOf(discountEt.getText().toString()))+"");
-
                        }
                    }
 
@@ -269,8 +266,5 @@ public class DiscountActivity extends AppCompatActivity {
 
           }
       }
-
-
-
 
 }

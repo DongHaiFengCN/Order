@@ -21,7 +21,7 @@ import butterknife.ButterKnife;
  */
 
 public class MyGridAdapter extends RecyclerView.Adapter{
-    private int index = -1;
+    private int index = 0;
     private Activity activity;
     private List<String> tasteList;
 
@@ -77,6 +77,7 @@ public class MyGridAdapter extends RecyclerView.Adapter{
     public int getItemCount() {
         return tasteList == null ? 0 : tasteList.size();
     }
+
 
     class HolderView extends RecyclerView.ViewHolder {
 

@@ -4,6 +4,8 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +21,7 @@ import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
 import com.couchbase.lite.Ordering;
 import com.zm.order.R;
+import com.zm.order.view.adapter.MyGridAdapter;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -93,7 +96,9 @@ public class OrderFragment extends Fragment {
         //初始化数量
         for (Map.Entry<String, List<Document>> entry : dishesObjectCollection.entrySet()) {
 
-            dishesCollection.put(entry.getKey(), new float[entry.getValue().size()]);
+            float[] floats = new float[entry.getValue().size()];
+
+            dishesCollection.put(entry.getKey(), floats);
 
         }
 
@@ -158,7 +163,7 @@ public class OrderFragment extends Fragment {
 
                 for (int i = 0; i < goodsCList.size(); i++) {
 
-                    if(id.equals(goodsCList.get(i).getDishesId())){
+                    if (id.equals(goodsCList.get(i).getDishesId())) {
 
                         stringList.add(goodsCList.get(i).getDishesTaste());
 
@@ -178,9 +183,12 @@ public class OrderFragment extends Fragment {
      */
     private void myNotifyDataSetChanged() {
 
+
         //获取order数据
         goodsCList = ((MainActivity) getActivity()).getGoodsList();
 
+        //重置菜品数量数据
+        resetNumber();
 
         //如果有数据，数值复制给dishesCollection
         if (!goodsCList.isEmpty()) {
@@ -188,33 +196,31 @@ public class OrderFragment extends Fragment {
             //遍历已存的goodsList
             for (GoodsC goodsC : goodsCList) {
 
+
                 //依次获取每个Goodc对应的映射表包含的dishe集合
                 List<Document> dishesCList = dishesObjectCollection.get(goodsC.getDishesKindId());
 
                 //获取缓存的数量对应数组
                 float[] floats = dishesCollection.get(goodsC.getDishesKindId());
 
-
                 //遍历disheList 得到所在映射表的位置
                 for (int i = 0; i < dishesCList.size(); i++) {
 
                     //找到对应的位置
                     if (dishesCList.get(i).getString("dishesName").equals(goodsC.getDishesName())) {
+                        Log.e("DOAING", "修改前的数据：" + floats[i]);
+
+                        Log.e("DOAING", "添加的数据：" + goodsC.getDishesCount());
+                        floats[i] = goodsC.getDishesCount() + floats[i];
+                        Log.e("DOAING", "修改完成的数据：" + floats[i]);
+                        dishesCollection.put(goodsC.getDishesKindId(), floats);
 
 
-                        //数值不相等更新数值
-                        if (floats[i] != goodsC.getDishesCount()) {
-
-                            floats[i] = goodsC.getDishesCount();
-
-                            //保存
-                            dishesCollection.put(goodsC.getDishesKindId(), floats);
-
-
-                            break;
-                        }
+                        break;
                     }
                 }
+                //保存
+
             }
 
 
@@ -228,18 +234,8 @@ public class OrderFragment extends Fragment {
             }
 
             //重置数量
+            resetNumber();
 
-            //初始化数量
-            for (Map.Entry<String, float[]> entry : dishesCollection.entrySet()) {
-
-                float[] floats = dishesCollection.get(entry.getKey());
-
-                for (int i = 0; i < floats.length; i++) {
-
-                    floats[i] = 0f;
-                }
-
-            }
 
         }
 
@@ -248,6 +244,20 @@ public class OrderFragment extends Fragment {
         orderDragAdapter.notifyDataSetChanged();
 
 
+    }
+
+    private void resetNumber() {
+        //初始化数量
+        for (Map.Entry<String, float[]> entry : dishesCollection.entrySet()) {
+
+            float[] floats = dishesCollection.get(entry.getKey());
+
+            for (int i = 0; i < floats.length; i++) {
+
+                floats[i] = 0f;
+            }
+
+        }
     }
 
     private void markDishesKindFlag() {
@@ -290,21 +300,51 @@ public class OrderFragment extends Fragment {
      */
     private void showDialog(final DishesC dishesC, final int position, float number) {
 
+        final DishesMessage dishesMessage = new DishesMessage();
+
+        final List<String> tasteList = new ArrayList<>();
+        if (dishesC.getTasteList() != null&&!dishesC.getTasteList().isEmpty()) {
+
+            for (int i = 0; i < dishesC.getTasteList().size(); i++) {
+                Document document = CDBHelper.getDocByID(getActivity().getApplicationContext(), dishesC.getTasteList().get(i).toString());
+                tasteList.add(document.getString("tasteName"));
+            }
+
+            dishesMessage.setDishesTaste(tasteList.get(0));
+
+        }
 
         view = LayoutInflater.from(getActivity()).inflate(R.layout.view_item_dialog, null);
+
+        RecyclerView recyclerView = view.findViewById(R.id.view_dialog_recycler);
+
+        final GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);
+
+
+
+        recyclerView.setLayoutManager(manager);
+        MyGridAdapter myGridAdapter = new MyGridAdapter(getActivity(), tasteList);
+        myGridAdapter.setmOnItemOlickListener(new MyGridAdapter.OnItemOlickListener() {
+            @Override
+            public void onItemClick(int position) {
+
+                dishesMessage.setDishesTaste(tasteList.get(position));
+            }
+        });
+        recyclerView.setAdapter(myGridAdapter);
 
         final TextView price_tv = view.findViewById(R.id.price);
 
         final AmountView amountView = view.findViewById(R.id.amount_view);
 
-        amountView.setNumber(number + "");
+        amountView.setNumber(1.0 + "");
 
         String all = MyBigDecimal.mul(amountView.getAmount() + "", dishesC.getPrice() + "", 2);
 
         price_tv.setText("总计 " + all + " 元");
 
 
-        final DishesMessage dishesMessage = new DishesMessage();
+
         dishesMessage.setDishKindId(dishesC.getDishesKindId());
         dishesMessage.setOperation(true);
         dishesMessage.setSingle(false);
@@ -354,9 +394,9 @@ public class OrderFragment extends Fragment {
 
                     dishesMessage.setCount(amountView.getAmount());
 
-                    myNotifyDataSetChanged();
-
                     EventBus.getDefault().postSticky(dishesMessage);
+
+                    myNotifyDataSetChanged();
 
                     alertDialog.dismiss();
 

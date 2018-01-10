@@ -139,8 +139,6 @@ public class OrderDragAdapter extends BaseAdapter {
 
 
         //设置数量
-        //  view.number.setText(floatMap.get(mlistDishesId.get(position)) + "");
-
 
         view.number.setText(numbers[position]+"");
         //加法指示器
@@ -300,25 +298,11 @@ public class OrderDragAdapter extends BaseAdapter {
 
     private void Refresh(boolean flag, int position, DishesMessage dishesMessage) {
 
-        if (flag) {
-
-            numbers[position] += 1f;
-
-        } else {
-
-            numbers[position] -= 1f;
-
-        }
-
-        // notifyDataSetChanged();
-
-
         dishesMessage.setOperation(flag);
 
         EventBus.getDefault().postSticky(dishesMessage);
 
         changerNumbersListener.getNumber(numbers);
-
     }
 
 
