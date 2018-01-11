@@ -102,7 +102,7 @@ public class ShowParticularsAdapter extends BaseAdapter {
         }else{
             viewHolder.kw.setText("");
         }
-        viewHolder.dj.setText(""+MyBigDecimal.mul(goodsCs.get(position).getPrice(),goodsCs.get(position).getDishesCount(),2));
+        viewHolder.dj.setText(""+MyBigDecimal.mul(goodsCs.get(position).getPrice(),goodsCs.get(position).getDishesCount(),1));
 
         viewHolder.sl.setText(goodsCs.get(position).getDishesCount()+"");
 

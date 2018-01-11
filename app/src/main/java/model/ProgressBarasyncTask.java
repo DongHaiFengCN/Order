@@ -112,7 +112,7 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
             String waiter = "默认";
             MyApplication m = (MyApplication) payActivity.getApplicationContext();
 
-            if(m.getUsersC().getEmployeeName() != null && !m.getUsersC().getEmployeeName().isEmpty()){
+            if(m.getUsersC() != null &&m.getUsersC().getEmployeeName() != null && !m.getUsersC().getEmployeeName().isEmpty()){
 
                 waiter =m.getUsersC().getEmployeeName();
             }
@@ -147,8 +147,12 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
                 for (int j = 0; j < goodsCList.size(); j++) {
 
                     GoodsC goodsC = goodsCList.get(j);
+                    String taste = "";
+                    if (goodsC.getDishesTaste() != null) {
+                        taste = "(" + goodsC.getDishesTaste() + ")";
+                    }
 
-                    PrintUtils.printText(PrintUtils.printThreeData(goodsC.getDishesName(),goodsC.getDishesCount()+"", MyBigDecimal.mul(goodsC.getPrice(),goodsC.getDishesCount(),2)+"\n"));
+                    PrintUtils.printText(PrintUtils.printThreeData(goodsC.getDishesName()+taste,goodsC.getDishesCount()+"", MyBigDecimal.mul(goodsC.getPrice(),goodsC.getDishesCount(),1)+"\n"));
 
 
                 }
@@ -277,130 +281,45 @@ public class ProgressBarasyncTask extends AsyncTask<Integer, Integer, String> {
         boolean flag = false;
 
 
-        for (OrderC orderC : checkOrderC.getOrderList())
-        {
-            if (orderC.getOrderCType() == 0)//0，正常菜订单
-            {
-                for (GoodsC goodsb : orderC.getGoodsList()) {
-                    flag = false;
-                    for (GoodsC goodsC : goodsCList) {
-                        if (goodsb.getGoodsType() == goodsC.getGoodsType()){
-                            if (goodsC.getDishesId().equals(goodsb.getDishesId())) {
-                                if (goodsb.getDishesTaste() != null) {
-                                    if (goodsb.getDishesTaste().equals(goodsC.getDishesTaste())) {
-                                        float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
-                                        goodsC.setDishesCount(count);
-                                        flag = true;
-                                    }
+        for (OrderC orderC : checkOrderC.getOrderList()) {
 
-                                } else {
+            for (GoodsC goodsb : orderC.getGoodsList()) {
+                flag = false;
+                for (GoodsC goodsC : goodsCList) {
 
-                                    float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
-                                    goodsC.setDishesCount(count);
-
-                                    flag = true;
-                                }
-
-                                break;
+                    if (goodsC.getDishesName().equals(goodsb.getDishesName())) {
+                        if (goodsb.getDishesTaste() != null) {
+                            if (goodsb.getDishesTaste().equals(goodsC.getDishesTaste())) {
+                                float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
+                                goodsC.setDishesCount(count);
+                                flag = true;
                             }
 
-                        }
-                    }
-                    if (!flag) {
-                        GoodsC objClone = null;
-                        try {
-                            objClone = (GoodsC) goodsb.clone();
-                        } catch (CloneNotSupportedException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        goodsCList.add(objClone);
+                        } else {
 
+                            float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
+                            goodsC.setDishesCount(count);
+
+                            flag = true;
+                        }
+
+                        break;
                     }
+
+
                 }
-            }else if (orderC.getOrderCType() == 1){
-                for (GoodsC goodsb : orderC.getGoodsList()) {
-                    flag = false;
-                    for (GoodsC goodsC : goodsCList) {
-
-                        if (goodsb.getGoodsType() == goodsC.getGoodsType()){
-                            if (goodsC.getDishesId().equals(goodsb.getDishesId())) {
-
-                                if (goodsb.getDishesTaste() != null) {
-
-                                    if (goodsb.getDishesTaste().equals(goodsC.getDishesTaste())) {
-
-                                        float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
-                                        goodsC.setDishesCount(count);
-                                        flag = true;
-                                    }
-
-                                } else {
-
-                                    float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
-                                    goodsC.setDishesCount(count);
-
-                                    flag = true;
-                                }
-
-                                break;
-                            }
-                        }
+                if (!flag) {
+                    GoodsC objClone = null;
+                    try {
+                        objClone = (GoodsC) goodsb.clone();
+                    } catch (CloneNotSupportedException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
                     }
-                    if (!flag) {
-                        GoodsC objClone = null;
-                        try {
-                            objClone = (GoodsC) goodsb.clone();
-                        } catch (CloneNotSupportedException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        goodsCList.add(objClone);
+                    goodsCList.add(objClone);
 
-                    }
-                }
-            }else if (orderC.getOrderCType() == 2){
-                for (GoodsC goodsb : orderC.getGoodsList()) {
-                    flag = false;
-                    for (GoodsC goodsC : goodsCList) {
-                        if (goodsb.getGoodsType() != goodsC.getGoodsType()){
-                            if (goodsC.getDishesId().equals(goodsb.getDishesId())) {
-
-                                if (goodsb.getDishesTaste() != null) {
-
-                                    if (goodsb.getDishesTaste().equals(goodsC.getDishesTaste())) {
-
-                                        float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
-                                        goodsC.setDishesCount(count);
-                                        flag = true;
-                                    }
-
-                                } else {
-
-                                    float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
-                                    goodsC.setDishesCount(count);
-
-                                    flag = true;
-                                }
-
-                                break;
-                            }
-                        }
-                    }
-                    if (!flag) {
-                        GoodsC objClone = null;
-                        try {
-                            objClone = (GoodsC) goodsb.clone();
-                        } catch (CloneNotSupportedException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        goodsCList.add(objClone);
-
-                    }
                 }
             }
-
         }
     }
 

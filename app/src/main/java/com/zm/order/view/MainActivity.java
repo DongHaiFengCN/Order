@@ -387,10 +387,10 @@ public class MainActivity extends AppCompatActivity {
                     if(goodsList.get(i).getDishesTaste().equals(goodsObj.getDishesTaste()))//口味相等
                     {
 
-                        float tmp = MyBigDecimal.mul(goodsObj.getPrice(),goodsObj.getDishesCount(),2);
-                        goodsList.get(i).setDishesCount(MyBigDecimal.add(goodsObj.getDishesCount(),goodsList.get(i).getDishesCount(),2));
+                        float tmp = MyBigDecimal.mul(goodsObj.getPrice(),goodsObj.getDishesCount(),1);
+                        goodsList.get(i).setDishesCount(MyBigDecimal.add(goodsObj.getDishesCount(),goodsList.get(i).getDishesCount(),1));
                         total =  getTotal();
-                        total = MyBigDecimal.add(total,tmp,2);
+                        total = MyBigDecimal.add(total,tmp,1);
                         setTotal(total);
                         isName = true;
                         break;
@@ -399,10 +399,10 @@ public class MainActivity extends AppCompatActivity {
                 }//口味为空
                 else
                 {
-                    float tmp = MyBigDecimal.mul(goodsObj.getPrice(),goodsObj.getDishesCount(),2);
-                    goodsList.get(i).setDishesCount(MyBigDecimal.add(goodsObj.getDishesCount(),goodsList.get(i).getDishesCount(),2));
+                    float tmp = MyBigDecimal.mul(goodsObj.getPrice(),goodsObj.getDishesCount(),1);
+                    goodsList.get(i).setDishesCount(MyBigDecimal.add(goodsObj.getDishesCount(),goodsList.get(i).getDishesCount(),1));
                     total =  getTotal();
-                    total = MyBigDecimal.add(total,tmp,2);
+                    total = MyBigDecimal.add(total,tmp,1);
                     setTotal(total);
                     isName = true;
                     break;
@@ -421,14 +421,14 @@ public class MainActivity extends AppCompatActivity {
 
             //计算总价
             total =getTotal();
-            total = MyBigDecimal.add(total,MyBigDecimal.mul(goodsObj.getDishesCount(),goodsObj.getPrice(),2),2);
+            total = MyBigDecimal.add(total,MyBigDecimal.mul(goodsObj.getDishesCount(),goodsObj.getPrice(),1),1);
             setTotal(total);
 
         }
     }
     public void setTotal(float total) {
         this.total = total;
-        String to = MyBigDecimal.round(total + "", 2);
+        String to = MyBigDecimal.round(total + "", 1);
         total_tv.setText(to + "元");
     }
 
@@ -496,7 +496,7 @@ public class MainActivity extends AppCompatActivity {
                                 goodsC.setGoodsType(2);
                                 goodsC.setDishesName(goodsC.getDishesName() + "(赠)");
 
-                                total = MyBigDecimal.sub(total, MyBigDecimal.mul(goodsC.getPrice(), goodsC.getDishesCount(), 2), 2);
+                                total = MyBigDecimal.sub(total, MyBigDecimal.mul(goodsC.getPrice(), goodsC.getDishesCount(), 1), 1);
                                 setTotal(total);
 
                                 orderAdapter.notifyDataSetChanged();
@@ -558,12 +558,12 @@ public class MainActivity extends AppCompatActivity {
                     public void onchangeListener(boolean flag, float allPrice, float sum) {
 
                         if (flag) {//点加号
-                            total = MyBigDecimal.add(total, allPrice, 2);
+                            total = MyBigDecimal.add(total, allPrice, 1);
                             total_tv.setText(total + "元");
 
                         } else {
 
-                            total = MyBigDecimal.sub(total, allPrice, 2);
+                            total = MyBigDecimal.sub(total, allPrice, 1);
                             total_tv.setText(total + "元");
 
                             if (sum == 0) {
@@ -929,7 +929,7 @@ public class MainActivity extends AppCompatActivity {
                 for (int j = 0; j < 7 - ("" + num).length(); j++)
                     esc.addText(" ");
 
-                esc.addText("" + (MyBigDecimal.mul(myshangpinlist.get(i).getPrice(), myshangpinlist.get(i).getDishesCount(), 2)) + "\n");
+                esc.addText("" + (MyBigDecimal.mul(myshangpinlist.get(i).getPrice(), myshangpinlist.get(i).getDishesCount(), 1)) + "\n");
                 esc.addPrintAndLineFeed();
 
             }
@@ -1283,9 +1283,13 @@ public class MainActivity extends AppCompatActivity {
         for (int j = 0; j < goodsCList.size(); j++) {
 
             GoodsC goodsC = goodsCList.get(j);
-            String allPrice = "" + MyBigDecimal.mul(goodsC.getPrice(), goodsC.getDishesCount(), 2);
+            String allPrice = "" + MyBigDecimal.mul(goodsC.getPrice(), goodsC.getDishesCount(), 1);
+            String taste = "";
+            if (goodsC.getDishesTaste() != null) {
+                taste = "(" + goodsC.getDishesTaste() + ")";
+            }
 
-            PrintUtils.printText(PrintUtils.printThreeData(goodsC.getDishesName(), goodsC.getDishesCount() + "", allPrice + "\n"));
+            PrintUtils.printText(PrintUtils.printThreeData(goodsC.getDishesName()+taste, goodsC.getDishesCount() + "", allPrice + "\n"));
 
         }
         if (zcGoodsList.size() > 0) {
@@ -1294,6 +1298,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         PrintUtils.printText("--------------------------------\n");
+        total = MyBigDecimal.add(total,0,1);
         PrintUtils.printText(PrintUtils.printTwoData("合计", total + "\n"));
         PrintUtils.printText("--------------------------------\n");
         PrintUtils.printText("\n\n\n\n");

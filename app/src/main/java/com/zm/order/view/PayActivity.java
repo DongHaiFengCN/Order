@@ -186,7 +186,7 @@ public class PayActivity extends AppCompatActivity {
         for (OrderC orderC : orderCList) {
             if (orderC.getOrderCType() == 0)//正常订单
             {
-                total = MyBigDecimal.add(total, orderC.getAllPrice(), 2);
+                total = MyBigDecimal.add(total, orderC.getAllPrice(), 1);
             }
             checkOrder.addOrder(orderC);
             //获取当前订单下goods集合下所有的菜品
@@ -505,7 +505,7 @@ public class PayActivity extends AppCompatActivity {
             GoodsC h = orderDishesList.get(j);
 
             String name = h.getDishesName();
-            float sum = MyBigDecimal.mul(h.getPrice(), h.getDishesCount(), 2);
+            float sum = MyBigDecimal.mul(h.getPrice(), h.getDishesCount(), 1);
             //1 设置菜品的名称
 
             s.put(1, name);
@@ -1124,7 +1124,7 @@ public class PayActivity extends AppCompatActivity {
                        // MyLog.e("当前总价 " + total);
                       //  MyLog.e("减去的部分 " + copy);
 
-                        total = MyBigDecimal.sub(total, copy, 2);//Tool.substrct(total,copy);
+                        total = MyBigDecimal.sub(total, copy, 1);//Tool.substrct(total,copy);
                      //   MyLog.e("减后的部分 " + total);
                         factTv.setText("实际支付：" + total + "元");
 
@@ -1225,7 +1225,7 @@ public class PayActivity extends AppCompatActivity {
                                     if (h.getDishesId().equals(allDishes.get(i).getDishesId())) {
                                       //  MyLog.e("打折的菜" + name);
 
-                                        copy = MyBigDecimal.add(copy, MyBigDecimal.mul(h.getPrice(), h.getDishesCount(), 2), 2);// h.getAllPrice();
+                                        copy = MyBigDecimal.add(copy, MyBigDecimal.mul(h.getPrice(), h.getDishesCount(), 1), 1);// h.getAllPrice();
 
 
                                         break;

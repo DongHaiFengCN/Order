@@ -58,6 +58,10 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.internal.Utils;
 import model.CDBHelper;
+import rx.Observable;
+import rx.Observer;
+import rx.Subscriber;
+import rx.functions.Action1;
 import untils.BluetoothUtil;
 import untils.PrintUtils;
 import untils.Tool;
@@ -126,7 +130,7 @@ public class ShowParticularsActivity extends Activity {
             newOrderObj.setOrderNum(1);
             newOrderObj.setSerialNum(Tool.getOrderSerialNum(this));
         }
-        newOrderObj.setAllPrice(MyBigDecimal.mul(newGoods.getPrice(), counts, 2));
+        newOrderObj.setAllPrice(MyBigDecimal.mul(newGoods.getPrice(), counts, 1));
         newOrderObj.setOrderState(1);//未买单
         newOrderObj.setOrderCType(0);//正常
         newOrderObj.setDeviceType(1);//点餐宝
@@ -152,7 +156,6 @@ public class ShowParticularsActivity extends Activity {
             e.printStackTrace();
         }
         newGoods.setDishesCount(counts);
-        Log.e("Show",newGoods.getDishesId());
         removeGoodsFromOrder(newGoods, 0);//修改正常老订单
 
         OrderC newOrderObj = new OrderC(myapp.getCompany_ID());
@@ -165,7 +168,7 @@ public class ShowParticularsActivity extends Activity {
             newOrderObj.setOrderNum(1);
             newOrderObj.setSerialNum(Tool.getOrderSerialNum(this));
         }
-        newOrderObj.setAllPrice(MyBigDecimal.mul(oldGoods.getPrice(), counts, 2));
+        newOrderObj.setAllPrice(MyBigDecimal.mul(oldGoods.getPrice(), counts, 1));
         newOrderObj.setOrderState(1);//未买单
         newOrderObj.setOrderCType(1);//退菜订单
         newOrderObj.setDeviceType(1);//点餐宝
@@ -207,7 +210,7 @@ public class ShowParticularsActivity extends Activity {
             newOrderObj.setOrderNum(1);
             newOrderObj.setSerialNum(Tool.getOrderSerialNum(this));
         }
-        newOrderObj.setAllPrice(MyBigDecimal.mul(oldGoods.getPrice(), counts, 2));
+        newOrderObj.setAllPrice(MyBigDecimal.mul(oldGoods.getPrice(), counts, 1));
         newOrderObj.setOrderState(1);//未买单
         newOrderObj.setOrderCType(2);//赠菜订单
         newOrderObj.setDeviceType(1);//点餐宝
@@ -248,7 +251,7 @@ public class ShowParticularsActivity extends Activity {
             newOrderObj.setOrderNum(1);
             newOrderObj.setSerialNum(Tool.getOrderSerialNum(this));
         }
-        newOrderObj.setAllPrice(MyBigDecimal.mul(oldGoods.getPrice(), counts, 2));
+        newOrderObj.setAllPrice(MyBigDecimal.mul(oldGoods.getPrice(), counts, 1));
         newOrderObj.setOrderState(1);//未买单
         newOrderObj.setOrderCType(0);//添菜订单
         newOrderObj.setDeviceType(1);//点餐宝
@@ -291,7 +294,7 @@ public class ShowParticularsActivity extends Activity {
             newOrderObj.setOrderNum(1);
             newOrderObj.setSerialNum(Tool.getOrderSerialNum(this));
         }
-        newOrderObj.setAllPrice(MyBigDecimal.mul(oldGoods.getPrice(), counts, 2));
+        newOrderObj.setAllPrice(MyBigDecimal.mul(oldGoods.getPrice(), counts, 1));
         newOrderObj.setOrderState(1);//未买单
         newOrderObj.setOrderCType(1);//退菜订单
         newOrderObj.setDeviceType(1);//点餐宝
@@ -320,8 +323,7 @@ public class ShowParticularsActivity extends Activity {
     {
         float  retreateCounts = retreateObj.getDishesCount();//数量
         String retreateTaste  = retreateObj.getDishesTaste();//口味
-        String retreateId =   retreateObj.getDishesId();//名字相同
-
+        String retreate =  retreateObj.getDishesName();
         for (int i = 0; i < orderCList.size(); i++)
         {
             if(retreateCounts<=0)
@@ -337,32 +339,32 @@ public class ShowParticularsActivity extends Activity {
                     break;
 
                 GoodsC oldGoods = oldGoodsList.get(j);
-                Log.e("Show","oldGoodsID"+oldGoods.getDishesId());
-                if (retreateId.equals(oldGoods.getDishesId()))//ID相同
+
+                if (retreate.equals(oldGoods.getDishesName()))//名字相同
                 {
                     if (TextUtils.isEmpty(retreateTaste)&&TextUtils.isEmpty(oldGoods.getDishesTaste()))//口味都为空
                     {
                         if (retreateCounts >= oldGoods.getDishesCount())//退出菜品数量超出原有数量
                         {
-                            float retreatePrice = MyBigDecimal.mul(oldGoods.getPrice(), oldGoods.getDishesCount(), 2);
+                            float retreatePrice = MyBigDecimal.mul(oldGoods.getPrice(), oldGoods.getDishesCount(), 1);
                             orderObj.getGoodsList().remove(oldGoods);
                             j--;
                             if (orderObj.getGoodsList().size() == 0)
                             {
                                 CDBHelper.deleteObj(getApplicationContext(), orderObj);
                             } else {
-                                float lastPrice = MyBigDecimal.sub(orderObj.getAllPrice(), retreatePrice, 2);
+                                float lastPrice = MyBigDecimal.sub(orderObj.getAllPrice(), retreatePrice, 1);
                                 orderObj.setAllPrice(lastPrice);
                                 CDBHelper.createAndUpdate(getApplicationContext(), orderObj);
                             }
-                            retreateCounts = MyBigDecimal.sub(retreateCounts,oldGoods.getDishesCount(),2);
+                            retreateCounts = MyBigDecimal.sub(retreateCounts,oldGoods.getDishesCount(),1);
                         } else //数量上有剩余菜品
                         {
-                            float retreatePrice = MyBigDecimal.mul(retreateObj.getPrice(), retreateCounts, 2);
-                            float lastPrice = MyBigDecimal.sub(orderObj.getAllPrice(), retreatePrice, 2);
+                            float retreatePrice = MyBigDecimal.mul(retreateObj.getPrice(), retreateCounts, 1);
+                            float lastPrice = MyBigDecimal.sub(orderObj.getAllPrice(), retreatePrice, 1);
                             orderObj.setAllPrice(lastPrice);
 
-                            float  lastCount = MyBigDecimal.sub(oldGoods.getDishesCount(),retreateCounts,2);
+                            float  lastCount = MyBigDecimal.sub(oldGoods.getDishesCount(),retreateCounts,1);
                             oldGoods.setDishesCount(lastCount);
                             Log.e("Show",""+lastCount);
                             CDBHelper.createAndUpdate(getApplicationContext(), orderObj);
@@ -373,26 +375,26 @@ public class ShowParticularsActivity extends Activity {
 
                         if (retreateCounts >= oldGoods.getDishesCount())//退出菜品数量超出原有数量
                         {
-                            float retreatePrice = MyBigDecimal.mul(oldGoods.getPrice(), oldGoods.getDishesCount(), 2);
+                            float retreatePrice = MyBigDecimal.mul(oldGoods.getPrice(), oldGoods.getDishesCount(), 1);
                             orderObj.getGoodsList().remove(oldGoods);
                             j--;
                             if (orderObj.getGoodsList().size() == 0)
                             {
                                 CDBHelper.deleteObj(getApplicationContext(), orderObj);
                             } else {
-                                float lastPrice = MyBigDecimal.sub(orderObj.getAllPrice(), retreatePrice, 2);
+                                float lastPrice = MyBigDecimal.sub(orderObj.getAllPrice(), retreatePrice, 1);
                                 orderObj.setAllPrice(lastPrice);
                                 CDBHelper.createAndUpdate(getApplicationContext(), orderObj);
                             }
-                            retreateCounts = MyBigDecimal.sub(retreateCounts,oldGoods.getDishesCount(),2);
+                            retreateCounts = MyBigDecimal.sub(retreateCounts,oldGoods.getDishesCount(),1);
                         }
                         else //数量上有剩余菜品
                         {
-                            float retreatePrice = MyBigDecimal.mul(retreateObj.getPrice(), retreateCounts, 2);
-                            float lastPrice = MyBigDecimal.sub(orderObj.getAllPrice(), retreatePrice, 2);
+                            float retreatePrice = MyBigDecimal.mul(retreateObj.getPrice(), retreateCounts, 1);
+                            float lastPrice = MyBigDecimal.sub(orderObj.getAllPrice(), retreatePrice, 1);
                             orderObj.setAllPrice(lastPrice);
 
-                            float  lastCount = MyBigDecimal.sub(oldGoods.getDishesCount(),retreateCounts,2);
+                            float  lastCount = MyBigDecimal.sub(oldGoods.getDishesCount(),retreateCounts,1);
                             oldGoods.setDishesCount(lastCount);
                             Log.e("Show",""+lastCount);
                             CDBHelper.createAndUpdate(getApplicationContext(), orderObj);
@@ -491,11 +493,10 @@ public class ShowParticularsActivity extends Activity {
                                                  public void run() {
 
                                                      GoodsC obj = goodsCList.get(position);
-                                                     DishesC dishesC = CDBHelper.getObjById(getApplicationContext(),obj.getDishesId(),DishesC.class);
                                                      if (isSupDishesCheck){
                                                          //1
                                                          //2
-
+                                                         DishesC dishesC = CDBHelper.getObjById(getApplicationContext(),obj.getDishesId(),DishesC.class);
                                                          for (OrderC orderC : orderCList)
                                                          {
                                                              if (orderC.getOrderCType() != 0){
@@ -503,18 +504,21 @@ public class ShowParticularsActivity extends Activity {
                                                              }
                                                              for (GoodsC goodsObj : orderC.getGoodsList())
                                                              {
+                                                                 if (goodsObj.getDishesId() ==null){
+                                                                     continue;
+                                                                 }
                                                                  if (goodsObj.getDishesId().equals(obj.getDishesId()))
                                                                  {
                                                                      if (TextUtils.isEmpty(goodsObj.getDishesTaste())&&TextUtils.isEmpty(obj.getDishesTaste())){
 
-                                                                         goodsObj.setDishesCount(MyBigDecimal.mul(goodsObj.getDishesCount(),dishesC.getSupCount(),2));
+                                                                         goodsObj.setDishesCount(MyBigDecimal.mul(goodsObj.getDishesCount(),dishesC.getSupCount(),1));
                                                                          goodsObj.setPrice(dishesC.getSupPrice());
                                                                          goodsObj.setDishesId(dishesC.getSupDishesId());
                                                                          goodsObj.setDishesName(dishesC.getSupDishesName());
                                                                          CDBHelper.createAndUpdate(getApplicationContext(),orderC);
                                                                      }else{
                                                                          if (!TextUtils.isEmpty(goodsObj.getDishesTaste())&&!TextUtils.isEmpty(obj.getDishesTaste())&&goodsObj.getDishesTaste().equals(obj.getDishesTaste())){
-                                                                             goodsObj.setDishesCount(MyBigDecimal.mul(goodsObj.getDishesCount(),dishesC.getSupCount(),2));
+                                                                             goodsObj.setDishesCount(MyBigDecimal.mul(goodsObj.getDishesCount(),dishesC.getSupCount(),1));
                                                                              goodsObj.setPrice(dishesC.getSupPrice());
                                                                              goodsObj.setDishesId(dishesC.getSupDishesId());
                                                                              goodsObj.setDishesName(dishesC.getSupDishesName());
@@ -695,21 +699,29 @@ public class ShowParticularsActivity extends Activity {
      */
     private void modificationUnit(View view, final TextView title, final int position,final EditText editText){
         final CheckBox checkBox = view.findViewById(R.id.dialog_delete_supDishes);
+        final float unitCount = goodsCList.get(position).getDishesCount();
         if (selActionId == R.id.dialog_add_zc){
             checkBox.setVisibility(View.GONE);
+            checkBox.setChecked(false);
+            editText.setText(""+unitCount);
+            title.setText(goodsCList.get(position).getDishesName() + "(已点数量 " + unitCount+ ")");
         }else if (selActionId == R.id.dialog_delete_tc)
         {
             GoodsC obj = goodsCList.get(position);
+            if (obj.getDishesId() == null){
+                return;
+            }
             final DishesC dishesC = CDBHelper.getObjById(getApplicationContext(),obj.getDishesId(),DishesC.class);
+
             if (dishesC.isHaveSupDishes())
             {
                 checkBox.setVisibility(View.VISIBLE);
-                final float unitCount = goodsCList.get(position).getDishesCount();
+
                 checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if (isChecked){
-                            supCount = MyBigDecimal.mul(dishesC.getSupCount(),unitCount,2);
+                            supCount = MyBigDecimal.mul(dishesC.getSupCount(),unitCount,1);
                             title.setText(goodsCList.get(position).getDishesName() + "(已点数量 " + supCount + ")");
                             editText.setText(""+supCount);
                             isSupDishesCheck = true;
@@ -728,6 +740,9 @@ public class ShowParticularsActivity extends Activity {
             }
         }else{
             checkBox.setVisibility(View.GONE);
+            checkBox.setChecked(false);
+            editText.setText(""+unitCount);
+            title.setText(goodsCList.get(position).getDishesName() + "(已点数量 " + unitCount+ ")");
         }
 
     }
@@ -755,7 +770,14 @@ public class ShowParticularsActivity extends Activity {
                 GoodsC obj = goodsCList.get(position);
                 switch (obj.getGoodsType()) {
                     case 0:
+                        String[] strings = new String[]{"1","2","3","4"};
+                        Observable.from(strings)
+                        .subscribe(new Action1<String>() {
+                            @Override
+                            public void call(String s) {
 
+                            }
+                        });
                         normalDishesDialog(position);
 
                         break;
@@ -789,131 +811,50 @@ public class ShowParticularsActivity extends Activity {
         boolean flag = false;
 
 
-        for (OrderC orderC : orderCList)
-        {
+        for (OrderC orderC : orderCList) {
             if (orderC.getOrderCType() == 0)//0，正常菜订单
             {
-                all = MyBigDecimal.add(all, orderC.getAllPrice(), 2);
-                for (GoodsC goodsb : orderC.getGoodsList()) {
-                    flag = false;
-                    for (GoodsC goodsC : goodsCList) {
-                        if (goodsb.getGoodsType() == goodsC.getGoodsType()){
-                            if (goodsC.getDishesId().equals(goodsb.getDishesId())) {
-                                if (goodsb.getDishesTaste() != null) {
-                                    if (goodsb.getDishesTaste().equals(goodsC.getDishesTaste())) {
-                                        float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
-                                        goodsC.setDishesCount(count);
-                                        flag = true;
-                                    }
+                all = MyBigDecimal.add(all, orderC.getAllPrice(), 1);
 
-                                } else {
-
-                                    float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
-                                    goodsC.setDishesCount(count);
-
-                                    flag = true;
-                                }
-
-                                break;
-                            }
-
-                        }
-                    }
-                    if (!flag) {
-                        GoodsC objClone = null;
-                        try {
-                            objClone = (GoodsC) goodsb.clone();
-                        } catch (CloneNotSupportedException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        goodsCList.add(objClone);
-
-                    }
-                }
-            }else if (orderC.getOrderCType() == 1){
-                for (GoodsC goodsb : orderC.getGoodsList()) {
-                    flag = false;
-                    for (GoodsC goodsC : goodsCList) {
-
-                        if (goodsb.getGoodsType() == goodsC.getGoodsType()){
-                            if (goodsC.getDishesId().equals(goodsb.getDishesId())) {
-
-                                if (goodsb.getDishesTaste() != null) {
-
-                                    if (goodsb.getDishesTaste().equals(goodsC.getDishesTaste())) {
-
-                                        float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
-                                        goodsC.setDishesCount(count);
-                                        flag = true;
-                                    }
-
-                                } else {
-
-                                    float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
-                                    goodsC.setDishesCount(count);
-
-                                    flag = true;
-                                }
-
-                                break;
-                            }
-                        }
-                    }
-                    if (!flag) {
-                        GoodsC objClone = null;
-                        try {
-                            objClone = (GoodsC) goodsb.clone();
-                        } catch (CloneNotSupportedException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        goodsCList.add(objClone);
-
-                    }
-                }
-            }else if (orderC.getOrderCType() == 2){
-                for (GoodsC goodsb : orderC.getGoodsList()) {
-                    flag = false;
-                    for (GoodsC goodsC : goodsCList) {
-                        if (goodsb.getGoodsType() != goodsC.getGoodsType()){
-                            if (goodsC.getDishesId().equals(goodsb.getDishesId())) {
-
-                                if (goodsb.getDishesTaste() != null) {
-
-                                    if (goodsb.getDishesTaste().equals(goodsC.getDishesTaste())) {
-
-                                        float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
-                                        goodsC.setDishesCount(count);
-                                        flag = true;
-                                    }
-
-                                } else {
-
-                                    float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
-                                    goodsC.setDishesCount(count);
-
-                                    flag = true;
-                                }
-
-                                break;
-                            }
-                        }
-                    }
-                    if (!flag) {
-                        GoodsC objClone = null;
-                        try {
-                            objClone = (GoodsC) goodsb.clone();
-                        } catch (CloneNotSupportedException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        goodsCList.add(objClone);
-
-                    }
-                }
             }
 
+            for (GoodsC goodsb : orderC.getGoodsList()) {
+                flag = false;
+                for (GoodsC goodsC : goodsCList) {
+
+                    if (goodsC.getDishesName().equals(goodsb.getDishesName())) {
+                        if (goodsb.getDishesTaste() != null) {
+                            if (goodsb.getDishesTaste().equals(goodsC.getDishesTaste())) {
+                                float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
+                                goodsC.setDishesCount(count);
+                                flag = true;
+                            }
+
+                        } else {
+
+                            float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
+                            goodsC.setDishesCount(count);
+
+                            flag = true;
+                        }
+
+                        break;
+                    }
+
+
+                }
+                if (!flag) {
+                    GoodsC objClone = null;
+                    try {
+                        objClone = (GoodsC) goodsb.clone();
+                    } catch (CloneNotSupportedException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    goodsCList.add(objClone);
+
+                }
+            }
         }
         showTvSl.setText(areaName+",   "+ myapp.getTable_sel_obj().getTableName()+":  " + goodsCList.size() + "道菜，总计：" + all + "元");
     }
@@ -1014,7 +955,7 @@ public class ShowParticularsActivity extends Activity {
                 taste = "(" + goodsC.getDishesTaste() + ")";
             }
 
-            PrintUtils.printText(PrintUtils.printThreeData(goodsC.getDishesName() + taste, goodsC.getDishesCount() + "", MyBigDecimal.mul(goodsC.getPrice(),goodsC.getDishesCount(),2) + "\n"));
+            PrintUtils.printText(PrintUtils.printThreeData(goodsC.getDishesName() + taste, goodsC.getDishesCount() + "", MyBigDecimal.mul(goodsC.getPrice(),goodsC.getDishesCount(),1) + "\n"));
 
 
         }
