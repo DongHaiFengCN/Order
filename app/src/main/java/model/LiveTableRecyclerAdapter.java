@@ -32,6 +32,7 @@ import com.tencent.bugly.crashreport.CrashReport;
 import com.zm.order.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +52,8 @@ public class LiveTableRecyclerAdapter extends RecyclerView.Adapter<LiveTableRecy
     private Database  db;
     private LiveQuery listsLiveQuery = null;
     protected Context context;
-    private List<String> documentList;
+   // private List<String> documentList;
+    private List<HashMap<String,Object>> hashMapList;
 
     private onRecyclerViewItemClickListener itemClickListener = null;
 
@@ -70,7 +72,12 @@ public class LiveTableRecyclerAdapter extends RecyclerView.Adapter<LiveTableRecy
                 Result row;
                 while ((row = rs.next()) != null)
                 {
-                    documentList.add(row.getString(0));
+                    HashMap map = new HashMap();
+                    map.put("id",row.getString(0));
+                    map.put("state",row.getInt(1));
+                    map.put("name",row.getString(2));
+                    hashMapList.add(map);
+                    //documentList.add(row.getString(0));
                    // MyLog.e("liveQuery change Id="+row.getString(0));
                 }
                 notifyDataSetChanged();
@@ -82,7 +89,8 @@ public class LiveTableRecyclerAdapter extends RecyclerView.Adapter<LiveTableRecy
     private LiveQuery listsLiveQuery( String areaId)
     {
         return Query.select(SelectResult.expression(Expression.meta().getId()),
-                SelectResult.expression(Expression.property("state")))
+                SelectResult.expression(Expression.property("state")),
+                SelectResult.expression(Expression.property("tableName")))
                 .from(DataSource.database(db))
                 .where(Expression.property("className").equalTo("TableC")
                         .and(Expression.property("areaId").equalTo(areaId)))
@@ -124,33 +132,22 @@ public class LiveTableRecyclerAdapter extends RecyclerView.Adapter<LiveTableRecy
 
     private void clear()
     {
-     if(documentList==null)
-         documentList=new ArrayList<String>();
-        documentList.clear();
+     if(hashMapList==null)
+         hashMapList=new ArrayList<HashMap<String, Object>>();
+        hashMapList.clear();
     }
     @Override
     public void onBindViewHolder(TestHolderView holder, int position)
     {
 
-
-        String docId=documentList.get(position);
-        TableC tableobj=CDBHelper.getObjById(context.getApplicationContext(),docId, TableC.class);
-
-        int state=tableobj.getState();
-
+        HashMap map = hashMapList.get(position);
+        String docId=map.get("id").toString();
+        int state = (int)map.get("state");
+        String name = map.get("name").toString();
 
         switch (state)
         {
             case 0:
-                if(tableobj.getTotalCount()>0)
-                {
-                    tableobj.setState(2);
-                    CDBHelper.createAndUpdate(context.getApplicationContext(),tableobj);
-                   // CrashReport.putUserData(context.getApplicationContext(),"mykey","tablechange");
-                    //CrashReport.testJavaCrash();
-                    Log.e("&&&&&&&&&&&&&&&","*************");
-                    break;
-                }
                 holder.cardView.setCardBackgroundColor(Color.rgb(86,209,109));
                 break;
             case 1:
@@ -163,7 +160,7 @@ public class LiveTableRecyclerAdapter extends RecyclerView.Adapter<LiveTableRecy
                 break;
         }
 
-        holder.tv.setText(tableobj.getTableName());
+        holder.tv.setText(name);
        // holder.itemView.setTag(tableobj);
         holder.itemView.setTag(docId);
 
@@ -172,7 +169,7 @@ public class LiveTableRecyclerAdapter extends RecyclerView.Adapter<LiveTableRecy
     @Override
     public int getItemCount()
     {
-        return documentList != null ? documentList.size() : 0;
+        return hashMapList != null ? hashMapList.size() : 0;
     }
     public class TestHolderView extends RecyclerView.ViewHolder
     {

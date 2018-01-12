@@ -71,11 +71,6 @@ public class TableC implements Serializable{
 	 */
 	private List<UsersC> usersList;
 
-	/**
-	 * 当前桌位消费
-	 * @return
-	 */
-    private float  totalCount;
 
 	public String getLastCheckOrderId() {
 		return lastCheckOrderId;
@@ -202,14 +197,6 @@ public class TableC implements Serializable{
 
 	public void setValid(boolean is) {
 		valid = is;
-	}
-
-	public float getTotalCount() {
-		return totalCount;
-	}
-
-	public void setTotalCount(float totalCount) {
-		this.totalCount = totalCount;
 	}
 
 	public List<UsersC> getUsersList()

@@ -287,6 +287,7 @@ public class MainActivity extends AppCompatActivity {
             }
             else if (action.equals(GpCom.ACTION_RECEIPT_RESPONSE))//本地打印完成回调
             {
+                Log.e("Main","-----");
                 proDialog.setMessage("分单打印完成");
                 try {
                     Thread.sleep(500);

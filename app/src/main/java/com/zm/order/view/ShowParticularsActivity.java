@@ -2,6 +2,7 @@ package com.zm.order.view;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -9,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.text.method.DigitsKeyListener;
@@ -98,6 +100,7 @@ public class ShowParticularsActivity extends Activity {
     private int selActionId;
     private boolean isSupDishesCheck = false;
     private float supCount;
+    private ProgressDialog proDialog =null;
 
     public static final String TAG = "ShowParticularsActivity";
 
@@ -759,9 +762,10 @@ public class ShowParticularsActivity extends Activity {
 
         goodsCList = new ArrayList<>();
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-        setAll();
         adatper = new ShowParticularsAdapter(this, goodsCList);
         showListView.setAdapter(adatper);
+        initData();
+
         showListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(final AdapterView<?> parent, View view, final int position, long id) {
@@ -796,6 +800,75 @@ public class ShowParticularsActivity extends Activity {
         });
     }
 
+    private void initData()
+    {
+        proDialog = new ProgressDialog( ShowParticularsActivity.this,R.style.CustomDialog);
+        proDialog.setTitle("");
+        proDialog.setCanceledOnTouchOutside(false);// 设置在点击Dialog外是否取消Dialog进度条
+        proDialog.show();
+        myapp.mExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                goodsCList.clear();
+                all = 0f;
+                orderCList = CDBHelper.getObjByWhere(getApplicationContext(),
+                        Expression.property("className").equalTo("OrderC")
+                                .and(Expression.property("tableNo").equalTo(myapp.getTable_sel_obj().getTableNum()))
+                                .and(Expression.property("orderState").equalTo(1))
+                        , Ordering.property("createdTime").ascending()
+                        , OrderC.class);
+                Log.e("",""+orderCList.size());
+                boolean flag = false;
+                for (OrderC orderC : orderCList) {
+                    if (orderC.getOrderCType() == 0)//0，正常菜订单
+                    {
+                        all = MyBigDecimal.add(all, orderC.getAllPrice(), 1);
+
+                    }
+
+                    for (GoodsC goodsb : orderC.getGoodsList()) {
+                        flag = false;
+                        for (GoodsC goodsC : goodsCList) {
+
+                            if (goodsC.getDishesName().equals(goodsb.getDishesName())) {
+                                if (goodsb.getDishesTaste() != null) {
+                                    if (goodsb.getDishesTaste().equals(goodsC.getDishesTaste())) {
+                                        float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
+                                        goodsC.setDishesCount(count);
+                                        flag = true;
+                                    }
+
+                                } else {
+
+                                    float count = MyBigDecimal.add(goodsC.getDishesCount(), goodsb.getDishesCount(), 1);
+                                    goodsC.setDishesCount(count);
+
+                                    flag = true;
+                                }
+
+                                break;
+                            }
+
+
+                        }
+                        if (!flag) {
+                            GoodsC objClone = null;
+                            try {
+                                objClone = (GoodsC) goodsb.clone();
+                            } catch (CloneNotSupportedException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                            goodsCList.add(objClone);
+
+                        }
+                    }
+                }
+                uiHandler.obtainMessage(0).sendToTarget();
+            }
+            }
+        );
+    }
     /**
      * 查询所有订单并合并
      */
@@ -808,9 +881,8 @@ public class ShowParticularsActivity extends Activity {
                         .and(Expression.property("orderState").equalTo(1))
                 , Ordering.property("createdTime").ascending()
                 , OrderC.class);
+        Log.e("",""+orderCList.size());
         boolean flag = false;
-
-
         for (OrderC orderC : orderCList) {
             if (orderC.getOrderCType() == 0)//0，正常菜订单
             {
@@ -995,6 +1067,29 @@ public class ShowParticularsActivity extends Activity {
 
         return null;
     }
+
+    private Handler uiHandler = new Handler()
+    {
+
+        @Override
+        public void handleMessage(Message msg)
+        {
+
+            switch (msg.what)
+            {
+                case 0:
+                    proDialog.dismiss();
+                    showTvSl.setText(areaName+",   "+ myapp.getTable_sel_obj().getTableName()+":  " + goodsCList.size() + "道菜，总计：" + all + "元");
+                    adatper.notifyDataSetChanged();
+                    break;
+
+                default:
+                    break;
+            }
+            super.handleMessage(msg);
+        }
+    };
+
 
 
 }

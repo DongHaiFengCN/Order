@@ -41,7 +41,9 @@ import com.couchbase.lite.SelectResult;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -166,6 +168,19 @@ public class CDBHelper {
     }
 
     /**
+     * @return 时间格式 yyyy-MM-dd HH:mm:ss
+     */
+    public static String getFormatDate() {
+        Date date = new Date();
+        if (date != null) {
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            return formatter.format(date);
+        }
+
+        return null;
+    }
+
+    /**
      * 1.4
      *
      * @param context
@@ -177,6 +192,7 @@ public class CDBHelper {
      */
     public static <T> List<T> getObjByWhere(Context context, Expression where, Ordering orderBy, Class<T> aClass) {
         // 1
+        Log.e("CDB","1"+getFormatDate());
         List<T> documentList = new ArrayList<>();
         //1\
         if (db == null) {
@@ -196,6 +212,7 @@ public class CDBHelper {
         try {
             ResultSet resultSet = query.run();
             Result row;
+            Log.e("CDB","2"+getFormatDate());
             while ((row = resultSet.next()) != null) {
                 ObjectMapper objectMapper = new ObjectMapper();
                 // Ignore undeclared properties
@@ -209,12 +226,66 @@ public class CDBHelper {
                 T obj = objectMapper.convertValue(map, aClass);
                 documentList.add(obj);
             }
+            Log.e("CDB","3"+getFormatDate());
         } catch (CouchbaseLiteException e) {
             Log.e("getDocmentsByClass", "Exception=", e);
         }
 
         return documentList;
     }
+
+    /**
+     * 1.4
+     *
+     * @param context
+     * @param where
+     * @param orderBy
+     * @param aClass
+     * @param <T>
+     * @return
+     */
+    public static <T> List<T> getObjByWhere1(Context context, Expression where, Ordering orderBy, Class<T> aClass) {
+        // 1
+        List<T> documentList = new ArrayList<>();
+        //1\
+        if (db == null) {
+            db = ((MyApplication) context).getDatabase();
+        }
+        //2
+        Query query;
+        if (where == null)
+            return null;
+
+        if (orderBy == null)
+            query = Query.select(SelectResult.expression(Expression.meta().getId())).from(DataSource.database(db)).where(where);
+        else
+            query = Query.select(SelectResult.expression(Expression.meta().getId())).from(DataSource.database(db)).where(where).orderBy(orderBy);
+
+
+        try {
+
+            ResultSet resultSet = query.run();
+            Result row;
+            while ((row = resultSet.next()) != null)
+            {
+                String id = row.getString(0);
+                Document doc = db.getDocument(id);
+                ObjectMapper objectMapper = new ObjectMapper();
+                // Ignore undeclared properties
+                objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                Map<String, Object> map;
+                map = doc.toMap();
+                map.put("_id", id);
+                T obj = objectMapper.convertValue(map, aClass);
+                documentList.add(obj);
+            }
+        } catch (CouchbaseLiteException e) {
+            Log.e("getDocmentsByClass", "Exception=", e);
+        }
+
+        return documentList;
+    }
+
 
     /**
      * 1.5

@@ -15,6 +15,8 @@ import com.couchbase.lite.Database;
 import com.couchbase.lite.DatabaseConfiguration;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
+import com.couchbase.lite.FTSIndexItem;
+import com.couchbase.lite.Index;
 import com.couchbase.lite.Log;
 import com.couchbase.lite.Ordering;
 import com.couchbase.lite.ReadOnlyDocument;
@@ -141,8 +143,18 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 
     private void startSession(String dbName) {
         openDatabase(dbName);
+        createFTSQueryIndex();
         startReplication(getCompany_ID(), "123456");
     }
+
+    private void createFTSQueryIndex() {
+        try {
+            database.createIndex("descFTSIndex", Index.ftsIndex().on(FTSIndexItem.expression(Expression.property("className"))));
+        } catch (CouchbaseLiteException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     // -------------------------
     // Database operation

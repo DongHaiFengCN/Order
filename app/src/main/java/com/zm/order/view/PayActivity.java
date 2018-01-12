@@ -862,7 +862,6 @@ public class PayActivity extends AppCompatActivity {
             TableC obj = myApplication.getTable_sel_obj();
             obj.setLastCheckOrderId(id);
             obj.setState(0);
-            obj.setTotalCount(0);
             CDBHelper.createAndUpdate(getApplicationContext(), tableC);
         } else {
             Toast.makeText(getApplicationContext(), "有未买单信息，不能改变桌位状态", Toast.LENGTH_SHORT).show();

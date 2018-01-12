@@ -61,6 +61,8 @@ import model.LiveTableRecyclerAdapter;
 import untils.MyLog;
 import untils.Tool;
 
+import static untils.Tool.isFastDoubleClick;
+
 public class DeskActivity extends AppCompatActivity {
 
     private Database db;
@@ -169,6 +171,11 @@ public class DeskActivity extends AppCompatActivity {
             @Override
             public void onItemClick(View view,Object data)
             {
+
+//                if (isFastDoubleClick()){
+//                    Toast.makeText(DeskActivity.this,"点击太快，请稍候",Toast.LENGTH_LONG).show();
+//                    return;
+//                }
                 String tableId= (String)data;
                 final TableC  tableC =  CDBHelper.getObjById(getApplicationContext(),tableId,TableC.class);
                 myapp.setTable_sel_obj(tableC);
@@ -256,12 +263,12 @@ public class DeskActivity extends AppCompatActivity {
                     });
 
                 }else {
-                    List<OrderC> orderCList= CDBHelper.getObjByWhere(getApplicationContext(),
+                    List<String> orderCList= CDBHelper.getIdsByWhere(getApplicationContext(),
                             Expression.property("className").equalTo("OrderC")
                                     .and(Expression.property("tableNo").equalTo(tableC.getTableNum()))
                                     .and(Expression.property("orderState").equalTo(1))
                                     ,null
-                            ,OrderC.class);
+                            );
 
                     Log.e("orderCList","orderCList.size()"+orderCList.size()+"-----"+tableC.getTableNum());
                     if (orderCList.size() > 0 )
