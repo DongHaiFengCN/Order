@@ -373,7 +373,9 @@ public class ShowParticularsActivity extends Activity {
 
                             float  lastCount = MyBigDecimal.sub(oldGoods.getDishesCount(),retreateCounts,1);
                             oldGoods.setDishesCount(lastCount);
-                            oldGoods.setCreatedTime(getFormatDate());
+                            if (oldGoods.getCreatedTime() != null){
+                                oldGoods.setCreatedTime(getFormatDate());
+                            }
                             CDBHelper.createAndUpdate(getApplicationContext(), orderObj);
                             retreateCounts = 0;
                         }
@@ -403,7 +405,9 @@ public class ShowParticularsActivity extends Activity {
 
                             float  lastCount = MyBigDecimal.sub(oldGoods.getDishesCount(),retreateCounts,1);
                             oldGoods.setDishesCount(lastCount);
-                            oldGoods.setCreatedTime(getFormatDate());
+                            if (oldGoods.getCreatedTime() != null){
+                                oldGoods.setCreatedTime(getFormatDate());
+                            }
                             CDBHelper.createAndUpdate(getApplicationContext(), orderObj);
                             retreateCounts = 0;
                         }
@@ -866,7 +870,11 @@ public class ShowParticularsActivity extends Activity {
                       List<GoodsC> goodsCList1 = orderC.getGoodsList();
                       SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                       GoodsC temp ;
+
                       for (int i = 0 ; i < goodsCList1.size()-1 ;i++){
+                          if (goodsCList1.get(i).getCreatedTime() == null){
+                              break;
+                          }
                           for (int j = i+1 ; j < goodsCList1.size() ;j++){
                               ParsePosition pos1 = new ParsePosition(0);
                               ParsePosition pos2 = new ParsePosition(0);
@@ -965,6 +973,10 @@ public class ShowParticularsActivity extends Activity {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             GoodsC temp ;
             for (int i = 0 ; i < goodsCList1.size()-1 ;i++){
+                if (goodsCList1.get(i).getCreatedTime() ==null)
+                {
+                    break;
+                }
                 for (int j = i+1 ; j < goodsCList1.size() ;j++){
                     ParsePosition pos1 = new ParsePosition(0);
                     ParsePosition pos2 = new ParsePosition(0);
