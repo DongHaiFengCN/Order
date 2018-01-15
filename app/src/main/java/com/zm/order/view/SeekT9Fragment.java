@@ -3,6 +3,7 @@ package com.zm.order.view;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -49,6 +50,8 @@ import butterknife.Unbinder;
 import model.CDBHelper;
 import untils.MyLog;
 
+import static model.CDBHelper.getFormatDate;
+
 /**
  * Created by lenovo on 2017/10/26.
  */
@@ -94,7 +97,6 @@ public class SeekT9Fragment extends Fragment {
     LinearLayout activitySeekLin26;
 
     public static String[][] pinyin2sz = new String[][]{{"a", "b", "c", ""}, {"d", "e", "f", ""}, {"g", "h", "i", ""}, {"j", "k", "l", ""}, {"m", "n", "o", ""}, {"p", "q", "r", "s"}, {"t", "u", "v", ""}, {"w", "x", "y", "z"}};
-    private String taste = "默认";
     private float total = 0.0f;
     public int point = 1, tastePos;
     private float tmpAllPrice;
@@ -105,10 +107,10 @@ public class SeekT9Fragment extends Fragment {
     private List<String> tasteList;
 
     View view;
-    private MainActivity mainActivity;
     private Handler mHandler = null;
     private MyApplication myapp;
     private boolean isT9And26 = true;
+    private boolean isT9And261 = true;
 
     @Nullable
     @Override
@@ -120,7 +122,8 @@ public class SeekT9Fragment extends Fragment {
         unbinder = ButterKnife.bind(this, view);
         mHandler = new Handler();
         myapp = (MyApplication) getActivity().getApplication();
-
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("T9and26", 0);
+        isT9And261 = sharedPreferences.getBoolean("isFlag",true);
         initView();
         return view;
 
@@ -160,7 +163,15 @@ public class SeekT9Fragment extends Fragment {
         activitySeekList.setAdapter(seekT9Adapter);
         ((MainActivity) getActivity()).setT9GoodsList(t9GoodsList);
         ((MainActivity) getActivity()).setSeekT9Adapter(seekT9Adapter);
-
+        if (isT9And261){
+            isT9And26 = false;
+            tlKeyGrid.setVisibility(View.GONE);
+            activitySeekLin26.setVisibility(View.VISIBLE);
+        }else{
+            isT9And26 = true;
+            tlKeyGrid.setVisibility(View.VISIBLE);
+            activitySeekLin26.setVisibility(View.GONE);
+        }
 
 
         setSeetSearch();
@@ -244,7 +255,6 @@ public class SeekT9Fragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialogInterface, int i)
             {
-                mainActivity = (MainActivity) getActivity();
                 float destCount = Float.parseFloat(amountView.getEtAmount().getText().toString());
                 Log.e("SeekT9",destCount+"----------"+amountView.getAmount());
                 if(destCount<=0)
@@ -266,40 +276,11 @@ public class SeekT9Fragment extends Fragment {
                 goodsC.setDishesCount(destCount);
                 goodsC.setPrice(price);
                 goodsC.setGoodsType(0);
+                goodsC.setCreatedTime(getFormatDate());
                 goodsC.setDishesId(dishesC.get_id());
                 goodsC.setDishesKindId(dishesC.getDishesKindId());
                 ((MainActivity) getActivity()).changeOrderGoodsByT9(goodsC);
                 activitySeekEdit.setText("");
-               /* //1、还未点此菜弹出
-                if(sourceCount==0.0)
-                {
-                        ((MainActivity) getActivity()).getGoodsList().add(goodsC);
-
-                        //购物车计数器数据更新
-                        point = (((MainActivity) getActivity()).getPoint());
-                        point++;
-                        ((MainActivity) getActivity()).setPoint(point);
-
-                        //计算总价
-                        total = ((MainActivity) getActivity()).getTotal();
-                        total = MyBigDecimal.add(total,tmpAllPrice,2);
-                        ((MainActivity) getActivity()).setTotal(total);
-
-                }//
-                else//原来点有此菜
-                {
-                    ((MainActivity) getActivity()).changeOrderGoodsByT9(goodsC);
-
-                    float tmp = MyBigDecimal.mul(goodsC.getPrice(),MyBigDecimal.sub(destCount,sourceCount,2),2);
-                    total = ((MainActivity) getActivity()).getTotal();
-                    total = MyBigDecimal.add(total,tmp,2);
-                    ((MainActivity) getActivity()).setTotal(total);
-
-                }
-*/
-
-
-
             }
         });
         builder.show();
@@ -331,25 +312,6 @@ public class SeekT9Fragment extends Fragment {
 
     }
 
-    private String ChangeSZ(String pinyin) {
-        Log.e("changesz", "ss=" + pinyin);
-        String SZ = "";
-
-        for (int i = 0; i < pinyin.length(); i++) {
-
-            for (int j = 2; j < 10; j++) {
-                for (int k = 0; k < 4; k++) {
-                    if (pinyin2sz[j - 2][k].equals(pinyin.charAt(i) + "")) {
-                        SZ += Integer.toString(j);
-                    }
-                }
-            }
-        }
-        Log.e("ChangeSZ", "sz=" + SZ);
-        return SZ;
-
-    }
-
     // 查询方法
     public void search(final String search) {
         if (search.length() < 2)
@@ -360,17 +322,17 @@ public class SeekT9Fragment extends Fragment {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                List<DishesC> dishesCs = CDBHelper.getObjByWhere(getActivity().getApplicationContext()
+                List<Document> documentList = CDBHelper.getDocmentsByWhere(getActivity().getApplicationContext()
                         , Expression.property("className").equalTo("DishesC")
                                 .and(Expression.property("dishesNameCode9").like("%" + search + "%"))
-                        , null, DishesC.class);
-                for (DishesC obj : dishesCs) {
+                        , null);
+                for (Document doc : documentList) {
                     GoodsC goodsObj = new GoodsC(myapp.getCompany_ID());
-                    goodsObj.setDishesName(obj.getDishesName());
+                    goodsObj.setDishesName(doc.getString("dishesName"));
                     goodsObj.setDishesCount(0);
-                    goodsObj.setPrice(obj.getPrice());
-                    goodsObj.setDishesId(obj.get_id());
-                    goodsObj.setDishesKindId(obj.getDishesKindId());
+                    goodsObj.setPrice(doc.getFloat("price"));
+                    goodsObj.setDishesId(doc.getId());
+                    goodsObj.setDishesKindId(doc.getString("dishesKindId"));
                     t9GoodsList.add(goodsObj);
 
                 }
@@ -378,10 +340,6 @@ public class SeekT9Fragment extends Fragment {
             }
 
         });
-
-        //        List<Document> documentList=CDBHelper.getDocmentsByWhere((getActivity().getApplicationContext(), Expression.property("className").equalTo("DishesC")
-//                .and(Expression.property("dishesNameCode9").like(search+"%")),null,DishesC.class);
-
     }
 
     // 查询方法
@@ -394,26 +352,25 @@ public class SeekT9Fragment extends Fragment {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                List<DishesC> dishesCs = CDBHelper.getObjByWhere(getActivity().getApplicationContext()
+
+                List<Document> documentList = CDBHelper.getDocmentsByWhere(getActivity().getApplicationContext()
                         , Expression.property("className").equalTo("DishesC")
                                 .and(Expression.property("dishesNameCode26").like("%"+search + "%"))
-                        , Ordering.property("dishesName").ascending(), DishesC.class);
-                for (DishesC obj : dishesCs) {
+                        , Ordering.property("dishesName").ascending());
+
+                for (Document doc : documentList) {
                     GoodsC goodsObj = new GoodsC(myapp.getCompany_ID());
-                    goodsObj.setDishesName(obj.getDishesName());
+                    goodsObj.setDishesName(doc.getString("dishesName"));
                     goodsObj.setDishesCount(0);
-                    goodsObj.setPrice(obj.getPrice());
-                    goodsObj.setDishesId(obj.get_id());
-                    goodsObj.setDishesKindId(obj.getDishesKindId());
+                    goodsObj.setPrice(doc.getFloat("price"));
+                    goodsObj.setDishesId(doc.getId());
+                    goodsObj.setDishesKindId(doc.getString("dishesKindId"));
                     t9GoodsList.add(goodsObj);
                 }
                 seekT9Adapter.notifyDataSetChanged();
             }
 
         });
-
-        //        List<Document> documentList=CDBHelper.getDocmentsByWhere((getActivity().getApplicationContext(), Expression.property("className").equalTo("DishesC")
-//                .and(Expression.property("dishesNameCode9").like(search+"%")),null,DishesC.class);
 
     }
 
@@ -556,6 +513,7 @@ public class SeekT9Fragment extends Fragment {
                                 String zdcDishedKindId = findZDCKindId();
                                 obj.setDishesKindId(zdcDishedKindId);
                                 obj.setGoodsType(3);
+                                obj.setCreatedTime(getFormatDate());
                                 ((MainActivity) getActivity()).getGoodsList().add(obj);
                                 //购物车计数器数据更新
                                 point = (((MainActivity) getActivity()).getPoint());
@@ -595,6 +553,12 @@ public class SeekT9Fragment extends Fragment {
                 activitySeekEdit.setText("");
                 t9GoodsList.clear();
                 seekT9Adapter.notifyDataSetChanged();
+                SharedPreferences settings = getActivity().getSharedPreferences("T9and26", 0);
+                SharedPreferences.Editor editor = settings.edit();
+                editor.clear();
+                editor.commit();
+                editor.putBoolean("isFlag",true);
+                editor.commit();
                 break;
             case R.id.ibtn_key_del:
                 int length = activitySeekEdit.getSelectionEnd();
@@ -722,6 +686,13 @@ public class SeekT9Fragment extends Fragment {
                 activitySeekEdit.setText("");
                 t9GoodsList.clear();
                 seekT9Adapter.notifyDataSetChanged();
+
+                SharedPreferences sharedPreferences = getActivity().getSharedPreferences("T9and26", 0);
+                SharedPreferences.Editor edit = sharedPreferences.edit();
+                edit.clear();
+                edit.commit();
+                edit.putBoolean("isFlag",false);
+                edit.commit();
                 break;
 
             case R.id.seek_26_sc:

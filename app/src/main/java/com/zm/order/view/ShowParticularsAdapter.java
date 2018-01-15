@@ -26,11 +26,6 @@ public class ShowParticularsAdapter extends BaseAdapter {
 
     private Activity activity;
     private List<GoodsC> goodsCs;
-    private OnLinClickListener linClickListener;
-
-    public void setLinClickListener(OnLinClickListener linClickListener){
-        this.linClickListener = linClickListener;
-    }
 
     public ShowParticularsAdapter(Activity activity,List<GoodsC> goodsCs)
     {
@@ -114,9 +109,5 @@ public class ShowParticularsAdapter extends BaseAdapter {
         private TextView mc,dj,sl,kw;
         private LinearLayout item_show_lin;
 
-    }
-
-    interface OnLinClickListener{
-        void getLinClick(ImageView imageView);
     }
 }

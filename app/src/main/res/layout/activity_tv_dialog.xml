@@ -176,6 +176,7 @@
         android:layout_height="50dp">
 
         <TextView
+            android:id="@+id/dialog_count"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="输入数量"

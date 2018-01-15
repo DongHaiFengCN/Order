@@ -21,7 +21,9 @@ import com.couchbase.lite.Document;
 import com.zm.order.R;
 import com.zm.order.view.adapter.SeekT9DialogAdapter;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.TimerTask;
 
@@ -33,12 +35,15 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import model.CDBHelper;
 
+import static model.CDBHelper.getFormatDate;
+
 /**
  * Created by lenovo on 2017/10/26.
  */
 
 public class SeekT9Adapter extends BaseAdapter {
 
+    private static final String TAG = "SeekT9Adapter";
     private List<GoodsC> mGoodsList;
     private MainActivity activity;
     private SeekT9OnClickListener listener;
@@ -108,23 +113,6 @@ public class SeekT9Adapter extends BaseAdapter {
                 }
             }
         });
-//        if (activity.getGoodsList().size() != 0 )
-//        {
-//            for (int i = 0 ;i< activity.getGoodsList().size() ;i++){
-//                if (activity.getGoodsList().get(i).getDishesName().toString().equals(dishesC.getDishesName())) {
-//                    viewHolder.viewShu.setText(activity.getGoodsList().get(i).getDishesCount()+"");
-//                    mData.get(position).setDishesCount(Float.parseFloat(viewHolder.viewShu.getText().toString()));
-//                    break;
-//                }else {
-//                    mData.get(position).setDishesCount(0);
-//                    viewHolder.viewShu.setText(mData.get(position).getDishesCount()+"");
-//                }
-//            }
-//            number = Float.parseFloat(viewHolder.viewShu.getText().toString());
-//        }else{
-//            mData.get(position).setDishesCount(0);
-//            viewHolder.viewShu.setText(mData.get(position).getDishesCount()+"");
-//        }
 
         final String str = viewHolder.viewShu.getText().toString();
         Log.e("viewShu", str);
@@ -272,8 +260,7 @@ public class SeekT9Adapter extends BaseAdapter {
         goodsObj.setGoodsType(0);
         goodsObj.setDishesId(mGoodsList.get(position).getDishesId());
         goodsObj.setDishesKindId(mGoodsList.get(position).getDishesKindId());
-
-
+        goodsObj.setCreatedTime(getFormatDate());
         if (!viewHolder.viewShu.getText().toString().equals("0")) {
             viewHolder.viewShu.setVisibility(View.VISIBLE);
             viewHolder.viewJian.setVisibility(View.VISIBLE);
@@ -409,12 +396,9 @@ public class SeekT9Adapter extends BaseAdapter {
         dialog.show();
     }
 
+
     interface SeekT9OnClickListener {
         void OnClickListener(View view, String name, float price, int pos);
-    }
-
-    interface SeekT9OrderItem {
-        void seekT9OrderItem(SparseArray<Object> list, int point, float total);
     }
 
     public class ViewHolder {

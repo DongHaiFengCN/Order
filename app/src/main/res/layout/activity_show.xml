@@ -39,10 +39,21 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/show_tv_sl"
+            android:id="@+id/show_tv_area"
+            android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center_vertical"
+            android:gravity="center"
+            android:paddingLeft="20dp"
+            android:textSize="18sp"
+            android:textColor="@color/md_black_1000"
+            />
+        <TextView
+            android:id="@+id/show_tv_sl"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
             android:paddingLeft="20dp"
             android:textSize="18sp"
             android:textColor="@color/md_black_1000"

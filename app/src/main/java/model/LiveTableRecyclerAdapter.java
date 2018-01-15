@@ -161,7 +161,6 @@ public class LiveTableRecyclerAdapter extends RecyclerView.Adapter<LiveTableRecy
         }
 
         holder.tv.setText(name);
-       // holder.itemView.setTag(tableobj);
         holder.itemView.setTag(docId);
 
     }

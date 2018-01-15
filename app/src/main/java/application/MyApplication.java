@@ -65,7 +65,7 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 
     private static final String TAG = Application.class.getSimpleName();
 
-    private final static boolean SYNC_ENABLED = true;
+    private final static boolean SYNC_ENABLED = false;
 
     public Map<String, List<Document>> getDishesObjectCollection() {
         return dishesObjectCollection;

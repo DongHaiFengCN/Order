@@ -30,22 +30,23 @@
 
         <TextView
             android:id="@+id/custom_dc_text"
-            android:layout_width="150dp"
+            android:layout_width="100dp"
             android:layout_height="40dp"
             android:background="@null"
             android:gravity="center_vertical"
             android:paddingLeft="20sp"
-            android:text="菜名："
+            android:text="  菜名："
             android:textColor="@color/md_black_1000"
             android:textSize="18sp" />
 
         <EditText
             android:id="@+id/custom_dc_c"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginRight="50sp"
+            android:layout_height="30dp"
+            android:layout_marginRight="30sp"
             android:background="@drawable/animselect"
             android:ems="10"
+            android:hint="输入菜名"
             android:gravity="center"
             android:imeOptions="flagNoExtractUi"
             android:inputType="text"
@@ -63,7 +64,7 @@
 
         <TextView
             android:id="@+id/custom_dc_tv"
-            android:layout_width="150dp"
+            android:layout_width="100dp"
             android:layout_height="40dp"
             android:background="@null"
             android:gravity="center_vertical"
@@ -75,8 +76,8 @@
         <EditText
             android:id="@+id/custom_dc_t"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginRight="50sp"
+            android:layout_height="30dp"
+            android:layout_marginRight="30sp"
             android:background="@drawable/animselect"
             android:ems="10"
             android:gravity="center"
@@ -97,10 +98,10 @@
 
         <TextView
 
-            android:layout_width="150dp"
+            android:layout_width="100dp"
             android:layout_height="40dp"
             android:background="@null"
-            android:text="数量："
+            android:text="  数量："
             android:textColor="@color/md_black_1000"
             android:paddingLeft="20sp"
             android:textSize="18sp"
@@ -109,13 +110,17 @@
         <EditText
             android:id="@+id/custom_dc_count"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginRight="50sp"
+            android:layout_height="30dp"
+            android:layout_marginRight="30sp"
             android:background="@drawable/animselect"
             android:ems="10"
             android:gravity="center"
-            android:imeOptions="flagNoExtractUi"
             android:inputType="number|numberDecimal"
+            android:focusable="true"
+            android:textSize="16sp"
+            android:paddingLeft="10dp"
+            android:focusableInTouchMode="true"
+            android:selectAllOnFocus="true"
             android:text="1.0"
             android:textColor="@color/md_black_1000" />
 

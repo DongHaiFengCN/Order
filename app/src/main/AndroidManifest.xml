@@ -53,7 +53,8 @@
         </activity>
         <activity
             android:name=".view.DeskActivity"
-            android:launchMode="singleTask" />
+            android:launchMode="singleTask"
+            />
         <activity
             android:name=".view.PayActivity"
             android:configChanges="keyboard|keyboardHidden|orientation"

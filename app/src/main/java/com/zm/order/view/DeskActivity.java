@@ -1,6 +1,7 @@
 package com.zm.order.view;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
@@ -21,6 +22,9 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -29,6 +33,7 @@ import android.widget.Toast;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
+import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -120,17 +125,8 @@ public class DeskActivity extends AppCompatActivity {
 
     private void initWidget()
     {
-        //BuglyLog.e("DeskActivity", "initWidget");
-       // CrashReport.setIsDevelopmentDevice(getApplicationContext(), BuildConfig.DEBUG);
 
         db = myapp.getDatabase();
-
-        List<AreaC> list = CDBHelper.getObjByClass(getApplicationContext(),AreaC.class);
-      /*  if(list!=null)
-        {
-            for(AreaC obj:list)
-                Log.e("for*****","areaName="+obj.getAreaName());
-        }*/
         if(db == null) throw new IllegalArgumentException();
         areaAdapter = new AreaAdapter(this, db);
 
@@ -161,7 +157,6 @@ public class DeskActivity extends AppCompatActivity {
     private void showDeskListView(String areaId)
     {
 
-        long starttime = System.currentTimeMillis();
         if(tableadapter!=null)
             tableadapter.StopQuery();
 
@@ -172,16 +167,11 @@ public class DeskActivity extends AppCompatActivity {
             public void onItemClick(View view,Object data)
             {
 
-//                if (isFastDoubleClick()){
-//                    Toast.makeText(DeskActivity.this,"点击太快，请稍候",Toast.LENGTH_LONG).show();
-//                    return;
-//                }
                 String tableId= (String)data;
                 final TableC  tableC =  CDBHelper.getObjById(getApplicationContext(),tableId,TableC.class);
                 myapp.setTable_sel_obj(tableC);
                 if(tableC.getState()!=2)
                 {
-
                     final EditText  editText = new EditText(DeskActivity.this);
                     editText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(2)});
                     LinearLayout linearLayout =new LinearLayout(DeskActivity.this);
@@ -207,32 +197,16 @@ public class DeskActivity extends AppCompatActivity {
                     //添加控件到布局
                     linearLayout.addView(editText);
 
-
-
                     editText.setHint("最多人数："+tableC.getMaxPersons()+"最小人数 : "+tableC.getMinConsum());
 
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(DeskActivity.this);
 
-
                     builder.setTitle("设置就餐人数");
                     builder.setView(linearLayout);
-                    builder.setPositiveButton("确定", null);
-                    builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-
-                        }
-                    });
-
-                    final AlertDialog alertDialog = builder.show();
-
-                    //重置点击事件
-
-                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-
+                        public void onClick(DialogInterface dialog, int which) {
                             if(TextUtils.isEmpty(editText.getText().toString())){
 
                                 editText.setError("人数不能为空");
@@ -251,16 +225,32 @@ public class DeskActivity extends AppCompatActivity {
                                 myapp.setTable_sel_obj(tableC);
                                 CDBHelper.createAndUpdate(getApplicationContext(),tableC);
 
-                                alertDialog.dismiss();
+                                dialog.dismiss();
 
                                 //转跳点餐界面
                                 turnMainActivity();
 
 
                             }
-
                         }
                     });
+                    builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    });
+
+                    final AlertDialog alertDialog = builder.create();
+
+                    alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                        public void onShow(DialogInterface dialog) {
+                            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                            imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
+                        }
+                    });
+
+                    alertDialog.show();
 
                 }else {
                     List<String> orderCList= CDBHelper.getIdsByWhere(getApplicationContext(),
@@ -287,7 +277,7 @@ public class DeskActivity extends AppCompatActivity {
 
             }
             @Override
-            public void onItemLongClick(View view,Object data)
+            public void onItemLongClick(View view, final Object data)
             {
                 String tableId = (String)data;
                 final TableC tableC = CDBHelper.getObjById(getApplicationContext(),tableId,TableC.class);
@@ -312,9 +302,7 @@ public class DeskActivity extends AppCompatActivity {
                        @Override
                        public void onClick(View view) {
 
-
                            final ProgressDialog proDialog = android.app.ProgressDialog.show(DeskActivity.this, "重置", "正在配置订单请稍等~");
-
 
                            myapp.mExecutor.execute(new Runnable() {
                                @Override
@@ -325,12 +313,8 @@ public class DeskActivity extends AppCompatActivity {
                                                                 @Override
                                                                 public void run() {
                                                                     CheckOrderC checkOrderC = null;
-
-
                                                                     //老数据没有字段遍历查询
                                                                     if(tableC.getLastCheckOrderId() == null || tableC.getLastCheckOrderId().isEmpty()){
-
-                                                                        //  long startTime=System.currentTimeMillis();//记录开始时间
 
                                                                         Date date = new Date();
                                                                         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
@@ -342,54 +326,24 @@ public class DeskActivity extends AppCompatActivity {
                                                                                         .and(Expression.property("checkTime").like(formatter.format(date)+"%"))
                                                                                 , null, CheckOrderC.class);
 
-
-                                                                        /* long endTime=System.currentTimeMillis();//记录结束时间
-
-                                                                       float excTime=(float)(endTime-startTime)/1000;
-
-                                                                       Log.e("执行时间1：",excTime+"s");*/
                                                                         Iterator<CheckOrderC> iterator = checkOrderCS.iterator();
-
-
 
                                                                         //移除不是当前桌的订单
                                                                         while (iterator.hasNext()){
-
                                                                             CheckOrderC c = iterator.next();
-
                                                                             if(!c.getTableNo().equals(tableC.getTableNum())){
-
                                                                                 iterator.remove();
-
                                                                             }
                                                                         }
-
                                                                         if(checkOrderCS.size() > 0){
-
                                                                             List<String> dateList = new ArrayList<>();
-
                                                                             //获取当前桌订单今日时间集合
                                                                             for (int i1 = 0; i1 < checkOrderCS.size(); i1++) {
-
-
                                                                                 dateList.add(checkOrderCS.get(i1).getCheckTime());
-
                                                                             }
-
-                                                                        /* long endTime1=System.currentTimeMillis();//记录结束时间
-
-                                                                           float excTime1=(float)(endTime1-endTime)/1000;
-
-                                                                           Log.e("执行时间2：",excTime1+"s");*/
 
                                                                             //得到最近订单的坐标
                                                                             int f =  Tool.getLastCheckOrder(dateList);
-/*
-                                                                           long endTime2=System.currentTimeMillis();//记录结束时间
-
-                                                                           float excTime2=(float)(endTime2-endTime1)/1000;
-
-                                                                           Log.e("执行时间3：",excTime2+"s");*/
                                                                             checkOrderC = checkOrderCS.get(f);
                                                                             for (int i = 0; i < checkOrderC.getOrderList().size(); i++) {
 
@@ -404,8 +358,6 @@ public class DeskActivity extends AppCompatActivity {
                                                                             tableC.setState(2);
                                                                             CDBHelper.createAndUpdate(getApplicationContext(), tableC);
 
-                                                                           /*EventBus.getDefault().postSticky(checkOrderC);
-                                                                           startActivity(new Intent(DeskActivity.this, ResetBillActivity.class));*/
                                                                         }else {
 
                                                                             Message msg = Message.obtain();
@@ -436,15 +388,6 @@ public class DeskActivity extends AppCompatActivity {
                                                                         tableC.setState(2);
                                                                         CDBHelper.createAndUpdate(getApplicationContext(), tableC);
 
-                                                                     /*  EventBus.getDefault().postSticky(checkOrderC);
-                                                                       try {
-                                                                           Thread.sleep(1000);
-                                                                       } catch (InterruptedException e) {
-                                                                           e.printStackTrace();
-                                                                       }
-
-                                                                       startActivity(new Intent(DeskActivity.this, ResetBillActivity.class));
-                                */
                                                                     }
 
                                                                 }
@@ -452,8 +395,6 @@ public class DeskActivity extends AppCompatActivity {
                                    } catch (CouchbaseLiteException e) {
                                        e.printStackTrace();
                                    }
-
-
                                    proDialog.dismiss();//关闭proDialog
 
                                }
@@ -465,18 +406,14 @@ public class DeskActivity extends AppCompatActivity {
 
                        }
                    });
-
-
-                }else {//使用&&预定状态
-
-                    List<OrderC> orderCList = CDBHelper.getObjByWhere(getApplicationContext(),
+                }else {
+                    //使用&&预定状态
+                    List<String> orderCList = CDBHelper.getIdsByWhere(getApplicationContext(),
                             Expression.property("className").equalTo("OrderC")
                                     .and(Expression.property("tableNo").equalTo(tableC.getTableNum()))
                                     .and(Expression.property("orderState").equalTo(1))
                                     .and(Expression.property("orderCType").notEqualTo(1))
-                            ,null
-                            ,OrderC.class);
-                    Log.e("orderCList","orderCList.size()"+orderCList.size());
+                            ,null);
 
                     if(orderCList.size()>0)//有未买单订单，可以买单
                     {
@@ -514,15 +451,16 @@ public class DeskActivity extends AppCompatActivity {
                                         tableC.setState(0);
                                         CDBHelper.createAndUpdate(getApplicationContext(),tableC);
                                         myapp.setTable_sel_obj(tableC);
-                                        List<OrderC> orderCList = CDBHelper.getObjByWhere(getApplicationContext(),
+                                        List<Document> orderCList = CDBHelper.getDocmentsByWhere(getApplicationContext(),
                                                 Expression.property("className").equalTo("OrderC")
                                                         .and(Expression.property("tableNo").equalTo(tableC.getTableNum()))
                                                         .and(Expression.property("orderState").equalTo(1))
                                                 ,null
-                                                ,OrderC.class);
-                                        for (OrderC orderC : orderCList){
-                                            orderC.setOrderState(0);
-                                            CDBHelper.createAndUpdate(getApplicationContext(),orderC);
+                                                );
+                                        for (Document doc : orderCList){
+                                            doc.setInt("orderState",0);
+                                            CDBHelper.saveDocument(getApplicationContext(),doc);
+
                                         }
                                     }
                                 }).setPositiveButton("否",
@@ -534,14 +472,10 @@ public class DeskActivity extends AppCompatActivity {
                                     }
                                 }).show();
                     }
-
-
                 }
-
             }
         });
 
-        //3,recyclerview created
         listViewDesk = (RecyclerView)findViewById(R.id.lv_desk);
         listViewDesk.setItemAnimator(new DefaultItemAnimator());
         listViewDesk.setLayoutManager(new GridLayoutManager(this,3));
@@ -568,8 +502,6 @@ public class DeskActivity extends AppCompatActivity {
                 break;
             case R.id.action_alipay:
 
-                //Toast.makeText(DeskActivity.this,"alipay",Toast.LENGTH_LONG).show();
-
                 flag = 1;
                 turnScan();
 
@@ -579,7 +511,6 @@ public class DeskActivity extends AppCompatActivity {
 
                 flag = 2;
                 turnScan();
-               // Toast.makeText(DeskActivity.this,"wechat",Toast.LENGTH_LONG).show();
                 break;
                 default:
                     break;

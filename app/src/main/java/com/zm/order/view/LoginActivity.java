@@ -233,7 +233,6 @@ public class LoginActivity extends AppCompatActivity implements ILoginView, ISha
 
         initDishesData();
         startActivity(intent);
-        finish();
     }
 
     @Override

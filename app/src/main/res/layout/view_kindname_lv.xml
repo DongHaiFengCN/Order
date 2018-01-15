@@ -39,6 +39,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/redpoint"
         android:visibility="visible"
+        android:layout_gravity="center_vertical"
 
         />
 </LinearLayout>

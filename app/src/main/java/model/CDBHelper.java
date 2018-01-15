@@ -192,7 +192,6 @@ public class CDBHelper {
      */
     public static <T> List<T> getObjByWhere(Context context, Expression where, Ordering orderBy, Class<T> aClass) {
         // 1
-        Log.e("CDB","1"+getFormatDate());
         List<T> documentList = new ArrayList<>();
         //1\
         if (db == null) {
@@ -212,7 +211,6 @@ public class CDBHelper {
         try {
             ResultSet resultSet = query.run();
             Result row;
-            Log.e("CDB","2"+getFormatDate());
             while ((row = resultSet.next()) != null) {
                 ObjectMapper objectMapper = new ObjectMapper();
                 // Ignore undeclared properties
@@ -226,7 +224,6 @@ public class CDBHelper {
                 T obj = objectMapper.convertValue(map, aClass);
                 documentList.add(obj);
             }
-            Log.e("CDB","3"+getFormatDate());
         } catch (CouchbaseLiteException e) {
             Log.e("getDocmentsByClass", "Exception=", e);
         }

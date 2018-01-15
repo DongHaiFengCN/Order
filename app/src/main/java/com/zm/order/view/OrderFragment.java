@@ -402,7 +402,8 @@ public class OrderFragment extends Fragment {
 
                 } else {
 
-                    Toast.makeText(getActivity(), "数量必须大于0！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "没有选择商品数量！", Toast.LENGTH_SHORT).show();
+                    return;
                 }
 
 

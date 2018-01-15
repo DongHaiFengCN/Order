@@ -56,6 +56,13 @@ public class GoodsC implements Cloneable {
 	 */
     private int isWaitCall;
 
+    /**
+	 *订单产生时间
+	 *yyyy-MM-dd HH:mm:ss
+	 *之所以定义成String型，是因为 DB4o 按该字段排序时不支持 Date型
+	 *
+	 */
+	private String createdTime;// 日期时间****
 
 
 	/**
@@ -171,4 +178,11 @@ public class GoodsC implements Cloneable {
 		return super.clone(); // 具体的克隆操作由父类完成
 	}
 
+	public String getCreatedTime() {
+		return createdTime;
+	}
+
+	public void setCreatedTime(String createdTime) {
+		this.createdTime = createdTime;
+	}
 }

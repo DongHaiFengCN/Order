@@ -17,6 +17,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -97,6 +98,7 @@ import untils.PrintUtils;
 import untils.Tool;
 
 import static com.gprinter.service.GpPrintService.ACTION_CONNECT_STATUS;
+import static model.CDBHelper.getFormatDate;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -175,7 +177,8 @@ public class MainActivity extends AppCompatActivity {
         });
         myApp = (MyApplication) getApplicationContext();
 
-
+        SharedPreferences sharedPreferences = getSharedPreferences("T9andOrder", 0);
+        isFlag = sharedPreferences.getBoolean("isFlag",true);
 
         initView();
 
@@ -484,22 +487,23 @@ public class MainActivity extends AppCompatActivity {
         orderAdapter.setListener(new OrderAdapter.setOnItemListener() {
             @Override
             public void setListener(final int position) {
-
+//1\
+                final GoodsC goodsC = goodsList.get(position);
+                if (goodsC.getGoodsType() == 2){
+                    return ;
+                }
                 AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
                 alert.setMessage("是否赠菜")
                         .setPositiveButton("是", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
-                                //1\
-                                GoodsC goodsC = goodsList.get(position);
                                 //2\
                                 goodsC.setGoodsType(2);
                                 goodsC.setDishesName(goodsC.getDishesName() + "(赠)");
 
                                 total = MyBigDecimal.sub(total, MyBigDecimal.mul(goodsC.getPrice(), goodsC.getDishesCount(), 1), 1);
                                 setTotal(total);
-
                                 orderAdapter.notifyDataSetChanged();
                                 dialog.dismiss();
                             }
@@ -521,37 +525,6 @@ public class MainActivity extends AppCompatActivity {
                 if (getGoodsList().size() > 0) {
                     setOrderDialog();
                 }
-                /*if (flag) {
-                    orderAdapter.notifyDataSetChanged();
-
-                    linearLayout.setAnimation(AnimationUtil.moveToViewLocation());
-                    linearLayout.setVisibility(View.VISIBLE);
-                    imageView.setVisibility(View.VISIBLE);
-                    imageView.animate()
-                            .alpha(1f)
-                            .setDuration(400)
-                            .setListener(null);
-                    flag = false;
-
-                } else {
-
-                    linearLayout.setAnimation(AnimationUtil.moveToViewBottom());
-                    linearLayout.setVisibility(View.GONE);
-
-                    imageView.animate()
-                            .alpha(0f)
-                            .setDuration(400)
-                            .setListener(new AnimatorListenerAdapter() {
-                                @Override
-                                public void onAnimationEnd(Animator animation) {
-                                    imageView.setVisibility(View.GONE);
-                                }
-                            });
-
-                    flag = true;
-
-                }*/
-
                 //监听orderItem的增加删除，设置总价以及总数量, flag ？+ ：-,price 单价 ,sum 当前item的个数。
 
                 orderAdapter.setOnchangeListener(new OrderAdapter.OnchangeListener() {
@@ -674,10 +647,6 @@ public class MainActivity extends AppCompatActivity {
 
                                 dialog.dismiss();
 
-
-
-
-
                             }
                         });
 
@@ -750,7 +719,8 @@ public class MainActivity extends AppCompatActivity {
                 {
                     if (dishKindId.equals(goodsC.getDishesKindId())) {
                         findflag = true;
-                        // g_printGoodsList.remove(goodsC);//为了降低循环次数，因为菜品只可能在一个厨房打印分发，故分发完后移除掉。
+                        // g_printGoodsList.remove(goodsC);
+                        // 为了降低循环次数，因为菜品只可能在一个厨房打印分发，故分发完后移除掉。
                         oneKitchenClientGoods.add(goodsC);
                     }
 
@@ -979,43 +949,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-/*
-        for (int i = 0; i < myshangpinlist.size(); i++)
-        {
-            esc.addSelectPrintModes(EscCommand.FONT.FONTA, EscCommand.ENABLE.OFF, EscCommand.ENABLE.ON, EscCommand.ENABLE.ON, EscCommand.ENABLE.OFF); // 设置为倍高倍宽
-
-            esc.addText("--------------------\n");
-            esc.addText("房间:" + areaName + "\n");// 打印文字
-            esc.addText("桌位："+ tableName +"\n");
-            esc.addText("--------------------\n");
-            esc.addPrintAndLineFeed();
-
-            float num = 1; // 数量 默认为1
-            num = myshangpinlist.get(i).getDishesCount();
-            esc.addText(myshangpinlist.get(i).getDishesName().toString());
-            String temp = myshangpinlist.get(i).getDishesTaste();
-            if (temp == null || "".equals(temp))
-            {
-                esc.addPrintAndLineFeed();
-            }
-            else
-            {
-                esc.addText("(" + temp + ")");
-                esc.addPrintAndLineFeed();
-            }
-
-
-            esc.addText("数量： " + num);
-            esc.addPrintAndLineFeed();
-            byte len1 = 0x01;
-            esc.addPrintAndFeedLines(len1);
-            esc.addCutAndFeedPaper(len1);
-
-
-        }
-*/
-
-// 加入查询打印机状态，打印完成后，此时会接收到GpCom.ACTION_DEVICE_STATUS广播
+        // 加入查询打印机状态，打印完成后，此时会接收到GpCom.ACTION_DEVICE_STATUS广播
         esc.addQueryPrinterStatus();
 
         Vector<Byte> datas = esc.getCommand();
@@ -1049,7 +983,7 @@ public class MainActivity extends AppCompatActivity {
     private int connectClientPrint(int index) {
         if (mGpService != null) {
             try {
-                //  PortParamDataBase database = new PortParamDataBase(this);
+                //PortParamDataBase database = new PortParamDataBase(this);
                 PortParameters mPortParam = new PortParameters();
                 mPortParam.setPortType(PortParameters.ETHERNET);
                 mPortParam.setIpAddr(pIp);
@@ -1307,28 +1241,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    /**
-     * @return 订单号
-     */
-    public String OrderId() {
-        Date date = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-        return formatter.format(date);
-    }
-
-    /**
-     * @return 时间格式 yyyy-MM-dd HH:mm:ss
-     */
-    public String getFormatDate() {
-        Date date = new Date();
-        if (date != null) {
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            return formatter.format(date);
-        }
-        return null;
-    }
-
-
     private void saveOrder()
     {
 
@@ -1341,19 +1253,23 @@ public class MainActivity extends AppCompatActivity {
                     OrderC zcOrderObj = new OrderC(myApp.getCompany_ID());
                     gOrderId = CDBHelper.createAndUpdate(getApplicationContext(), newOrderObj);
                     newOrderObj.set_id(gOrderId);
-                    List<OrderC> orderCList = CDBHelper.getObjByWhere(getApplicationContext(),
+                    List<Document> orderCList = CDBHelper.getDocmentsByWhere(getApplicationContext(),
                             Expression.property("className").equalTo("OrderC")
                                     .and(Expression.property("orderState").equalTo(1))
                                     .and(Expression.property("tableNo").equalTo(myApp.getTable_sel_obj().getTableNum()))
                             , Ordering.property("createdTime").descending()
-                            , OrderC.class);
+                            );
 
                     if (orderCList.size() > 0) {
-                        newOrderObj.setOrderNum(orderCList.get(0).getOrderNum() + 1);
-                        newOrderObj.setSerialNum(orderCList.get(0).getSerialNum());
+
+                        newOrderObj.setOrderNum(orderCList.get(0).getInt("orderNum") + 1);
+                        newOrderObj.setSerialNum(orderCList.get(0).getString("serialNum"));
+
                     } else {
+
                         newOrderObj.setOrderNum(1);
                         newOrderObj.setSerialNum(getOrderSerialNum());
+
                     }
                     for (int i = 0; i < goodsList.size(); i++) {
                         GoodsC obj = goodsList.get(i);
@@ -1396,7 +1312,6 @@ public class MainActivity extends AppCompatActivity {
 
                         CDBHelper.createAndUpdate(getApplicationContext(), zcOrderObj);
                     }
-
 
                     Log.e("id", gOrderId);
 
@@ -1475,6 +1390,12 @@ public class MainActivity extends AppCompatActivity {
         }
         ft.commit();
 
+        SharedPreferences settings = getSharedPreferences("T9andOrder", 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.clear();
+        editor.commit();
+        editor.putBoolean("isFlag",isTrue);
+        editor.commit();
     }
 
     /**
@@ -1585,8 +1506,8 @@ public class MainActivity extends AppCompatActivity {
             goodsC.setDishesCount(dishesMessage.getCount());
             goodsC.setDishesId(dishesMessage.getDishesC().get_id());
             goodsC.setGoodsType(0);
+            goodsC.setCreatedTime(getFormatDate());
             goodsC.setPrice(dishesMessage.getDishesC().getPrice());
-
             goodsList.add(goodsC);
 
         }
