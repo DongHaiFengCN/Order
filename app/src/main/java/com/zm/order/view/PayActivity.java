@@ -1219,18 +1219,25 @@ public class PayActivity extends AppCompatActivity {
                                 //遍历所活动菜品找匹配的打折菜品
 
                                 for (int i = 0; i < allDishes.size(); i++) {
-                                    if (h.getDishesId() == null){
-                                        continue;
-                                    }
-                                    //找到打折的
-                                    if (h.getDishesId().equals(allDishes.get(i).getDishesId())) {
-                                      //  MyLog.e("打折的菜" + name);
 
+                                    //确保绝对是自点菜
+                                    if (h.getGoodsType() == 3 && h.getDishesId() == null){
                                         copy = MyBigDecimal.add(copy, MyBigDecimal.mul(h.getPrice(), h.getDishesCount(), 1), 1);// h.getAllPrice();
+                                        break;
+                                    }else  if (h.getDishesId() != null && h.getDishesId().equals(allDishes.get(i).getDishesId())) {//找到打折的
+                                            //  MyLog.e("打折的菜" + name);
 
+                                            copy = MyBigDecimal.add(copy, MyBigDecimal.mul(h.getPrice(), h.getDishesCount(), 1), 1);// h.getAllPrice();
+                                            break;
+                                    }else if (h.getDishesId() == null){
+
+                                        new NullPointerException("菜品DishesId为空");
 
                                         break;
                                     }
+
+
+
                                 }
 
                             }

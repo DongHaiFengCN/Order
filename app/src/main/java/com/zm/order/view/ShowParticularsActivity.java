@@ -767,8 +767,6 @@ public class ShowParticularsActivity extends Activity {
                     }
                 });
 
-
-
             }else{
                 checkBox.setVisibility(View.GONE);
             }
