@@ -451,17 +451,6 @@ public class DeskActivity extends AppCompatActivity {
                                         tableC.setState(0);
                                         CDBHelper.createAndUpdate(getApplicationContext(),tableC);
                                         myapp.setTable_sel_obj(tableC);
-                                        List<Document> orderCList = CDBHelper.getDocmentsByWhere(getApplicationContext(),
-                                                Expression.property("className").equalTo("OrderC")
-                                                        .and(Expression.property("tableNo").equalTo(tableC.getTableNum()))
-                                                        .and(Expression.property("orderState").equalTo(1))
-                                                ,null
-                                                );
-                                        for (Document doc : orderCList){
-                                            doc.setInt("orderState",0);
-                                            CDBHelper.saveDocument(getApplicationContext(),doc);
-
-                                        }
                                     }
                                 }).setPositiveButton("否",
                                 new DialogInterface.OnClickListener() {
