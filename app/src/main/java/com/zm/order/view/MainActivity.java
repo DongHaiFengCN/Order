@@ -159,7 +159,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
         EventBus.getDefault().register(this);
         ButterKnife.bind(this);
@@ -179,10 +178,7 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences sharedPreferences = getSharedPreferences("T9andOrder", 0);
         isFlag = sharedPreferences.getBoolean("isFlag",true);
-
         initView();
-
-
         //连接打印机服务
         registerPrinterBroadcast();
         connectPrinter();
@@ -464,7 +460,7 @@ public class MainActivity extends AppCompatActivity {
         car_iv = (ImageView) findViewById(R.id.car);
 
         ok_tv = (TextView) findViewById(R.id.ok_tv);
-        order_lv = (ListView) findViewById(R.id.order_lv);
+        order_lv =  findViewById(R.id.order_lv);
         final ImageView imageView = (ImageView) findViewById(R.id.shade);
 
         final LinearLayout linearLayout = (LinearLayout) findViewById(R.id.orderList);
@@ -1459,7 +1455,12 @@ public class MainActivity extends AppCompatActivity {
 
                 orderAdapter = new OrderAdapter(goodsList, MainActivity.this);
 
+                if (order_lv == null){
+                    order_lv = findViewById(R.id.order_lv);
+                }
+
                 order_lv.setAdapter(orderAdapter);
+
             }
 
 
