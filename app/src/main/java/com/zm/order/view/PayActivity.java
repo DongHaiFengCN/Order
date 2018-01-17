@@ -1219,7 +1219,9 @@ public class PayActivity extends AppCompatActivity {
                                 //遍历所活动菜品找匹配的打折菜品
 
                                 for (int i = 0; i < allDishes.size(); i++) {
-
+                                    if (h.getDishesId() == null){
+                                        continue;
+                                    }
                                     //找到打折的
                                     if (h.getDishesId().equals(allDishes.get(i).getDishesId())) {
                                       //  MyLog.e("打折的菜" + name);
