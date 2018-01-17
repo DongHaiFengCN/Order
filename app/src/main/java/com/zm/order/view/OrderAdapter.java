@@ -128,8 +128,10 @@ public class OrderAdapter extends BaseAdapter {
                     MyLog.e("OnChange    数量="+ls);
                     goodsCs.get(i).setDishesCount(ls);
                     onchangeListener.onchangeListener(flag, goodsCs.get(i).getPrice(),ls);
-                    context.getT9GoodsList().clear();
-                    context.getSeekT9Adapter().notifyDataSetChanged();
+                    if (context.getGoodsList().size()==0 ){
+                        context.getT9GoodsList().clear();
+                        context.getSeekT9Adapter().notifyDataSetChanged();
+                    }
                   if(ls <= 0){
 
                       goodsCs.get(i).setDishesCount(0);

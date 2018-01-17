@@ -91,13 +91,13 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 
 //    private String Company_ID="gysz";
 //    private final static String DATABASE_NAME = "gyszdb";
-    //private final static String SYNCGATEWAY_URL = "blip://123.207.174.171:4984/kitchendb/";
+    private final static String SYNCGATEWAY_URL = "blip://123.207.174.171:4984/kitchen/";
 
     private String Company_ID = "gysz";
     //private final static String DATABASE_NAME = "gyszdbD";
     private final static String DATABASE_NAME = "GYSZDB";
 
-    private final static String SYNCGATEWAY_URL = "blip://192.168.2.166:4984/kitchendb/";
+    //private final static String SYNCGATEWAY_URL = "blip://192.168.2.166:4984/kitchendb/";
 
 
     private Database database = null;
@@ -204,7 +204,7 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
 
                 // copy all data from theirs document
                 for (String key : theirs) {
-                    Log.e("ConflictResolvertheir", "key=" + key + "value=" + theirs.getObject(key));
+                    Log.e(" ", "key=" + key + "value=" + theirs.getObject(key));
                     resolved.setObject(key, theirs.getObject(key));
                     changed.add(key);
                 }
@@ -240,9 +240,9 @@ public class MyApplication extends MobApplication implements ISharedPreferences,
         ReplicatorConfiguration config = new ReplicatorConfiguration(database, uri);
         List<String> channels = new ArrayList<>();
 
-//        MyLog.d("companyid="+getCompany_ID());
-//        channels.add(getCompany_ID());
-//        config.setChannels(channels);
+        MyLog.d("companyid="+getCompany_ID());
+        channels.add(getCompany_ID());
+        config.setChannels(channels);
 
         config.setReplicatorType(ReplicatorConfiguration.ReplicatorType.PUSH_AND_PULL);
         config.setContinuous(true);

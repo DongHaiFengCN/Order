@@ -1117,14 +1117,17 @@ public class MainActivity extends AppCompatActivity {
 
         point = 0;
         point_tv.setVisibility(View.INVISIBLE);
-
         total_tv.setText("0.0元");
         total = 0;
-
         getGoodsList().clear();
         orderAdapter.notifyDataSetChanged();
-        seekT9Adapter.notifyDataSetChanged();
+        if (seekT9Adapter != null){
+            if (seekT9Adapter.getGoodsList().size() != 0){
+                seekT9Adapter.getGoodsList().clear();
+            }
+            seekT9Adapter.notifyDataSetChanged();
 
+        }
         EventBus.getDefault().postSticky("1");
     }
 

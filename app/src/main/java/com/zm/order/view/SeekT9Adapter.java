@@ -64,6 +64,10 @@ public class SeekT9Adapter extends BaseAdapter {
         this.mGoodsList = mData;
     }
 
+    public List<GoodsC> getGoodsList(){
+        return mGoodsList;
+    }
+
     public void setListener(SeekT9OnClickListener listener) {
         this.listener = listener;
     }
@@ -239,10 +243,7 @@ public class SeekT9Adapter extends BaseAdapter {
                     }
 
                 }
-
-
             }
-
         }
         activity.getOrderAdapter().notifyDataSetChanged();
     }
