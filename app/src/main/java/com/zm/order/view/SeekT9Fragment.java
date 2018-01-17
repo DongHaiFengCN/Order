@@ -38,6 +38,7 @@ import com.zm.order.view.adapter.MyGridAdapter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TimerTask;
+import java.util.UUID;
 
 import application.MyApplication;
 import bean.kitchenmanage.dishes.DishesC;
@@ -510,6 +511,7 @@ public class SeekT9Fragment extends Fragment {
                                 obj.setPrice(singlePrice);
                                 float counts = Float.parseFloat(f_count.getText().toString());
                                 obj.setDishesCount(counts);
+                                obj.setDishesId("Dishes."+ UUID.randomUUID());
                                 String zdcDishedKindId = findZDCKindId();
                                 obj.setDishesKindId(zdcDishedKindId);
                                 obj.setGoodsType(3);
