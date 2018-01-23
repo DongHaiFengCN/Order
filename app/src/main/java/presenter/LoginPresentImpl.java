@@ -38,7 +38,7 @@ public class LoginPresentImpl implements ILoginPresenter {
 
         ILoginModel iLoginModel  =new LoginModelImpl();          //得到登陆的操作model
 
-        if(iLoginModel.Networkconnectionfailed(context)){        //判断网络是否可用
+        if(true){        //判断网络是否可用
 
             if(!iLoginModel.isEmpty(info)){                      //判断登陆密码账号是否有空
 

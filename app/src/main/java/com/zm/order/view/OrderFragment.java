@@ -208,11 +208,11 @@ public class OrderFragment extends Fragment {
 
                     //找到对应的位置
                     if (dishesCList.get(i).getString("dishesName").equals(goodsC.getDishesName())) {
-                        Log.e("DOAING", "修改前的数据：" + floats[i]);
+                     //   Log.e("DOAING", "修改前的数据：" + floats[i]);
 
-                        Log.e("DOAING", "添加的数据：" + goodsC.getDishesCount());
+                     //   Log.e("DOAING", "添加的数据：" + goodsC.getDishesCount());
                         floats[i] = goodsC.getDishesCount() + floats[i];
-                        Log.e("DOAING", "修改完成的数据：" + floats[i]);
+                      //  Log.e("DOAING", "修改完成的数据：" + floats[i]);
                         dishesCollection.put(goodsC.getDishesKindId(), floats);
 
 

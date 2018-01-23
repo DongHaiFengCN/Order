@@ -4,26 +4,22 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -35,17 +31,10 @@ import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
+import com.couchbase.lite.Ordering;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-import com.tencent.bugly.crashreport.BuglyLog;
-import com.tencent.bugly.crashreport.CrashReport;
-import com.zm.order.BuildConfig;
 import com.zm.order.R;
-
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -63,10 +52,7 @@ import bean.kitchenmanage.table.TableC;
 import model.AreaAdapter;
 import model.CDBHelper;
 import model.LiveTableRecyclerAdapter;
-import untils.MyLog;
 import untils.Tool;
-
-import static untils.Tool.isFastDoubleClick;
 
 public class DeskActivity extends AppCompatActivity {
 
@@ -77,6 +63,9 @@ public class DeskActivity extends AppCompatActivity {
     private RecyclerView listViewDesk;
     private LiveTableRecyclerAdapter tableadapter;
     private int flag = 0;
+    private List<Document> freeTableList = new ArrayList<>();
+    private String[] tablesNos,tablesName;
+    public int pos = 0,mPos = 0;
 
 
     private MyApplication myapp;
@@ -110,6 +99,7 @@ public class DeskActivity extends AppCompatActivity {
 
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         if(actionBar != null){
+            actionBar.setTitle("桌位");
             actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
@@ -118,7 +108,6 @@ public class DeskActivity extends AppCompatActivity {
 
         initWidget();
 
-        Log.e("DeskActivity","oncreate");
 
 
 }
@@ -168,7 +157,7 @@ public class DeskActivity extends AppCompatActivity {
             {
 
                 String tableId= (String)data;
-                final TableC  tableC =  CDBHelper.getObjById(getApplicationContext(),tableId,TableC.class);
+                final TableC tableC =  CDBHelper.getObjById(getApplicationContext(),tableId,TableC.class);
                 myapp.setTable_sel_obj(tableC);
                 if(tableC.getState()!=2)
                 {
@@ -260,7 +249,6 @@ public class DeskActivity extends AppCompatActivity {
                                     ,null
                             );
 
-                    Log.e("orderCList","orderCList.size()"+orderCList.size()+"-----"+tableC.getTableNum());
                     if (orderCList.size() > 0 )
                     {
                         //使用状态下跳到查看订单界面
@@ -279,134 +267,150 @@ public class DeskActivity extends AppCompatActivity {
             @Override
             public void onItemLongClick(View view, final Object data)
             {
-                String tableId = (String)data;
+                final String tableId = (String)data;
                 final TableC tableC = CDBHelper.getObjById(getApplicationContext(),tableId,TableC.class);
                 myapp.setTable_sel_obj(tableC);
 
+
+                final AlertDialog.Builder alertLog = new AlertDialog.Builder(DeskActivity.this);
+
+
                 //空闲状态下重置上一次未买单状态
                 if(tableC.getState()==0){
-
-                    AlertDialog.Builder builder = new AlertDialog.Builder(DeskActivity.this);
-                    builder.setTitle("重置最近一次账单");
-
-                    builder.setNegativeButton("确定",null);
-                    builder.setPositiveButton("取消", new DialogInterface.OnClickListener() {
+                    alertLog.setTitle("是否重置？");
+                    String[] an = new  String[1];
+                    an[0] = "重置最近一次账单";
+                    alertLog.setSingleChoiceItems(an, 0, new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
+                        public void onClick(DialogInterface dialog, int which) {
 
                         }
-                    });
-                   final AlertDialog alertDialog = builder.show();
+                    }).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
 
-                   alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(new View.OnClickListener() {
-                       @Override
-                       public void onClick(View view) {
+                            final AlertDialog alertDialog = alertLog.create();
+                            final ProgressDialog proDialog = ProgressDialog.show(DeskActivity.this, "重置", "正在配置订单请稍等~");
 
-                           final ProgressDialog proDialog = android.app.ProgressDialog.show(DeskActivity.this, "重置", "正在配置订单请稍等~");
+                            myapp.mExecutor.execute(new Runnable() {
+                                @Override
+                                public void run() {
 
-                           myapp.mExecutor.execute(new Runnable() {
-                               @Override
-                               public void run() {
+                                    try {
+                                        CDBHelper.db.inBatch(new TimerTask() {
+                                            @Override
+                                            public void run() {
+                                                CheckOrderC checkOrderC = null;
+                                                //老数据没有字段遍历查询
+                                                if(tableC.getLastCheckOrderId() == null || tableC.getLastCheckOrderId().isEmpty()){
 
-                                   try {
-                                       CDBHelper.db.inBatch(new TimerTask() {
-                                                                @Override
-                                                                public void run() {
-                                                                    CheckOrderC checkOrderC = null;
-                                                                    //老数据没有字段遍历查询
-                                                                    if(tableC.getLastCheckOrderId() == null || tableC.getLastCheckOrderId().isEmpty()){
-
-                                                                        Date date = new Date();
-                                                                        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                                                    Date date = new Date();
+                                                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
 
-                                                                        //查询当日的订单
-                                                                        List<CheckOrderC> checkOrderCS = CDBHelper.getObjByWhere(getApplicationContext()
-                                                                                , Expression.property("className").equalTo("CheckOrderC")
-                                                                                        .and(Expression.property("checkTime").like(formatter.format(date)+"%"))
-                                                                                , null, CheckOrderC.class);
+                                                    //查询当日的订单
+                                                    List<CheckOrderC> checkOrderCS = CDBHelper.getObjByWhere(getApplicationContext()
+                                                            , Expression.property("className").equalTo("CheckOrderC")
+                                                                    .and(Expression.property("checkTime").like(formatter.format(date)+"%"))
+                                                            , null, CheckOrderC.class);
 
-                                                                        Iterator<CheckOrderC> iterator = checkOrderCS.iterator();
+                                                    Iterator<CheckOrderC> iterator = checkOrderCS.iterator();
 
-                                                                        //移除不是当前桌的订单
-                                                                        while (iterator.hasNext()){
-                                                                            CheckOrderC c = iterator.next();
-                                                                            if(!c.getTableNo().equals(tableC.getTableNum())){
-                                                                                iterator.remove();
-                                                                            }
-                                                                        }
-                                                                        if(checkOrderCS.size() > 0){
-                                                                            List<String> dateList = new ArrayList<>();
-                                                                            //获取当前桌订单今日时间集合
-                                                                            for (int i1 = 0; i1 < checkOrderCS.size(); i1++) {
-                                                                                dateList.add(checkOrderCS.get(i1).getCheckTime());
-                                                                            }
+                                                    //移除不是当前桌的订单
+                                                    while (iterator.hasNext()){
+                                                        CheckOrderC c = iterator.next();
+                                                        if(!c.getTableNo().equals(tableC.getTableNum())){
+                                                            iterator.remove();
+                                                        }
+                                                    }
+                                                    if(checkOrderCS.size() > 0){
+                                                        List<String> dateList = new ArrayList<>();
+                                                        //获取当前桌订单今日时间集合
+                                                        for (int i1 = 0; i1 < checkOrderCS.size(); i1++) {
+                                                            dateList.add(checkOrderCS.get(i1).getCheckTime());
+                                                        }
 
-                                                                            //得到最近订单的坐标
-                                                                            int f =  Tool.getLastCheckOrder(dateList);
-                                                                            checkOrderC = checkOrderCS.get(f);
-                                                                            for (int i = 0; i < checkOrderC.getOrderList().size(); i++) {
+                                                        //得到最近订单的坐标
+                                                        int f =  Tool.getLastCheckOrder(dateList);
+                                                        checkOrderC = checkOrderCS.get(f);
+                                                        for (int i = 0; i < checkOrderC.getOrderList().size(); i++) {
 
-                                                                                OrderC orderC = checkOrderC.getOrderList().get(i);
-                                                                                orderC.setOrderState(1);
-                                                                                CDBHelper.createAndUpdate(getApplicationContext(), orderC);
-                                                                            }
+                                                            OrderC orderC = checkOrderC.getOrderList().get(i);
+                                                            orderC.setOrderState(1);
+                                                            CDBHelper.createAndUpdate(getApplicationContext(), orderC);
+                                                        }
 
-                                                                            //删除之前的checkorder记录
-                                                                            CDBHelper.deleDocumentById(getApplicationContext(),checkOrderC.get_id());
+                                                        //删除之前的checkorder记录
+                                                        CDBHelper.deleDocumentById(getApplicationContext(),checkOrderC.get_id());
 
-                                                                            tableC.setState(2);
-                                                                            CDBHelper.createAndUpdate(getApplicationContext(), tableC);
+                                                        tableC.setState(2);
+                                                        CDBHelper.createAndUpdate(getApplicationContext(), tableC);
 
-                                                                        }else {
+                                                    }else {
 
-                                                                            Message msg = Message.obtain();
-                                                                            msg.what = 2;
-                                                                            uiHandler.sendMessage(msg);
-                                                                        }
+                                                        Message msg = Message.obtain();
+                                                        msg.what = 2;
+                                                        uiHandler.sendMessage(msg);
+                                                    }
 
-                                                                    }else {
+                                                }else {
 
-                                                                        //新数据查询
+                                                    //新数据查询
 
 
-                                                                        checkOrderC = CDBHelper.getObjById(getApplicationContext(),tableC.getLastCheckOrderId(),CheckOrderC.class);
-                                                                        if (checkOrderC == null&&checkOrderC.getOrderList().size()==0){
-                                                                            return;
-                                                                        }
+                                                    checkOrderC = CDBHelper.getObjById(getApplicationContext(),tableC.getLastCheckOrderId(),CheckOrderC.class);
+                                                    if (checkOrderC == null&&checkOrderC.getOrderList().size()==0){
+                                                        return;
+                                                    }
 
-                                                                        for (int i = 0; i < checkOrderC.getOrderList().size(); i++) {
+                                                    for (int i = 0; i < checkOrderC.getOrderList().size(); i++) {
 
-                                                                            OrderC orderC = checkOrderC.getOrderList().get(i);
-                                                                            orderC.setOrderState(1);
-                                                                            CDBHelper.createAndUpdate(getApplicationContext(), orderC);
-                                                                        }
+                                                        OrderC orderC = checkOrderC.getOrderList().get(i);
+                                                        orderC.setOrderState(1);
+                                                        CDBHelper.createAndUpdate(getApplicationContext(), orderC);
+                                                    }
 
-                                                                        //删除之前的checkorder记录
-                                                                        CDBHelper.deleDocumentById(getApplicationContext(),checkOrderC.get_id());
+                                                    //删除之前的checkorder记录
+                                                    CDBHelper.deleDocumentById(getApplicationContext(),checkOrderC.get_id());
 
-                                                                        tableC.setState(2);
-                                                                        CDBHelper.createAndUpdate(getApplicationContext(), tableC);
+                                                    tableC.setState(2);
+                                                    CDBHelper.createAndUpdate(getApplicationContext(), tableC);
 
-                                                                    }
+                                                }
 
-                                                                }
-                                                            });
-                                   } catch (CouchbaseLiteException e) {
-                                       e.printStackTrace();
-                                   }
-                                   proDialog.dismiss();//关闭proDialog
+                                            }
+                                        });
+                                    } catch (CouchbaseLiteException e) {
+                                        e.printStackTrace();
+                                    }
+                                    proDialog.dismiss();//关闭proDialog
 
-                               }
-                           });
+                                }
+                            });
 
-                           //获取今天日期
+                            //获取今天日期
 
-                           alertDialog.dismiss();
+                            alertDialog.dismiss();
 
-                       }
-                   });
+
+
+
+                        }
+                    }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    }).show();
+
+
                 }else {
+
                     //使用&&预定状态
                     List<String> orderCList = CDBHelper.getIdsByWhere(getApplicationContext(),
                             Expression.property("className").equalTo("OrderC")
@@ -417,49 +421,102 @@ public class DeskActivity extends AppCompatActivity {
 
                     if(orderCList.size()>0)//有未买单订单，可以买单
                     {
-                        android.app.AlertDialog.Builder dialog1 = new android.app.AlertDialog.Builder(DeskActivity.this);
-                        dialog1.setTitle("是否买单？").setCancelable(false);
-                        dialog1.setNegativeButton("是",
-                                new DialogInterface.OnClickListener()
-                                {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which)
-                                    {
-                                        Intent mainIntent = new Intent();
-                                        mainIntent.setClass(DeskActivity.this, PayActivity.class);
-                                        startActivity(mainIntent);
-                                    }
-                                }).setPositiveButton("否",
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface arg0, int arg1)
-                                    {
-                                        // TODO Auto-generated method stub
-                                    }
-                                }).show();
+                        final String[] an = new  String[2];
+                        an[0] = "是否买单";
+                        an[1] = "是否换桌";
+                        alertLog.setTitle("请选择买单或换桌");
+                        alertLog.setSingleChoiceItems(an, 0, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mPos = which;
+                            }
+                        }).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (an[mPos].equals("是否买单")){
+                                    Intent mainIntent = new Intent();
+                                    mainIntent.setClass(DeskActivity.this, PayActivity.class);
+                                    startActivity(mainIntent);
+                                    dialog.dismiss();
+                                }else{
+                                    tablesName = findFreeTable();
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(DeskActivity.this);
+                                    builder.setTitle("请点击您要换的桌位号")
+                                            .setSingleChoiceItems(tablesName, 0, new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    pos = which;
+                                                    Document selectTable = freeTableList.get(pos);
+                                                    String tableName = selectTable.getString("tableName");
+                                                    Document document = CDBHelper.getDocByID(getApplication(),selectTable.getString("areaId"));
+                                                    String areaName = document.getString("areaName");
+                                                    Toast.makeText(DeskActivity.this,areaName+":   "+tableName,Toast.LENGTH_SHORT).show();
+                                                }
+                                            }).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            String tableNum = tablesNos[pos];
+                                            //1\改变所选桌位对象状态为使用
+                                            Document selectTable = freeTableList.get(pos);
+                                            selectTable.setInt("state",2);
+                                            CDBHelper.saveDocument(getApplicationContext(),selectTable);
+                                            //2\改变原桌位对象状态为空闲
+                                            changeOldTable(tableId);
+                                            //3\改变原桌位下订单为该桌位下
+                                            List<Document> documentList = CDBHelper.getDocmentsByWhere(getApplicationContext(),
+                                                    Expression.property("className").equalTo("OrderC").and(Expression.property("orderState").equalTo(1)
+                                                            .and(Expression.property("tableNo").equalTo(tableC.getTableNum()))),
+                                                    null);
+                                            for (Document doc : documentList){
+                                                doc.setString("tableNo",tableNum);
+                                                CDBHelper.saveDocument(getApplicationContext(),doc);
+                                            }
+                                            dialog.dismiss();
+                                            pos = 0;
+                                        }
+                                    }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    }).show();
+
+                                    dialog.dismiss();
+                                }
+                                mPos = 0;
+
+                            }
+                        }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        }).show();
                     }
                     else
                     {
-                        android.app.AlertDialog.Builder dialog1 = new android.app.AlertDialog.Builder(DeskActivity.this);
-                        dialog1.setTitle("是否消台？").setCancelable(false);
-                        dialog1.setNegativeButton("是",
-                                new DialogInterface.OnClickListener()
-                                {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which)
-                                    {
-                                        tableC.setState(0);
-                                        CDBHelper.createAndUpdate(getApplicationContext(),tableC);
-                                        myapp.setTable_sel_obj(tableC);
-                                    }
-                                }).setPositiveButton("否",
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface arg0, int arg1)
-                                    {
-                                        // TODO Auto-generated method stub
-                                    }
-                                }).show();
+                        String[] an = new  String[1];
+                        an[0] = "是否消台";
+                        alertLog.setTitle("是否消台？");
+                        alertLog.setSingleChoiceItems(an, 0, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mPos = which;
+                            }
+                        }).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                tableC.setState(0);
+                                CDBHelper.createAndUpdate(getApplicationContext(),tableC);
+                                myapp.setTable_sel_obj(tableC);
+                                dialog.dismiss();
+                            }
+                        }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        }).show();
                     }
                 }
             }
@@ -469,6 +526,44 @@ public class DeskActivity extends AppCompatActivity {
         listViewDesk.setItemAnimator(new DefaultItemAnimator());
         listViewDesk.setLayoutManager(new GridLayoutManager(this,3));
         listViewDesk.setAdapter(tableadapter);
+
+    }
+
+    private void changeOldTable(String tableId){
+        Document doc = CDBHelper.getDocByID(getApplicationContext(),tableId);
+        doc.setInt("state",0);
+        CDBHelper.saveDocument(getApplicationContext(),doc);
+
+    }
+
+    private   String [] findFreeTable()
+    {
+        String[] freetables=null;
+        freeTableList.clear();
+        List<Document> tableDocList= CDBHelper.getDocmentsByWhere(getApplicationContext()
+                , Expression.property("className").equalTo("TableC")
+                        .and(Expression.property("state").equalTo(0))
+                , Ordering.property("tableNum").ascending()
+                );
+
+
+        if(tableDocList.size()>0)
+        {
+            tablesNos=new String[tableDocList.size()];
+            freetables = new String[tableDocList.size()];
+            int i=0;
+            for(Document doc:tableDocList)
+            {
+
+                freeTableList.add(doc);
+                freetables[i] = doc.getString("tableName");
+                tablesNos[i]=doc.getString("tableNum");
+                i++;
+
+            }
+        }
+
+        return freetables;
 
     }
 

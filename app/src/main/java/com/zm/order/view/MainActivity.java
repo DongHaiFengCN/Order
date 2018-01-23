@@ -143,8 +143,8 @@ public class MainActivity extends AppCompatActivity {
     private GpService mGpService = null;
     private Map<String, ArrayList<GoodsC>> allKitchenClientGoods = new HashMap<String, ArrayList<GoodsC>>();
     private Map<String, String> allKitchenClientPrintNames = new HashMap<String, String>();
-    //  private static String pIp = "192.168.1.249";
-    private static String pIp = "192.168.2.100";
+     private static String pIp = "192.168.2.249";
+    //private static String pIp = "192.168.2.100";
     private static int pPortNum = 9100;
     private String tableName, areaName, currentPersions, serNum;
     private static final int MAIN_QUERY_PRINTER_STATUS = 0xfe;
@@ -380,7 +380,7 @@ public class MainActivity extends AppCompatActivity {
         boolean isName = false;
         for (int i = 0; i<goodsList.size();i++)//+for
         {
-            if (goodsList.get(i).getDishesId().toString().equals(goodsObj.getDishesId()))//名称相等
+            if (goodsList.get(i).getDishesName().equals(goodsObj.getDishesName()))//名称相等
             {
                 if(goodsList.get(i).getDishesTaste()!=null)//口味不为空
                 {

@@ -1236,8 +1236,6 @@ public class PayActivity extends AppCompatActivity {
                                         break;
                                     }
 
-
-
                                 }
 
                             }
